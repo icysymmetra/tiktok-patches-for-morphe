@@ -18,6 +18,7 @@ public class BaseSettings {
     public static final BooleanSetting DEBUG_STACKTRACE = new BooleanSetting("morphe_debug_stacktrace", FALSE, parent(DEBUG));
     public static final BooleanSetting DEBUG_TOAST_ON_ERROR = new BooleanSetting("morphe_debug_toast_on_error", TRUE, "morphe_debug_toast_on_error_user_dialog_message");
     public static final BooleanSetting SANITIZE_SHARING_LINKS = new BooleanSetting("morphe_sanitize_sharing_links", TRUE);
+    public static final BooleanSetting HIDE_SUGGESTED_ACCOUNTS = new BooleanSetting("morphe_hide_suggested_accounts", TRUE, true);
 
     public static final IntegerSetting CHECK_ENVIRONMENT_WARNINGS_ISSUED = new IntegerSetting("morphe_check_environment_warnings_issued", 0, true, false);
 

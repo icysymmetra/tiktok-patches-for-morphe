@@ -35,6 +35,12 @@ public class ExtensionPreferenceCategory extends ConditionalPreferenceCategory {
                 BaseSettings.SANITIZE_SHARING_LINKS
         ));
 
+        addPreference(new TogglePreference(
+                context,
+                "Hide suggested accounts",
+                "Remove suggested accounts from profile and inbox.",
+                BaseSettings.HIDE_SUGGESTED_ACCOUNTS
+        ));
     }
 }
 

@@ -52,6 +52,7 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 - `Copy comments without username`: Copies only the comment text when using TikTok's copy comment action.
 - `Auto Translate comments`: Automatically translates loaded and expanded comment batches using TikTok's translation system, while skipping comments that already match the device language when TikTok exposes that language clearly.
 - `Show seekbar`: Shows the video seekbar where TikTok would normally hide it.
+- `Hide suggested accounts`: Removes suggested accounts from profile and inbox.
 
 <br>
 
