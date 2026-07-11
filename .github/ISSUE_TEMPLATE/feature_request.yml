@@ -1,17 +1,17 @@
 name: ⭐ Feature request
 description: Create a detailed request for a new feature.
 title: "feat: "
-labels: ["Feature request"]
+labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        # Template Patches template feature request
+        # TikTok patches for Morphe feature request
 
         Before creating a new feature request, please keep the following in mind:
 
-        - **Do not submit a duplicate feature request**: Search for existing feature requests [here](https://github.com/TEMPlATE/TEMPLATE-patches-template/issues?q=label%3A%22Feature+request%22).
-        - **Review the contribution guidelines**: Make sure your feature request adheres to it. You can find the guidelines [here](https://github.com/TEMPLATE/TEMPLATE-patches-template/blob/main/CONTRIBUTING.md).
+        - **Do not submit a duplicate feature request**: Search for existing feature requests [here](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues?q=is%3Aissue%20label%3Aenhancement).
+        - **Review the contribution guidelines**: Make sure your feature request adheres to them. You can find the guidelines [here](https://github.com/icysymmetra/tiktok-patches-for-morphe/blob/main/CONTRIBUTING.md).
   - type: textarea
     attributes:
       label: Feature description

@@ -114,6 +114,10 @@ Morphe reads `patches-bundle.json` from this repository, downloads the `.mpp` re
 - `patches-list.json`: Generated patch metadata.
 - `patches-bundle.json`: Morphe source metadata for the published release bundle.
 
+## Credits
+
+- Thanks to [@lyyako](https://github.com/lyyako) for the original contributions behind the simplified sanitize sharing links hook, show seekbar patch, and anti-recording patch.
+
 ## Notes
 
 - The source is based on [RookieEnough/De-Vanced](https://github.com/RookieEnough/De-Vanced) and the [Morphe patches template](https://github.com/MorpheApp/morphe-patches-template).

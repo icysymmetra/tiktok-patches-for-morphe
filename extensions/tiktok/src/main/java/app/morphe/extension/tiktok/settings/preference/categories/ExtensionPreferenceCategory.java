@@ -9,6 +9,7 @@ import android.content.Context;
 import android.preference.PreferenceScreen;
 
 import app.morphe.extension.shared.settings.BaseSettings;
+import app.morphe.extension.tiktok.settings.Settings;
 import app.morphe.extension.tiktok.settings.preference.MorpheTikTokAboutPreference;
 import app.morphe.extension.tiktok.settings.preference.TogglePreference;
 
@@ -33,6 +34,13 @@ public class ExtensionPreferenceCategory extends ConditionalPreferenceCategory {
                 "Sanitize sharing links",
                 "Remove tracking parameters from shared links.",
                 BaseSettings.SANITIZE_SHARING_LINKS
+        ));
+
+        addPreference(new TogglePreference(
+                context,
+                "Show seekbar",
+                "Show the native seekbar on videos where TikTok would normally hide it.",
+                Settings.SHOW_SEEKBAR
         ));
 
         addPreference(new TogglePreference(
