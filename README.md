@@ -40,6 +40,7 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Custom offline videos limit` | Adds a custom entry to TikTok's offline videos menu with a configurable limit of up to 500 videos. |
 | `Disable login requirement` | Removes TikTok's mandatory login gate from supported flows. |
 | `Disable long-press quick share` | Keeps long-pressing Share from opening TikTok's quick-share interaction. |
+| `Disable long-press repost` | Keeps long-pressing Like from triggering TikTok's repost action and restores the 2x speed hold behaviour. |
 | `Disable screen capture detection` | Prevents TikTok from detecting screenshots and screen recordings. |
 | `Diagnostic tools` | Adds optional structured Morphe logs, Java crash capture, and clipboard or file report export. |
 | `Downloads` | Adds watermark-free downloads, filename templates, and comment sticker saving with animated-media preservation. |

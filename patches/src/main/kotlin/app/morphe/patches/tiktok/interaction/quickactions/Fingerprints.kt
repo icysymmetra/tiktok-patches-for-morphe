@@ -23,3 +23,12 @@ internal object LongPressQuickShareGateFingerprint : Fingerprint(
             method.name == "LIZ"
     },
 )
+
+internal object LongPressRepostGateFingerprint : Fingerprint(
+    returnType = "I",
+    parameters = emptyList(),
+    custom = { method, classDef ->
+        classDef.type == "LX/0oDq;" &&
+            method.name == "LIZ"
+    },
+)

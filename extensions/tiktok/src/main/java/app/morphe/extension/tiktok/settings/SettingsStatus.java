@@ -17,6 +17,7 @@ public class SettingsStatus {
     public static boolean promotionalBannersEnabled = false;
     public static boolean longPressSpeedLockEnabled = false;
     public static boolean disableLongPressQuickShareEnabled = false;
+    public static boolean disableLongPressRepostEnabled = false;
     public static boolean nonPersonalizedSearchEnabled = false;
     public static boolean liveSearchEnabled = false;
     public static boolean seekbarThumbnailEnabled = false;
@@ -68,6 +69,10 @@ public class SettingsStatus {
 
     public static void enableDisableLongPressQuickShare() {
         disableLongPressQuickShareEnabled = true;
+    }
+
+    public static void enableDisableLongPressRepost() {
+        disableLongPressRepostEnabled = true;
     }
 
     public static void enableNonPersonalizedSearch() {

@@ -110,6 +110,8 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting ENABLE_LONG_PRESS_SPEED_LOCK = new BooleanSetting("enable_long_press_speed_lock", FALSE, true);
     public static final BooleanSetting DISABLE_LONG_PRESS_QUICK_SHARE =
             new BooleanSetting("disable_long_press_quick_share", FALSE);
+    public static final BooleanSetting DISABLE_LONG_PRESS_REPOST =
+            new BooleanSetting("disable_long_press_repost", FALSE);
     public static final BooleanSetting ENABLE_NON_PERSONALIZED_SEARCH =
             new BooleanSetting("enable_non_personalized_search", FALSE, true);
     public static final BooleanSetting ENABLE_LIVE_SEARCH =

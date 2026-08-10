@@ -450,6 +450,10 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
                 && Settings.DISABLE_LONG_PRESS_QUICK_SHARE.get()) {
             count++;
         }
+        if (SettingsStatus.disableLongPressRepostEnabled
+                && Settings.DISABLE_LONG_PRESS_REPOST.get()) {
+            count++;
+        }
         return count;
     }
 
