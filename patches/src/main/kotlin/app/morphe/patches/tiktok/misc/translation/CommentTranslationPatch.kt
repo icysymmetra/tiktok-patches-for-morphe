@@ -15,6 +15,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/translation/CommentBatchTranslator;"
+private const val FILTER_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/translation/TranslationFilter;"
 
 @Suppress("unused")
 val commentTranslationPatch = bytecodePatch(
@@ -105,6 +106,42 @@ val commentTranslationPatch = bytecodePatch(
             0,
             """
                 invoke-static {p0}, $EXTENSION_CLASS_DESCRIPTOR->onNativeBatchComplete(Ljava/lang/Object;)V
+            """,
+        )
+
+        TranslationServiceCommentLanguageAllowedFingerprint.methodOrNull?.addInstructions(
+            0,
+            """
+                invoke-static {p1}, $FILTER_CLASS_DESCRIPTOR->shouldSkipCommentTranslation(Ljava/lang/Object;)Z
+                move-result v0
+                if-eqz v0, :skip_comment_lang
+                const/4 v0, 0x0
+                return v0
+                :skip_comment_lang
+            """,
+        )
+
+        TranslationServiceCommentTranslatableFingerprint.methodOrNull?.addInstructions(
+            0,
+            """
+                invoke-static {p1}, $FILTER_CLASS_DESCRIPTOR->shouldSkipCommentTranslation(Ljava/lang/Object;)Z
+                move-result v0
+                if-eqz v0, :skip_comment_trans
+                const/4 v0, 0x0
+                return v0
+                :skip_comment_trans
+            """,
+        )
+
+        TranslationServiceAwemeTranslationRequestFingerprint.methodOrNull?.addInstructions(
+            0,
+            """
+                invoke-static {p2, p3, p4}, $FILTER_CLASS_DESCRIPTOR->shouldSkipAwemeTranslation(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z
+                move-result v0
+                if-eqz v0, :skip_aweme_trans
+                const/4 v0, 0x0
+                return-object v0
+                :skip_aweme_trans
             """,
         )
     }

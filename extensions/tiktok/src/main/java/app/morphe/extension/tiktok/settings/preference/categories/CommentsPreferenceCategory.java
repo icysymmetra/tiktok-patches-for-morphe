@@ -5,6 +5,7 @@ import android.preference.PreferenceScreen;
 
 import app.morphe.extension.tiktok.settings.Settings;
 import app.morphe.extension.tiktok.settings.SettingsStatus;
+import app.morphe.extension.tiktok.settings.preference.LanguageSelectionPreference;
 import app.morphe.extension.tiktok.settings.preference.TogglePreference;
 
 @SuppressWarnings("deprecation")
@@ -29,6 +30,10 @@ public class CommentsPreferenceCategory extends ConditionalPreferenceCategory {
                     "Auto translate comments",
                     "Automatically translates loaded comment batches using TikTok's translation system.",
                     Settings.COMMENT_BATCH_TRANSLATION
+            ));
+            addPreference(new LanguageSelectionPreference(
+                    context,
+                    Settings.COMMENT_TRANSLATION_EXCLUDED_LANGUAGES
             ));
         }
         if (SettingsStatus.hideCommentQuickReactionsEnabled) {

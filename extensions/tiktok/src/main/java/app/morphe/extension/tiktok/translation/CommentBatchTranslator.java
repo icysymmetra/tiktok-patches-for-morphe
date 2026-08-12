@@ -355,6 +355,8 @@ public final class CommentBatchTranslator {
         String commentLanguage = primaryLanguageTag(invokeStringQuiet(comment, "getCommentLanguage"));
         if (isBlank(commentLanguage)) return false;
 
+        if (TranslationFilter.isLanguageExcluded(commentLanguage)) return true;
+
         String targetLanguage = primaryLanguageTag(getNativeTranslationTargetLanguage());
         if (!isBlank(targetLanguage) && commentLanguage.equals(targetLanguage)) return true;
 
@@ -367,6 +369,8 @@ public final class CommentBatchTranslator {
     private static String currentLanguagePolicyKey() {
         StringBuilder key = new StringBuilder("native-target:")
                 .append(value(primaryLanguageTag(getNativeTranslationTargetLanguage())))
+                .append(":custom-excluded:")
+                .append(value(Settings.COMMENT_TRANSLATION_EXCLUDED_LANGUAGES.get()))
                 .append(":dnt");
         for (String language : getNativeDoNotTranslateLanguages()) {
             key.append(':').append(value(primaryLanguageTag(language)));
