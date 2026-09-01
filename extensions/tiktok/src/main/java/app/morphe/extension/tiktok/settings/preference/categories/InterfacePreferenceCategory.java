@@ -22,6 +22,10 @@ public final class InterfacePreferenceCategory extends ConditionalPreferenceCate
     public boolean getSettingsStatus() {
         return SettingsStatus.captchaPopupSuppressionEnabled
                 || SettingsStatus.promotionalBannersEnabled
+                || SettingsStatus.hideFeedFollowButtonEnabled
+                || SettingsStatus.hideFeedSaveButtonEnabled
+                || SettingsStatus.hideFeedLiveButtonEnabled
+                || SettingsStatus.hideFeedSearchButtonEnabled
                 || SettingsStatus.alwaysShowPublishDateEnabled;
     }
 
@@ -41,6 +45,38 @@ public final class InterfacePreferenceCategory extends ConditionalPreferenceCate
                     "Hide CAPTCHA popups",
                     "Hide browsing and LIVE puzzle dialogs. Login and account verification remain available.",
                     Settings.HIDE_CAPTCHA_POPUPS
+            ));
+        }
+        if (SettingsStatus.hideFeedFollowButtonEnabled) {
+            addPreference(new TogglePreference(
+                    context,
+                    "Hide feed follow button",
+                    "Hide the + follow button below creator avatars in video feeds. Requires restart.",
+                    Settings.HIDE_FEED_FOLLOW_BUTTON
+            ));
+        }
+        if (SettingsStatus.hideFeedSaveButtonEnabled) {
+            addPreference(new TogglePreference(
+                    context,
+                    "Hide feed save button",
+                    "Hide the save/favourites button from the video feed interaction rail. Requires restart.",
+                    Settings.HIDE_FEED_SAVE_BUTTON
+            ));
+        }
+        if (SettingsStatus.hideFeedLiveButtonEnabled) {
+            addPreference(new TogglePreference(
+                    context,
+                    "Hide feed LIVE button",
+                    "Hide the LIVE button at the top left of video feeds. Requires restart.",
+                    Settings.HIDE_FEED_LIVE_BUTTON
+            ));
+        }
+        if (SettingsStatus.hideFeedSearchButtonEnabled) {
+            addPreference(new TogglePreference(
+                    context,
+                    "Hide feed search button",
+                    "Hide the search button at the top right of video feeds. Requires restart.",
+                    Settings.HIDE_FEED_SEARCH_BUTTON
             ));
         }
         if (SettingsStatus.alwaysShowPublishDateEnabled) {

@@ -123,6 +123,22 @@ public final class FeatureControls {
         return Settings.HIDE_COMMENT_QUICK_REACTIONS.get() || original;
     }
 
+    public static int hideFeedFollowButtonVisibility(int originalVisibility) {
+        return Settings.HIDE_FEED_FOLLOW_BUTTON.get() ? 8 : originalVisibility;
+    }
+
+    public static int hideFeedSaveButtonVisibility(int originalVisibility) {
+        return Settings.HIDE_FEED_SAVE_BUTTON.get() ? 8 : originalVisibility;
+    }
+
+    public static boolean hideFeedLiveButtonEnabled(boolean originalEnabled) {
+        return !Settings.HIDE_FEED_LIVE_BUTTON.get() && originalEnabled;
+    }
+
+    public static boolean hideFeedSearchButtonEnabled(boolean originalEnabled) {
+        return !Settings.HIDE_FEED_SEARCH_BUTTON.get() && originalEnabled;
+    }
+
     public static int overrideLongPressQuickShare(int originalMode) {
         return Settings.DISABLE_LONG_PRESS_QUICK_SHARE.get() ? 0 : originalMode;
     }

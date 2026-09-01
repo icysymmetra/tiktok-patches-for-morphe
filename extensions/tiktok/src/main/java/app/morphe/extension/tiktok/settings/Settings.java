@@ -75,6 +75,14 @@ public class Settings extends BaseSettings {
     public static final StringSetting COMMENT_TRANSLATION_EXCLUDED_LANGUAGES = new StringSetting("comment_translation_excluded_languages", "");
     public static final BooleanSetting HIDE_COMMENT_QUICK_REACTIONS =
             new BooleanSetting("hide_comment_quick_reactions", FALSE);
+    public static final BooleanSetting HIDE_FEED_FOLLOW_BUTTON =
+            new BooleanSetting("hide_feed_follow_button", FALSE, true);
+    public static final BooleanSetting HIDE_FEED_SAVE_BUTTON =
+            new BooleanSetting("hide_feed_save_button", FALSE, true);
+    public static final BooleanSetting HIDE_FEED_LIVE_BUTTON =
+            new BooleanSetting("hide_feed_live_button", FALSE, true);
+    public static final BooleanSetting HIDE_FEED_SEARCH_BUTTON =
+            new BooleanSetting("hide_feed_search_button", FALSE, true);
     public static final StringSetting DOWNLOAD_PATH = new StringSetting("down_path", "DCIM/TikTok");
     public static final StringSetting DOWNLOAD_VIDEO_PATH = new StringSetting("download_video_path", "DCIM/TikTok");
     public static final StringSetting DOWNLOAD_PHOTO_PATH = new StringSetting("download_photo_path", "DCIM/TikTok");

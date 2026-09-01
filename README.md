@@ -52,6 +52,10 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Fix Google login` | Restores Google account sign-in after patching. |
 | `Hide CAPTCHA popups` | Hides non-account verification puzzle dialogs, including those shown while browsing LIVE. Account verification remains available, and server checks are not bypassed. |
 | `Hide floating promotions` | Removes floating promotional badges, coin icons, and timer banners from the Home feed. |
+| `Hide feed follow button` | Adds an option to hide the + follow button below creator avatars in video feeds. |
+| `Hide feed LIVE button` | Adds an option to hide the LIVE button at the top left of video feeds. |
+| `Hide feed save button` | Adds an option to hide the save/favourites button from video feeds. |
+| `Hide feed search button` | Adds an option to hide the search button at the top right of video feeds. |
 | `Hide quick comment reactions` | Hides TikTok's exposed quick emoji row in supported comment inputs. |
 | `Hold-and-slide 2x lock` | Enables TikTok's native hold, slide down, and release gesture for locking playback at 2x speed. |
 | `Open external links directly` | Opens profile and story website links in the system browser instead of TikTok's in-app browser. |
