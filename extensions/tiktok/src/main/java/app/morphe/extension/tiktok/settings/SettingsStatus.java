@@ -29,6 +29,7 @@ public class SettingsStatus {
     public static boolean resumeVideoAfterScrollEnabled = false;
     public static boolean externalBrowserEnabled = false;
     public static boolean alwaysShowPublishDateEnabled = false;
+    public static boolean foldableSplitViewEnabled = false;
     public static boolean diagnosticsEnabled = false;
     public static boolean shareSheetEnabled = false;
 
@@ -122,6 +123,10 @@ public class SettingsStatus {
 
     public static void enableAlwaysShowPublishDate() {
         alwaysShowPublishDateEnabled = true;
+    }
+
+    public static void enableFoldableSplitView() {
+        foldableSplitViewEnabled = true;
     }
 
     public static void enableDiagnostics() {

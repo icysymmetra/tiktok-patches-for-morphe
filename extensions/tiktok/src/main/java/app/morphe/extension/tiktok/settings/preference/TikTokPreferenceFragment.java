@@ -476,6 +476,9 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
                 && Settings.DISABLE_LONG_PRESS_REPOST.get()) {
             count++;
         }
+        if (SettingsStatus.foldableSplitViewEnabled && Settings.FOLDABLE_SPLIT_VIEW.get()) {
+            count++;
+        }
         return count;
     }
 
