@@ -388,8 +388,6 @@ public final class SettingsMenuPreference extends Preference {
                     canvas.drawLine(cx + bounds.width() * 0.16f, cy, right, cy, line);
                     break;
                 case SHARE: {
-                    // Traced from a 24x24 "share" glyph (svgrepo.com); coordinates below are
-                    // that glyph's own path data, mapped 1:1 from its viewBox into this tile.
                     float pad = bounds.width() * 0.20f;
                     float s = (bounds.width() - pad * 2f) / 24f;
                     float ox = bounds.left + pad;
