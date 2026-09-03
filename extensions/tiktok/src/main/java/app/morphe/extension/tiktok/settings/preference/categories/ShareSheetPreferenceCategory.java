@@ -55,7 +55,7 @@ public class ShareSheetPreferenceCategory extends ConditionalPreferenceCategory 
 
         addPreference(new TogglePreference(
                 context,
-                "Show video actions",
+                "Show \"Video Actions\"",
                 "Show the actions grid (Report, Download, Duet, Stitch, Playback Speed, ...).",
                 Settings.SHARE_SHEET_ACTIONS
         ));
