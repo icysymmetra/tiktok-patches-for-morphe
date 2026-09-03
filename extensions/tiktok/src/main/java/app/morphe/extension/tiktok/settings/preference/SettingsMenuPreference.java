@@ -35,7 +35,8 @@ public final class SettingsMenuPreference extends Preference {
         REGION,
         BEHAVIOR,
         LAB,
-        DIAGNOSTICS
+        DIAGNOSTICS,
+        SHARE
     }
 
     private static final int ACCESSORY_TAG = 0x4D4D454E;
@@ -274,6 +275,7 @@ public final class SettingsMenuPreference extends Preference {
         private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint border = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint glyphFill = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path path = new Path();
 
         MenuIconDrawable(Icon icon) {
@@ -293,6 +295,8 @@ public final class SettingsMenuPreference extends Preference {
             line.setStrokeWidth(1.8f);
             line.setStrokeCap(Paint.Cap.ROUND);
             line.setStrokeJoin(Paint.Join.ROUND);
+            glyphFill.setColor(line.getColor());
+            glyphFill.setStyle(Paint.Style.FILL);
         }
 
         @Override
@@ -383,6 +387,56 @@ public final class SettingsMenuPreference extends Preference {
                     canvas.drawLine(left, cy, cx - bounds.width() * 0.16f, cy, line);
                     canvas.drawLine(cx + bounds.width() * 0.16f, cy, right, cy, line);
                     break;
+                case SHARE: {
+                    // Traced from a 24x24 "share" glyph (svgrepo.com); coordinates below are
+                    // that glyph's own path data, mapped 1:1 from its viewBox into this tile.
+                    float pad = bounds.width() * 0.20f;
+                    float s = (bounds.width() - pad * 2f) / 24f;
+                    float ox = bounds.left + pad;
+                    float oy = bounds.top + pad;
+
+                    path.reset();
+                    path.setFillType(Path.FillType.EVEN_ODD);
+
+                    path.moveTo(ox + 1f * s, oy + 18.5088f * s);
+                    path.cubicTo(ox + 1f * s, oy + 13.1679f * s, ox + 4.90169f * s, oy + 8.77098f * s, ox + 9.99995f * s, oy + 7.84598f * s);
+                    path.lineTo(ox + 9.99995f * s, oy + 5.51119f * s);
+                    path.cubicTo(ox + 9.99995f * s, oy + 3.63887f * s, ox + 12.1534f * s, oy + 2.58563f * s, ox + 13.6313f * s, oy + 3.73514f * s);
+                    path.lineTo(ox + 21.9742f * s, oy + 10.224f * s);
+                    path.cubicTo(ox + 23.1323f * s, oy + 11.1248f * s, ox + 23.1324f * s, oy + 12.8752f * s, ox + 21.9742f * s, oy + 13.7761f * s);
+                    path.lineTo(ox + 13.6314f * s, oy + 20.2649f * s);
+                    path.cubicTo(ox + 12.1534f * s, oy + 21.4144f * s, ox + 10f * s, oy + 20.3612f * s, ox + 10f * s, oy + 18.4888f * s);
+                    path.lineTo(ox + 10f * s, oy + 16.5189f * s);
+                    path.cubicTo(ox + 7.74106f * s, oy + 16.9525f * s, ox + 5.9625f * s, oy + 18.1157f * s, ox + 4.92778f * s, oy + 19.6838f * s);
+                    path.cubicTo(ox + 4.33222f * s, oy + 20.5863f * s, ox + 3.30568f * s, oy + 20.7735f * s, ox + 2.55965f * s, oy + 20.5635f * s);
+                    path.cubicTo(ox + 1.80473f * s, oy + 20.3511f * s, ox + 1.00011f * s, oy + 19.6306f * s, ox + 1f * s, oy + 18.5088f * s);
+                    path.close();
+
+                    path.moveTo(ox + 12.4034f * s, oy + 5.31385f * s);
+                    path.cubicTo(ox + 12.2392f * s, oy + 5.18613f * s, ox + 11.9999f * s, oy + 5.30315f * s, ox + 11.9999f * s, oy + 5.51119f * s);
+                    path.lineTo(ox + 11.9999f * s, oy + 9.41672f * s);
+                    path.cubicTo(ox + 11.9999f * s, oy + 9.55479f * s, ox + 11.8873f * s, oy + 9.66637f * s, ox + 11.7493f * s, oy + 9.67008f * s);
+                    path.cubicTo(ox + 8.09094f * s, oy + 9.76836f * s, ox + 4.97774f * s, oy + 12.0115f * s, ox + 3.66558f * s, oy + 15.1656f * s);
+                    path.cubicTo(ox + 3.46812f * s, oy + 15.6402f * s, ox + 3.31145f * s, oy + 16.1354f * s, ox + 3.19984f * s, oy + 16.6471f * s);
+                    path.cubicTo(ox + 3.07554f * s, oy + 17.217f * s, ox + 3.00713f * s, oy + 17.8072f * s, ox + 3.00053f * s, oy + 18.412f * s);
+                    path.cubicTo(ox + 3.00018f * s, oy + 18.4442f * s, ox + 3f * s, oy + 18.4765f * s, ox + 3f * s, oy + 18.5088f * s);
+                    path.cubicTo(ox + 3.00001f * s, oy + 18.6437f * s, ox + 3.18418f * s, oy + 18.6948f * s, ox + 3.25846f * s, oy + 18.5822f * s);
+                    path.cubicTo(ox + 3.27467f * s, oy + 18.5577f * s, ox + 3.29101f * s, oy + 18.5332f * s, ox + 3.30747f * s, oy + 18.5088f * s);
+                    path.cubicTo(ox + 3.30748f * s, oy + 18.5088f * s, ox + 3.30746f * s, oy + 18.5088f * s, ox + 3.30747f * s, oy + 18.5088f * s);
+                    path.cubicTo(ox + 3.63446f * s, oy + 18.0244f * s, ox + 4.01059f * s, oy + 17.5765f * s, ox + 4.42994f * s, oy + 17.168f * s);
+                    path.cubicTo(ox + 4.71487f * s, oy + 16.8905f * s, ox + 5.01975f * s, oy + 16.6313f * s, ox + 5.34276f * s, oy + 16.3912f * s);
+                    path.cubicTo(ox + 7.05882f * s, oy + 15.1158f * s, ox + 9.28642f * s, oy + 14.3823f * s, ox + 11.7496f * s, oy + 14.3357f * s);
+                    path.cubicTo(ox + 11.8877f * s, oy + 14.3331f * s, ox + 12f * s, oy + 14.4453f * s, ox + 12f * s, oy + 14.5834f * s);
+                    path.lineTo(ox + 12f * s, oy + 18.4888f * s);
+                    path.cubicTo(ox + 12f * s, oy + 18.6969f * s, ox + 12.2393f * s, oy + 18.8139f * s, ox + 12.4035f * s, oy + 18.6862f * s);
+                    path.lineTo(ox + 20.7463f * s, oy + 12.1973f * s);
+                    path.cubicTo(ox + 20.875f * s, oy + 12.0973f * s, ox + 20.875f * s, oy + 11.9028f * s, ox + 20.7463f * s, oy + 11.8027f * s);
+                    path.lineTo(ox + 12.4034f * s, oy + 5.31385f * s);
+                    path.close();
+
+                    canvas.drawPath(path, glyphFill);
+                    break;
+                }
             }
         }
 
@@ -391,6 +445,7 @@ public final class SettingsMenuPreference extends Preference {
             fill.setAlpha(alpha);
             border.setAlpha(alpha);
             line.setAlpha(alpha);
+            glyphFill.setAlpha(alpha);
         }
 
         @Override
@@ -398,6 +453,7 @@ public final class SettingsMenuPreference extends Preference {
             fill.setColorFilter(colorFilter);
             border.setColorFilter(colorFilter);
             line.setColorFilter(colorFilter);
+            glyphFill.setColorFilter(colorFilter);
         }
 
         @Override
