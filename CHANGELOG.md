@@ -1,3 +1,21 @@
+# [0.8.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.2...v0.8.0-dev.3) (2026-09-05)
+
+
+### Bug Fixes
+
+* **tiktok:** close feed filter delivery gaps ([e58fb96](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/e58fb96a1724df3c2e81693b5fab87676453f314))
+
+
+### Features
+
+* **tiktok:** add feed interface controls ([0c79175](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/0c79175312c45e74af99d6d986564a79742affbe))
+
+
+
+
+
+## 0.8.0-dev.3
+
 # [0.8.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.1...v0.8.0-dev.2) (2026-08-30)
 
 
