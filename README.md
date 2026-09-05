@@ -65,6 +65,7 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Region spoof` | Adds in-app controls for changing the region identity values TikTok reads. TikTok may still use IP address, account history, language, and other region signals. |
 | `Sanitize sharing links` | Removes tracking parameters from TikTok links before they are shared. |
 | `Settings` | Adds the Metra patches settings screen inside TikTok. |
+| `Share sheet modification` | Toggles the share sheet's "Send to", "Share via app", and "Video Actions" sections, with an allow-list for which apps and actions appear in the latter two. |
 | `Show seekbar` | Shows TikTok's native video seekbar where it would normally be hidden. |
 | `Show seekbar thumbnail` | Shows TikTok's video preview thumbnail while dragging the seekbar. |
 | `Stop video looping` | Stops a completed video instead of automatically replaying it. |

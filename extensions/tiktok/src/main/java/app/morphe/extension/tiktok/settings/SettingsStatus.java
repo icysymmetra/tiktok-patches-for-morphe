@@ -30,6 +30,7 @@ public class SettingsStatus {
     public static boolean externalBrowserEnabled = false;
     public static boolean alwaysShowPublishDateEnabled = false;
     public static boolean diagnosticsEnabled = false;
+    public static boolean shareSheetEnabled = false;
 
     public static void enableFeedFilter() {
         feedFilterEnabled = true;
@@ -125,6 +126,10 @@ public class SettingsStatus {
 
     public static void enableDiagnostics() {
         diagnosticsEnabled = true;
+    }
+
+    public static void enableShareSheet() {
+        shareSheetEnabled = true;
     }
 
     public static void load() {
