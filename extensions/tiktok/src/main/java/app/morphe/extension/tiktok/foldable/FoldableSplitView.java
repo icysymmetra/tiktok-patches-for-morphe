@@ -13,7 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.WindowManager;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -31,7 +31,10 @@ public final class FoldableSplitView {
      * (app cold start, or a fresh Activity). This flag lets us detect exactly that transition
      * (false -> true) and force a rebuild via that same, already-correct fresh-bind path.
      */
-    private static final AtomicBoolean lastForced = new AtomicBoolean(false);
+    private static final int FORCE_STATE_UNKNOWN = -1;
+    private static final int FORCE_STATE_DISABLED = 0;
+    private static final int FORCE_STATE_ENABLED = 1;
+    private static final AtomicInteger lastForceState = new AtomicInteger(FORCE_STATE_UNKNOWN);
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private FoldableSplitView() {}
@@ -44,8 +47,8 @@ public final class FoldableSplitView {
             return false;
         }
 
-        if (activity != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                && (activity.isInMultiWindowMode() || activity.isInPictureInPictureMode())) {
+        if (isUnsupportedWindowMode(activity)) {
+            lastForceState.set(FORCE_STATE_DISABLED);
             Logger.printDebug(() -> "[Morphe TikTok FoldableSplitView] shouldForceCommentSplit"
                     + " skipped, activity is in multi-window or picture-in-picture mode");
             return false;
@@ -64,6 +67,12 @@ public final class FoldableSplitView {
         }
 
         Activity windowActivity = Utils.getActivity();
+        if (isUnsupportedWindowMode(windowActivity)) {
+            lastForceState.set(FORCE_STATE_DISABLED);
+            Logger.printDebug(() -> "[Morphe TikTok FoldableSplitView] shouldForceCommentSplitContainer"
+                    + " skipped, activity is in multi-window or picture-in-picture mode");
+            return false;
+        }
         return evaluate("shouldForceCommentSplitContainer", resolveScreenWidthDp(windowActivity, null), windowActivity);
     }
 
@@ -73,15 +82,19 @@ public final class FoldableSplitView {
         Logger.printDebug(() -> "[Morphe TikTok FoldableSplitView] " + source
                 + " widthDp=" + widthDp + " thresholdDp=" + thresholdDp + " force=" + force);
 
-        if (force) {
-            if (lastForced.compareAndSet(false, true)) {
-                onWidenTransitionDetected(windowActivity);
-            }
-        } else {
-            lastForced.set(false);
+        int currentState = force ? FORCE_STATE_ENABLED : FORCE_STATE_DISABLED;
+        int previousState = lastForceState.getAndSet(currentState);
+        if (previousState == FORCE_STATE_DISABLED && currentState == FORCE_STATE_ENABLED) {
+            onWidenTransitionDetected(windowActivity);
         }
 
         return force;
+    }
+
+    private static boolean isUnsupportedWindowMode(Activity activity) {
+        return activity != null
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                && (activity.isInMultiWindowMode() || activity.isInPictureInPictureMode());
     }
 
     /**
