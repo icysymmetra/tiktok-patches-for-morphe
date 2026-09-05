@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import app.morphe.extension.shared.settings.StringSetting;
 import app.morphe.extension.shared.settings.preference.AbstractPreferenceFragment;
@@ -35,7 +36,7 @@ public class ShareSheetItemSelectionPreference extends Preference {
     private final Function<String, Set<String>> parseEnabledKeys;
     private final Function<Set<String>, String> serializeEnabledKeys;
     private final Function<Set<String>, List<Row>> optionsForKeys;
-    private final Set<String> knownKeys;
+    private final Supplier<Set<String>> knownKeysSupplier;
     private String value;
     private boolean valueSet;
 
@@ -48,7 +49,7 @@ public class ShareSheetItemSelectionPreference extends Preference {
             Function<String, Set<String>> parseEnabledKeys,
             Function<Set<String>, String> serializeEnabledKeys,
             Function<Set<String>, List<Row>> optionsForKeys,
-            Set<String> knownKeys
+            Supplier<Set<String>> knownKeysSupplier
     ) {
         super(context);
         this.dialogTitle = dialogTitle;
@@ -57,7 +58,7 @@ public class ShareSheetItemSelectionPreference extends Preference {
         this.parseEnabledKeys = parseEnabledKeys;
         this.serializeEnabledKeys = serializeEnabledKeys;
         this.optionsForKeys = optionsForKeys;
-        this.knownKeys = knownKeys;
+        this.knownKeysSupplier = knownKeysSupplier;
         setTitle(title);
         setKey(setting.key);
         setValue(setting.get());
@@ -85,20 +86,22 @@ public class ShareSheetItemSelectionPreference extends Preference {
 
     @Override
     protected void onClick() {
+        refreshSummary();
         showSelectionDialog();
     }
 
     @Override
     protected void onBindView(View view) {
+        refreshSummary();
         super.onBindView(view);
         app.morphe.extension.tiktok.Utils.setTitleAndSummaryColor(view);
     }
 
     private void refreshSummary() {
         Set<String> selected = parseEnabledKeys.apply(value);
-        List<Row> allRows = optionsForKeys.apply(knownKeys);
+        List<Row> allRows = currentRows();
         if (allRows.isEmpty()) {
-            setSummary("All");
+            setSummary("No items discovered yet");
             return;
         }
 
@@ -129,7 +132,7 @@ public class ShareSheetItemSelectionPreference extends Preference {
     private void showSelectionDialog() {
         Context context = getContext();
         Set<String> selected = new LinkedHashSet<>(parseEnabledKeys.apply(value));
-        List<Row> rows = optionsForKeys.apply(knownKeys);
+        List<Row> rows = currentRows();
 
         LinearLayout dialogView = new LinearLayout(context);
         dialogView.setOrientation(LinearLayout.VERTICAL);
@@ -163,8 +166,20 @@ public class ShareSheetItemSelectionPreference extends Preference {
         int optionInset = Math.max(1, dpToPx(1));
         optionsContainer.setPadding(optionInset, optionInset, optionInset, optionInset);
 
-        for (Row row : rows) {
-            optionsContainer.addView(createOptionRow(context, selected, row));
+        if (rows.isEmpty()) {
+            TextView emptyState = new TextView(context);
+            emptyState.setText("No items discovered yet. Open a video's Share menu once, then return here.");
+            emptyState.setTextColor(getSummaryTextColor());
+            emptyState.setTextSize(15);
+            emptyState.setPadding(dpToPx(12), dpToPx(18), dpToPx(12), dpToPx(18));
+            optionsContainer.addView(emptyState, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+        } else {
+            for (Row row : rows) {
+                optionsContainer.addView(createOptionRow(context, selected, row));
+            }
         }
 
         ScrollView scrollView = new ScrollView(context);
@@ -225,6 +240,10 @@ public class ShareSheetItemSelectionPreference extends Preference {
 
         dialog.show();
         SettingsUi.styleDialog(dialog);
+    }
+
+    private List<Row> currentRows() {
+        return optionsForKeys.apply(knownKeysSupplier.get());
     }
 
     private View createOptionRow(Context context, Set<String> selected, Row row) {

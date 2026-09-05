@@ -45,12 +45,13 @@ public class ShareSheetPreferenceCategory extends ConditionalPreferenceCategory 
                 context,
                 "Allowed sharing apps",
                 "Allowed sharing apps",
-                "Only apps checked here appear in \"Share via\". Apps TikTok adds later show up automatically.",
+                "Only apps TikTok has exposed on this installation are listed. Open a video's Share menu "
+                        + "once to discover currently available apps; newly discovered apps start enabled.",
                 Settings.SHARE_SHEET_CHANNELS_ENABLED,
                 ShareChannelOptions::parseEnabledKeys,
                 ShareChannelOptions::serializeEnabledKeys,
                 keys -> toRows(ShareChannelOptions.optionsForKeys(keys)),
-                observedChannelKeys()
+                ShareSheetPreferenceCategory::observedChannelKeys
         ));
 
         addPreference(new TogglePreference(
@@ -63,12 +64,13 @@ public class ShareSheetPreferenceCategory extends ConditionalPreferenceCategory 
                 context,
                 "Allowed video actions",
                 "Allowed video actions",
-                "Only actions checked here appear in \"Video Actions\". Actions TikTok adds later show up automatically.",
+                "Only actions TikTok has exposed on this installation are listed. Open a video's Share menu "
+                        + "once to discover currently available actions; newly discovered actions start enabled.",
                 Settings.SHARE_SHEET_ACTIONS_ENABLED,
                 VideoActionOptions::parseEnabledKeys,
                 VideoActionOptions::serializeEnabledKeys,
                 keys -> toRowsFromActions(VideoActionOptions.optionsForKeys(keys)),
-                observedActionKeys()
+                ShareSheetPreferenceCategory::observedActionKeys
         ));
     }
 

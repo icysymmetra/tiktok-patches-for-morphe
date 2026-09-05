@@ -54,7 +54,7 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
         FEED_FILTER("Feed filter", "Ads, Shop, livestreams, and view limits."),
         FEED_NAVIGATION("Feed navigation", "Feed tabs, bottom tabs, and Tako AI."),
         INTERFACE("Interface", "Promotions, popups, and publish dates."),
-        COMMENTS("Comments and translation", "Auto translate, quick reactions, and copy options."),
+        COMMENTS("Comments and translation", "Translation, reactions, copy options, and split view."),
         DOWNLOADS("Downloads", "Path, watermark, and offline videos."),
         REGION("Region spoof", "Change the region TikTok reads."),
         SHARE_SHEET("Share sheet", "Send to, share via app, and video actions."),
@@ -284,11 +284,13 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
         }
         if (SettingsStatus.commentTranslationEnabled
                 || SettingsStatus.hideCommentQuickReactionsEnabled
-                || SettingsStatus.copyCommentsWithoutUsernameEnabled) {
+                || SettingsStatus.copyCommentsWithoutUsernameEnabled
+                || SettingsStatus.foldableSplitViewEnabled) {
             addMenu(screen, Section.COMMENTS, SettingsMenuPreference.Icon.COMMENTS, countEnabled(
                     SettingsStatus.commentTranslationEnabled && Settings.COMMENT_BATCH_TRANSLATION.get(),
                     SettingsStatus.hideCommentQuickReactionsEnabled && Settings.HIDE_COMMENT_QUICK_REACTIONS.get(),
-                    SettingsStatus.copyCommentsWithoutUsernameEnabled && Settings.COPY_COMMENTS_WITHOUT_USERNAME.get()
+                    SettingsStatus.copyCommentsWithoutUsernameEnabled && Settings.COPY_COMMENTS_WITHOUT_USERNAME.get(),
+                    SettingsStatus.foldableSplitViewEnabled && Settings.FOLDABLE_SPLIT_VIEW.get()
             ));
         }
         if (SettingsStatus.downloadEnabled) {
@@ -474,9 +476,6 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
         }
         if (SettingsStatus.disableLongPressRepostEnabled
                 && Settings.DISABLE_LONG_PRESS_REPOST.get()) {
-            count++;
-        }
-        if (SettingsStatus.foldableSplitViewEnabled && Settings.FOLDABLE_SPLIT_VIEW.get()) {
             count++;
         }
         return count;
