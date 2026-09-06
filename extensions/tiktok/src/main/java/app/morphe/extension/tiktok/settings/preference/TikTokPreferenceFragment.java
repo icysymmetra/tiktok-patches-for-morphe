@@ -40,6 +40,7 @@ import app.morphe.extension.tiktok.settings.preference.categories.ExtensionPrefe
 import app.morphe.extension.tiktok.settings.preference.categories.FeedFilterPreferenceCategory;
 import app.morphe.extension.tiktok.settings.preference.categories.FeedNavigationPreferenceCategory;
 import app.morphe.extension.tiktok.settings.preference.categories.InterfacePreferenceCategory;
+import app.morphe.extension.tiktok.settings.preference.categories.ShareSheetPreferenceCategory;
 import app.morphe.extension.tiktok.settings.preference.categories.SimSpoofPreferenceCategory;
 
 @SuppressWarnings("deprecation")
@@ -53,9 +54,10 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
         FEED_FILTER("Feed filter", "Ads, Shop, livestreams, and view limits."),
         FEED_NAVIGATION("Feed navigation", "Feed tabs, bottom tabs, and Tako AI."),
         INTERFACE("Interface", "Promotions, popups, and publish dates."),
-        COMMENTS("Comments and translation", "Auto translate, quick reactions, and copy options."),
+        COMMENTS("Comments and translation", "Translation, reactions, copy options, and split view."),
         DOWNLOADS("Downloads", "Path, watermark, and offline videos."),
-        REGION("Bypass regional restriction", "SIM info, country, and operator."),
+        REGION("Region spoof", "Change the region TikTok reads."),
+        SHARE_SHEET("Share sheet", "Send to, share via app, and video actions."),
         BEHAVIOR("App behavior", "Sharing, playback, and gestures."),
         DIAGNOSTICS("Diagnostics", "Logging, crash capture, and report export.");
 
@@ -134,6 +136,13 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
             } else {
                 Setting.privateSetValueFromString(setting, languagePreference.getValue());
             }
+        } else if (pref instanceof ShareSheetItemSelectionPreference) {
+            ShareSheetItemSelectionPreference shareSheetItemPref = (ShareSheetItemSelectionPreference) pref;
+            if (applySettingToPreference) {
+                shareSheetItemPref.setValue(setting.get().toString());
+            } else {
+                Setting.privateSetValueFromString(setting, shareSheetItemPref.getValue());
+            }
         } else {
             super.syncSettingWithPreference(pref, setting, applySettingToPreference);
         }
@@ -156,6 +165,9 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
         }
         if (pref instanceof LanguageSelectionPreference) {
             return defaultValue.equals(((LanguageSelectionPreference) pref).getValue());
+        }
+        if (pref instanceof ShareSheetItemSelectionPreference) {
+            return defaultValue.equals(((ShareSheetItemSelectionPreference) pref).getValue());
         }
 
         return super.prefIsSetToDefault(pref, setting);
@@ -272,11 +284,13 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
         }
         if (SettingsStatus.commentTranslationEnabled
                 || SettingsStatus.hideCommentQuickReactionsEnabled
-                || SettingsStatus.copyCommentsWithoutUsernameEnabled) {
+                || SettingsStatus.copyCommentsWithoutUsernameEnabled
+                || SettingsStatus.foldableSplitViewEnabled) {
             addMenu(screen, Section.COMMENTS, SettingsMenuPreference.Icon.COMMENTS, countEnabled(
                     SettingsStatus.commentTranslationEnabled && Settings.COMMENT_BATCH_TRANSLATION.get(),
                     SettingsStatus.hideCommentQuickReactionsEnabled && Settings.HIDE_COMMENT_QUICK_REACTIONS.get(),
-                    SettingsStatus.copyCommentsWithoutUsernameEnabled && Settings.COPY_COMMENTS_WITHOUT_USERNAME.get()
+                    SettingsStatus.copyCommentsWithoutUsernameEnabled && Settings.COPY_COMMENTS_WITHOUT_USERNAME.get(),
+                    SettingsStatus.foldableSplitViewEnabled && Settings.FOLDABLE_SPLIT_VIEW.get()
             ));
         }
         if (SettingsStatus.downloadEnabled) {
@@ -288,6 +302,13 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
         if (SettingsStatus.simSpoofEnabled) {
             addMenu(screen, Section.REGION, SettingsMenuPreference.Icon.REGION, countEnabled(
                     Settings.SIM_SPOOF.get()
+            ));
+        }
+        if (SettingsStatus.shareSheetEnabled) {
+            addMenu(screen, Section.SHARE_SHEET, SettingsMenuPreference.Icon.SHARE, countEnabled(
+                    Settings.SHARE_SHEET_SEND_TO.get(),
+                    Settings.SHARE_SHEET_CHANNELS.get(),
+                    Settings.SHARE_SHEET_ACTIONS.get()
             ));
         }
 
@@ -359,6 +380,9 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
                 break;
             case REGION:
                 category = new SimSpoofPreferenceCategory(context, screen);
+                break;
+            case SHARE_SHEET:
+                category = new ShareSheetPreferenceCategory(context, screen);
                 break;
             case DIAGNOSTICS:
                 category = new DebugPreferenceCategory(context, screen);

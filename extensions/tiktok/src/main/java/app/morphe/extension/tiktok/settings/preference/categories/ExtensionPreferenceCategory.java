@@ -112,7 +112,6 @@ public class ExtensionPreferenceCategory extends ConditionalPreferenceCategory {
                     Settings.ENABLE_LIVE_SEARCH
             ));
         }
-
     }
 }
 

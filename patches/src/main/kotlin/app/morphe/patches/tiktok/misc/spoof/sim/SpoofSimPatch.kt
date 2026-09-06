@@ -24,8 +24,8 @@ private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/spo
 
 @Suppress("unused")
 val simSpoofPatch = bytecodePatch(
-    name = "SIM spoof",
-    description = "Spoofs SIM country and operator information retrieved by TikTok, with country presets for easier setup.",
+    name = "Region spoof",
+    description = "Adds in-app controls for changing the region TikTok reads.",
     default = true,
 ) {
     dependsOn(

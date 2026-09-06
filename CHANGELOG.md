@@ -1,3 +1,67 @@
+# [0.8.0-dev.4](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.3...v0.8.0-dev.4) (2026-09-06)
+
+
+### Bug Fixes
+
+* **tiktok:** harden reviewed foldable integration ([55f5776](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/55f57763da90cee3727e36888e63a41b061da6c6))
+* **tiktok:** refresh discovered share items in settings ([656d791](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/656d791dfcfaabb327377fa62fc5a897969c6f26))
+
+
+### Features
+
+* add share sheet modifications ([cf3ede5](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/cf3ede56a5eb49fe1a5c17594c54425a5ee1cf6c))
+* Add Split-View Comment Section for Foldable/Wide Devices ([c0571bc](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/c0571bcc1df32b4db108b1de68adaa387125b5fb))
+
+
+
+
+
+## 0.8.0-dev.4
+
+# [0.8.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.2...v0.8.0-dev.3) (2026-09-05)
+
+
+### Bug Fixes
+
+* **tiktok:** close feed filter delivery gaps ([e58fb96](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/e58fb96a1724df3c2e81693b5fab87676453f314))
+
+
+### Features
+
+* **tiktok:** add feed interface controls ([0c79175](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/0c79175312c45e74af99d6d986564a79742affbe))
+
+
+
+
+
+## 0.8.0-dev.3
+
+# [0.8.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.1...v0.8.0-dev.2) (2026-08-30)
+
+
+### Bug Fixes
+
+* remove ineffective regional fallback ([714830c](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/714830caeeaa5be1691609efefdae4d50ff179c6))
+
+
+
+
+
+## 0.8.0-dev.2
+
+# [0.8.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.7.0...v0.8.0-dev.1) (2026-08-27)
+
+
+### Features
+
+* add configurable regional restriction fallback ([9781ef2](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/9781ef2c18b1372764f590260e37d3df54fd6794))
+
+
+
+
+
+## 0.8.0-dev.1
+
 # [0.7.0](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.6.1...v0.7.0) (2026-08-23)
 
 

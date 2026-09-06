@@ -28,6 +28,7 @@ public class SimPresets {
             new SimPreset("Hungary", "hu", "21630", "Magyar Telekom"),
             new SimPreset("Ireland", "ie", "27201", "Vodafone"),
             new SimPreset("Turkey", "tr", "28601", "Turkcell"),
+            new SimPreset("United Arab Emirates", "ae", "42403", "du"),
             new SimPreset("United Arab Emirates", "ae", "42402", "Etisalat"),
             new SimPreset("Saudi Arabia", "sa", "42001", "stc"),
             new SimPreset("Qatar", "qa", "42701", "Ooredoo"),
