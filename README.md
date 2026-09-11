@@ -138,6 +138,8 @@ Morphe reads `patches-bundle.json` from this repository, downloads the `.mpp` re
 
 - Thanks to [@lyyako](https://github.com/lyyako) for the original contributions behind the simplified sanitize sharing links hook, show seekbar patch, anti-recording patch, `Open external links directly`, and `Always show publish date`.
 - Thanks to [@oscski](https://github.com/oscski) for the original contribution behind `Disable long-press repost`.
+- Thanks to [@HazyArc14](https://github.com/HazyArc14) for the original contributions behind `Share sheet modification` and `Foldable split comment view`.
+- Thanks to [@tymmesyde](https://github.com/tymmesyde) for the original contribution behind `Hide suggested accounts`.
 
 ## Notes
 
