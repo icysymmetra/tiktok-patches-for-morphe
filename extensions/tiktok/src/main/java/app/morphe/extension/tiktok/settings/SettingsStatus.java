@@ -17,7 +17,6 @@ public class SettingsStatus {
     public static boolean hideSuggestedAccountsEnabled = false;
     public static boolean copyCommentsWithoutUsernameEnabled = false;
     public static boolean downloadEnabled = false;
-    public static boolean storyDownloadsEnabled = false;
     public static boolean simSpoofEnabled = false;
     public static boolean captchaPopupSuppressionEnabled = false;
     public static boolean promotionalBannersEnabled = false;
@@ -79,10 +78,6 @@ public class SettingsStatus {
 
     public static void enableDownload() {
         downloadEnabled = true;
-    }
-
-    public static void enableStoryDownloads() {
-        storyDownloadsEnabled = true;
     }
 
     public static void enableSimSpoof() {

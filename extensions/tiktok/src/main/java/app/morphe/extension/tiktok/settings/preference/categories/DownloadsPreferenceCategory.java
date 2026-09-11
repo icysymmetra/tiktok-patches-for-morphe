@@ -44,16 +44,6 @@ public class DownloadsPreferenceCategory extends ConditionalPreferenceCategory {
                 Settings.DOWNLOAD_WATERMARK
         ));
 
-        if (SettingsStatus.storyDownloadsEnabled) {
-            addPreference(group(context, "Story downloads"));
-            addPreference(new TogglePreference(
-                    context,
-                    "Download stories",
-                    "Add Save video or Save photo to the current story's share menu. Each story uses its own item ID, including when one profile has several stories.",
-                    Settings.DOWNLOAD_STORIES
-            ));
-        }
-
         addPreference(group(context, "Save locations"));
         addPreference(new DownloadPathPreference(
                 context,

@@ -92,7 +92,6 @@ public class Settings extends BaseSettings {
     public static final StringSetting DOWNLOAD_PHOTO_PATH = new StringSetting("download_photo_path", "DCIM/TikTok");
     public static final StringSetting DOWNLOAD_STICKER_PATH = new StringSetting("download_sticker_path", "DCIM/TikTok");
     public static final StringSetting DOWNLOAD_VIDEO_QUALITY = new StringSetting("download_video_quality", "high");
-    public static final BooleanSetting DOWNLOAD_STORIES = new BooleanSetting("download_stories", TRUE);
     private static final BooleanSetting DOWNLOAD_PATHS_MIGRATED = new BooleanSetting(
             "download_paths_migrated",
             FALSE,
