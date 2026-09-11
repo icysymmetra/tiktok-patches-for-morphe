@@ -1,3 +1,17 @@
+# [0.8.0-dev.9](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.8...v0.8.0-dev.9) (2026-09-11)
+
+
+### Features
+
+* add share sheet modifications ([3e92957](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/3e92957509558f5b3c89817c6cb1e69fd27a2980))
+* Add Split-View Comment Section for Foldable/Wide Devices ([2fc6eb1](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/2fc6eb148d5b8cb717192643c505ca30cad02d33))
+
+
+
+
+
+## 0.8.0-dev.9
+
 # [0.8.0-dev.8](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.7...v0.8.0-dev.8) (2026-09-11)
 
 
