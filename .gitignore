@@ -38,7 +38,7 @@ google-services.json
 # NPM modules
 node_modules/
 
-# Local CodeGraph index
+# Legacy local graph metadata; Codebase Memory uses an external cache
 .codegraph/
 
 # Local copy of upstream ReVanced sources (do not commit)

@@ -77,6 +77,12 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 
 <br>
 
+## Regional Restrictions
+
+Region spoofing changes the country, SIM, carrier, and related region details that TikTok reads from the app, so it can help with client-side region checks and onboarding. It cannot hide the public IP address that TikTok's servers see from the connection, so it cannot replace a VPN or proxy in a country where TikTok blocks service by IP. The regional popup can be hidden, but that only removes the warning and does not turn a rejected feed request into a successful one. TikTok may also keep a blocked network state for a while after a VPN is disconnected, in which case force-stopping TikTok and clearing its cache can be required before the feed recovers.
+
+<br>
+
 ## Add Source
 
 Open this link on the Android device where Morphe is installed:
