@@ -1,3 +1,16 @@
+# [0.8.0-dev.8](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.7...v0.8.0-dev.8) (2026-09-11)
+
+
+### Bug Fixes
+
+* cover secure window flag writes ([79abbbf](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/79abbbfc23c3ea21cc9350f3d206dfd2af125b88))
+
+
+
+
+
+## 0.8.0-dev.8
+
 # [0.8.0-dev.7](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.6...v0.8.0-dev.7) (2026-09-07)
 
 
