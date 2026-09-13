@@ -7,9 +7,17 @@ import com.ss.android.ugc.aweme.feed.model.Aweme;
 import com.ss.android.ugc.aweme.feed.model.AwemeBizExtKt;
 import com.ss.android.ugc.aweme.feed.model.AwemeStatistics;
 import com.ss.android.ugc.aweme.feed.model.FeedItemList;
+import com.ss.android.ugc.aweme.feed.model.friends.FriendsFeed;
 import com.ss.android.ugc.aweme.feed.panel.BaseListFragmentPanel;
 import com.ss.android.ugc.aweme.follow.presenter.FollowFeed;
 import com.ss.android.ugc.aweme.follow.presenter.FollowFeedList;
+import com.ss.android.ugc.aweme.friendstab.api.FriendsFeedResponse;
+import com.ss.android.ugc.aweme.discover.model.Banner;
+import com.ss.android.ugc.aweme.discover.model.BannerList;
+import com.ss.android.ugc.aweme.discover.model.TrendingTopic;
+import com.ss.android.ugc.aweme.discover.model.TrendingTopicList;
+import com.ss.android.ugc.aweme.search.pages.result.topsearch.core.model.SearchMixFeed;
+import com.ss.android.ugc.aweme.search.pages.result.topsearch.core.model.SearchMixFeedList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,6 +122,49 @@ public final class FeedItemsFilter {
         return filterAdOnlyAwemeList("ProfileAwemeList", items);
     }
 
+    public static void filterSearchAds(SearchMixFeedList response) {
+        if (response == null || response.mItems == null || !ADS_FILTER.getEnabled()) return;
+
+        response.mItems = filterAdContainers(
+            "SearchMixFeedList",
+            response.mItems,
+            container -> container instanceof SearchMixFeed
+                ? ((SearchMixFeed) container).getAweme()
+                : null,
+            container -> container instanceof SearchMixFeed
+                && ((SearchMixFeed) container).isAdOrContainAd()
+        );
+    }
+
+    public static void filterFriendsAds(Object value) {
+        if (!(value instanceof FriendsFeedResponse) || !ADS_FILTER.getEnabled()) return;
+
+        FriendsFeedResponse response = (FriendsFeedResponse) value;
+        response.friendFeedData = filterAdContainers(
+            "FriendsFeedResponse:feed",
+            response.friendFeedData,
+            FeedItemsFilter::extractFriendsAweme,
+            container -> false
+        );
+    }
+
+    public static void filterDiscoverBanners(BannerList response) {
+        if (response == null || response.items == null || !ADS_FILTER.getEnabled()) return;
+        removeMatchingInPlace(response.items, item -> item instanceof Banner && ((Banner) item).isAd());
+    }
+
+    public static void filterDiscoverTrending(TrendingTopicList response) {
+        if (response == null || response.items == null || !ADS_FILTER.getEnabled()) return;
+        removeMatchingInPlace(
+            response.items,
+            item -> item instanceof TrendingTopic && ((TrendingTopic) item).isAd()
+        );
+    }
+
+    public static Aweme filterMidRollAd(Aweme aweme) {
+        return ADS_FILTER.getEnabled() ? null : aweme;
+    }
+
     public static List filterLateInsertedAds(String source, List items) {
         String insertionSource = source == null ? "unknown" : source;
         return filterAdOnlyAwemeList("FeedInsertion:" + insertionSource, items);
@@ -152,6 +203,58 @@ public final class FeedItemsFilter {
                 + initialSize + " -> " + resultSize + " (removed=" + removedFinal + ")");
         }
         return kept;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static List filterAdContainers(
+        String source,
+        List items,
+        AwemeExtractor extractor,
+        ContainerFilter containerFilter
+    ) {
+        if (items == null || items.isEmpty()) return items;
+
+        ArrayList kept = null;
+        int removed = 0;
+        for (int index = 0; index < items.size(); index++) {
+            Object container = items.get(index);
+            Aweme aweme = extractor.extract(container);
+            boolean filtered = containerFilter.getFiltered(container)
+                || (aweme != null && ADS_FILTER.getFiltered(aweme));
+            if (!filtered) {
+                if (kept != null) kept.add(container);
+                continue;
+            }
+
+            if (kept == null) {
+                kept = new ArrayList(items.size());
+                kept.addAll(items.subList(0, index));
+            }
+            removed++;
+            if (aweme != null) logItem(aweme, AdsFilter.class.getSimpleName(), BaseSettings.DEBUG.get());
+        }
+
+        if (kept == null) return items;
+        if (BaseSettings.DEBUG.get() && shouldLogBatch()) {
+            int initialSize = items.size();
+            int resultSize = kept.size();
+            int removedFinal = removed;
+            Logger.printInfo(() -> "[Morphe TikTok FeedFilter] filter(" + source + "): size "
+                + initialSize + " -> " + resultSize + " (removed=" + removedFinal + ")");
+        }
+        return kept;
+    }
+
+    private static Aweme extractFriendsAweme(Object container) {
+        if (container instanceof FriendsFeed) return ((FriendsFeed) container).getAweme();
+        return container instanceof Aweme ? (Aweme) container : null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static void removeMatchingInPlace(List items, ContainerFilter filter) {
+        for (int index = items.size() - 1; index >= 0; index--) {
+            if (filter.getFiltered(items.get(index))) items.remove(index);
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -859,6 +962,11 @@ public final class FeedItemsFilter {
     @FunctionalInterface
     interface AwemeExtractor {
         Aweme extract(Object source);
+    }
+
+    @FunctionalInterface
+    interface ContainerFilter {
+        boolean getFiltered(Object source);
     }
 
     private static final class ProbeSeenList {

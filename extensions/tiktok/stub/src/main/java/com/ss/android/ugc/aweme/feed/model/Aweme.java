@@ -37,6 +37,10 @@ public class Aweme {
         throw new UnsupportedOperationException("Stub");
     }
 
+    public AwemeRawAd getAwemeRawAd() {
+        throw new UnsupportedOperationException("Stub");
+    }
+
     public boolean getIsTikTokStory() {
         throw new UnsupportedOperationException("Stub");
     }

@@ -17,6 +17,22 @@ private const val INSERT_CACHE_WHEN_PLAY_LAG_COMPONENT_DESCRIPTOR =
     "Lcom/ss/android/ugc/aweme/feed/component/InsertCacheWhenPlayLagComponent;"
 private const val REACH_BOTTOM_CACHE_COMPONENT_DESCRIPTOR =
     "Lcom/ss/android/ugc/aweme/feed/component/ReachBottomCacheComponent;"
+private const val SEARCH_MIX_FEED_LIST_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/search/pages/result/topsearch/core/model/SearchMixFeedList;"
+private const val SEARCH_MIX_FEED_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/search/pages/result/topsearch/core/model/SearchMixFeed;"
+private const val FRIENDS_FEED_RESPONSE_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/friendstab/api/FriendsFeedResponse;"
+private const val FRIENDS_FEED_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/feed/model/friends/FriendsFeed;"
+private const val BANNER_LIST_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/discover/model/BannerList;"
+private const val BANNER_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/discover/model/Banner;"
+private const val TRENDING_TOPIC_LIST_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;"
+private const val MID_AD_RESPONSE_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/commercialize/feed/assem/midad/MidAdResponse;"
 
 internal object MainFeedResponseFingerprint : Fingerprint(
     definingClass = "Lcom/ss/android/ugc/aweme/feed/FeedApiService;",
@@ -27,6 +43,108 @@ internal object MainFeedResponseFingerprint : Fingerprint(
         classDef.type == "Lcom/ss/android/ugc/aweme/feed/FeedApiService;" &&
             method.parameterTypes.size == 1
     },
+)
+
+internal object SearchMixFeedResponseFingerprint : Fingerprint(
+    returnType = "V",
+    parameters = listOf(SEARCH_MIX_FEED_LIST_DESCRIPTOR),
+    custom = { method, _ ->
+        val fieldReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<FieldReference>() }
+            ?: emptyList()
+        val methodReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<MethodReference>() }
+            ?: emptyList()
+
+        fieldReferences.any {
+            it.definingClass == SEARCH_MIX_FEED_LIST_DESCRIPTOR &&
+                it.name == "mItems" && it.type == "Ljava/util/List;"
+        } && methodReferences.any {
+            it.definingClass == method.definingClass &&
+                it.parameterTypes == listOf(SEARCH_MIX_FEED_DESCRIPTOR) &&
+                it.returnType == "Z"
+        }
+    },
+)
+
+internal object FriendsFeedNetworkResponseFingerprint : Fingerprint(
+    returnType = "V",
+    parameters = listOf("Ljava/lang/Object;"),
+    strings = listOf("client_read_gids_report_time"),
+    custom = { method, _ ->
+        val fieldReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<FieldReference>() }
+            ?: emptyList()
+        val methodReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<MethodReference>() }
+            ?: emptyList()
+
+        fieldReferences.any {
+            it.definingClass == FRIENDS_FEED_RESPONSE_DESCRIPTOR &&
+                it.name == "friendFeedData" && it.type == "Ljava/util/List;"
+        } && methodReferences.any {
+            it.definingClass == FRIENDS_FEED_DESCRIPTOR && it.name == "getAweme" &&
+                it.returnType == AWEME_DESCRIPTOR
+        }
+    },
+)
+
+internal object DiscoverBannerResponseFingerprint : Fingerprint(
+    returnType = "Ljava/lang/Object;",
+    parameters = listOf("Ljava/lang/Object;"),
+    custom = { method, _ ->
+        val fieldReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<FieldReference>() }
+            ?: emptyList()
+        val methodReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<MethodReference>() }
+            ?: emptyList()
+
+        fieldReferences.any {
+            it.definingClass == BANNER_LIST_DESCRIPTOR &&
+                it.name == "items" && it.type == "Ljava/util/List;"
+        } && methodReferences.any {
+            it.definingClass == BANNER_DESCRIPTOR &&
+                it.name == "setRequestId" &&
+                it.parameterTypes == listOf("Ljava/lang/String;")
+        }
+    },
+)
+
+internal object DiscoverTrendingResponseFingerprint : Fingerprint(
+    returnType = "Ljava/lang/Object;",
+    parameters = listOf("Ljava/lang/Object;"),
+    custom = { method, _ ->
+        method.implementation?.instructions?.any {
+            it.getReference<FieldReference>()?.let { reference ->
+                reference.definingClass == TRENDING_TOPIC_LIST_DESCRIPTOR &&
+                    reference.name == "items" && reference.type == "Ljava/util/List;"
+            } == true
+        } == true
+    },
+)
+
+internal object DiscoverTrendingPairResponseFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC, AccessFlags.FINAL),
+    returnType = "Ljava/lang/Object;",
+    strings = listOf("discovery_trending_topic_receive_time"),
+    custom = { method, _ ->
+        method.parameterTypes.size == 2 &&
+            method.implementation?.instructions?.any {
+                it.getReference<FieldReference>()?.let { reference ->
+                    reference.definingClass == TRENDING_TOPIC_LIST_DESCRIPTOR &&
+                        reference.name == "items" && reference.type == "Ljava/util/List;"
+                } == true
+            } == true
+    },
+)
+
+internal object MidAdResponseFingerprint : Fingerprint(
+    definingClass = MID_AD_RESPONSE_DESCRIPTOR,
+    name = "getAweme",
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
+    returnType = AWEME_DESCRIPTOR,
+    parameters = emptyList(),
 )
 
 internal object FollowFeedFingerprint : Fingerprint(

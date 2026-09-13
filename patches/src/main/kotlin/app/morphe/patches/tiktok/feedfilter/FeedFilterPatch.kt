@@ -24,6 +24,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/feedfilter/FeedItemsFilter;"
 private const val TAKO_AI_FILTER_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/feedfilter/TakoAiFilter;"
@@ -60,6 +61,48 @@ val feedFilterPatch = bytecodePatch(
                 method.addInstructionsAtControlFlowLabel(
                     returnIndex,
                     "invoke-static/range { v$register .. v$register }, $EXTENSION_CLASS_DESCRIPTOR->filter(Lcom/ss/android/ugc/aweme/feed/model/FeedItemList;)V",
+                )
+            }
+        }
+
+        SearchMixFeedResponseFingerprint.method.addInstruction(
+            0,
+            "invoke-static/range {p1 .. p1}, $EXTENSION_CLASS_DESCRIPTOR->filterSearchAds(Lcom/ss/android/ugc/aweme/search/pages/result/topsearch/core/model/SearchMixFeedList;)V",
+        )
+
+        FriendsFeedNetworkResponseFingerprint.method.addInstruction(
+            0,
+            "invoke-static/range {p1 .. p1}, $EXTENSION_CLASS_DESCRIPTOR->filterFriendsAds(Ljava/lang/Object;)V",
+        )
+
+        DiscoverBannerResponseFingerprint.method.filterResponseAfterCast(
+            "Lcom/ss/android/ugc/aweme/discover/model/BannerList;",
+            "filterDiscoverBanners",
+        )
+
+        DiscoverTrendingResponseFingerprint.method.filterResponseAfterCast(
+            "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;",
+            "filterDiscoverTrending",
+        )
+        DiscoverTrendingPairResponseFingerprint.method.filterResponseAfterCast(
+            "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;",
+            "filterDiscoverTrending",
+        )
+
+        MidAdResponseFingerprint.method.let { method ->
+            val returnIndices = method.implementation!!.instructions.withIndex()
+                .filter { it.value.opcode == Opcode.RETURN_OBJECT }
+                .map { it.index }
+                .toList()
+
+            returnIndices.asReversed().forEach { returnIndex ->
+                val register = method.getInstruction<OneRegisterInstruction>(returnIndex).registerA
+                method.addInstructions(
+                    returnIndex,
+                    """
+                        invoke-static/range {v$register .. v$register}, $EXTENSION_CLASS_DESCRIPTOR->filterMidRollAd(Lcom/ss/android/ugc/aweme/feed/model/Aweme;)Lcom/ss/android/ugc/aweme/feed/model/Aweme;
+                        move-result-object v$register
+                    """,
                 )
             }
         }
@@ -278,6 +321,29 @@ val feedFilterPatch = bytecodePatch(
             "invoke-static {p1}, $TAKO_AI_FILTER_CLASS_DESCRIPTOR->hideBoundFeedButtonView(Landroid/view/View;)V",
         )
     }
+}
+
+private fun MutableMethod.filterResponseAfterCast(targetType: String, extensionMethod: String) {
+    val castIndices = implementation?.instructions?.withIndex()
+        ?.filter { (_, instruction) ->
+            instruction.opcode == Opcode.CHECK_CAST &&
+                instruction.getReference<TypeReference>()?.type == targetType
+        }
+        ?.map { it.index }
+        ?.toList()
+        ?: throw PatchException("Response mapper has no implementation")
+    if (castIndices.size != 1) {
+        throw PatchException(
+            "Expected one $targetType cast in $definingClass->$name, found ${castIndices.size}",
+        )
+    }
+
+    val castIndex = castIndices.single()
+    val register = getInstruction<OneRegisterInstruction>(castIndex).registerA
+    addInstruction(
+        castIndex + 1,
+        "invoke-static/range {v$register .. v$register}, $EXTENSION_CLASS_DESCRIPTOR->$extensionMethod($targetType)V",
+    )
 }
 
 private fun MutableMethod.filterChainedCacheDelivery(
