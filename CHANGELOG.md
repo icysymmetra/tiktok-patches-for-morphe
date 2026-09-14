@@ -1,3 +1,16 @@
+# [0.8.0-dev.11](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.10...v0.8.0-dev.11) (2026-09-14)
+
+
+### Bug Fixes
+
+* **tiktok:** block dedicated profile ad requests ([e82cfcd](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/e82cfcd2a9c77a7232b52d4b507ab226caee6741))
+
+
+
+
+
+## 0.8.0-dev.11
+
 # [0.8.0-dev.10](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.9...v0.8.0-dev.10) (2026-09-14)
 
 
