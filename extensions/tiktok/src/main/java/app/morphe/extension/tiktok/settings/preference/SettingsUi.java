@@ -7,15 +7,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.view.View;
@@ -249,7 +243,6 @@ public final class SettingsUi {
         } else if (view instanceof CheckedTextView) {
             CheckedTextView checkedTextView = (CheckedTextView) view;
             checkedTextView.setTextColor(textPrimary());
-            checkedTextView.setCheckMarkDrawable(new DialogCheckMarkDrawable(checkedTextView.getContext()));
         } else if (view instanceof Button) {
             ((Button) view).setTextColor(ACCENT);
         } else if (view instanceof TextView) {
@@ -298,92 +291,4 @@ public final class SettingsUi {
         }
     }
 
-    private static final class DialogCheckMarkDrawable extends Drawable {
-        private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final int intrinsicSize;
-        private final float boxSize;
-        private final float radius;
-        private boolean checked;
-
-        DialogCheckMarkDrawable(Context context) {
-            intrinsicSize = dp(context, 32);
-            boxSize = dp(context, 18);
-            radius = dp(context, 2);
-            stroke.setStyle(Paint.Style.STROKE);
-            stroke.setStrokeWidth(Math.max(2, dp(context, 2)));
-            stroke.setStrokeCap(Paint.Cap.ROUND);
-            stroke.setStrokeJoin(Paint.Join.ROUND);
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            float left = getBounds().exactCenterX() - boxSize / 2f;
-            float top = getBounds().exactCenterY() - boxSize / 2f;
-            RectF box = new RectF(left, top, left + boxSize, top + boxSize);
-
-            if (checked) {
-                fill.setColor(ACCENT);
-                canvas.drawRoundRect(box, radius, radius, fill);
-                stroke.setColor(Color.WHITE);
-                float unit = boxSize / 18f;
-                canvas.drawLine(left + 4f * unit, top + 9f * unit,
-                        left + 8f * unit, top + 13f * unit, stroke);
-                canvas.drawLine(left + 8f * unit, top + 13f * unit,
-                        left + 15f * unit, top + 5f * unit, stroke);
-            } else {
-                stroke.setColor(textSecondary());
-                canvas.drawRoundRect(box, radius, radius, stroke);
-            }
-        }
-
-        @Override
-        protected boolean onStateChange(int[] stateSet) {
-            boolean nextChecked = false;
-            for (int state : stateSet) {
-                if (state == android.R.attr.state_checked) {
-                    nextChecked = true;
-                    break;
-                }
-            }
-            if (checked == nextChecked) {
-                return false;
-            }
-            checked = nextChecked;
-            invalidateSelf();
-            return true;
-        }
-
-        @Override
-        public boolean isStateful() {
-            return true;
-        }
-
-        @Override
-        public int getIntrinsicWidth() {
-            return intrinsicSize;
-        }
-
-        @Override
-        public int getIntrinsicHeight() {
-            return intrinsicSize;
-        }
-
-        @Override
-        public void setAlpha(int alpha) {
-            fill.setAlpha(alpha);
-            stroke.setAlpha(alpha);
-        }
-
-        @Override
-        public void setColorFilter(ColorFilter colorFilter) {
-            fill.setColorFilter(colorFilter);
-            stroke.setColorFilter(colorFilter);
-        }
-
-        @Override
-        public int getOpacity() {
-            return PixelFormat.TRANSLUCENT;
-        }
-    }
 }

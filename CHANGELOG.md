@@ -1,3 +1,159 @@
+# [0.8.0-dev.11](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.10...v0.8.0-dev.11) (2026-09-14)
+
+
+### Bug Fixes
+
+* **tiktok:** block dedicated profile ad requests ([e82cfcd](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/e82cfcd2a9c77a7232b52d4b507ab226caee6741))
+
+
+
+
+
+## 0.8.0-dev.11
+
+# [0.8.0-dev.10](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.9...v0.8.0-dev.10) (2026-09-14)
+
+
+### Bug Fixes
+
+* **tiktok:** extend ad filtering coverage ([154e0be](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/154e0be78aee40da6d2987e78760ac96c8820d01))
+
+
+
+
+
+## 0.8.0-dev.10
+
+# [0.8.0-dev.9](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.8...v0.8.0-dev.9) (2026-09-11)
+
+
+### Features
+
+* add share sheet modifications ([3e92957](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/3e92957509558f5b3c89817c6cb1e69fd27a2980))
+* Add Split-View Comment Section for Foldable/Wide Devices ([2fc6eb1](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/2fc6eb148d5b8cb717192643c505ca30cad02d33))
+
+
+
+
+
+## 0.8.0-dev.9
+
+# [0.8.0-dev.8](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.7...v0.8.0-dev.8) (2026-09-11)
+
+
+### Bug Fixes
+
+* cover secure window flag writes ([79abbbf](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/79abbbfc23c3ea21cc9350f3d206dfd2af125b88))
+
+
+
+
+
+## 0.8.0-dev.8
+
+# [0.8.0-dev.7](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.6...v0.8.0-dev.7) (2026-09-07)
+
+
+### Bug Fixes
+
+* **tiktok:** split auto scroll into separate patch ([683979b](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/683979b1ff98d5fc707a4ae401a8365306ec47b7))
+
+
+
+
+
+## 0.8.0-dev.7
+
+# [0.8.0-dev.6](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.5...v0.8.0-dev.6) (2026-09-07)
+
+
+### Features
+
+* **tiktok:** add native comment sort controls ([e1fb74c](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/e1fb74c740f862d702b2d03a2968960ca5d9d954))
+
+
+
+
+
+## 0.8.0-dev.6
+
+# [0.8.0-dev.5](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.4...v0.8.0-dev.5) (2026-09-06)
+
+
+### Features
+
+* **tiktok:** add reviewed local feature patches ([0e4a6e1](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/0e4a6e1d9b4687f41328d3112ef8c341de4a081a))
+
+
+
+
+
+## 0.8.0-dev.5
+
+# [0.8.0-dev.4](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.3...v0.8.0-dev.4) (2026-09-06)
+
+
+### Bug Fixes
+
+* **tiktok:** harden reviewed foldable integration ([55f5776](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/55f57763da90cee3727e36888e63a41b061da6c6))
+* **tiktok:** refresh discovered share items in settings ([656d791](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/656d791dfcfaabb327377fa62fc5a897969c6f26))
+
+
+### Features
+
+* add share sheet modifications ([cf3ede5](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/cf3ede56a5eb49fe1a5c17594c54425a5ee1cf6c))
+* Add Split-View Comment Section for Foldable/Wide Devices ([c0571bc](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/c0571bcc1df32b4db108b1de68adaa387125b5fb))
+
+
+
+
+
+## 0.8.0-dev.4
+
+# [0.8.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.2...v0.8.0-dev.3) (2026-09-05)
+
+
+### Bug Fixes
+
+* **tiktok:** close feed filter delivery gaps ([e58fb96](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/e58fb96a1724df3c2e81693b5fab87676453f314))
+
+
+### Features
+
+* **tiktok:** add feed interface controls ([0c79175](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/0c79175312c45e74af99d6d986564a79742affbe))
+
+
+
+
+
+## 0.8.0-dev.3
+
+# [0.8.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.1...v0.8.0-dev.2) (2026-08-30)
+
+
+### Bug Fixes
+
+* remove ineffective regional fallback ([714830c](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/714830caeeaa5be1691609efefdae4d50ff179c6))
+
+
+
+
+
+## 0.8.0-dev.2
+
+# [0.8.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.7.0...v0.8.0-dev.1) (2026-08-27)
+
+
+### Features
+
+* add configurable regional restriction fallback ([9781ef2](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/9781ef2c18b1372764f590260e37d3df54fd6794))
+
+
+
+
+
+## 0.8.0-dev.1
+
 # [0.7.0](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.6.1...v0.7.0) (2026-08-23)
 
 

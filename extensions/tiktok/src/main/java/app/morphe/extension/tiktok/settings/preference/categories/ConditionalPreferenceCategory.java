@@ -11,6 +11,7 @@ import android.preference.PreferenceScreen;
 import android.view.View;
 
 import app.morphe.extension.tiktok.settings.preference.SettingsUi;
+import app.morphe.extension.tiktok.settings.preference.SettingsGroupPreference;
 
 @SuppressWarnings("deprecation")
 public abstract class ConditionalPreferenceCategory extends PreferenceCategory {
@@ -27,10 +28,13 @@ public abstract class ConditionalPreferenceCategory extends PreferenceCategory {
 
     public abstract void addPreferences(Context context);
 
+    protected final SettingsGroupPreference group(Context context, String title) {
+        return new SettingsGroupPreference(context, title);
+    }
+
     @Override
     protected void onBindView(View view) {
         super.onBindView(view);
         SettingsUi.styleCategory(view);
     }
 }
-

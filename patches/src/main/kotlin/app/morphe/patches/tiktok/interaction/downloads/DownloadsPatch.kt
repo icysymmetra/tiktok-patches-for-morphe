@@ -33,7 +33,9 @@ private const val FILENAME_FORMATTER_CLASS_DESCRIPTOR = "Lapp/morphe/extension/t
 @Suppress("unused")
 val downloadsPatch = bytecodePatch(
     name = "Downloads",
-    description = "Adds watermark-free downloads, comment sticker saving, configurable folders, and filename templates.",
+    description =
+        "Adds watermark-free downloads, video quality selection, comment sticker saving, " +
+            "configurable folders, and filename templates.",
     default = true,
 ) {
     dependsOn(sharedExtensionPatch)

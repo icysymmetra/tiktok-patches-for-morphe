@@ -41,30 +41,45 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Disable login requirement` | Removes TikTok's mandatory login gate from supported flows. |
 | `Disable long-press quick share` | Keeps long-pressing Share from opening TikTok's quick-share interaction. |
 | `Disable long-press repost` | Keeps holding Like from opening TikTok's repost action without disabling TikTok's wider repost and upvote systems. |
-| `Disable screen capture detection` | Prevents TikTok from detecting screenshots and screen recordings. |
+| `Disable screen capture detection` | Disables capture detection and secure-window screenshot protection, including Circle to Search blocking. |
 | `Diagnostic tools` | Adds optional structured Morphe logs, TikTok crash capture, and clipboard or file report export. |
-| `Downloads` | Adds watermark-free downloads, filename templates, and comment sticker saving with animated-media preservation. |
+| `Downloads` | Adds watermark-free downloads, separate media destinations, filename templates, video quality selection, and comment sticker saving with animated-media preservation. |
 | `Enable Live search` | Shows TikTok's search entry in the Live drawer where supported. |
 | `Enable non-personalized search` | Uses TikTok's non-personalized search mode instead of its saved account choice. |
+| `Enable voice comments` | Enables TikTok's native voice-message controls in video comment sections when the account and server support them. |
 | `Feature Gate Lab` | Adds a searchable menu for viewing and overriding supported TikTok feature flags and configuration values. Client-side overrides cannot bypass server enforcement. |
 | `Feed filter` | Hides feed ads, TikTok Shop items, livestreams, stories, photo posts, and videos outside configured view or like ranges, with optional filtering of cached and offline FYP fallback videos. |
 | `Feed tab navigation` | Controls which loaded top and bottom navigation tabs remain visible, blocks newly added tabs when requested, and can hide the Tako AI bubble. |
 | `Fix Google login` | Restores Google account sign-in after patching. |
+| `Foldable split comment view` | Forces TikTok's tablet-style split layout, showing comments beside the video instead of as a bottom sheet, once the screen is at least as wide as a configurable threshold (600dp by default). Intended for foldables TikTok doesn't already treat as tablet-class. |
+| `Force show Auto scroll` | Adds a setting that bypasses TikTok's rollout gates for its native Auto scroll action on supported videos. |
 | `Hide CAPTCHA popups` | Hides non-account verification puzzle dialogs, including those shown while browsing LIVE. Account verification remains available, and server checks are not bypassed. |
 | `Hide floating promotions` | Removes floating promotional badges, coin icons, and timer banners from the Home feed. |
+| `Hide feed follow button` | Adds an option to hide the + follow button below creator avatars in video feeds. |
+| `Hide feed LIVE button` | Adds an option to hide the LIVE button at the top left of video feeds. |
+| `Hide feed save button` | Adds an option to hide the save/favourites button from video feeds. |
+| `Hide feed search button` | Adds an option to hide the search button at the top right of video feeds. |
 | `Hide quick comment reactions` | Hides TikTok's exposed quick emoji row in supported comment inputs. |
+| `Hide suggested accounts` | Removes suggested-account cards from profile and inbox surfaces. |
 | `Hold-and-slide 2x lock` | Enables TikTok's native hold, slide down, and release gesture for locking playback at 2x speed. |
 | `Open external links directly` | Opens profile and story website links in the system browser instead of TikTok's in-app browser. |
 | `Playback speed` | Enables playback-speed controls for all videos and remembers the selected speed between videos. |
 | `Remember clear display` | Remembers TikTok's clear-display state between videos. |
 | `Resume videos after scrolling` | Restores a video's prior playback position when returning to it in the feed. |
-| `SIM spoof` | Replaces SIM country and operator values reported to TikTok and provides country presets. TikTok may still use IP address, account history, language, and other region signals. |
+| `Region spoof` | Adds in-app controls for changing the region identity values TikTok reads. TikTok may still use IP address, account history, language, and other region signals. |
 | `Sanitize sharing links` | Removes tracking parameters from TikTok links before they are shared. |
 | `Settings` | Adds the Metra patches settings screen inside TikTok. |
+| `Share sheet modification` | Toggles the share sheet's "Send to", "Share via app", and "Video Actions" sections, with an allow-list for which apps and actions appear in the latter two. |
 | `Show seekbar` | Shows TikTok's native video seekbar where it would normally be hidden. |
 | `Show seekbar thumbnail` | Shows TikTok's video preview thumbnail while dragging the seekbar. |
 | `Stop video looping` | Stops a completed video instead of automatically replaying it. |
 | `Translate comments` | Adds comment translation controls using TikTok's translation system, with selectable language exclusions. |
+
+<br>
+
+## Regional Restrictions
+
+Region spoofing changes the country, SIM, carrier, and related region details that TikTok reads from the app, so it can help with client-side region checks and onboarding. It cannot hide the public IP address that TikTok's servers see from the connection, so it cannot replace a VPN or proxy in a country where TikTok blocks service by IP. The regional popup can be hidden, but that only removes the warning and does not turn a rejected feed request into a successful one. TikTok may also keep a blocked network state for a while after a VPN is disconnected, in which case force-stopping TikTok and clearing its cache can be required before the feed recovers.
 
 <br>
 
@@ -123,6 +138,8 @@ Morphe reads `patches-bundle.json` from this repository, downloads the `.mpp` re
 
 - Thanks to [@lyyako](https://github.com/lyyako) for the original contributions behind the simplified sanitize sharing links hook, show seekbar patch, anti-recording patch, `Open external links directly`, and `Always show publish date`.
 - Thanks to [@oscski](https://github.com/oscski) for the original contribution behind `Disable long-press repost`.
+- Thanks to [@HazyArc14](https://github.com/HazyArc14) for the original contributions behind `Share sheet modification` and `Foldable split comment view`.
+- Thanks to [@tymmesyde](https://github.com/tymmesyde) for the original contribution behind `Hide suggested accounts`.
 
 ## Notes
 

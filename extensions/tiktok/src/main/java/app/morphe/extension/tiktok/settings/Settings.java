@@ -16,6 +16,8 @@ import app.morphe.extension.shared.settings.Setting;
 import app.morphe.extension.shared.settings.StringSetting;
 import app.morphe.extension.tiktok.navigation.BottomNavigationTabOptions;
 import app.morphe.extension.tiktok.navigation.NavigationTabOptions;
+import app.morphe.extension.tiktok.sharesheet.ShareChannelOptions;
+import app.morphe.extension.tiktok.sharesheet.VideoActionOptions;
 
 public class Settings extends BaseSettings {
     public static final BooleanSetting REMOVE_ADS = new BooleanSetting("remove_ads", TRUE, true);
@@ -27,7 +29,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_HOMEPAGE_COIN = new BooleanSetting("hide_homepage_coin", FALSE, true);
     public static final StringSetting MIN_MAX_VIEWS = new StringSetting("min_max_views", "0-" + Long.MAX_VALUE, true);
     public static final StringSetting MIN_MAX_LIKES = new StringSetting("min_max_likes", "0-" + Long.MAX_VALUE, true);
-    public static final BooleanSetting FILTER_CACHED_OFFLINE_VIDEOS = new BooleanSetting(
+    public static final BooleanSetting FILTER_OFFLINE_FALLBACK_VIDEOS = new BooleanSetting(
             "filter_cached_offline_videos",
             TRUE,
             true
@@ -75,10 +77,21 @@ public class Settings extends BaseSettings {
     public static final StringSetting COMMENT_TRANSLATION_EXCLUDED_LANGUAGES = new StringSetting("comment_translation_excluded_languages", "");
     public static final BooleanSetting HIDE_COMMENT_QUICK_REACTIONS =
             new BooleanSetting("hide_comment_quick_reactions", FALSE);
+    public static final BooleanSetting HIDE_FEED_FOLLOW_BUTTON =
+            new BooleanSetting("hide_feed_follow_button", FALSE, true);
+    public static final BooleanSetting HIDE_FEED_SAVE_BUTTON =
+            new BooleanSetting("hide_feed_save_button", FALSE, true);
+    public static final BooleanSetting HIDE_FEED_LIVE_BUTTON =
+            new BooleanSetting("hide_feed_live_button", FALSE, true);
+    public static final BooleanSetting HIDE_FEED_SEARCH_BUTTON =
+            new BooleanSetting("hide_feed_search_button", FALSE, true);
+    public static final BooleanSetting HIDE_SUGGESTED_ACCOUNTS =
+            new BooleanSetting("hide_suggested_accounts", TRUE, true);
     public static final StringSetting DOWNLOAD_PATH = new StringSetting("down_path", "DCIM/TikTok");
     public static final StringSetting DOWNLOAD_VIDEO_PATH = new StringSetting("download_video_path", "DCIM/TikTok");
     public static final StringSetting DOWNLOAD_PHOTO_PATH = new StringSetting("download_photo_path", "DCIM/TikTok");
     public static final StringSetting DOWNLOAD_STICKER_PATH = new StringSetting("download_sticker_path", "DCIM/TikTok");
+    public static final StringSetting DOWNLOAD_VIDEO_QUALITY = new StringSetting("download_video_quality", "high");
     private static final BooleanSetting DOWNLOAD_PATHS_MIGRATED = new BooleanSetting(
             "download_paths_migrated",
             FALSE,
@@ -119,6 +132,18 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting OPEN_EXTERNAL_LINKS = new BooleanSetting("open_external_links", TRUE);
     public static final BooleanSetting ALWAYS_SHOW_PUBLISH_DATE = new BooleanSetting("always_show_publish_date", TRUE, true);
     public static final BooleanSetting CLEAR_DISPLAY = new BooleanSetting("clear_display", FALSE);
+    public static final BooleanSetting FOLDABLE_SPLIT_VIEW = new BooleanSetting("foldable_split_view", FALSE, true);
+    public static final BooleanSetting COMMENT_SORT_FORCE_SHOW = new BooleanSetting(
+            "comment_sort_force_show",
+            FALSE,
+            true
+    );
+    public static final IntegerSetting FOLDABLE_SPLIT_VIEW_MIN_WIDTH_DP = new IntegerSetting(
+            "foldable_split_view_min_width_dp",
+            600,
+            true,
+            Setting.parent(FOLDABLE_SPLIT_VIEW)
+    );
     public static final BooleanSetting COPY_COMMENTS_WITHOUT_USERNAME = new BooleanSetting("copy_comments_without_username", TRUE);
     public static final FloatSetting REMEMBERED_SPEED = new FloatSetting("remembered_speed_v2", 1.0f);
     public static final BooleanSetting ENABLE_LONG_PRESS_SPEED_LOCK = new BooleanSetting("enable_long_press_speed_lock", FALSE, true);
@@ -134,6 +159,39 @@ public class Settings extends BaseSettings {
     public static final StringSetting SIM_SPOOF_ISO = new StringSetting("simspoof_iso", "us");
     public static final StringSetting SIMSPOOF_MCCMNC = new StringSetting("simspoof_mccmnc", "310260");
     public static final StringSetting SIMSPOOF_OP_NAME = new StringSetting("simspoof_op_name", "T-Mobile");
+    public static final BooleanSetting SHARE_SHEET_SEND_TO = new BooleanSetting("share_sheet_send_to", TRUE, true);
+    // Keep the original key so existing installations retain the user's choice.
+    public static final BooleanSetting FORCE_SHOW_AUTO_SCROLL = new BooleanSetting(
+            "share_sheet_force_auto_scroll",
+            FALSE,
+            true
+    );
+    public static final BooleanSetting SHARE_SHEET_CHANNELS = new BooleanSetting("share_sheet_channels", TRUE, true);
+    public static final StringSetting SHARE_SHEET_CHANNELS_ENABLED = new StringSetting(
+            "share_sheet_channels_enabled",
+            ShareChannelOptions.defaultEnabledKeys(),
+            true,
+            Setting.parent(SHARE_SHEET_CHANNELS)
+    );
+    public static final StringSetting SHARE_SHEET_CHANNELS_OBSERVED = new StringSetting(
+            "share_sheet_channels_observed",
+            "",
+            false,
+            false
+    );
+    public static final BooleanSetting SHARE_SHEET_ACTIONS = new BooleanSetting("share_sheet_actions", TRUE, true);
+    public static final StringSetting SHARE_SHEET_ACTIONS_ENABLED = new StringSetting(
+            "share_sheet_actions_enabled",
+            VideoActionOptions.defaultEnabledKeys(),
+            true,
+            Setting.parent(SHARE_SHEET_ACTIONS)
+    );
+    public static final StringSetting SHARE_SHEET_ACTIONS_OBSERVED = new StringSetting(
+            "share_sheet_actions_observed",
+            "",
+            false,
+            false
+    );
 
     static {
         if (!DOWNLOAD_PATHS_MIGRATED.get()) {

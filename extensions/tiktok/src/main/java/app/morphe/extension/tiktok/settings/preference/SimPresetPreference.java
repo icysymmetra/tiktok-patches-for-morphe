@@ -44,7 +44,7 @@ public class SimPresetPreference extends Preference {
         this.countryIsoPreference = countryIsoPreference;
         this.mccMncPreference = mccMncPreference;
         this.operatorNamePreference = operatorNamePreference;
-        setTitle("SIM country preset");
+        setTitle("Region preset");
         refreshSummary();
     }
 
@@ -89,7 +89,7 @@ public class SimPresetPreference extends Preference {
         dialogView.setPadding(padding, padding, padding, padding);
 
         TextView title = new TextView(context);
-        title.setText("SIM country preset");
+        title.setText("Region preset");
         title.setTextColor(getTitleTextColor());
         title.setTextSize(20);
         title.setTypeface(title.getTypeface(), android.graphics.Typeface.BOLD);
@@ -99,7 +99,7 @@ public class SimPresetPreference extends Preference {
         ));
 
         TextView helper = new TextView(context);
-        helper.setText("Choose a preset to fill the SIM details.");
+        helper.setText("Choose a preset to fill these region details.");
         helper.setTextColor(getSummaryTextColor());
         LinearLayout.LayoutParams helperParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -214,7 +214,7 @@ public class SimPresetPreference extends Preference {
         if (Settings.SIM_SPOOF.get()) {
             AbstractPreferenceFragment.showRestartDialog(getContext());
         } else {
-            app.morphe.extension.shared.Utils.showToastShort("SIM preset saved");
+            app.morphe.extension.shared.Utils.showToastShort("Region preset saved");
         }
 
         return true;

@@ -22,6 +22,7 @@ public class FeedNavigationPreferenceCategory extends ConditionalPreferenceCateg
 
     @Override
     public void addPreferences(Context context) {
+        addPreference(group(context, "Feed tabs"));
         addPreference(new TogglePreference(
                 context,
                 "Filter feed tabs",
@@ -38,6 +39,8 @@ public class FeedNavigationPreferenceCategory extends ConditionalPreferenceCateg
                 "Hide tabs TikTok adds later unless you allow them.",
                 Settings.FEED_NAVIGATION_BLOCK_NEW_TABS
         ));
+
+        addPreference(group(context, "Bottom navigation"));
         addPreference(new TogglePreference(
                 context,
                 "Filter bottom tabs",
@@ -55,6 +58,8 @@ public class FeedNavigationPreferenceCategory extends ConditionalPreferenceCateg
                 "Hide bottom tabs TikTok adds later unless you allow them.",
                 Settings.BOTTOM_NAVIGATION_BLOCK_NEW_TABS
         ));
+
+        addPreference(group(context, "Other navigation"));
         addPreference(new TogglePreference(
                 context,
                 "Hide Tako AI",

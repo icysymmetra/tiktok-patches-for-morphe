@@ -18,7 +18,7 @@ import app.morphe.extension.tiktok.settings.preference.TogglePreference;
 public class SimSpoofPreferenceCategory extends ConditionalPreferenceCategory {
     public SimSpoofPreferenceCategory(Context context, PreferenceScreen screen) {
         super(context, screen);
-        setTitle("Bypass regional restriction");
+        setTitle("Region spoof");
     }
 
     @Override
@@ -28,10 +28,11 @@ public class SimSpoofPreferenceCategory extends ConditionalPreferenceCategory {
 
     @Override
     public void addPreferences(Context context) {
+        addPreference(group(context, "Region selection"));
         addPreference(new TogglePreference(
                 context,
-                "Fake sim card info",
-                "Bypass regional restriction by fake sim card information.",
+                "Use custom region",
+                "Use the selected region instead of the device region.",
                 Settings.SIM_SPOOF
         ));
         InputTextPreference countryIsoPreference = new InputTextPreference(
@@ -82,9 +83,10 @@ public class SimSpoofPreferenceCategory extends ConditionalPreferenceCategory {
         });
 
         addPreference(simPresetPreference);
+
+        addPreference(group(context, "Manual operator values"));
         addPreference(countryIsoPreference);
         addPreference(mccMncPreference);
         addPreference(operatorNamePreference);
     }
 }
-

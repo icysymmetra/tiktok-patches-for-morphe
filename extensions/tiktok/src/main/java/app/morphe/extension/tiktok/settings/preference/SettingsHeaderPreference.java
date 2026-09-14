@@ -107,6 +107,7 @@ public final class SettingsHeaderPreference extends Preference {
         LinearLayout.LayoutParams kickerParams = new LinearLayout.LayoutParams(0, -2, 1);
         kickerParams.leftMargin = SettingsUi.dp(context, 4);
         topRow.addView(kicker, kickerParams);
+        topRow.addView(createSupportPill(context), new LinearLayout.LayoutParams(-2, -2));
         container.addView(topRow, new LinearLayout.LayoutParams(-1, -2));
 
         TextView title = SettingsUi.text(context, heading, 32, SettingsUi.textPrimary(), 1);
@@ -152,7 +153,12 @@ public final class SettingsHeaderPreference extends Preference {
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, -2, 1);
         titleParams.leftMargin = SettingsUi.dp(context, 4);
         container.addView(title, titleParams);
+        container.addView(createSupportPill(context), new LinearLayout.LayoutParams(-2, -2));
         return container;
+    }
+
+    private View createSupportPill(Context context) {
+        return SupportUi.createPill(context);
     }
 
     private View createCaption() {

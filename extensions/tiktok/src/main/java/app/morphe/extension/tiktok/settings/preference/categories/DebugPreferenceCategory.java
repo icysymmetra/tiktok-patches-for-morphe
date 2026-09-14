@@ -28,6 +28,7 @@ public class DebugPreferenceCategory extends ConditionalPreferenceCategory {
 
     @Override
     public void addPreferences(Context context) {
+        addPreference(group(context, "Logging and crash capture"));
         addPreference(new TogglePreference(
                 context,
                 "Enable diagnostic logging",
@@ -42,6 +43,7 @@ public class DebugPreferenceCategory extends ConditionalPreferenceCategory {
                 BaseSettings.CAPTURE_JAVA_CRASHES
         ));
 
+        addPreference(group(context, "Reports and stored data"));
         var logFilter = new TintedLogExportFilterPreference(context);
         logFilter.setTitle("Included diagnostics");
         addPreference(logFilter);
