@@ -33,6 +33,9 @@ private const val TRENDING_TOPIC_LIST_DESCRIPTOR =
     "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;"
 private const val MID_AD_RESPONSE_DESCRIPTOR =
     "Lcom/ss/android/ugc/aweme/commercialize/feed/assem/midad/MidAdResponse;"
+private const val USER_DESCRIPTOR = "Lcom/ss/android/ugc/aweme/profile/model/User;"
+private const val MATCHED_FRIEND_DESCRIPTOR =
+    "Lcom/ss/android/ugc/aweme/profile/model/MatchedFriendStruct;"
 
 internal object MainFeedResponseFingerprint : Fingerprint(
     definingClass = "Lcom/ss/android/ugc/aweme/feed/FeedApiService;",
@@ -145,6 +148,33 @@ internal object MidAdResponseFingerprint : Fingerprint(
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
     returnType = AWEME_DESCRIPTOR,
     parameters = emptyList(),
+)
+
+internal object ProfileAdEligibilityFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    returnType = "Z",
+    parameters = listOf(USER_DESCRIPTOR),
+    strings = listOf("profile_ad_experiment"),
+    custom = { method, _ ->
+        val fieldReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<FieldReference>() }
+            ?: emptyList()
+        val methodReferences = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<MethodReference>() }
+            ?: emptyList()
+
+        fieldReferences.any {
+            it.definingClass == MATCHED_FRIEND_DESCRIPTOR &&
+                it.name == "recType" && it.type == "Ljava/lang/String;"
+        } && methodReferences.any {
+            it.definingClass == USER_DESCRIPTOR &&
+                it.name == "getMatchedFriendStruct" &&
+                it.returnType == MATCHED_FRIEND_DESCRIPTOR
+        } && methodReferences.any {
+            it.definingClass == USER_DESCRIPTOR &&
+                it.name == "getFollowStatus" && it.returnType == "I"
+        }
+    },
 )
 
 internal object FollowFeedFingerprint : Fingerprint(

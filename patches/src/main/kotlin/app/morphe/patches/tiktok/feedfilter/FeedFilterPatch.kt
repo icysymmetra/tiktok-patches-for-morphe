@@ -107,6 +107,24 @@ val feedFilterPatch = bytecodePatch(
             }
         }
 
+        ProfileAdEligibilityFingerprint.method.let { method ->
+            val returnIndices = method.implementation!!.instructions.withIndex()
+                .filter { it.value.opcode == Opcode.RETURN }
+                .map { it.index }
+                .toList()
+
+            returnIndices.asReversed().forEach { returnIndex ->
+                val register = method.getInstruction<OneRegisterInstruction>(returnIndex).registerA
+                method.addInstructionsAtControlFlowLabel(
+                    returnIndex,
+                    """
+                        invoke-static/range {v$register .. v$register}, $EXTENSION_CLASS_DESCRIPTOR->filterProfileAdEligibility(Z)Z
+                        move-result v$register
+                    """,
+                )
+            }
+        }
+
         FollowFeedFingerprint.method.let { method ->
             val returnIndices =
                 method.implementation!!.instructions.withIndex()

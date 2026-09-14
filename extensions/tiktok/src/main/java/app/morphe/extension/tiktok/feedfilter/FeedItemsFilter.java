@@ -122,6 +122,10 @@ public final class FeedItemsFilter {
         return filterAdOnlyAwemeList("ProfileAwemeList", items);
     }
 
+    public static boolean filterProfileAdEligibility(boolean eligible) {
+        return !ADS_FILTER.getEnabled() && eligible;
+    }
+
     public static void filterSearchAds(SearchMixFeedList response) {
         if (response == null || response.mItems == null || !ADS_FILTER.getEnabled()) return;
 
