@@ -17,7 +17,7 @@ import app.morphe.extension.shared.settings.StringSetting;
 import app.morphe.extension.tiktok.navigation.BottomNavigationTabOptions;
 import app.morphe.extension.tiktok.navigation.NavigationTabOptions;
 import app.morphe.extension.tiktok.sharesheet.ShareChannelOptions;
-import app.morphe.extension.tiktok.sharesheet.VideoActionOptions;
+import app.morphe.extension.tiktok.sharesheet.ShareSheetOptions;
 
 public class Settings extends BaseSettings {
     public static final BooleanSetting REMOVE_ADS = new BooleanSetting("remove_ads", TRUE, true);
@@ -182,7 +182,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting SHARE_SHEET_ACTIONS = new BooleanSetting("share_sheet_actions", TRUE, true);
     public static final StringSetting SHARE_SHEET_ACTIONS_ENABLED = new StringSetting(
             "share_sheet_actions_enabled",
-            VideoActionOptions.defaultEnabledKeys(),
+            ShareSheetOptions.VIDEO_ACTIONS.defaultEnabledKeys(),
             true,
             Setting.parent(SHARE_SHEET_ACTIONS)
     );
@@ -192,8 +192,46 @@ public class Settings extends BaseSettings {
             false,
             false
     );
+    public static final BooleanSetting SHARE_SHEET_USER_ACTIONS =
+            new BooleanSetting("share_sheet_user_actions", TRUE, true);
+    public static final StringSetting SHARE_SHEET_USER_ACTIONS_ENABLED = new StringSetting(
+            "share_sheet_user_actions_enabled",
+            ShareSheetOptions.USER_ACTIONS.defaultEnabledKeys(),
+            true,
+            Setting.parent(SHARE_SHEET_USER_ACTIONS)
+    );
+    public static final StringSetting SHARE_SHEET_USER_ACTIONS_OBSERVED = new StringSetting(
+            "share_sheet_user_actions_observed",
+            "",
+            false,
+            false
+    );
+    public static final BooleanSetting SHARE_SHEET_LIVE_ACTIONS =
+            new BooleanSetting("share_sheet_live_actions", TRUE, true);
+    public static final StringSetting SHARE_SHEET_LIVE_ACTIONS_ENABLED = new StringSetting(
+            "share_sheet_live_actions_enabled",
+            ShareSheetOptions.LIVE_ACTIONS.defaultEnabledKeys(),
+            true,
+            Setting.parent(SHARE_SHEET_LIVE_ACTIONS)
+    );
+    public static final StringSetting SHARE_SHEET_LIVE_ACTIONS_OBSERVED = new StringSetting(
+            "share_sheet_live_actions_observed",
+            "",
+            false,
+            false
+    );
+    private static final BooleanSetting SHARE_SHEET_ACTIONS_SPLIT_MIGRATED =
+            new BooleanSetting("share_sheet_actions_split_migrated", FALSE, false, false);
 
     static {
+        if (!SHARE_SHEET_ACTIONS_SPLIT_MIGRATED.get()) {
+            SHARE_SHEET_ACTIONS_ENABLED.save(
+                    ShareSheetOptions.pruneUserOnlyKeys(SHARE_SHEET_ACTIONS_ENABLED.get()));
+            SHARE_SHEET_ACTIONS_OBSERVED.save(
+                    ShareSheetOptions.pruneUserOnlyKeys(SHARE_SHEET_ACTIONS_OBSERVED.get()));
+            SHARE_SHEET_ACTIONS_SPLIT_MIGRATED.save(TRUE);
+        }
+
         if (!DOWNLOAD_PATHS_MIGRATED.get()) {
             String legacyPath = DOWNLOAD_PATH.get();
             DOWNLOAD_VIDEO_PATH.save(legacyPath);

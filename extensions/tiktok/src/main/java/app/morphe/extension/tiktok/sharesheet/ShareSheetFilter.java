@@ -15,12 +15,20 @@ import app.morphe.extension.shared.settings.StringSetting;
 import app.morphe.extension.tiktok.settings.Settings;
 
 /**
- * Filters the "Share via" and "Video Actions" lists TikTok builds on its
- * {@code C1476000oVp} panel builder, and toggles "Send to" via the same builder's
- * {@code LJJIIJZLJL} ("supports IM") field. Neither the builder nor its list-item types
- * are on this module's compile classpath, so everything here is reflective.
+ * Filters the "Share via" and action lists TikTok builds on its {@code X.0oVp} panel builder, and
+ * toggles "Send to" via the same builder's {@code LJJIIJZLJL} ("supports IM") field. Neither the
+ * builder nor its list-item types are on this module's compile classpath, so everything here is
+ * reflective.
+ * <p>
+ * That builder is shared by every "share this thing" surface, and each exposes a different set of
+ * actions from the same field, so the share package it carries picks which allow-list applies:
+ * video, profile, or live.
  */
 public final class ShareSheetFilter {
+    private static final String USER_SHARE_PACKAGE_CLASS =
+            "com.ss.android.ugc.aweme.share.improve.pkg.UserSharePackage";
+    private static final String LIVE_SHARE_PACKAGE_CLASS =
+            "com.ss.android.ugc.aweme.share.improve.pkg.LiveSharePackage";
 
     private ShareSheetFilter() {
     }
@@ -34,12 +42,42 @@ public final class ShareSheetFilter {
                 Settings.SHARE_SHEET_CHANNELS_ENABLED,
                 Settings.SHARE_SHEET_CHANNELS_OBSERVED,
                 ShareChannelOptions::parseEnabledKeys,
-                ShareChannelOptions::parseObservedKeys,
                 ShareChannelOptions::serializeEnabledKeys
         );
     }
 
     public static void filterActions(Object builder) {
+        String surface = sharePackageClass(builder);
+        Logger.printDebug(() -> "Share sheet: panel surface=" + surface);
+
+        if (USER_SHARE_PACKAGE_CLASS.equals(surface)) {
+            filterList(
+                    builder,
+                    "LJFF",
+                    "User Actions",
+                    Settings.SHARE_SHEET_USER_ACTIONS,
+                    Settings.SHARE_SHEET_USER_ACTIONS_ENABLED,
+                    Settings.SHARE_SHEET_USER_ACTIONS_OBSERVED,
+                    ShareSheetOptions.USER_ACTIONS::parseKeys,
+                    ShareSheetOptions.USER_ACTIONS::serializeKeys
+            );
+            return;
+        }
+
+        if (LIVE_SHARE_PACKAGE_CLASS.equals(surface)) {
+            filterList(
+                    builder,
+                    "LJFF",
+                    "Live Actions",
+                    Settings.SHARE_SHEET_LIVE_ACTIONS,
+                    Settings.SHARE_SHEET_LIVE_ACTIONS_ENABLED,
+                    Settings.SHARE_SHEET_LIVE_ACTIONS_OBSERVED,
+                    ShareSheetOptions.LIVE_ACTIONS::parseKeys,
+                    ShareSheetOptions.LIVE_ACTIONS::serializeKeys
+            );
+            return;
+        }
+
         filterList(
                 builder,
                 "LJFF",
@@ -47,9 +85,8 @@ public final class ShareSheetFilter {
                 Settings.SHARE_SHEET_ACTIONS,
                 Settings.SHARE_SHEET_ACTIONS_ENABLED,
                 Settings.SHARE_SHEET_ACTIONS_OBSERVED,
-                VideoActionOptions::parseEnabledKeys,
-                VideoActionOptions::parseObservedKeys,
-                VideoActionOptions::serializeEnabledKeys
+                ShareSheetOptions.VIDEO_ACTIONS::parseKeys,
+                ShareSheetOptions.VIDEO_ACTIONS::serializeKeys
         );
     }
 
@@ -69,6 +106,20 @@ public final class ShareSheetFilter {
             supportImField.setBoolean(builder, false);
         } catch (Throwable t) {
             Logger.printException(() -> "Share sheet: send-to visibility override failed", t);
+        }
+    }
+
+    /**
+     * The panel builder is shared by every "share this thing" surface; the share package it
+     * carries is what identifies the surface.
+     */
+    private static String sharePackageClass(Object builder) {
+        try {
+            Object sharePackage = findField(builder.getClass(), "LJJIIJ").get(builder);
+            return sharePackage == null ? null : sharePackage.getClass().getName();
+        } catch (Throwable t) {
+            Logger.printException(() -> "Share sheet: could not identify panel surface", t);
+            return null;
         }
     }
 
@@ -92,8 +143,7 @@ public final class ShareSheetFilter {
             BooleanSetting masterToggle,
             StringSetting enabledSetting,
             StringSetting observedSetting,
-            Function<String, Set<String>> parseEnabledKeys,
-            Function<String, Set<String>> parseObservedKeys,
+            Function<String, Set<String>> parseKeys,
             Function<Set<String>, String> serializeKeys
     ) {
         try {
@@ -111,7 +161,7 @@ public final class ShareSheetFilter {
             }
             List<Object> list = (List<Object>) raw;
 
-            Set<String> previousObserved = parseObservedKeys.apply(observedSetting.get());
+            Set<String> previousObserved = parseKeys.apply(observedSetting.get());
             LinkedHashSet<String> observedNow = new LinkedHashSet<>(previousObserved);
             LinkedHashSet<String> newlyObserved = new LinkedHashSet<>();
             List<String> thisPassKeys = new ArrayList<>();
@@ -132,7 +182,7 @@ public final class ShareSheetFilter {
             }
 
             if (!newlyObserved.isEmpty()) {
-                Set<String> enabledKeys = parseEnabledKeys.apply(enabledSetting.get());
+                Set<String> enabledKeys = parseKeys.apply(enabledSetting.get());
                 if (enabledKeys.addAll(newlyObserved)) {
                     enabledSetting.save(serializeKeys.apply(enabledKeys));
                 }
@@ -143,7 +193,7 @@ public final class ShareSheetFilter {
                 return;
             }
 
-            Set<String> enabledKeys = parseEnabledKeys.apply(enabledSetting.get());
+            Set<String> enabledKeys = parseKeys.apply(enabledSetting.get());
             Iterator<Object> iterator = list.iterator();
             while (iterator.hasNext()) {
                 String key = itemKey(iterator.next());

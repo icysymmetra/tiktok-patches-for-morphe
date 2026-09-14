@@ -12,7 +12,7 @@ import app.morphe.extension.tiktok.settings.SettingsStatus;
 import app.morphe.extension.tiktok.settings.preference.ShareSheetItemSelectionPreference;
 import app.morphe.extension.tiktok.settings.preference.TogglePreference;
 import app.morphe.extension.tiktok.sharesheet.ShareChannelOptions;
-import app.morphe.extension.tiktok.sharesheet.VideoActionOptions;
+import app.morphe.extension.tiktok.sharesheet.ShareSheetOptions;
 
 @SuppressWarnings("deprecation")
 public class ShareSheetPreferenceCategory extends ConditionalPreferenceCategory {
@@ -70,10 +70,51 @@ public class ShareSheetPreferenceCategory extends ConditionalPreferenceCategory 
                 "Only actions TikTok has exposed on this installation are listed. Open a video's Share menu "
                         + "once to discover currently available actions; newly discovered actions start enabled.",
                 Settings.SHARE_SHEET_ACTIONS_ENABLED,
-                VideoActionOptions::parseEnabledKeys,
-                VideoActionOptions::serializeEnabledKeys,
-                keys -> toRowsFromActions(VideoActionOptions.optionsForKeys(keys)),
+                ShareSheetOptions.VIDEO_ACTIONS::parseKeys,
+                ShareSheetOptions.VIDEO_ACTIONS::serializeKeys,
+                keys -> toRowsFromActions(ShareSheetOptions.VIDEO_ACTIONS.optionsForKeys(keys)),
                 ShareSheetPreferenceCategory::observedActionKeys
+        ));
+
+        addPreference(group(context, "User actions"));
+        addPreference(new TogglePreference(
+                context,
+                "Show \"User Actions\"",
+                "Show the actions grid on a profile's share sheet (Report, Block User, Message, ...).",
+                Settings.SHARE_SHEET_USER_ACTIONS
+        ));
+        addPreference(new ShareSheetItemSelectionPreference(
+                context,
+                "Allowed user actions",
+                "Allowed user actions",
+                "Only actions TikTok has exposed on this installation are listed. Open a profile's Share menu "
+                        + "once to discover currently available actions; newly discovered actions start enabled.",
+                Settings.SHARE_SHEET_USER_ACTIONS_ENABLED,
+                ShareSheetOptions.USER_ACTIONS::parseKeys,
+                ShareSheetOptions.USER_ACTIONS::serializeKeys,
+                keys -> toRowsFromActions(ShareSheetOptions.USER_ACTIONS.optionsForKeys(keys)),
+                ShareSheetPreferenceCategory::observedUserActionKeys
+        ));
+
+        addPreference(group(context, "Live actions"));
+        addPreference(new TogglePreference(
+                context,
+                "Show \"Live Actions\"",
+                "Show the actions grid on a live stream's share sheet.",
+                Settings.SHARE_SHEET_LIVE_ACTIONS
+        ));
+        addPreference(new ShareSheetItemSelectionPreference(
+                context,
+                "Allowed live actions",
+                "Allowed live actions",
+                "Only actions TikTok has exposed on this installation are listed. Open a live stream's "
+                        + "Share menu once to discover currently available actions; newly discovered "
+                        + "actions start enabled.",
+                Settings.SHARE_SHEET_LIVE_ACTIONS_ENABLED,
+                ShareSheetOptions.LIVE_ACTIONS::parseKeys,
+                ShareSheetOptions.LIVE_ACTIONS::serializeKeys,
+                keys -> toRowsFromActions(ShareSheetOptions.LIVE_ACTIONS.optionsForKeys(keys)),
+                ShareSheetPreferenceCategory::observedLiveActionKeys
         ));
     }
 
@@ -84,8 +125,20 @@ public class ShareSheetPreferenceCategory extends ConditionalPreferenceCategory 
     }
 
     private static Set<String> observedActionKeys() {
-        Set<String> keys = VideoActionOptions.parseEnabledKeys(Settings.SHARE_SHEET_ACTIONS_ENABLED.get());
-        keys.addAll(VideoActionOptions.parseObservedKeys(Settings.SHARE_SHEET_ACTIONS_OBSERVED.get()));
+        Set<String> keys = ShareSheetOptions.VIDEO_ACTIONS.parseKeys(Settings.SHARE_SHEET_ACTIONS_ENABLED.get());
+        keys.addAll(ShareSheetOptions.VIDEO_ACTIONS.parseKeys(Settings.SHARE_SHEET_ACTIONS_OBSERVED.get()));
+        return keys;
+    }
+
+    private static Set<String> observedLiveActionKeys() {
+        Set<String> keys = ShareSheetOptions.LIVE_ACTIONS.parseKeys(Settings.SHARE_SHEET_LIVE_ACTIONS_ENABLED.get());
+        keys.addAll(ShareSheetOptions.LIVE_ACTIONS.parseKeys(Settings.SHARE_SHEET_LIVE_ACTIONS_OBSERVED.get()));
+        return keys;
+    }
+
+    private static Set<String> observedUserActionKeys() {
+        Set<String> keys = ShareSheetOptions.USER_ACTIONS.parseKeys(Settings.SHARE_SHEET_USER_ACTIONS_ENABLED.get());
+        keys.addAll(ShareSheetOptions.USER_ACTIONS.parseKeys(Settings.SHARE_SHEET_USER_ACTIONS_OBSERVED.get()));
         return keys;
     }
 
@@ -98,10 +151,10 @@ public class ShareSheetPreferenceCategory extends ConditionalPreferenceCategory 
     }
 
     private static List<ShareSheetItemSelectionPreference.Row> toRowsFromActions(
-            List<VideoActionOptions.Option> options
+            List<ShareSheetOptions.Option> options
     ) {
         List<ShareSheetItemSelectionPreference.Row> rows = new ArrayList<>();
-        for (VideoActionOptions.Option option : options) {
+        for (ShareSheetOptions.Option option : options) {
             rows.add(new ShareSheetItemSelectionPreference.Row(option.key, option.label));
         }
         return rows;
