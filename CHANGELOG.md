@@ -1,3 +1,16 @@
+# [0.8.0-dev.10](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.9...v0.8.0-dev.10) (2026-09-14)
+
+
+### Bug Fixes
+
+* **tiktok:** extend ad filtering coverage ([154e0be](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/154e0be78aee40da6d2987e78760ac96c8820d01))
+
+
+
+
+
+## 0.8.0-dev.10
+
 # [0.8.0-dev.9](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.8...v0.8.0-dev.9) (2026-09-11)
 
 
