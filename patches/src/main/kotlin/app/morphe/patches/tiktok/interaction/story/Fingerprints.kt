@@ -14,3 +14,4 @@ internal object StoryViewReportFingerprint : Fingerprint(
         } == true
     },
 )
+
