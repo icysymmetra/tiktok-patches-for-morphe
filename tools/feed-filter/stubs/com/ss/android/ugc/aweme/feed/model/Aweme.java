@@ -3,6 +3,20 @@ package com.ss.android.ugc.aweme.feed.model;
 import com.ss.android.ugc.aweme.feed.AIGCInfo;
 
 public class Aweme {
+    public String itemDistributeSource;
+    public RecReasonsStruct recReasonsStruct;
+    public boolean throwSourceGetter;
+    public boolean throwReasonsGetter;
+
+    public String getItemDistributeSource() {
+        if (throwSourceGetter) throw new LinkageError("source fixture");
+        return itemDistributeSource;
+    }
+
+    public RecReasonsStruct getRecReasonsStruct() {
+        if (throwReasonsGetter) throw new LinkageError("reasons fixture");
+        return recReasonsStruct;
+    }
     public AIGCInfo aigcInfo;
     public ModerationAigcInfo moderationInfo;
     public boolean throwAigcGetter;

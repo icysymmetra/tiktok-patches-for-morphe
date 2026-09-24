@@ -8,6 +8,7 @@ package app.morphe.extension.tiktok.settings;
 public class SettingsStatus {
     public static boolean feedFilterEnabled = false;
     public static boolean hideAiContentEnabled = false;
+    public static boolean hideFypSlopEnabled = false;
     public static boolean feedNavigationEnabled = false;
     public static boolean commentTranslationEnabled = false;
     public static boolean hideCommentQuickReactionsEnabled = false;
@@ -43,6 +44,10 @@ public class SettingsStatus {
 
     public static void enableHideAiContent() {
         hideAiContentEnabled = true;
+    }
+
+    public static void enableHideFypSlop() {
+        hideFypSlopEnabled = true;
     }
 
     public static void enableFeedNavigation() {

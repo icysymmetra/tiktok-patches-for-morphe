@@ -41,7 +41,7 @@ private val feedListHooksPatch = bytecodePatch {
     execute {
         fun requirePublicClass(type: String) = classDefBy(type).also { classDef ->
             if (!AccessFlags.PUBLIC.isSet(classDef.accessFlags)) {
-                throw PatchException("Required AI model class is not public: $type")
+                throw PatchException("Required feed model class is not public: $type")
             }
         }
 
@@ -63,7 +63,7 @@ private val feedListHooksPatch = bytecodePatch {
             }
             val method = matches.single()
             if (!AccessFlags.PUBLIC.isSet(method.accessFlags) || AccessFlags.STATIC.isSet(method.accessFlags)) {
-                throw PatchException("Required AI model method is not a public instance method: $definingClass->$name")
+                throw PatchException("Required feed model method is not a public instance method: $definingClass->$name")
             }
         }
 
@@ -78,7 +78,7 @@ private val feedListHooksPatch = bytecodePatch {
             }
             val field = matches.single()
             if (!AccessFlags.PUBLIC.isSet(field.accessFlags) || AccessFlags.STATIC.isSet(field.accessFlags)) {
-                throw PatchException("Required AI model field is not a public instance field: $definingClass->$name")
+                throw PatchException("Required feed model field is not a public instance field: $definingClass->$name")
             }
         }
 
@@ -95,6 +95,16 @@ private val feedListHooksPatch = bytecodePatch {
         requirePublicInstanceMethod(aigcInfoType, "getAIGCLabelType", emptyList(), "I")
         requirePublicInstanceField(aigcInfoType, "createByAI", "Z")
         requirePublicInstanceField(moderationAigcInfoType, "moderationAigcLabelType", "I")
+        requirePublicInstanceMethod(awemeType, "getItemDistributeSource", emptyList(), "Ljava/lang/String;")
+        requirePublicInstanceMethod(
+            awemeType, "getRecReasonsStruct", emptyList(),
+            "Lcom/ss/android/ugc/aweme/feed/model/RecReasonsStruct;",
+        )
+        requirePublicClass("Lcom/ss/android/ugc/aweme/feed/model/RecReasonsStruct;")
+        requirePublicInstanceMethod(
+            "Lcom/ss/android/ugc/aweme/feed/panel/BaseListFragmentPanel;",
+            "getEventType", emptyList(), "Ljava/lang/String;",
+        )
 
         MainFeedResponseFingerprint.method.let { method ->
             val returnIndices =
@@ -195,6 +205,8 @@ private val feedListHooksPatch = bytecodePatch {
 
         ProfileNativeListTransformFingerprint.method.filterProfileItemsAtReturns()
 
+        ProfileDetailAdEventFingerprint.method.filterProfileDetailAdEvent()
+
         val finalFeedInsertionMethod = FinalFeedInsertionFingerprint.method
         val insertionPayloadType = finalFeedInsertionMethod.parameterTypes.single().toString()
         val insertionPayloadConstructors = mutableClassDefBy(insertionPayloadType).methods.filter { method ->
@@ -213,6 +225,49 @@ private val feedListHooksPatch = bytecodePatch {
             )
         }
         insertionPayloadConstructors.single().filterLateInsertedItems(insertionPayloadType)
+
+        val finalInsertionInstructions = finalFeedInsertionMethod.implementation?.instructions
+            ?: throw PatchException("Final feed insertion has no implementation")
+        val firstPayloadRead = finalInsertionInstructions.withIndex().firstOrNull { (_, instruction) ->
+            instruction.opcode == Opcode.IGET_OBJECT &&
+                instruction.getReference<FieldReference>()?.let { field ->
+                    field.definingClass == insertionPayloadType && field.type == "Ljava/util/List;"
+                } == true
+        } ?: throw PatchException("Final insertion does not read the payload List")
+        if (firstPayloadRead.index != 2 ||
+            finalInsertionInstructions.getOrNull(3)?.opcode != Opcode.IF_EQZ ||
+            finalInsertionInstructions.getOrNull(4)?.opcode != Opcode.INVOKE_INTERFACE
+        ) {
+            throw PatchException("Final insertion no longer checks the payload List before use")
+        }
+        val payloadListField = firstPayloadRead.value.getReference<FieldReference>()!!
+        val payloadClass = classDefBy(insertionPayloadType)
+        val listFields = payloadClass.fields.filter { it.type == "Ljava/util/List;" }
+        val positionFields = payloadClass.fields.filter { it.type == "I" && !AccessFlags.STATIC.isSet(it.accessFlags) }
+        val sourceFields = payloadClass.fields.filter { it.type == "Ljava/lang/String;" }
+        if (listFields.size != 1 || listFields.single().name != payloadListField.name ||
+            positionFields.size != 1 || sourceFields.size != 1
+        ) {
+            throw PatchException("Final insertion payload constructor fields have changed")
+        }
+        val positionField = "${insertionPayloadType}->${positionFields.single().name}:I"
+        val sourceField = "${insertionPayloadType}->${sourceFields.single().name}:Ljava/lang/String;"
+        finalFeedInsertionMethod.addInstructions(
+            0,
+            """
+                iget-object v0, p1, $payloadListField
+                invoke-static {p0, v0}, $EXTENSION_CLASS_DESCRIPTOR->filterFinalForYouInsertion(Lcom/ss/android/ugc/aweme/feed/panel/BaseListFragmentPanel;Ljava/util/List;)Ljava/util/List;
+                move-result-object v1
+                if-eq v0, v1, :morphe_keep_original_insertion_payload
+                iget v2, p1, $positionField
+                iget-object v3, p1, $sourceField
+                new-instance v4, $insertionPayloadType
+                invoke-direct {v4, v2, v3, v1}, $insertionPayloadType-><init>(ILjava/lang/String;Ljava/util/List;)V
+                move-object p1, v4
+                :morphe_keep_original_insertion_payload
+                nop
+            """,
+        )
 
         InsertedFeedItemsFingerprint.method.addInstructions(
             0,
@@ -438,6 +493,22 @@ val hideAiContentPatch = bytecodePatch(
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,
             "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableHideAiContent()V",
+        )
+    }
+}
+
+@Suppress("unused")
+val hideFypSlopPatch = bytecodePatch(
+    name = "Hide FYP unpersonalized slop videos",
+    description = "Hides posts from an observed FYP source when TikTok provides no recommendation details. Photo posts are included.",
+    default = true,
+) {
+    dependsOn(feedListHooksPatch, settingsPatch)
+    compatibleWith(*AppCompatibilities.tiktok4623())
+    execute {
+        SettingsStatusLoadFingerprint.method.addInstruction(
+            0,
+            "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableHideFypSlop()V",
         )
     }
 }

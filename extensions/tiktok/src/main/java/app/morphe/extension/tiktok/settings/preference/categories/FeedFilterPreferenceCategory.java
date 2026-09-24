@@ -22,7 +22,8 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
 
     @Override
     public boolean getSettingsStatus() {
-        return SettingsStatus.feedFilterEnabled || SettingsStatus.hideAiContentEnabled;
+        return SettingsStatus.feedFilterEnabled || SettingsStatus.hideAiContentEnabled
+                || SettingsStatus.hideFypSlopEnabled;
     }
 
     @Override
@@ -63,6 +64,15 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
                     Settings.HIDE_AI_CONTENT
             ));
         }
+        if (SettingsStatus.hideFypSlopEnabled) {
+            addPreference(new TogglePreference(
+                    context,
+                    "Hide FYP unpersonalized slop videos",
+                    "Experimental: hide posts from an observed FYP source when TikTok provides no recommendation details. Also includes photo posts.",
+                    Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES
+            ));
+        }
+
         if (SettingsStatus.feedFilterEnabled) {
             addPreference(group(context, "Popularity limits"));
             addPreference(new RangeValuePreference(
@@ -80,7 +90,7 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
             addPreference(new TogglePreference(
                     context,
                     "Filter offline fallback videos",
-                    "Apply the general content and popularity filters to downloaded fallback videos. The separately installed AI filter still applies.",
+                    "Apply the general content and popularity filters to downloaded fallback videos. Separately installed AI and FYP slop filters still apply.",
                     Settings.FILTER_OFFLINE_FALLBACK_VIDEOS
             ));
         }

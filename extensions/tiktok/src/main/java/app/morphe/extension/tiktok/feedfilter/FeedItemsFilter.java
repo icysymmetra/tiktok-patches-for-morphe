@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class FeedItemsFilter {
     private static final AdsFilter ADS_FILTER = new AdsFilter();
+    private static final AlternateForYouBatchFilter ALTERNATE_FILTER = new AlternateForYouBatchFilter();
     private static final List<IFilter> CONTENT_FILTERS = List.of(
         ADS_FILTER,
         new LiveFilter(),
@@ -41,6 +42,11 @@ public final class FeedItemsFilter {
         new ImageVideoFilter(),
         new ShopFilter()
     );
+    private static final List<IFilter> FOR_YOU_FILTERS = List.of(
+        ADS_FILTER, new LiveFilter(), new StoryFilter(), new ImageVideoFilter(),
+        new ShopFilter(), ALTERNATE_FILTER
+    );
+    private static final List<IFilter> ALTERNATE_ONLY_FILTERS = List.of(ALTERNATE_FILTER);
     private static final List<IFilter> RANGE_FILTERS = List.of(
         new ViewCountFilter(),
         new LikeCountFilter()
@@ -77,6 +83,17 @@ public final class FeedItemsFilter {
     private static AiSummary aiSummary = new AiSummary(SystemClock.elapsedRealtime());
     private static long lastAiErrorLogElapsed;
     private static int pendingAiReadErrors;
+    private static final Object alternateSummaryLock = new Object();
+    private static long alternateSummaryStarted = SystemClock.elapsedRealtime();
+    private static int alternateCalls;
+    private static int alternateMatched;
+    private static int alternateRemoved;
+    private static int alternateReadErrors;
+    private static int alternateCallbackErrors;
+    private static int alternateInputSize;
+    private static int alternateOutputSize;
+    private static String alternateLastRoute = "none";
+    private static String alternateLastStatus = "none";
 
     private FeedItemsFilter() {}
 
@@ -378,6 +395,34 @@ public final class FeedItemsFilter {
         return outcome.effectiveList;
     }
 
+    /** Final native payload boundary, after the destination panel is known. */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static List filterFinalForYouInsertion(BaseListFragmentPanel panel, List items) {
+        if (panel == null || items == null || items.isEmpty()) return items;
+        FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
+        if (!settings.hideAlternate) return items;
+        try {
+            if (!"homepage_hot".equals(panel.getEventType())) return items;
+        } catch (RuntimeException | LinkageError error) {
+            return items;
+        }
+        ContentListFilter.Outcome outcome = filterContainerListWithSnapshot(
+            "FinalForYouInsertion", items,
+            container -> container instanceof Aweme ? (Aweme) container : null,
+            null, ALTERNATE_ONLY_FILTERS, List.of(), settings,
+            false, "final-fyp-insertion"
+        );
+        String installation = outcome.stalePolicy ? "STALE_POLICY"
+            : outcome.staleSnapshot ? "STALE_MEMBERSHIP" : "UNCHANGED";
+        if (outcome.changed() && settings.matchesCurrentPolicy()) {
+            installation = "RETURNED_TO_PAYLOAD";
+        } else if (outcome.changed()) {
+            installation = "STALE_POLICY";
+        }
+        recordAiOutcome("FinalForYouInsertion", outcome, installation);
+        return "RETURNED_TO_PAYLOAD".equals(installation) ? outcome.effectiveList : items;
+    }
+
     public static FeedItemList filterCachedFeedList(FeedItemList feedItemList) {
         if (feedItemList == null || feedItemList.items == null) return null;
         filterCachedFeedItems("FeedItemList:cold-cache", feedItemList, true);
@@ -387,7 +432,7 @@ public final class FeedItemsFilter {
     public static FeedItemList filterOfflineFeedList(FeedItemList feedItemList) {
         if (feedItemList == null || feedItemList.items == null) return null;
         FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
-        if (!settings.filterOffline && !settings.hideAiContent) return feedItemList;
+        if (!settings.filterOffline && !settings.hideAiContent && !settings.hideAlternate) return feedItemList;
         filterCachedFeedItems(
             "FeedItemList:offline-fallback",
             feedItemList,
@@ -404,11 +449,14 @@ public final class FeedItemsFilter {
         int cacheSourceType = AwemeBizExtKt.getCacheSourceType(item);
         boolean allowNonAi = cacheSourceType != CACHE_SOURCE_OFFLINE_MODE || settings.filterOffline;
         String reason = null;
+        int[] alternateErrors = {0};
         if (allowNonAi) {
-            List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS, settings);
+            List<IFilter> activeContentFilters = getActiveFilters(FOR_YOU_FILTERS, settings);
             List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS, settings);
-            reason = getFilterReason(activeContentFilters, item);
+            reason = getFilterReason(activeContentFilters, item, alternateErrors);
             if (reason == null) reason = getFilterReason(activeRangeFilters, item);
+        } else if (settings.hideAlternate) {
+            reason = getFilterReason(ALTERNATE_ONLY_FILTERS, item, alternateErrors);
         }
 
         boolean verbose = BaseSettings.DEBUG.get();
@@ -420,7 +468,14 @@ public final class FeedItemsFilter {
             aiResult = AiContentFilter.READ_ERROR;
         }
         boolean aiRejected = AiContentClassifier.removes(aiResult);
+        if (!settings.matchesCurrentPolicy()) {
+            recordAlternateSingle(false, false, alternateErrors[0], "STALE_POLICY");
+            return true;
+        }
         boolean keep = reason == null && !aiRejected;
+        recordAlternateSingle("AlternateForYouBatchFilter".equals(reason),
+            !keep && "AlternateForYouBatchFilter".equals(reason), alternateErrors[0],
+            keep ? "UNCHANGED" : "SUPPRESSED_CACHE");
         if (reason != null) logItem(item, reason, verbose);
         recordSingleAiDecision(
             "CachedAweme:" + cacheSourceType,
@@ -547,15 +602,15 @@ public final class FeedItemsFilter {
     ) {
         if (list == null) return;
 
-        List<IFilter> configuredContentFilters = includeNonAi
-            ? (phase == FilterPhase.RESPONSE ? CONTENT_FILTERS : LATE_FOLLOW_FILTERS)
-            : List.of();
-        List<IFilter> configuredRangeFilters = includeNonAi && phase == FilterPhase.RESPONSE
-            ? RANGE_FILTERS
-            : List.of();
         FilterSettingsSnapshot settings = capturedSettings == null
             ? FilterSettingsSnapshot.capture()
             : capturedSettings;
+        boolean forYou = owner instanceof FeedItemList;
+        List<IFilter> configuredContentFilters = forYou
+            ? (includeNonAi ? FOR_YOU_FILTERS : ALTERNATE_ONLY_FILTERS)
+            : (includeNonAi ? (phase == FilterPhase.RESPONSE ? CONTENT_FILTERS : LATE_FOLLOW_FILTERS) : List.of());
+        List<IFilter> configuredRangeFilters = includeNonAi && phase == FilterPhase.RESPONSE
+            ? RANGE_FILTERS : List.of();
         List<IFilter> activeContentFilters = getActiveFilters(configuredContentFilters, settings);
         List<IFilter> activeRangeFilters = getActiveFilters(configuredRangeFilters, settings);
         if (activeContentFilters.isEmpty()
@@ -587,9 +642,16 @@ public final class FeedItemsFilter {
         );
 
         List resultList = list;
-        String installation = outcome.staleSnapshot ? "STALE" : "UNCHANGED";
+        String installation = outcome.staleSnapshot ? "STALE_MEMBERSHIP"
+            : outcome.stalePolicy ? "STALE_POLICY" : "UNCHANGED";
         if (outcome.changed()) {
             try {
+                if (!settings.matchesCurrentPolicy()) {
+                    installation = "STALE_POLICY";
+                } else if (owner instanceof FeedItemList && ((FeedItemList) owner).items != list
+                    || owner instanceof FollowFeedList && ((FollowFeedList) owner).mItems != list) {
+                    installation = "STALE_OWNER";
+                } else {
                 if (owner instanceof FeedItemList) {
                     ((FeedItemList) owner).items = outcome.effectiveList;
                 } else if (owner instanceof FollowFeedList) {
@@ -601,6 +663,7 @@ public final class FeedItemsFilter {
                 }
                 resultList = outcome.effectiveList;
                 installation = "ASSIGNED";
+                }
             } catch (RuntimeException | LinkageError error) {
                 installation = "INSTALL_FAILED";
                 logInstallFailure(source, error);
@@ -689,14 +752,15 @@ public final class FeedItemsFilter {
         String activeMask = getFilterMask(activeContentFilters, activeRangeFilters);
         String policyKey = settings.nonAiKey(policySuffix + ':' + activeMask);
 
-        return ContentListFilter.filter(new ContentListFilter.Request(
+        final int[] alternateErrors = {0};
+        ContentListFilter.Outcome outcome = ContentListFilter.filter(new ContentListFilter.Request(
             policyKey,
             list,
             extractor,
             nativeAdPredicate,
             item -> {
                 Aweme aweme = (Aweme) item;
-                String reason = getFilterReason(activeContentFilters, aweme);
+                String reason = getFilterReason(activeContentFilters, aweme, alternateErrors);
                 return reason == null ? getFilterReason(activeRangeFilters, aweme) : reason;
             },
             (item, observation) -> AiContentFilter.evaluate(
@@ -709,10 +773,12 @@ public final class FeedItemsFilter {
             nativeAdPredicate != null && settings.removeAds,
             nonAiActive,
             settings.hideAiContent,
-            allowRecentSkip,
-            verbose,
+            allowRecentSkip && !settings.hideAlternate,
+            verbose || settings.hideAlternate,
             SystemClock.elapsedRealtime()
         ));
+        outcome.alternateReadErrors = alternateErrors[0];
+        return outcome;
     }
 
     private static void observeRemoval(
@@ -763,8 +829,16 @@ public final class FeedItemsFilter {
         ContentListFilter.Outcome outcome,
         String installation
     ) {
+        boolean committed = "ASSIGNED".equals(installation)
+            || "ASSIGNED_AND_RETURNED".equals(installation)
+            || "RETURNED".equals(installation)
+            || "RETURNED_TO_PAYLOAD".equals(installation)
+            || "SUPPRESSED_CACHE".equals(installation);
+        int observerErrors = committed ? outcome.notifyCommitted() : 0;
+        recordAlternateOutcome(source, outcome, installation, observerErrors,
+            committed ? outcome.removed : 0);
         if (outcome.aiReadErrors > 0) recordAiReadErrors(outcome.aiReadErrors);
-        if (!outcome.diagnosticsEnabled) return;
+        if (!outcome.diagnosticsEnabled || !BaseSettings.DEBUG.get()) return;
 
         synchronized (aiSummaryLock) {
             aiSummary.calls++;
@@ -776,7 +850,7 @@ public final class FeedItemsFilter {
             aiSummary.moderatorLabels += outcome.moderatorLabels;
             aiSummary.unknownLabels += outcome.unknownLabels;
             aiSummary.readErrors += outcome.aiReadErrors;
-            aiSummary.callbackErrors += outcome.callbackErrors;
+            aiSummary.callbackErrors += outcome.callbackErrors + observerErrors;
             aiSummary.coalescedCalls += Math.max(0, outcome.aiEvaluated - 1);
             if ("ASSIGNED".equals(installation)
                 || "ASSIGNED_AND_RETURNED".equals(installation)
@@ -822,37 +896,108 @@ public final class FeedItemsFilter {
         );
     }
 
+    private static void recordAlternateOutcome(
+        String source, ContentListFilter.Outcome outcome, String status,
+        int observerErrors, int effectiveRemoved
+    ) {
+        int matched = outcome.reasonCounts.getOrDefault("AlternateForYouBatchFilter", 0);
+        if (!(SettingsStatus.hideFypSlopEnabled && Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES.get()) && matched == 0
+            && outcome.alternateReadErrors == 0) return;
+        long now = SystemClock.elapsedRealtime();
+        synchronized (alternateSummaryLock) {
+            alternateCalls++;
+            alternateMatched += matched;
+            alternateRemoved += Math.min(matched, effectiveRemoved);
+            alternateReadErrors += outcome.alternateReadErrors;
+            alternateCallbackErrors += outcome.callbackErrors + observerErrors;
+            alternateInputSize = outcome.inputSize;
+            alternateOutputSize = effectiveRemoved > 0
+                ? outcome.effectiveList.size() : outcome.inputSize;
+            alternateLastRoute = source.startsWith("FeedInsertion:") ? "FeedInsertion" : source;
+            alternateLastStatus = status;
+            emitAlternateSummaryIfReadyLocked(now);
+        }
+    }
+
+    private static void recordAlternateSingle(
+        boolean matched, boolean removed, int readErrors, String status
+    ) {
+        if (!(SettingsStatus.hideFypSlopEnabled && Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES.get())
+            && !matched && readErrors == 0) return;
+        long now = SystemClock.elapsedRealtime();
+        synchronized (alternateSummaryLock) {
+            alternateCalls++;
+            if (matched) alternateMatched++;
+            if (removed) alternateRemoved++;
+            alternateReadErrors += readErrors;
+            alternateInputSize = 1;
+            alternateOutputSize = removed ? 0 : 1;
+            alternateLastRoute = "CachedAweme";
+            alternateLastStatus = status;
+            emitAlternateSummaryIfReadyLocked(now);
+        }
+    }
+
+    private static void emitAlternateSummaryIfReadyLocked(long now) {
+        if (now - alternateSummaryStarted < 5000 || alternateCalls == 0) return;
+        LogBufferManager.appendEvent(
+            DiagnosticCategory.FEED_AND_NAVIGATION, "FeedItemsFilter", "DEBUG",
+            "Alternate FYP summary calls=" + alternateCalls
+                + " matched=" + alternateMatched
+                + " effectiveRemoved=" + alternateRemoved
+                + " reasons={AlternateForYouBatchFilter=" + alternateMatched + "}"
+                + " readErrors={AlternateForYouBatchFilter=" + alternateReadErrors + "}"
+                + " callbackErrors=" + alternateCallbackErrors
+                + " lastRoute=" + alternateLastRoute
+                + " size=" + alternateInputSize + "->" + alternateOutputSize
+                + " status=" + alternateLastStatus
+        );
+        alternateCalls = alternateMatched = alternateRemoved = alternateReadErrors = 0;
+        alternateCallbackErrors = 0;
+        alternateSummaryStarted = now;
+    }
+
     private static List<IFilter> getActiveFilters(
         List<IFilter> filters, FilterSettingsSnapshot settings
     ) {
-        List<IFilter> activeFilters = new ArrayList<>(filters.size());
+        List<IFilter> active = new ArrayList<>(filters.size());
         for (IFilter filter : filters) {
             boolean enabled;
-            if (filter instanceof AdsFilter) enabled = settings.removeAds;
+            if (filter instanceof AlternateForYouBatchFilter) enabled = settings.hideAlternate;
+            else if (filter instanceof AdsFilter) enabled = settings.removeAds;
             else if (filter instanceof LiveFilter) enabled = settings.hideLive;
             else if (filter instanceof StoryFilter) enabled = settings.hideStory;
             else if (filter instanceof ImageVideoFilter) enabled = settings.hideImage;
             else if (filter instanceof ShopFilter) enabled = settings.hideShop;
-            else enabled = settings.feedFilterEnabled && filter.getEnabled();
-            if (enabled) {
-                activeFilters.add(filter);
-            }
+            else if (filter instanceof ViewCountFilter || filter instanceof LikeCountFilter) {
+                enabled = settings.feedFilterEnabled && filter.getEnabled();
+            } else enabled = settings.feedFilterEnabled && filter.getEnabled();
+            if (enabled) active.add(filter);
         }
-        return activeFilters;
+        return active;
     }
 
     private static String getFilterReason(List<IFilter> activeFilters, Aweme item) {
+        return getFilterReason(activeFilters, item, null);
+    }
+
+    private static String getFilterReason(
+        List<IFilter> activeFilters, Aweme item, int[] alternateErrors
+    ) {
         for (IFilter filter : activeFilters) {
             try {
                 if (filter.getFiltered(item)) {
                     return filter.getClass().getSimpleName();
                 }
-            } catch (RuntimeException exception) {
+            } catch (RuntimeException | LinkageError exception) {
+                if (alternateErrors != null && filter instanceof AlternateForYouBatchFilter) {
+                    alternateErrors[0]++;
+                }
                 int count = filterExceptionLogCount.getAndIncrement();
                 if (count < 3) {
                     Logger.printException(
                         () -> "[Morphe TikTok FeedFilter] " + filter.getClass().getSimpleName()
-                            + " failed for aid=" + item.getAid() + "; keeping the item",
+                            + " read failed; keeping the item",
                         exception
                     );
                 }
@@ -882,6 +1027,7 @@ public final class FeedItemsFilter {
                 + " hide_story=" + settings.hideStory
                 + " hide_image=" + settings.hideImage
                 + " hide_ai_content=" + settings.hideAiContent
+                + " hide_fyp_slop=" + settings.hideAlternate
                 + " min_max_views=\"" + (settings.feedFilterEnabled ? settings.minMaxViews : "inactive") + "\""
                 + " min_max_likes=\"" + (settings.feedFilterEnabled ? settings.minMaxLikes : "inactive") + "\""
         );
@@ -1222,6 +1368,7 @@ public final class FeedItemsFilter {
         final boolean hideImage;
         final boolean filterOffline;
         final boolean hideAiContent;
+        final boolean hideAlternate;
         final String minMaxViews;
         final String minMaxLikes;
 
@@ -1234,6 +1381,7 @@ public final class FeedItemsFilter {
             boolean hideImage,
             boolean filterOffline,
             boolean hideAiContent,
+            boolean hideAlternate,
             String minMaxViews,
             String minMaxLikes
         ) {
@@ -1245,6 +1393,7 @@ public final class FeedItemsFilter {
             this.hideImage = hideImage;
             this.filterOffline = filterOffline;
             this.hideAiContent = hideAiContent;
+            this.hideAlternate = hideAlternate;
             this.minMaxViews = minMaxViews;
             this.minMaxLikes = minMaxLikes;
         }
@@ -1260,6 +1409,7 @@ public final class FeedItemsFilter {
                 generalEnabled && Settings.HIDE_IMAGE.get(),
                 generalEnabled && Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get(),
                 SettingsStatus.hideAiContentEnabled && Settings.HIDE_AI_CONTENT.get(),
+                SettingsStatus.hideFypSlopEnabled && Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES.get(),
                 Settings.MIN_MAX_VIEWS.get(),
                 Settings.MIN_MAX_LIKES.get()
             );
@@ -1273,6 +1423,8 @@ public final class FeedItemsFilter {
                 + "|story=" + hideStory
                 + "|image=" + hideImage
                 + "|offline=" + filterOffline
+                + "|ai=" + hideAiContent
+                + "|alternate=" + hideAlternate
                 + "|views=" + minMaxViews
                 + "|likes=" + minMaxLikes;
         }
@@ -1287,6 +1439,7 @@ public final class FeedItemsFilter {
                 && hideImage == current.hideImage
                 && filterOffline == current.filterOffline
                 && hideAiContent == current.hideAiContent
+                && hideAlternate == current.hideAlternate
                 && minMaxViews.equals(current.minMaxViews)
                 && minMaxLikes.equals(current.minMaxLikes);
         }

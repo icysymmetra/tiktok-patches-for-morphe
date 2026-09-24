@@ -255,14 +255,16 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
     private void createMasterMenu(Context context, PreferenceScreen screen) {
         screen.addPreference(SettingsHeaderPreference.master(context, this::closeSettings));
 
-        if (SettingsStatus.feedFilterEnabled || SettingsStatus.hideAiContentEnabled) {
+        if (SettingsStatus.feedFilterEnabled || SettingsStatus.hideAiContentEnabled
+                || SettingsStatus.hideFypSlopEnabled) {
             addMenu(screen, Section.FEED_FILTER, SettingsMenuPreference.Icon.FILTER, countEnabled(
                     SettingsStatus.feedFilterEnabled && Settings.REMOVE_ADS.get(),
                     SettingsStatus.feedFilterEnabled && Settings.HIDE_SHOP.get(),
                     SettingsStatus.feedFilterEnabled && Settings.HIDE_LIVE.get(),
                     SettingsStatus.feedFilterEnabled && Settings.HIDE_STORY.get(),
                     SettingsStatus.feedFilterEnabled && Settings.HIDE_IMAGE.get(),
-                    SettingsStatus.hideAiContentEnabled && Settings.HIDE_AI_CONTENT.get()
+                    SettingsStatus.hideAiContentEnabled && Settings.HIDE_AI_CONTENT.get(),
+                    SettingsStatus.hideFypSlopEnabled && Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES.get()
             ));
         }
         if (SettingsStatus.feedNavigationEnabled) {

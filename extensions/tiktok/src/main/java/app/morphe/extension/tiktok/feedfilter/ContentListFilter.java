@@ -117,6 +117,10 @@ final class ContentListFilter {
         final boolean aiEnabled;
         final boolean nonAiSkipped;
         final boolean staleSnapshot;
+        boolean stalePolicy;
+        int alternateReadErrors;
+        private List<RemovedRecord> removedRecords;
+        private RemovalObserver removalObserver;
 
         private Outcome(
             List originalList,
@@ -165,6 +169,22 @@ final class ContentListFilter {
         boolean changed() {
             return effectiveList != originalList;
         }
+
+        int notifyCommitted() {
+            if (removedRecords == null || removalObserver == null) return 0;
+            int errors = 0;
+            for (RemovedRecord record : removedRecords) {
+                try {
+                    removalObserver.removed(
+                        record.item, record.primaryReason, record.aiReasonMask, record.observation
+                    );
+                } catch (RuntimeException | LinkageError error) {
+                    errors++;
+                }
+            }
+            removedRecords = null;
+            return errors;
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -180,7 +200,14 @@ final class ContentListFilter {
             && request.allowRecentSkip
             && recentlyProcessed(list, request.policyKey, request.elapsedMs);
         boolean runNonAi = request.nonAiActive && !skipNonAi;
-        List snapshot = new ArrayList(list);
+        List snapshot;
+        try {
+            snapshot = new ArrayList(list);
+        } catch (RuntimeException | LinkageError error) {
+            Outcome stale = emptyOutcome(list, inputSize, request.diagnostics, request.aiEnabled);
+            stale.stalePolicy = true;
+            return stale;
+        }
         ArrayList kept = null;
         ArrayList<RemovedRecord> removedRecords = request.removalObserver == null
             ? null
@@ -271,7 +298,13 @@ final class ContentListFilter {
             }
         }
 
-        boolean membershipStable = sameReferences(list, snapshot);
+        boolean membershipStable;
+        try {
+            membershipStable = sameReferences(list, snapshot);
+        } catch (RuntimeException | LinkageError error) {
+            membershipStable = false;
+            callbackErrors++;
+        }
         if (!membershipStable) {
             forget(list);
             return new Outcome(
@@ -282,32 +315,47 @@ final class ContentListFilter {
             );
         }
 
+        boolean policyStable;
+        try {
+            policyStable = request.policyVerifier == null || request.policyVerifier.isUnchanged();
+        } catch (RuntimeException | LinkageError error) {
+            policyStable = false;
+            callbackErrors++;
+        }
+        if (!policyStable) {
+            forget(list);
+            Outcome stale = new Outcome(
+                list, list, immutableCounts(reasonCounts), inputSize, rejectedCandidates, 0, 0,
+                aiEvaluated, aiMatched, aiReadErrors, creatorLabels, tiktokLabels, createdByAi,
+                moderatorLabels, unknownLabels, callbackErrors, request.diagnostics,
+                request.aiEnabled, skipNonAi, false
+            );
+            stale.stalePolicy = true;
+            return stale;
+        }
+
         List effective = kept == null ? list : kept;
         int removed = kept == null ? 0 : inputSize - kept.size();
         if (removed > 0) {
             forget(list);
-        } else if (runNonAi && callbackErrors == 0 && request.policyVerifier.isUnchanged()) {
-            remember(list, request.policyKey, request.elapsedMs);
-        }
-
-        if (removed > 0 && removedRecords != null) {
-            for (RemovedRecord record : removedRecords) {
-                request.removalObserver.removed(
-                    record.item,
-                    record.primaryReason,
-                    record.aiReasonMask,
-                    record.observation
-                );
+        } else if (runNonAi && callbackErrors == 0) {
+            try {
+                remember(list, request.policyKey, request.elapsedMs);
+            } catch (RuntimeException | LinkageError ignored) {
+                // This cache is only an optimization; the list stays unchanged.
             }
         }
 
-        return new Outcome(
+        Outcome outcome = new Outcome(
             list, effective, immutableCounts(reasonCounts), inputSize, rejectedCandidates, removed,
             aiOnlyRemoved,
             aiEvaluated, aiMatched, aiReadErrors, creatorLabels, tiktokLabels, createdByAi,
             moderatorLabels, unknownLabels, callbackErrors, request.diagnostics,
             request.aiEnabled, skipNonAi, false
         );
+        outcome.removedRecords = removedRecords;
+        outcome.removalObserver = request.removalObserver;
+        return outcome;
     }
 
     private static Outcome emptyOutcome(
@@ -347,7 +395,11 @@ final class ContentListFilter {
             ProcessedListState state = PROCESSED_LISTS.get(list);
             if (state == null || !state.policyKey.equals(policyKey)) return false;
             long age = elapsedMs - state.processedAtMs;
-            return age >= 0 && age < CACHE_TTL_MS && state.matches(list);
+            try {
+                return age >= 0 && age < CACHE_TTL_MS && state.matches(list);
+            } catch (RuntimeException | LinkageError error) {
+                return false;
+            }
         }
     }
 

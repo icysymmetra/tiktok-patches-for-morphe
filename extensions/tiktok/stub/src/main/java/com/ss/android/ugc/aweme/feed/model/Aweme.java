@@ -11,6 +11,14 @@ import com.ss.android.ugc.aweme.feed.AIGCInfo;
 
 @SuppressWarnings("unused")
 public class Aweme {
+    public String getItemDistributeSource() {
+        throw new UnsupportedOperationException("Stub");
+    }
+
+    public RecReasonsStruct getRecReasonsStruct() {
+        throw new UnsupportedOperationException("Stub");
+    }
+
     public AIGCInfo getAigcInfo() {
         throw new UnsupportedOperationException("Stub");
     }

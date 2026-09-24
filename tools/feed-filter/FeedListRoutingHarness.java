@@ -15,6 +15,7 @@ public final class FeedListRoutingHarness {
         testIdentityCache();
         testErrorAndStaleFailOpen();
         testReasonPrecedenceAndAllAi();
+        testAlternateRuleAndCommit();
         System.out.println("FeedListRoutingHarness OK");
     }
 
@@ -171,6 +172,70 @@ public final class FeedListRoutingHarness {
         equal(1, both.aiMatched, "AI match still counted");
         equal(0, both.aiOnlyRemoved, "overlapping non-AI rejection is not AI-caused removal");
         equal(0, both.effectiveList.size(), "all-AI list becomes empty");
+    }
+
+    private static void testAlternateRuleAndCommit() {
+        app.morphe.extension.tiktok.settings.Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES.enabled = true;
+        AlternateForYouBatchFilter filter = new AlternateForYouBatchFilter();
+        check(!filter.getEnabled(), "stored toggle cannot enable an absent patch");
+        app.morphe.extension.tiktok.settings.SettingsStatus.hideFypSlopEnabled = true;
+        com.ss.android.ugc.aweme.feed.model.Aweme target =
+            new com.ss.android.ugc.aweme.feed.model.Aweme();
+        target.itemDistributeSource = "for_you_page_999";
+        com.ss.android.ugc.aweme.feed.model.Aweme ordinary =
+            new com.ss.android.ugc.aweme.feed.model.Aweme();
+        ordinary.itemDistributeSource = "for_you_page_1";
+        com.ss.android.ugc.aweme.feed.model.Aweme reasoned =
+            new com.ss.android.ugc.aweme.feed.model.Aweme();
+        reasoned.itemDistributeSource = "for_you_page_999";
+        reasoned.recReasonsStruct = new com.ss.android.ugc.aweme.feed.model.RecReasonsStruct();
+        check(filter.getEnabled(), "live alternate setting enabled");
+        check(filter.getFiltered(target), "source 999 without reasons matches");
+        check(!filter.getFiltered(ordinary), "ordinary source without reasons stays");
+        check(!filter.getFiltered(reasoned), "source 999 with reasons stays");
+
+        List<Object> page = new ArrayList<>(List.of(target, ordinary, reasoned));
+        AtomicInteger observed = new AtomicInteger();
+        ContentListFilter.Outcome result = ContentListFilter.filter(new ContentListFilter.Request(
+            "alternate", page, value -> value, null,
+            value -> filter.getFiltered((com.ss.android.ugc.aweme.feed.model.Aweme) value)
+                ? "AlternateForYouBatchFilter" : null,
+            (value, observation) -> 0, () -> true,
+            (value, reason, aiMask, observation) -> observed.incrementAndGet(),
+            false, true, false, false, true, 0
+        ));
+        equal(1, result.removed, "one target removed");
+        equal(List.of(ordinary, reasoned), result.effectiveList, "survivor order");
+        equal(0, observed.get(), "observer held before installation");
+        equal(0, result.notifyCommitted(), "committed callback succeeds");
+        equal(1, observed.get(), "observer sees actual removal once");
+        equal(0, result.notifyCommitted(), "callback idempotent");
+
+        target.throwReasonsGetter = true;
+        ContentListFilter.Outcome readError = ContentListFilter.filter(new ContentListFilter.Request(
+            "alternate", new ArrayList<>(List.of(target)), value -> value, null,
+            value -> {
+                try { return filter.getFiltered((com.ss.android.ugc.aweme.feed.model.Aweme) value)
+                    ? "AlternateForYouBatchFilter" : null; }
+                catch (LinkageError error) { return null; }
+            }, (value, observation) -> 0, () -> true, null,
+            false, true, false, false, true, 0
+        ));
+        equal(1, readError.effectiveList.size(), "getter failure fails open");
+        target.throwReasonsGetter = false;
+
+        ContentListFilter.Outcome stale = ContentListFilter.filter(new ContentListFilter.Request(
+            "alternate", page, value -> value, null,
+            value -> filter.getFiltered((com.ss.android.ugc.aweme.feed.model.Aweme) value)
+                ? "AlternateForYouBatchFilter" : null,
+            (value, observation) -> 0, () -> false, null,
+            false, true, false, false, true, 0
+        ));
+        check(stale.stalePolicy, "changed policy detected");
+        same(page, stale.effectiveList, "stale candidate not installed");
+        app.morphe.extension.tiktok.settings.Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES.enabled = false;
+        check(!filter.getEnabled(), "live alternate setting disabled");
+        app.morphe.extension.tiktok.settings.SettingsStatus.hideFypSlopEnabled = false;
     }
 
     private static ContentListFilter.Outcome run(
