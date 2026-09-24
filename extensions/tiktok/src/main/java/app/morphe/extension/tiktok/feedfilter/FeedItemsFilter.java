@@ -747,6 +747,39 @@ public final class FeedItemsFilter {
         boolean allowRecentSkip,
         String policySuffix
     ) {
+        app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.Token capture =
+            app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.begin(source, null, list);
+        ContentListFilter.Outcome outcome = null;
+        try {
+            outcome = filterContainerListCore(
+                list, extractor, nativeAdPredicate, activeContentFilters,
+                activeRangeFilters, settings, allowRecentSkip, policySuffix
+            );
+            return outcome;
+        } finally {
+            if (capture != null) {
+                app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.note(
+                    outcome == null ? "FILTER_EXCEPTION" : "CANDIDATE_REMOVED=" + outcome.removed
+                        + " CANDIDATE_REASONS=" + outcome.reasonCounts
+                        + " STALE_SNAPSHOT=" + outcome.staleSnapshot
+                );
+                app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.end(
+                    capture, null, outcome == null ? list : outcome.effectiveList
+                );
+            }
+        }
+    }
+
+    private static ContentListFilter.Outcome filterContainerListCore(
+        List list,
+        ContentListFilter.Extractor extractor,
+        ContentListFilter.ContainerPredicate nativeAdPredicate,
+        List<IFilter> activeContentFilters,
+        List<IFilter> activeRangeFilters,
+        FilterSettingsSnapshot settings,
+        boolean allowRecentSkip,
+        String policySuffix
+    ) {
         boolean nonAiActive = !activeContentFilters.isEmpty() || !activeRangeFilters.isEmpty();
         boolean verbose = BaseSettings.DEBUG.get();
         String activeMask = getFilterMask(activeContentFilters, activeRangeFilters);
@@ -774,7 +807,8 @@ public final class FeedItemsFilter {
             nonAiActive,
             settings.hideAiContent,
             allowRecentSkip && !settings.hideAlternate,
-            verbose || settings.hideAlternate,
+            verbose || settings.hideAlternate
+                || app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.active(),
             SystemClock.elapsedRealtime()
         ));
         outcome.alternateReadErrors = alternateErrors[0];

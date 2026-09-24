@@ -28,6 +28,9 @@ public class DebugPreferenceCategory extends ConditionalPreferenceCategory {
 
     @Override
     public void addPreferences(Context context) {
+        if (app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.installed) {
+            addPreference(app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.controls(context));
+        }
         addPreference(group(context, "Logging and crash capture"));
         addPreference(new TogglePreference(
                 context,

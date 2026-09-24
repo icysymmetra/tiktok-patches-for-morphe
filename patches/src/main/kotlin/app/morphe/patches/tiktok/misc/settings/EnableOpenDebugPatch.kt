@@ -4,6 +4,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
+import app.morphe.patches.tiktok.feedfilter.feedObservationProbeHooksPatch
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 
@@ -13,10 +14,10 @@ private const val CRASH_CAPTURE_INITIALIZER =
 @Suppress("unused")
 val enableOpenDebugPatch = bytecodePatch(
     name = "Diagnostic tools",
-    description = "Adds optional Morphe diagnostic logging, filtered reports, and local TikTok crash capture.",
+    description = "Adds diagnostic logging, crash capture, reports, and an optional rolling feed debugger.",
     default = false,
 ) {
-    dependsOn(sharedExtensionPatch, settingsPatch)
+    dependsOn(sharedExtensionPatch, settingsPatch, feedObservationProbeHooksPatch)
 
     compatibleWith(*AppCompatibilities.tiktok4623())
 
