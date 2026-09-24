@@ -5,7 +5,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 if ([string]::IsNullOrWhiteSpace($ProbeLogRoot)) {
-    $ProbeLogRoot = (Resolve-Path (Join-Path $repoRoot "..\..\artifacts\logs")).Path
+    $ProbeLogRoot = (Resolve-Path (Join-Path $repoRoot "..\..\versions\46.2.3\global\artifacts\logs")).Path
 }
 $outputRoot = Join-Path $repoRoot "build\hide-ai-harness"
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null

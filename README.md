@@ -48,11 +48,12 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Enable non-personalized search` | Uses TikTok's non-personalized search mode instead of its saved account choice. |
 | `Enable voice comments` | Enables TikTok's native voice-message controls in video comment sections when the account and server support them. |
 | `Feature Gate Lab` | Adds a searchable menu for viewing and overriding supported TikTok feature flags and configuration values. Client-side overrides cannot bypass server enforcement. |
-| `Feed filter` | Hides feed ads, TikTok Shop items, livestreams, stories, photo posts, and videos outside configured view or like ranges, with optional filtering of cached and offline FYP fallback videos. |
+| `Feed filter` | Hides feed ads, TikTok Shop items, livestreams, stories, photo posts, and videos outside configured view or like ranges. |
 | `Feed tab navigation` | Controls which loaded top and bottom navigation tabs remain visible, blocks newly added tabs when requested, and can hide the Tako AI bubble. |
 | `Fix Google login` | Restores Google account sign-in after patching. |
 | `Foldable split comment view` | Forces TikTok's tablet-style split layout, showing comments beside the video instead of as a bottom sheet, once the screen is at least as wide as a configurable threshold (600dp by default). Intended for foldables TikTok doesn't already treat as tablet-class. |
 | `Force show Auto scroll` | Adds a setting that bypasses TikTok's rollout gates for its native Auto scroll action on supported videos. |
+| `Hide AI content` | Hides posts marked as AI-generated or AI-modified by TikTok or their creators. Unmarked AI content may still appear. |
 | `Hide CAPTCHA popups` | Hides non-account verification puzzle dialogs, including those shown while browsing LIVE. Account verification remains available, and server checks are not bypassed. |
 | `Hide floating promotions` | Removes floating promotional badges, coin icons, and timer banners from the Home feed. |
 | `Hide feed follow button` | Adds an option to hide the + follow button below creator avatars in video feeds. |

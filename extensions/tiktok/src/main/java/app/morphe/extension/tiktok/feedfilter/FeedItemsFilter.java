@@ -7,6 +7,7 @@ import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.preference.LogBufferManager;
 import app.morphe.extension.tiktok.settings.Settings;
+import app.morphe.extension.tiktok.settings.SettingsStatus;
 import com.ss.android.ugc.aweme.feed.model.Aweme;
 import com.ss.android.ugc.aweme.feed.model.AwemeBizExtKt;
 import com.ss.android.ugc.aweme.feed.model.AwemeStatistics;
@@ -335,8 +336,8 @@ public final class FeedItemsFilter {
         if (panel == null || !"homepage_hot".equals(panel.getEventType())) return items;
 
         FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
-        List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS);
-        List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS);
+        List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS, settings);
+        List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS, settings);
         boolean cacheInsertion = "golden_house".equals(source)
             || "middle_insert_when_video_lagging".equals(source);
         boolean verbose = BaseSettings.DEBUG.get();
@@ -360,7 +361,7 @@ public final class FeedItemsFilter {
                 settings.hideAiContent,
                 observation
             ),
-            settings::matchesCurrentNonAi,
+            settings::matchesCurrentPolicy,
             verbose ? FeedItemsFilter::observeRemoval : null,
             false,
             nonAiActive,
@@ -404,8 +405,8 @@ public final class FeedItemsFilter {
         boolean allowNonAi = cacheSourceType != CACHE_SOURCE_OFFLINE_MODE || settings.filterOffline;
         String reason = null;
         if (allowNonAi) {
-            List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS);
-            List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS);
+            List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS, settings);
+            List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS, settings);
             reason = getFilterReason(activeContentFilters, item);
             if (reason == null) reason = getFilterReason(activeRangeFilters, item);
         }
@@ -552,11 +553,11 @@ public final class FeedItemsFilter {
         List<IFilter> configuredRangeFilters = includeNonAi && phase == FilterPhase.RESPONSE
             ? RANGE_FILTERS
             : List.of();
-        List<IFilter> activeContentFilters = getActiveFilters(configuredContentFilters);
-        List<IFilter> activeRangeFilters = getActiveFilters(configuredRangeFilters);
         FilterSettingsSnapshot settings = capturedSettings == null
             ? FilterSettingsSnapshot.capture()
             : capturedSettings;
+        List<IFilter> activeContentFilters = getActiveFilters(configuredContentFilters, settings);
+        List<IFilter> activeRangeFilters = getActiveFilters(configuredRangeFilters, settings);
         if (activeContentFilters.isEmpty()
             && activeRangeFilters.isEmpty()
             && !settings.hideAiContent) return;
@@ -657,8 +658,8 @@ public final class FeedItemsFilter {
         String policySuffix
     ) {
         FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
-        List<IFilter> activeContentFilters = getActiveFilters(configuredContentFilters);
-        List<IFilter> activeRangeFilters = getActiveFilters(configuredRangeFilters);
+        List<IFilter> activeContentFilters = getActiveFilters(configuredContentFilters, settings);
+        List<IFilter> activeRangeFilters = getActiveFilters(configuredRangeFilters, settings);
         return filterContainerListWithSnapshot(
             source,
             list,
@@ -703,7 +704,7 @@ public final class FeedItemsFilter {
                 settings.hideAiContent,
                 observation
             ),
-            settings::matchesCurrentNonAi,
+            settings::matchesCurrentPolicy,
             verbose ? FeedItemsFilter::observeRemoval : null,
             nativeAdPredicate != null && settings.removeAds,
             nonAiActive,
@@ -821,10 +822,19 @@ public final class FeedItemsFilter {
         );
     }
 
-    private static List<IFilter> getActiveFilters(List<IFilter> filters) {
+    private static List<IFilter> getActiveFilters(
+        List<IFilter> filters, FilterSettingsSnapshot settings
+    ) {
         List<IFilter> activeFilters = new ArrayList<>(filters.size());
         for (IFilter filter : filters) {
-            if (filter.getEnabled()) {
+            boolean enabled;
+            if (filter instanceof AdsFilter) enabled = settings.removeAds;
+            else if (filter instanceof LiveFilter) enabled = settings.hideLive;
+            else if (filter instanceof StoryFilter) enabled = settings.hideStory;
+            else if (filter instanceof ImageVideoFilter) enabled = settings.hideImage;
+            else if (filter instanceof ShopFilter) enabled = settings.hideShop;
+            else enabled = settings.feedFilterEnabled && filter.getEnabled();
+            if (enabled) {
                 activeFilters.add(filter);
             }
         }
@@ -862,17 +872,18 @@ public final class FeedItemsFilter {
 
     private static void debugLogBatch(String source, List list, String metadata) {
         int size = list == null ? -1 : list.size();
+        FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
         Logger.printInfo(() ->
             "[Morphe TikTok FeedFilter] filter(" + source + "): size=" + size
                 + " " + metadata
-                + " remove_ads=" + Settings.REMOVE_ADS.get()
-                + " hide_shop=" + Settings.HIDE_SHOP.get()
-                + " hide_live=" + Settings.HIDE_LIVE.get()
-                + " hide_story=" + Settings.HIDE_STORY.get()
-                + " hide_image=" + Settings.HIDE_IMAGE.get()
-                + " hide_ai_content=" + Settings.HIDE_AI_CONTENT.get()
-                + " min_max_views=\"" + Settings.MIN_MAX_VIEWS.get() + "\""
-                + " min_max_likes=\"" + Settings.MIN_MAX_LIKES.get() + "\""
+                + " remove_ads=" + settings.removeAds
+                + " hide_shop=" + settings.hideShop
+                + " hide_live=" + settings.hideLive
+                + " hide_story=" + settings.hideStory
+                + " hide_image=" + settings.hideImage
+                + " hide_ai_content=" + settings.hideAiContent
+                + " min_max_views=\"" + (settings.feedFilterEnabled ? settings.minMaxViews : "inactive") + "\""
+                + " min_max_likes=\"" + (settings.feedFilterEnabled ? settings.minMaxLikes : "inactive") + "\""
         );
     }
 
@@ -1203,6 +1214,7 @@ public final class FeedItemsFilter {
     }
 
     private static final class FilterSettingsSnapshot {
+        final boolean feedFilterEnabled;
         final boolean removeAds;
         final boolean hideLive;
         final boolean hideShop;
@@ -1214,6 +1226,7 @@ public final class FeedItemsFilter {
         final String minMaxLikes;
 
         private FilterSettingsSnapshot(
+            boolean feedFilterEnabled,
             boolean removeAds,
             boolean hideLive,
             boolean hideShop,
@@ -1224,6 +1237,7 @@ public final class FeedItemsFilter {
             String minMaxViews,
             String minMaxLikes
         ) {
+            this.feedFilterEnabled = feedFilterEnabled;
             this.removeAds = removeAds;
             this.hideLive = hideLive;
             this.hideShop = hideShop;
@@ -1236,14 +1250,16 @@ public final class FeedItemsFilter {
         }
 
         static FilterSettingsSnapshot capture() {
+            boolean generalEnabled = SettingsStatus.feedFilterEnabled;
             return new FilterSettingsSnapshot(
-                Settings.REMOVE_ADS.get(),
-                Settings.HIDE_LIVE.get(),
-                Settings.HIDE_SHOP.get(),
-                Settings.HIDE_STORY.get(),
-                Settings.HIDE_IMAGE.get(),
-                Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get(),
-                Settings.HIDE_AI_CONTENT.get(),
+                generalEnabled,
+                generalEnabled && Settings.REMOVE_ADS.get(),
+                generalEnabled && Settings.HIDE_LIVE.get(),
+                generalEnabled && Settings.HIDE_SHOP.get(),
+                generalEnabled && Settings.HIDE_STORY.get(),
+                generalEnabled && Settings.HIDE_IMAGE.get(),
+                generalEnabled && Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get(),
+                SettingsStatus.hideAiContentEnabled && Settings.HIDE_AI_CONTENT.get(),
                 Settings.MIN_MAX_VIEWS.get(),
                 Settings.MIN_MAX_LIKES.get()
             );
@@ -1261,15 +1277,18 @@ public final class FeedItemsFilter {
                 + "|likes=" + minMaxLikes;
         }
 
-        boolean matchesCurrentNonAi() {
-            return removeAds == Settings.REMOVE_ADS.get()
-                && hideLive == Settings.HIDE_LIVE.get()
-                && hideShop == Settings.HIDE_SHOP.get()
-                && hideStory == Settings.HIDE_STORY.get()
-                && hideImage == Settings.HIDE_IMAGE.get()
-                && filterOffline == Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get()
-                && minMaxViews.equals(Settings.MIN_MAX_VIEWS.get())
-                && minMaxLikes.equals(Settings.MIN_MAX_LIKES.get());
+        boolean matchesCurrentPolicy() {
+            FilterSettingsSnapshot current = capture();
+            return feedFilterEnabled == current.feedFilterEnabled
+                && removeAds == current.removeAds
+                && hideLive == current.hideLive
+                && hideShop == current.hideShop
+                && hideStory == current.hideStory
+                && hideImage == current.hideImage
+                && filterOffline == current.filterOffline
+                && hideAiContent == current.hideAiContent
+                && minMaxViews.equals(current.minMaxViews)
+                && minMaxLikes.equals(current.minMaxLikes);
         }
     }
 

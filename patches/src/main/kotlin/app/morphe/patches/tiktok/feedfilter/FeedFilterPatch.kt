@@ -16,6 +16,7 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint.method
+import app.morphe.patches.tiktok.misc.settings.settingsPatch
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.getReference
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -30,12 +31,7 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/feedfilter/FeedItemsFilter;"
 private const val TAKO_AI_FILTER_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/feedfilter/TakoAiFilter;"
 
-@Suppress("unused")
-val feedFilterPatch = bytecodePatch(
-    name = "Feed filter",
-    description = "Hides feed ads, AI-labelled posts, TikTok Shop items, livestreams, stories, photo posts, and videos outside configured view or like ranges.",
-    default = true,
-) {
+private val feedListHooksPatch = bytecodePatch {
     dependsOn(
         sharedExtensionPatch,
     )
@@ -100,12 +96,6 @@ val feedFilterPatch = bytecodePatch(
         requirePublicInstanceField(aigcInfoType, "createByAI", "Z")
         requirePublicInstanceField(moderationAigcInfoType, "moderationAigcLabelType", "I")
 
-        // Enables the feed filter extension after settings were loaded.
-        SettingsStatusLoadFingerprint.method.addInstruction(
-            0,
-            "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableFeedFilter()V",
-        )
-
         MainFeedResponseFingerprint.method.let { method ->
             val returnIndices =
                 method.implementation!!.instructions.withIndex()
@@ -156,56 +146,6 @@ val feedFilterPatch = bytecodePatch(
         )
         FriendsFeedFinalDeliveryFingerprint.method.filterFriendsFinalDelivery()
 
-        DiscoverBannerResponseFingerprint.method.filterResponseAfterCast(
-            "Lcom/ss/android/ugc/aweme/discover/model/BannerList;",
-            "filterDiscoverBanners",
-        )
-
-        DiscoverTrendingResponseFingerprint.method.filterResponseAfterCast(
-            "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;",
-            "filterDiscoverTrending",
-        )
-        DiscoverTrendingPairResponseFingerprint.method.filterResponseAfterCast(
-            "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;",
-            "filterDiscoverTrending",
-        )
-
-        MidAdResponseFingerprint.method.let { method ->
-            val returnIndices = method.implementation!!.instructions.withIndex()
-                .filter { it.value.opcode == Opcode.RETURN_OBJECT }
-                .map { it.index }
-                .toList()
-
-            returnIndices.asReversed().forEach { returnIndex ->
-                val register = method.getInstruction<OneRegisterInstruction>(returnIndex).registerA
-                method.addInstructions(
-                    returnIndex,
-                    """
-                        invoke-static/range {v$register .. v$register}, $EXTENSION_CLASS_DESCRIPTOR->filterMidRollAd(Lcom/ss/android/ugc/aweme/feed/model/Aweme;)Lcom/ss/android/ugc/aweme/feed/model/Aweme;
-                        move-result-object v$register
-                    """,
-                )
-            }
-        }
-
-        ProfileAdEligibilityFingerprint.method.let { method ->
-            val returnIndices = method.implementation!!.instructions.withIndex()
-                .filter { it.value.opcode == Opcode.RETURN }
-                .map { it.index }
-                .toList()
-
-            returnIndices.asReversed().forEach { returnIndex ->
-                val register = method.getInstruction<OneRegisterInstruction>(returnIndex).registerA
-                method.addInstructionsAtControlFlowLabel(
-                    returnIndex,
-                    """
-                        invoke-static/range {v$register .. v$register}, $EXTENSION_CLASS_DESCRIPTOR->filterProfileAdEligibility(Z)Z
-                        move-result v$register
-                    """,
-                )
-            }
-        }
-
         FollowFeedFingerprint.method.let { method ->
             val returnIndices =
                 method.implementation!!.instructions.withIndex()
@@ -254,8 +194,6 @@ val feedFilterPatch = bytecodePatch(
         }
 
         ProfileNativeListTransformFingerprint.method.filterProfileItemsAtReturns()
-
-        ProfileDetailAdEventFingerprint.method.filterProfileDetailAdEvent()
 
         val finalFeedInsertionMethod = FinalFeedInsertionFingerprint.method
         val insertionPayloadType = finalFeedInsertionMethod.parameterTypes.single().toString()
@@ -406,6 +344,70 @@ val feedFilterPatch = bytecodePatch(
             }
         }
 
+    }
+}
+
+@Suppress("unused")
+val feedFilterPatch = bytecodePatch(
+    name = "Feed filter",
+    description = "Hides feed ads, TikTok Shop items, livestreams, stories, photo posts, and videos outside configured view or like ranges.",
+    default = true,
+) {
+    dependsOn(feedListHooksPatch, settingsPatch)
+    compatibleWith(*AppCompatibilities.tiktok4623())
+    execute {
+        SettingsStatusLoadFingerprint.method.addInstruction(
+            0,
+            "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableFeedFilter()V",
+        )
+
+        DiscoverBannerResponseFingerprint.method.filterResponseAfterCast(
+            "Lcom/ss/android/ugc/aweme/discover/model/BannerList;",
+            "filterDiscoverBanners",
+        )
+        DiscoverTrendingResponseFingerprint.method.filterResponseAfterCast(
+            "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;",
+            "filterDiscoverTrending",
+        )
+        DiscoverTrendingPairResponseFingerprint.method.filterResponseAfterCast(
+            "Lcom/ss/android/ugc/aweme/discover/model/TrendingTopicList;",
+            "filterDiscoverTrending",
+        )
+
+        MidAdResponseFingerprint.method.let { method ->
+            val returnIndices = method.implementation!!.instructions.withIndex()
+                .filter { it.value.opcode == Opcode.RETURN_OBJECT }
+                .map { it.index }
+                .toList()
+            returnIndices.asReversed().forEach { returnIndex ->
+                val register = method.getInstruction<OneRegisterInstruction>(returnIndex).registerA
+                method.addInstructions(
+                    returnIndex,
+                    """
+                        invoke-static/range {v$register .. v$register}, $EXTENSION_CLASS_DESCRIPTOR->filterMidRollAd(Lcom/ss/android/ugc/aweme/feed/model/Aweme;)Lcom/ss/android/ugc/aweme/feed/model/Aweme;
+                        move-result-object v$register
+                    """,
+                )
+            }
+        }
+
+        ProfileAdEligibilityFingerprint.method.let { method ->
+            val returnIndices = method.implementation!!.instructions.withIndex()
+                .filter { it.value.opcode == Opcode.RETURN }
+                .map { it.index }
+                .toList()
+            returnIndices.asReversed().forEach { returnIndex ->
+                val register = method.getInstruction<OneRegisterInstruction>(returnIndex).registerA
+                method.addInstructionsAtControlFlowLabel(
+                    returnIndex,
+                    """
+                        invoke-static/range {v$register .. v$register}, $EXTENSION_CLASS_DESCRIPTOR->filterProfileAdEligibility(Z)Z
+                        move-result v$register
+                    """,
+                )
+            }
+        }
+
         TakoAiFeedButtonSetVisibleFingerprint.method.addInstructions(
             0,
             """
@@ -417,10 +419,25 @@ val feedFilterPatch = bytecodePatch(
                 nop
             """,
         )
-
         TakoAiFeedButtonBindFingerprint.method.addInstructions(
             2,
             "invoke-static {p1}, $TAKO_AI_FILTER_CLASS_DESCRIPTOR->hideBoundFeedButtonView(Landroid/view/View;)V",
+        )
+    }
+}
+
+@Suppress("unused")
+val hideAiContentPatch = bytecodePatch(
+    name = "Hide AI content",
+    description = "Hides posts marked as AI-generated or AI-modified by TikTok or their creators. Unmarked AI content may still appear.",
+    default = true,
+) {
+    dependsOn(feedListHooksPatch, settingsPatch)
+    compatibleWith(*AppCompatibilities.tiktok4623())
+    execute {
+        SettingsStatusLoadFingerprint.method.addInstruction(
+            0,
+            "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableHideAiContent()V",
         )
     }
 }

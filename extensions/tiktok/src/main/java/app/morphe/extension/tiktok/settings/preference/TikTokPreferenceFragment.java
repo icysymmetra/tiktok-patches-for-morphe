@@ -51,7 +51,7 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
     private static DownloadPathPreference pendingDownloadPathPreference;
 
     private enum Section {
-        FEED_FILTER("Feed filter", "Ads, Shop, livestreams, AI-labelled posts, and view limits."),
+        FEED_FILTER("Feed controls", "Choose which posts appear in your feeds."),
         FEED_NAVIGATION("Feed navigation", "Feed tabs, bottom tabs, and Tako AI."),
         INTERFACE("Interface", "Promotions, popups, and publish dates."),
         COMMENTS("Comments and translation", "Translation, reactions, copy options, and split view."),
@@ -255,14 +255,14 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
     private void createMasterMenu(Context context, PreferenceScreen screen) {
         screen.addPreference(SettingsHeaderPreference.master(context, this::closeSettings));
 
-        if (SettingsStatus.feedFilterEnabled) {
+        if (SettingsStatus.feedFilterEnabled || SettingsStatus.hideAiContentEnabled) {
             addMenu(screen, Section.FEED_FILTER, SettingsMenuPreference.Icon.FILTER, countEnabled(
-                    Settings.REMOVE_ADS.get(),
-                    Settings.HIDE_SHOP.get(),
-                    Settings.HIDE_LIVE.get(),
-                    Settings.HIDE_STORY.get(),
-                    Settings.HIDE_IMAGE.get(),
-                    Settings.HIDE_AI_CONTENT.get()
+                    SettingsStatus.feedFilterEnabled && Settings.REMOVE_ADS.get(),
+                    SettingsStatus.feedFilterEnabled && Settings.HIDE_SHOP.get(),
+                    SettingsStatus.feedFilterEnabled && Settings.HIDE_LIVE.get(),
+                    SettingsStatus.feedFilterEnabled && Settings.HIDE_STORY.get(),
+                    SettingsStatus.feedFilterEnabled && Settings.HIDE_IMAGE.get(),
+                    SettingsStatus.hideAiContentEnabled && Settings.HIDE_AI_CONTENT.get()
             ));
         }
         if (SettingsStatus.feedNavigationEnabled) {
