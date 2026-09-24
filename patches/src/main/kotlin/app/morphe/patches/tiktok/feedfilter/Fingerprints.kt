@@ -48,6 +48,24 @@ internal object MainFeedResponseFingerprint : Fingerprint(
     },
 )
 
+internal object FeedItemListGetItemsFingerprint : Fingerprint(
+    definingClass = "Lcom/ss/android/ugc/aweme/feed/model/FeedItemList;",
+    name = "getItems",
+    accessFlags = listOf(AccessFlags.PUBLIC),
+    returnType = "Ljava/util/List;",
+    parameters = emptyList(),
+    custom = { method, _ ->
+        method.implementation?.instructions?.any { instruction ->
+            instruction.getReference<FieldReference>()?.let { reference ->
+                reference.definingClass ==
+                    "Lcom/ss/android/ugc/aweme/feed/model/FeedItemList;" &&
+                    reference.name == "items" &&
+                    reference.type == "Ljava/util/List;"
+            } == true
+        } == true
+    },
+)
+
 internal object SearchMixFeedResponseFingerprint : Fingerprint(
     returnType = "V",
     parameters = listOf(SEARCH_MIX_FEED_LIST_DESCRIPTOR),
@@ -380,25 +398,54 @@ private const val DETAIL_FRAGMENT_DESCRIPTOR =
 private const val DETAIL_PAGE_ABILITY_DESCRIPTOR =
     "Lcom/ss/android/ugc/aweme/detail/platform/IDetailPageAbility;"
 
-internal object ProfileRefreshResultFingerprint : Fingerprint(
+internal object ProfileNativeListTransformFingerprint : Fingerprint(
     definingClass = PROFILE_AWEME_LIST_FRAGMENT_DESCRIPTOR,
-    returnType = "V",
-    parameters = listOf("Ljava/util/List;", "Z"),
-    strings = listOf("onRefreshResult: type="),
+    returnType = "Ljava/util/List;",
+    parameters = listOf("Ljava/util/List;"),
+    custom = { method, _ ->
+        val references = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<MethodReference>() }
+            ?: emptyList()
+        references.any { reference ->
+            reference.definingClass == "Lcom/ss/android/ugc/aweme/feed/model/Aweme;" &&
+                reference.name == "getAwemeRawAd" &&
+                reference.parameterTypes.isEmpty()
+        } && references.any { reference ->
+            reference.definingClass ==
+                "Lcom/ss/android/ugc/aweme/commercialize/profile/talent/ITalentAdRevenueShareService;" &&
+                reference.returnType == "Ljava/util/List;"
+        }
+    },
 )
 
-internal object ProfileLoadMoreResultFingerprint : Fingerprint(
-    definingClass = PROFILE_AWEME_LIST_FRAGMENT_DESCRIPTOR,
+internal object FriendsFeedFinalDeliveryFingerprint : Fingerprint(
     returnType = "V",
-    parameters = listOf("Ljava/util/List;", "Z"),
-    strings = listOf("onLoadMoreResult: type="),
-)
-
-internal object ProfileLoadLatestResultFingerprint : Fingerprint(
-    definingClass = PROFILE_AWEME_LIST_FRAGMENT_DESCRIPTOR,
-    returnType = "V",
-    parameters = listOf("Ljava/util/List;", "Z"),
-    strings = listOf("onLoadLatestResult: type="),
+    parameters = listOf(
+        "Lcom/ss/android/ugc/aweme/friendstab/api/FriendsFeedResponse;",
+        "Z",
+    ),
+    custom = { method, _ ->
+        val references = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<MethodReference>() }
+            ?: emptyList()
+        val fields = method.implementation?.instructions
+            ?.mapNotNull { it.getReference<FieldReference>() }
+            ?: emptyList()
+        fields.any { reference ->
+            reference.definingClass ==
+                "Lcom/ss/android/ugc/aweme/friendstab/api/FriendsFeedResponse;" &&
+                reference.name == "friendFeedData" &&
+                reference.type == "Ljava/util/List;"
+        } && references.any { reference ->
+            reference.parameterTypes == listOf("I", "Z", "Z", "Ljava/util/List;") &&
+                reference.returnType == "V"
+        } && references.any { reference ->
+            reference.definingClass ==
+                "Lcom/ss/android/ugc/aweme/friendstab/api/FriendsFeedResponse;" &&
+                reference.name == "getAwemeList" &&
+                reference.returnType == "Ljava/util/List;"
+        }
+    },
 )
 
 internal object ProfileDetailAdEventFingerprint : Fingerprint(

@@ -51,7 +51,7 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
     private static DownloadPathPreference pendingDownloadPathPreference;
 
     private enum Section {
-        FEED_FILTER("Feed filter", "Ads, Shop, livestreams, and view limits."),
+        FEED_FILTER("Feed filter", "Ads, Shop, livestreams, AI-labelled posts, and view limits."),
         FEED_NAVIGATION("Feed navigation", "Feed tabs, bottom tabs, and Tako AI."),
         INTERFACE("Interface", "Promotions, popups, and publish dates."),
         COMMENTS("Comments and translation", "Translation, reactions, copy options, and split view."),
@@ -261,7 +261,8 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
                     Settings.HIDE_SHOP.get(),
                     Settings.HIDE_LIVE.get(),
                     Settings.HIDE_STORY.get(),
-                    Settings.HIDE_IMAGE.get()
+                    Settings.HIDE_IMAGE.get(),
+                    Settings.HIDE_AI_CONTENT.get()
             ));
         }
         if (SettingsStatus.feedNavigationEnabled) {

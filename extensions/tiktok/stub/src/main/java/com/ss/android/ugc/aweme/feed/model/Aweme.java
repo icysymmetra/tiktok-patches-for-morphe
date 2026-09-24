@@ -7,8 +7,18 @@ package com.ss.android.ugc.aweme.feed.model;
 
 import java.util.List;
 
+import com.ss.android.ugc.aweme.feed.AIGCInfo;
+
 @SuppressWarnings("unused")
 public class Aweme {
+    public AIGCInfo getAigcInfo() {
+        throw new UnsupportedOperationException("Stub");
+    }
+
+    public ModerationAigcInfo getModerationAigcInfo() {
+        throw new UnsupportedOperationException("Stub");
+    }
+
     public String getAid() {
         throw new UnsupportedOperationException("Stub");
     }

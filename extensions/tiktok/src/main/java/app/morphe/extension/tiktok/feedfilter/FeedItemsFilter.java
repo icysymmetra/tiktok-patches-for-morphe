@@ -1,7 +1,11 @@
 package app.morphe.extension.tiktok.feedfilter;
 
+import android.os.SystemClock;
+
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
 import app.morphe.extension.shared.settings.BaseSettings;
+import app.morphe.extension.shared.settings.preference.LogBufferManager;
 import app.morphe.extension.tiktok.settings.Settings;
 import com.ss.android.ugc.aweme.feed.model.Aweme;
 import com.ss.android.ugc.aweme.feed.model.AwemeBizExtKt;
@@ -58,8 +62,6 @@ public final class FeedItemsFilter {
     private static final int FILTER_CALL_PROBE_MAX_SEEN_LISTS = 256;
     private static final int FILTER_CALL_PROBE_SLOW_MS = 8;
     private static final long FILTER_CALL_PROBE_SUMMARY_WINDOW_MS = 5000;
-    private static final long PROCESSED_LIST_CACHE_TTL_MS = 250;
-    private static final int PROCESSED_LIST_CACHE_MAX_SEEN_LISTS = 256;
     private static final AtomicInteger feedItemListNullItemsLogCount = new AtomicInteger();
     private static final AtomicInteger followFeedListNullItemsLogCount = new AtomicInteger();
     private static final AtomicInteger batchLogCount = new AtomicInteger();
@@ -68,9 +70,12 @@ public final class FeedItemsFilter {
     private static final AtomicInteger listReplacementLogCount = new AtomicInteger();
     private static final AtomicInteger filterCallProbeCount = new AtomicInteger();
     private static final Map<Integer, ProbeSeenList> filterCallProbeSeenLists = new HashMap<>();
-    private static final Map<Integer, ProcessedListState> processedListCache = new HashMap<>();
     private static final Object filterCallProbeSummaryLock = new Object();
     private static ProbeSummary filterCallProbeSummary = new ProbeSummary(System.currentTimeMillis());
+    private static final Object aiSummaryLock = new Object();
+    private static AiSummary aiSummary = new AiSummary(SystemClock.elapsedRealtime());
+    private static long lastAiErrorLogElapsed;
+    private static int pendingAiReadErrors;
 
     private FeedItemsFilter() {}
 
@@ -102,8 +107,61 @@ public final class FeedItemsFilter {
             container -> (container instanceof Aweme) ? (Aweme) container : null,
             verbose,
             true,
-            FilterPhase.RESPONSE
+            FilterPhase.RESPONSE,
+            true
         );
+    }
+
+    /**
+     * Rechecks the concrete items field when TikTok reads a FeedItemList after the
+     * response hook. Other getItems() return paths, such as CameoData, are left
+     * untouched because they are not the owner's items field.
+     */
+    public static List filterFeedItemListOnRead(
+        FeedItemList feedItemList,
+        List originalReturnList
+    ) {
+        if (feedItemList == null || originalReturnList == null) return originalReturnList;
+
+        try {
+            if (feedItemList.items != originalReturnList) return originalReturnList;
+        } catch (RuntimeException | LinkageError error) {
+            recordAiReadErrors(1);
+            return originalReturnList;
+        }
+
+        ContentListFilter.Outcome outcome = filterContainerList(
+            "FeedItemList:getItems",
+            originalReturnList,
+            container -> container instanceof Aweme ? (Aweme) container : null,
+            null,
+            List.of(),
+            List.of(),
+            false,
+            "feed-item-list-getter-ai"
+        );
+        if (!outcome.changed()) {
+            recordAiOutcome(
+                "FeedItemList:getItems",
+                outcome,
+                outcome.staleSnapshot ? "STALE" : "UNCHANGED"
+            );
+            return originalReturnList;
+        }
+
+        try {
+            if (feedItemList.items != originalReturnList) {
+                recordAiOutcome("FeedItemList:getItems", outcome, "STALE");
+                return originalReturnList;
+            }
+            feedItemList.items = outcome.effectiveList;
+            recordAiOutcome("FeedItemList:getItems", outcome, "ASSIGNED_AND_RETURNED");
+            return outcome.effectiveList;
+        } catch (RuntimeException | LinkageError error) {
+            recordAiOutcome("FeedItemList:getItems", outcome, "INSTALL_FAILED");
+            logInstallFailure("FeedItemList:getItems", error);
+            return originalReturnList;
+        }
     }
 
     public static void filter(FollowFeedList followFeedList) {
@@ -114,42 +172,107 @@ public final class FeedItemsFilter {
         filterFollowFeedList(followFeedList, true, FilterPhase.LATE_FOLLOW);
     }
 
+    public static List filterLateResult(FollowFeedList followFeedList, List originalReturnList) {
+        if (followFeedList == null || originalReturnList == null) return originalReturnList;
+        ContentListFilter.Outcome outcome = filterContainerList(
+            "FollowFeedList:getItems",
+            originalReturnList,
+            container -> container instanceof FollowFeed ? ((FollowFeed) container).aweme : null,
+            null,
+            LATE_FOLLOW_FILTERS,
+            List.of(),
+            true,
+            "following-getter"
+        );
+        if (!outcome.changed()) {
+            recordAiOutcome(
+                "FollowFeedList:getItems",
+                outcome,
+                outcome.staleSnapshot ? "STALE" : "UNCHANGED"
+            );
+            return originalReturnList;
+        }
+        try {
+            followFeedList.mItems = outcome.effectiveList;
+            recordAiOutcome("FollowFeedList:getItems", outcome, "ASSIGNED_AND_RETURNED");
+            return outcome.effectiveList;
+        } catch (RuntimeException | LinkageError error) {
+            recordAiOutcome("FollowFeedList:getItems", outcome, "INSTALL_FAILED");
+            logInstallFailure("FollowFeedList:getItems", error);
+            return originalReturnList;
+        }
+    }
+
     public static void filterLateFinal(FollowFeedList followFeedList) {
         filterFollowFeedList(followFeedList, false, FilterPhase.LATE_FOLLOW);
     }
 
-    public static List filterProfileAds(List items) {
-        return filterAdOnlyAwemeList("ProfileAwemeList", items);
+    public static List filterProfileItems(List items) {
+        return filterDirectAwemeList("ProfileAwemeList", items);
     }
 
     public static boolean filterProfileAdEligibility(boolean eligible) {
         return !ADS_FILTER.getEnabled() && eligible;
     }
 
-    public static void filterSearchAds(SearchMixFeedList response) {
-        if (response == null || response.mItems == null || !ADS_FILTER.getEnabled()) return;
+    public static void filterSearchContent(SearchMixFeedList response) {
+        if (response == null || response.mItems == null) return;
 
-        response.mItems = filterAdContainers(
+        ContentListFilter.Outcome outcome = filterContainerList(
             "SearchMixFeedList",
             response.mItems,
             container -> container instanceof SearchMixFeed
                 ? ((SearchMixFeed) container).getAweme()
                 : null,
             container -> container instanceof SearchMixFeed
-                && ((SearchMixFeed) container).isAdOrContainAd()
+                && ((SearchMixFeed) container).isAdOrContainAd(),
+            List.of(ADS_FILTER),
+            List.of(),
+            false,
+            "wrapped-search"
         );
+        if (outcome.changed()) {
+            try {
+                response.mItems = outcome.effectiveList;
+                recordAiOutcome("SearchMixFeedList", outcome, "ASSIGNED");
+            } catch (RuntimeException | LinkageError error) {
+                recordAiOutcome("SearchMixFeedList", outcome, "INSTALL_FAILED");
+                logInstallFailure("SearchMixFeedList", error);
+            }
+        } else {
+            recordAiOutcome("SearchMixFeedList", outcome, outcome.staleSnapshot ? "STALE" : "UNCHANGED");
+        }
     }
 
-    public static void filterFriendsAds(Object value) {
-        if (!(value instanceof FriendsFeedResponse) || !ADS_FILTER.getEnabled()) return;
+    public static void filterFriendsContent(Object value) {
+        if (!(value instanceof FriendsFeedResponse)) return;
 
         FriendsFeedResponse response = (FriendsFeedResponse) value;
-        response.friendFeedData = filterAdContainers(
+        ContentListFilter.Outcome outcome = filterContainerList(
             "FriendsFeedResponse:feed",
             response.friendFeedData,
             FeedItemsFilter::extractFriendsAweme,
-            container -> false
+            null,
+            List.of(ADS_FILTER),
+            List.of(),
+            false,
+            "wrapped-friends"
         );
+        if (outcome.changed()) {
+            try {
+                response.friendFeedData = outcome.effectiveList;
+                recordAiOutcome("FriendsFeedResponse:feed", outcome, "ASSIGNED");
+            } catch (RuntimeException | LinkageError error) {
+                recordAiOutcome("FriendsFeedResponse:feed", outcome, "INSTALL_FAILED");
+                logInstallFailure("FriendsFeedResponse:feed", error);
+            }
+        } else {
+            recordAiOutcome(
+                "FriendsFeedResponse:feed",
+                outcome,
+                outcome.staleSnapshot ? "STALE" : "UNCHANGED"
+            );
+        }
     }
 
     public static void filterDiscoverBanners(BannerList response) {
@@ -169,84 +292,24 @@ public final class FeedItemsFilter {
         return ADS_FILTER.getEnabled() ? null : aweme;
     }
 
-    public static List filterLateInsertedAds(String source, List items) {
+    public static List filterLateInsertedItems(String source, List items) {
         String insertionSource = source == null ? "unknown" : source;
-        return filterAdOnlyAwemeList("FeedInsertion:" + insertionSource, items);
+        return filterDirectAwemeList("FeedInsertion:" + insertionSource, items);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static List filterAdOnlyAwemeList(String source, List items) {
-        if (items == null || items.isEmpty() || !ADS_FILTER.getEnabled()) return items;
-
-        boolean verbose = BaseSettings.DEBUG.get();
-        ArrayList kept = null;
-        int removed = 0;
-        for (int index = 0; index < items.size(); index++) {
-            Object container = items.get(index);
-            Aweme item = container instanceof Aweme ? (Aweme) container : null;
-            String reason = item == null ? null : getFilterReason(LATE_FOLLOW_FILTERS, item);
-            if (reason == null) {
-                if (kept != null) kept.add(container);
-                continue;
-            }
-
-            if (kept == null) {
-                kept = new ArrayList(items.size());
-                kept.addAll(items.subList(0, index));
-            }
-            removed++;
-            logItem(item, reason, verbose);
-        }
-
-        if (kept == null) return items;
-        if (verbose && shouldLogBatch()) {
-            int initialSize = items.size();
-            int resultSize = kept.size();
-            int removedFinal = removed;
-            Logger.printInfo(() -> "[Morphe TikTok FeedFilter] filter(" + source + "): size "
-                + initialSize + " -> " + resultSize + " (removed=" + removedFinal + ")");
-        }
-        return kept;
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static List filterAdContainers(
-        String source,
-        List items,
-        AwemeExtractor extractor,
-        ContainerFilter containerFilter
-    ) {
-        if (items == null || items.isEmpty()) return items;
-
-        ArrayList kept = null;
-        int removed = 0;
-        for (int index = 0; index < items.size(); index++) {
-            Object container = items.get(index);
-            Aweme aweme = extractor.extract(container);
-            boolean filtered = containerFilter.getFiltered(container)
-                || (aweme != null && ADS_FILTER.getFiltered(aweme));
-            if (!filtered) {
-                if (kept != null) kept.add(container);
-                continue;
-            }
-
-            if (kept == null) {
-                kept = new ArrayList(items.size());
-                kept.addAll(items.subList(0, index));
-            }
-            removed++;
-            if (aweme != null) logItem(aweme, AdsFilter.class.getSimpleName(), BaseSettings.DEBUG.get());
-        }
-
-        if (kept == null) return items;
-        if (BaseSettings.DEBUG.get() && shouldLogBatch()) {
-            int initialSize = items.size();
-            int resultSize = kept.size();
-            int removedFinal = removed;
-            Logger.printInfo(() -> "[Morphe TikTok FeedFilter] filter(" + source + "): size "
-                + initialSize + " -> " + resultSize + " (removed=" + removedFinal + ")");
-        }
-        return kept;
+    private static List filterDirectAwemeList(String source, List items) {
+        ContentListFilter.Outcome outcome = filterContainerList(
+            source,
+            items,
+            container -> container instanceof Aweme ? (Aweme) container : null,
+            null,
+            List.of(ADS_FILTER),
+            List.of(),
+            false,
+            "direct-wrapped"
+        );
+        recordAiOutcome(source, outcome, outcome.changed() ? "RETURNED" : "UNCHANGED");
+        return outcome.effectiveList;
     }
 
     private static Aweme extractFriendsAweme(Object container) {
@@ -271,98 +334,117 @@ public final class FeedItemsFilter {
         if (items == null || items.isEmpty()) return items;
         if (panel == null || !"homepage_hot".equals(panel.getEventType())) return items;
 
+        FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
         List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS);
         List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS);
-        if (activeContentFilters.isEmpty() && activeRangeFilters.isEmpty()) return items;
-
         boolean cacheInsertion = "golden_house".equals(source)
             || "middle_insert_when_video_lagging".equals(source);
-        ArrayList kept = null;
-        int removed = 0;
-
-        for (int index = 0; index < items.size(); index++) {
-            Object container = items.get(index);
-            if (!(container instanceof Aweme)) {
-                if (kept != null) kept.add(container);
-                continue;
-            }
-
-            Aweme item = (Aweme) container;
-            int cacheSourceType = AwemeBizExtKt.getCacheSourceType(item);
-            if (!cacheInsertion && !isKnownFeedCacheSource(cacheSourceType)) {
-                if (kept != null) kept.add(container);
-                continue;
-            }
-            if (cacheSourceType == CACHE_SOURCE_OFFLINE_MODE &&
-                    !Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get()) {
-                if (kept != null) kept.add(container);
-                continue;
-            }
-
-            String reason = getFilterReason(activeContentFilters, item);
-            if (reason == null) reason = getFilterReason(activeRangeFilters, item);
-            if (reason == null) {
-                if (kept != null) kept.add(container);
-                continue;
-            }
-
-            if (kept == null) {
-                kept = new ArrayList(items.size());
-                kept.addAll(items.subList(0, index));
-            }
-            removed++;
-            logItem(item, reason, BaseSettings.DEBUG.get());
-        }
-
-        if (kept == null) return items;
-        if (BaseSettings.DEBUG.get()) {
-            int removedCount = removed;
-            int keptCount = kept.size();
-            Logger.printInfo(() -> "[Morphe TikTok FeedFilter] Final insert source=" + source
-                + " removed=" + removedCount + " kept=" + keptCount);
-        }
-        return kept;
+        boolean verbose = BaseSettings.DEBUG.get();
+        boolean nonAiActive = !activeContentFilters.isEmpty() || !activeRangeFilters.isEmpty();
+        String policyKey = settings.nonAiKey("panel-insertion:" + cacheInsertion);
+        ContentListFilter.Outcome outcome = ContentListFilter.filter(new ContentListFilter.Request(
+            policyKey,
+            items,
+            container -> container instanceof Aweme ? (Aweme) container : null,
+            null,
+            item -> {
+                Aweme aweme = (Aweme) item;
+                int cacheSourceType = AwemeBizExtKt.getCacheSourceType(aweme);
+                if (!cacheInsertion && !isKnownFeedCacheSource(cacheSourceType)) return null;
+                if (cacheSourceType == CACHE_SOURCE_OFFLINE_MODE && !settings.filterOffline) return null;
+                String reason = getFilterReason(activeContentFilters, aweme);
+                return reason == null ? getFilterReason(activeRangeFilters, aweme) : reason;
+            },
+            (item, observation) -> AiContentFilter.evaluate(
+                (Aweme) item,
+                settings.hideAiContent,
+                observation
+            ),
+            settings::matchesCurrentNonAi,
+            verbose ? FeedItemsFilter::observeRemoval : null,
+            false,
+            nonAiActive,
+            settings.hideAiContent,
+            false,
+            verbose,
+            SystemClock.elapsedRealtime()
+        ));
+        recordAiOutcome(
+            "FeedInsertionPanel:" + (source == null ? "unknown" : source),
+            outcome,
+            outcome.changed() ? "RETURNED" : outcome.staleSnapshot ? "STALE" : "UNCHANGED"
+        );
+        return outcome.effectiveList;
     }
 
     public static FeedItemList filterCachedFeedList(FeedItemList feedItemList) {
         if (feedItemList == null || feedItemList.items == null) return null;
-        filterCachedFeedItems("FeedItemList:cold-cache", feedItemList);
+        filterCachedFeedItems("FeedItemList:cold-cache", feedItemList, true);
         return feedItemList.items.isEmpty() ? null : feedItemList;
     }
 
     public static FeedItemList filterOfflineFeedList(FeedItemList feedItemList) {
         if (feedItemList == null || feedItemList.items == null) return null;
-        if (!Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get()) return feedItemList;
-        filterCachedFeedItems("FeedItemList:offline-fallback", feedItemList);
+        FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
+        if (!settings.filterOffline && !settings.hideAiContent) return feedItemList;
+        filterCachedFeedItems(
+            "FeedItemList:offline-fallback",
+            feedItemList,
+            settings.filterOffline,
+            settings
+        );
         return feedItemList.items.isEmpty() ? null : feedItemList;
     }
 
     public static boolean shouldKeepCachedAweme(Aweme item) {
         if (item == null) return true;
 
+        FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
         int cacheSourceType = AwemeBizExtKt.getCacheSourceType(item);
-        if (cacheSourceType == CACHE_SOURCE_OFFLINE_MODE &&
-                !Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get()) {
-            return true;
+        boolean allowNonAi = cacheSourceType != CACHE_SOURCE_OFFLINE_MODE || settings.filterOffline;
+        String reason = null;
+        if (allowNonAi) {
+            List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS);
+            List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS);
+            reason = getFilterReason(activeContentFilters, item);
+            if (reason == null) reason = getFilterReason(activeRangeFilters, item);
         }
 
-        List<IFilter> activeContentFilters = getActiveFilters(CONTENT_FILTERS);
-        List<IFilter> activeRangeFilters = getActiveFilters(RANGE_FILTERS);
-        String reason = getFilterReason(activeContentFilters, item);
-        if (reason == null) reason = getFilterReason(activeRangeFilters, item);
-        if (reason == null) return true;
-
-        logItem(item, reason, BaseSettings.DEBUG.get());
-        if (BaseSettings.DEBUG.get()) {
-            String rejectionReason = reason;
-            Logger.printInfo(() -> "[Morphe TikTok FeedFilter] Cached item aid="
-                + item.getAid() + " sourceType=" + cacheSourceType
-                + " rejected by " + rejectionReason);
+        boolean verbose = BaseSettings.DEBUG.get();
+        AiObservation observation = verbose && settings.hideAiContent ? new AiObservation() : null;
+        int aiResult;
+        try {
+            aiResult = AiContentFilter.evaluate(item, settings.hideAiContent, observation);
+        } catch (RuntimeException | LinkageError error) {
+            aiResult = AiContentFilter.READ_ERROR;
         }
-        return false;
+        boolean aiRejected = AiContentClassifier.removes(aiResult);
+        boolean keep = reason == null && !aiRejected;
+        if (reason != null) logItem(item, reason, verbose);
+        recordSingleAiDecision(
+            "CachedAweme:" + cacheSourceType,
+            aiResult,
+            settings.hideAiContent,
+            reason == null && aiRejected,
+            verbose
+        );
+        return keep;
     }
 
-    private static void filterCachedFeedItems(String source, FeedItemList feedItemList) {
+    private static void filterCachedFeedItems(
+        String source,
+        FeedItemList feedItemList,
+        boolean includeNonAi
+    ) {
+        filterCachedFeedItems(source, feedItemList, includeNonAi, null);
+    }
+
+    private static void filterCachedFeedItems(
+        String source,
+        FeedItemList feedItemList,
+        boolean includeNonAi,
+        FilterSettingsSnapshot settings
+    ) {
         boolean verbose = BaseSettings.DEBUG.get();
         filterFeedList(
             source,
@@ -371,7 +453,9 @@ public final class FeedItemsFilter {
             container -> (container instanceof Aweme) ? (Aweme) container : null,
             verbose,
             false,
-            FilterPhase.RESPONSE
+            FilterPhase.RESPONSE,
+            includeNonAi,
+            settings
         );
     }
 
@@ -421,7 +505,8 @@ public final class FeedItemsFilter {
             container -> (container instanceof FollowFeed) ? ((FollowFeed) container).aweme : null,
             verbose,
             allowRecentSkip,
-            phase
+            phase,
+            true
         );
     }
 
@@ -432,20 +517,52 @@ public final class FeedItemsFilter {
         AwemeExtractor extractor,
         boolean verbose,
         boolean allowRecentSkip,
-        FilterPhase phase
+        FilterPhase phase,
+        boolean includeNonAi
+    ) {
+        filterFeedList(
+            source,
+            owner,
+            list,
+            extractor,
+            verbose,
+            allowRecentSkip,
+            phase,
+            includeNonAi,
+            null
+        );
+    }
+
+    private static void filterFeedList(
+        String source,
+        Object owner,
+        List list,
+        AwemeExtractor extractor,
+        boolean verbose,
+        boolean allowRecentSkip,
+        FilterPhase phase,
+        boolean includeNonAi,
+        FilterSettingsSnapshot capturedSettings
     ) {
         if (list == null) return;
 
-        List<IFilter> activeContentFilters = getActiveFilters(
-            phase == FilterPhase.RESPONSE ? CONTENT_FILTERS : LATE_FOLLOW_FILTERS
-        );
-        List<IFilter> activeRangeFilters = phase == FilterPhase.RESPONSE
-            ? getActiveFilters(RANGE_FILTERS)
+        List<IFilter> configuredContentFilters = includeNonAi
+            ? (phase == FilterPhase.RESPONSE ? CONTENT_FILTERS : LATE_FOLLOW_FILTERS)
             : List.of();
-        if (activeContentFilters.isEmpty() && activeRangeFilters.isEmpty()) return;
+        List<IFilter> configuredRangeFilters = includeNonAi && phase == FilterPhase.RESPONSE
+            ? RANGE_FILTERS
+            : List.of();
+        List<IFilter> activeContentFilters = getActiveFilters(configuredContentFilters);
+        List<IFilter> activeRangeFilters = getActiveFilters(configuredRangeFilters);
+        FilterSettingsSnapshot settings = capturedSettings == null
+            ? FilterSettingsSnapshot.capture()
+            : capturedSettings;
+        if (activeContentFilters.isEmpty()
+            && activeRangeFilters.isEmpty()
+            && !settings.hideAiContent) return;
 
-        String filterMask = getFilterMask(activeContentFilters, activeRangeFilters);
-        ListFingerprint beforeFingerprint = ListFingerprint.from(list, extractor);
+        String filterMask = getFilterMask(activeContentFilters, activeRangeFilters)
+            + (settings.hideAiContent ? "|AiContentFilter" : "");
         boolean probeEnabled = verbose && FILTER_CALL_PROBE_ENABLED;
         int callId = probeEnabled ? filterCallProbeCount.incrementAndGet() : 0;
         long startNs = probeEnabled ? System.nanoTime() : 0;
@@ -456,71 +573,39 @@ public final class FeedItemsFilter {
         if (probeEnabled) {
             recordProbeCall(listId, filterMask);
         }
-
-        if (allowRecentSkip && shouldSkipRecentlyProcessedList(
-            listId,
-            beforeFingerprint,
-            filterMask,
-            callId,
+        ContentListFilter.Outcome outcome = filterContainerListWithSnapshot(
             source,
-            probeEnabled
-        )) {
-            return;
-        }
-
-        int contentRemoved = 0;
-        int rangeRejected = 0;
-        Map<String, Integer> reasonCounts = probeEnabled ? new HashMap<>() : null;
-
-        List snapshot = new ArrayList(list);
-        List contentKept = new ArrayList(snapshot.size());
-        List rangeKept = new ArrayList(snapshot.size());
-        for (Object container : snapshot) {
-            Aweme item = extractor.extract(container);
-            if (item == null) {
-                contentKept.add(container);
-                rangeKept.add(container);
-                continue;
-            }
-
-            String contentReason = getFilterReason(activeContentFilters, item);
-            if (contentReason != null) {
-                contentRemoved++;
-                incrementReason(reasonCounts, contentReason);
-                logItem(item, contentReason, verbose);
-                continue;
-            }
-
-            contentKept.add(container);
-            String rangeReason = getFilterReason(activeRangeFilters, item);
-            if (rangeReason != null) {
-                rangeRejected++;
-                incrementReason(reasonCounts, rangeReason);
-                logItem(item, rangeReason, verbose);
-                continue;
-            }
-
-            rangeKept.add(container);
-        }
-
-        List kept = rangeKept;
-        int removed = initialSize - kept.size();
+            list,
+            container -> extractor.extract(container),
+            null,
+            activeContentFilters,
+            activeRangeFilters,
+            settings,
+            allowRecentSkip,
+            phase == FilterPhase.RESPONSE ? "response" : "late-follow"
+        );
 
         List resultList = list;
-        if (removed > 0) {
+        String installation = outcome.staleSnapshot ? "STALE" : "UNCHANGED";
+        if (outcome.changed()) {
             try {
-                list.clear();
-                list.addAll(kept);
-            } catch (RuntimeException exception) {
-                resultList = replaceOwnerList(owner, kept);
-                if (listReplacementLogCount.getAndIncrement() < 3) {
-                    Logger.printException(
-                        () -> "[Morphe TikTok FeedFilter] Replaced a non-mutable " + source + " list",
-                        exception
+                if (owner instanceof FeedItemList) {
+                    ((FeedItemList) owner).items = outcome.effectiveList;
+                } else if (owner instanceof FollowFeedList) {
+                    ((FollowFeedList) owner).mItems = outcome.effectiveList;
+                } else {
+                    throw new IllegalStateException(
+                        "Unsupported feed list owner: " + (owner == null ? "null" : owner.getClass().getName())
                     );
                 }
+                resultList = outcome.effectiveList;
+                installation = "ASSIGNED";
+            } catch (RuntimeException | LinkageError error) {
+                installation = "INSTALL_FAILED";
+                logInstallFailure(source, error);
             }
         }
+        recordAiOutcome(source, outcome, installation);
 
         if (probeEnabled) {
             logFilterCallProbe(
@@ -530,52 +615,210 @@ public final class FeedItemsFilter {
                 listId,
                 initialSize,
                 resultList.size(),
-                removed,
-                rangeRejected,
+                installation.equals("ASSIGNED") ? outcome.removed : 0,
+                0,
                 filterMask,
                 beforeSample,
                 sampleAids(resultList, extractor),
-                reasonCounts,
+                outcome.reasonCounts,
                 System.nanoTime() - startNs
             );
         }
 
         if (probeEnabled) {
-            recordProbeScan(listId, removed, System.nanoTime() - startNs);
+            if (outcome.nonAiSkipped) {
+                recordProbeCacheHit(listId);
+            } else {
+                recordProbeScan(
+                    listId,
+                    installation.equals("ASSIGNED") ? outcome.removed : 0,
+                    System.nanoTime() - startNs
+                );
+            }
         }
 
-        rememberProcessedList(listId, ListFingerprint.from(resultList, extractor), filterMask);
-
-        if (verbose && removed > 0 && shouldLogBatch()) {
-            int removedFinal = removed;
-            int contentRemovedFinal = contentRemoved;
-            int rangeRejectedFinal = rangeRejected;
+        if (verbose && installation.equals("ASSIGNED") && outcome.removed > 0 && shouldLogBatch()) {
+            int removedFinal = outcome.removed;
             int resultSize = resultList.size();
             Logger.printInfo(() -> "[Morphe TikTok FeedFilter] filter(" + source + "): size "
                 + initialSize + " -> " + resultSize
-                + " (removed=" + removedFinal
-                + ", contentRemoved=" + contentRemovedFinal
-                + ", rangeRejected=" + rangeRejectedFinal + ")");
+                + " (removed=" + removedFinal + ")");
         }
     }
 
-    private static List replaceOwnerList(Object owner, List kept) {
-        List replacement = new ArrayList(kept);
-        if (owner instanceof FeedItemList) {
-            ((FeedItemList) owner).items = replacement;
-            return replacement;
-        }
-        if (owner instanceof FollowFeedList) {
-            ((FollowFeedList) owner).mItems = replacement;
-            return replacement;
-        }
-        throw new IllegalStateException("Unsupported feed list owner: " + owner.getClass().getName());
+    private static ContentListFilter.Outcome filterContainerList(
+        String source,
+        List list,
+        ContentListFilter.Extractor extractor,
+        ContentListFilter.ContainerPredicate nativeAdPredicate,
+        List<IFilter> configuredContentFilters,
+        List<IFilter> configuredRangeFilters,
+        boolean allowRecentSkip,
+        String policySuffix
+    ) {
+        FilterSettingsSnapshot settings = FilterSettingsSnapshot.capture();
+        List<IFilter> activeContentFilters = getActiveFilters(configuredContentFilters);
+        List<IFilter> activeRangeFilters = getActiveFilters(configuredRangeFilters);
+        return filterContainerListWithSnapshot(
+            source,
+            list,
+            extractor,
+            nativeAdPredicate,
+            activeContentFilters,
+            activeRangeFilters,
+            settings,
+            allowRecentSkip,
+            policySuffix
+        );
     }
 
-    private static void incrementReason(Map<String, Integer> reasonCounts, String reason) {
-        if (reasonCounts == null) return;
-        Integer count = reasonCounts.get(reason);
-        reasonCounts.put(reason, count == null ? 1 : count + 1);
+    private static ContentListFilter.Outcome filterContainerListWithSnapshot(
+        String source,
+        List list,
+        ContentListFilter.Extractor extractor,
+        ContentListFilter.ContainerPredicate nativeAdPredicate,
+        List<IFilter> activeContentFilters,
+        List<IFilter> activeRangeFilters,
+        FilterSettingsSnapshot settings,
+        boolean allowRecentSkip,
+        String policySuffix
+    ) {
+        boolean nonAiActive = !activeContentFilters.isEmpty() || !activeRangeFilters.isEmpty();
+        boolean verbose = BaseSettings.DEBUG.get();
+        String activeMask = getFilterMask(activeContentFilters, activeRangeFilters);
+        String policyKey = settings.nonAiKey(policySuffix + ':' + activeMask);
+
+        return ContentListFilter.filter(new ContentListFilter.Request(
+            policyKey,
+            list,
+            extractor,
+            nativeAdPredicate,
+            item -> {
+                Aweme aweme = (Aweme) item;
+                String reason = getFilterReason(activeContentFilters, aweme);
+                return reason == null ? getFilterReason(activeRangeFilters, aweme) : reason;
+            },
+            (item, observation) -> AiContentFilter.evaluate(
+                (Aweme) item,
+                settings.hideAiContent,
+                observation
+            ),
+            settings::matchesCurrentNonAi,
+            verbose ? FeedItemsFilter::observeRemoval : null,
+            nativeAdPredicate != null && settings.removeAds,
+            nonAiActive,
+            settings.hideAiContent,
+            allowRecentSkip,
+            verbose,
+            SystemClock.elapsedRealtime()
+        ));
+    }
+
+    private static void observeRemoval(
+        Object item,
+        String primaryReason,
+        int aiReasonMask,
+        AiObservation observation
+    ) {
+        if (!(item instanceof Aweme)) return;
+        if (!AiContentFilter.class.getSimpleName().equals(primaryReason)) {
+            logItem((Aweme) item, primaryReason, true);
+        }
+    }
+
+    private static void logInstallFailure(String source, Throwable error) {
+        if (listReplacementLogCount.getAndIncrement() >= 3) return;
+        Logger.printException(
+            () -> "[Morphe TikTok FeedFilter] Failed to install filtered " + source + " list",
+            error
+        );
+    }
+
+    private static void recordSingleAiDecision(
+        String source,
+        int aiResult,
+        boolean enabled,
+        boolean aiOnlyRemoved,
+        boolean diagnostics
+    ) {
+        int aiReasons = aiResult & AiContentClassifier.REMOVAL_MASK;
+        int readErrors = (aiResult & AiContentFilter.READ_ERROR) == 0 ? 0 : 1;
+        if (readErrors > 0) recordAiReadErrors(readErrors);
+        if (!diagnostics) return;
+        synchronized (aiSummaryLock) {
+            aiSummary.calls++;
+            if (enabled) aiSummary.evaluated++;
+            aiSummary.addReasons(aiResult);
+            if (AiContentClassifier.removes(aiReasons)) aiSummary.matched++;
+            if (aiOnlyRemoved) aiSummary.removed++;
+            aiSummary.lastEnabled = enabled;
+            aiSummary.lastSource = source;
+            emitAiSummaryIfReadyLocked(SystemClock.elapsedRealtime());
+        }
+    }
+
+    private static void recordAiOutcome(
+        String source,
+        ContentListFilter.Outcome outcome,
+        String installation
+    ) {
+        if (outcome.aiReadErrors > 0) recordAiReadErrors(outcome.aiReadErrors);
+        if (!outcome.diagnosticsEnabled) return;
+
+        synchronized (aiSummaryLock) {
+            aiSummary.calls++;
+            aiSummary.evaluated += outcome.aiEvaluated;
+            aiSummary.matched += outcome.aiMatched;
+            aiSummary.creatorLabels += outcome.creatorLabels;
+            aiSummary.tiktokLabels += outcome.tiktokLabels;
+            aiSummary.createdByAi += outcome.createdByAi;
+            aiSummary.moderatorLabels += outcome.moderatorLabels;
+            aiSummary.unknownLabels += outcome.unknownLabels;
+            aiSummary.readErrors += outcome.aiReadErrors;
+            aiSummary.callbackErrors += outcome.callbackErrors;
+            aiSummary.coalescedCalls += Math.max(0, outcome.aiEvaluated - 1);
+            if ("ASSIGNED".equals(installation)
+                || "ASSIGNED_AND_RETURNED".equals(installation)
+                || "RETURNED".equals(installation)) {
+                aiSummary.removed += outcome.aiOnlyRemoved;
+            }
+            if ("INSTALL_FAILED".equals(installation)) aiSummary.installFailed++;
+            if ("STALE".equals(installation)) aiSummary.staleSnapshots++;
+            aiSummary.lastEnabled = outcome.aiEnabled;
+            aiSummary.lastSource = source;
+            aiSummary.lastInstallation = installation;
+            emitAiSummaryIfReadyLocked(SystemClock.elapsedRealtime());
+        }
+    }
+
+    private static void recordAiReadErrors(int count) {
+        long now = SystemClock.elapsedRealtime();
+        synchronized (aiSummaryLock) {
+            pendingAiReadErrors += count;
+            if (now - lastAiErrorLogElapsed < 5000) return;
+            int errors = pendingAiReadErrors;
+            pendingAiReadErrors = 0;
+            lastAiErrorLogElapsed = now;
+            LogBufferManager.appendEvent(
+                DiagnosticCategory.FEED_AND_NAVIGATION,
+                "FeedItemsFilter",
+                "ERROR",
+                "AI_READ_ERROR count=" + errors
+            );
+        }
+    }
+
+    private static void emitAiSummaryIfReadyLocked(long now) {
+        long windowMs = now - aiSummary.startedAtElapsedMs;
+        if (windowMs < 5000 || aiSummary.calls == 0) return;
+        String message = aiSummary.toMessage(windowMs);
+        aiSummary = new AiSummary(now);
+        LogBufferManager.appendEvent(
+            DiagnosticCategory.FEED_AND_NAVIGATION,
+            "FeedItemsFilter",
+            "DEBUG",
+            message
+        );
     }
 
     private static List<IFilter> getActiveFilters(List<IFilter> filters) {
@@ -627,6 +870,7 @@ public final class FeedItemsFilter {
                 + " hide_live=" + Settings.HIDE_LIVE.get()
                 + " hide_story=" + Settings.HIDE_STORY.get()
                 + " hide_image=" + Settings.HIDE_IMAGE.get()
+                + " hide_ai_content=" + Settings.HIDE_AI_CONTENT.get()
                 + " min_max_views=\"" + Settings.MIN_MAX_VIEWS.get() + "\""
                 + " min_max_likes=\"" + Settings.MIN_MAX_LIKES.get() + "\""
         );
@@ -677,78 +921,6 @@ public final class FeedItemsFilter {
 
     private static boolean shouldLogItem() {
         return itemLogCount.getAndIncrement() < MAX_ITEM_LOGS;
-    }
-
-    private static boolean shouldSkipRecentlyProcessedList(
-        int listId,
-        ListFingerprint fingerprint,
-        String filterMask,
-        int callId,
-        String source,
-        boolean probeEnabled
-    ) {
-        ProcessedListState state;
-        long now = System.currentTimeMillis();
-        String missReason = null;
-        int skipCount = 0;
-
-        synchronized (processedListCache) {
-            state = processedListCache.get(listId);
-            if (state == null) {
-                missReason = "newList";
-            } else if (!state.filterMask.equals(filterMask)) {
-                missReason = "filterMask";
-            } else if (state.fingerprint.size != fingerprint.size) {
-                missReason = "size";
-            } else if (!state.fingerprint.matches(fingerprint)) {
-                missReason = "sample";
-            } else if (now - state.processedAtMs > PROCESSED_LIST_CACHE_TTL_MS) {
-                missReason = "expired";
-            } else {
-                state.skipCount++;
-                skipCount = state.skipCount;
-            }
-        }
-
-        if (missReason != null) {
-            if (probeEnabled) {
-                recordProbeCacheMiss(missReason);
-            }
-            return false;
-        }
-
-        if (probeEnabled) {
-            recordProbeCacheHit(listId);
-        }
-
-        if (probeEnabled && shouldLogCacheSkip(skipCount)) {
-            int skipCountFinal = skipCount;
-            Logger.printInfo(() -> "[Morphe TikTok FeedFilterProbe]"
-                + " call=" + callId
-                + " source=" + source
-                + " list=" + listId
-                + " cacheHit=true"
-                + " skipCount=" + skipCountFinal
-                + " size=" + fingerprint.size
-                + " filters=\"" + filterMask + "\""
-                + " sample=\"" + fingerprint.toSampleString() + "\"");
-        }
-
-        return true;
-    }
-
-    private static boolean shouldLogCacheSkip(int skipCount) {
-        return skipCount <= 20 || skipCount % 100 == 0;
-    }
-
-    private static void rememberProcessedList(int listId, ListFingerprint fingerprint, String filterMask) {
-        synchronized (processedListCache) {
-            if (processedListCache.size() > PROCESSED_LIST_CACHE_MAX_SEEN_LISTS) {
-                processedListCache.clear();
-            }
-
-            processedListCache.put(listId, new ProcessedListState(fingerprint, filterMask, System.currentTimeMillis()));
-        }
     }
 
     private static void recordProbeCall(int listId, String filterMask) {
@@ -1030,105 +1202,130 @@ public final class FeedItemsFilter {
         }
     }
 
-    private static final class ProcessedListState {
-        final ListFingerprint fingerprint;
-        final String filterMask;
-        final long processedAtMs;
-        int skipCount;
+    private static final class FilterSettingsSnapshot {
+        final boolean removeAds;
+        final boolean hideLive;
+        final boolean hideShop;
+        final boolean hideStory;
+        final boolean hideImage;
+        final boolean filterOffline;
+        final boolean hideAiContent;
+        final String minMaxViews;
+        final String minMaxLikes;
 
-        ProcessedListState(ListFingerprint fingerprint, String filterMask, long processedAtMs) {
-            this.fingerprint = fingerprint;
-            this.filterMask = filterMask;
-            this.processedAtMs = processedAtMs;
-        }
-
-        boolean matches(ListFingerprint currentFingerprint, String currentFilterMask, long nowMs) {
-            return nowMs - processedAtMs <= PROCESSED_LIST_CACHE_TTL_MS
-                && filterMask.equals(currentFilterMask)
-                && fingerprint.matches(currentFingerprint);
-        }
-    }
-
-    private static final class ListFingerprint {
-        final int size;
-        final int firstIdentity;
-        final int middleIdentity;
-        final int lastIdentity;
-        final String firstAid;
-        final String middleAid;
-        final String lastAid;
-
-        private ListFingerprint(
-            int size,
-            int firstIdentity,
-            int middleIdentity,
-            int lastIdentity,
-            String firstAid,
-            String middleAid,
-            String lastAid
+        private FilterSettingsSnapshot(
+            boolean removeAds,
+            boolean hideLive,
+            boolean hideShop,
+            boolean hideStory,
+            boolean hideImage,
+            boolean filterOffline,
+            boolean hideAiContent,
+            String minMaxViews,
+            String minMaxLikes
         ) {
-            this.size = size;
-            this.firstIdentity = firstIdentity;
-            this.middleIdentity = middleIdentity;
-            this.lastIdentity = lastIdentity;
-            this.firstAid = firstAid;
-            this.middleAid = middleAid;
-            this.lastAid = lastAid;
+            this.removeAds = removeAds;
+            this.hideLive = hideLive;
+            this.hideShop = hideShop;
+            this.hideStory = hideStory;
+            this.hideImage = hideImage;
+            this.filterOffline = filterOffline;
+            this.hideAiContent = hideAiContent;
+            this.minMaxViews = minMaxViews;
+            this.minMaxLikes = minMaxLikes;
         }
 
-        static ListFingerprint from(List list, AwemeExtractor extractor) {
-            int size = list.size();
-            if (size == 0) {
-                return new ListFingerprint(0, 0, 0, 0, "", "", "");
-            }
-
-            int middleIndex = size / 2;
-            int lastIndex = size - 1;
-            Aweme first = extractAt(list, extractor, 0);
-            Aweme middle = extractAt(list, extractor, middleIndex);
-            Aweme last = extractAt(list, extractor, lastIndex);
-
-            return new ListFingerprint(
-                size,
-                identity(first),
-                identity(middle),
-                identity(last),
-                aid(first),
-                aid(middle),
-                aid(last)
+        static FilterSettingsSnapshot capture() {
+            return new FilterSettingsSnapshot(
+                Settings.REMOVE_ADS.get(),
+                Settings.HIDE_LIVE.get(),
+                Settings.HIDE_SHOP.get(),
+                Settings.HIDE_STORY.get(),
+                Settings.HIDE_IMAGE.get(),
+                Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get(),
+                Settings.HIDE_AI_CONTENT.get(),
+                Settings.MIN_MAX_VIEWS.get(),
+                Settings.MIN_MAX_LIKES.get()
             );
         }
 
-        private static Aweme extractAt(List list, AwemeExtractor extractor, int index) {
-            try {
-                return extractor.extract(list.get(index));
-            } catch (RuntimeException ex) {
-                return null;
-            }
+        String nonAiKey(String routePolicy) {
+            return routePolicy
+                + "|ads=" + removeAds
+                + "|live=" + hideLive
+                + "|shop=" + hideShop
+                + "|story=" + hideStory
+                + "|image=" + hideImage
+                + "|offline=" + filterOffline
+                + "|views=" + minMaxViews
+                + "|likes=" + minMaxLikes;
         }
 
-        boolean matches(ListFingerprint other) {
-            return size == other.size
-                && firstIdentity == other.firstIdentity
-                && middleIdentity == other.middleIdentity
-                && lastIdentity == other.lastIdentity
-                && firstAid.equals(other.firstAid)
-                && middleAid.equals(other.middleAid)
-                && lastAid.equals(other.lastAid);
+        boolean matchesCurrentNonAi() {
+            return removeAds == Settings.REMOVE_ADS.get()
+                && hideLive == Settings.HIDE_LIVE.get()
+                && hideShop == Settings.HIDE_SHOP.get()
+                && hideStory == Settings.HIDE_STORY.get()
+                && hideImage == Settings.HIDE_IMAGE.get()
+                && filterOffline == Settings.FILTER_OFFLINE_FALLBACK_VIDEOS.get()
+                && minMaxViews.equals(Settings.MIN_MAX_VIEWS.get())
+                && minMaxLikes.equals(Settings.MIN_MAX_LIKES.get());
+        }
+    }
+
+    private static final class AiSummary {
+        final long startedAtElapsedMs;
+        int calls;
+        int evaluated;
+        int matched;
+        int removed;
+        int creatorLabels;
+        int tiktokLabels;
+        int createdByAi;
+        int moderatorLabels;
+        int unknownLabels;
+        int readErrors;
+        int callbackErrors;
+        int installFailed;
+        int staleSnapshots;
+        int coalescedCalls;
+        String lastSource = "none";
+        String lastInstallation = "none";
+        boolean lastEnabled;
+
+        AiSummary(long startedAtElapsedMs) {
+            this.startedAtElapsedMs = startedAtElapsedMs;
         }
 
-        String toSampleString() {
-            return firstAid + "|" + middleAid + "|" + lastAid;
+        void addReasons(int reasons) {
+            if ((reasons & AiContentClassifier.CREATOR_LABEL) != 0) creatorLabels++;
+            if ((reasons & AiContentClassifier.TIKTOK_AI_LABEL) != 0) tiktokLabels++;
+            if ((reasons & AiContentClassifier.CREATED_BY_AI) != 0) createdByAi++;
+            if ((reasons & AiContentClassifier.MODERATOR_AI_LABEL) != 0) moderatorLabels++;
+            if ((reasons & AiContentClassifier.UNKNOWN_LABEL_TYPE) != 0) unknownLabels++;
+            if ((reasons & AiContentFilter.READ_ERROR) != 0) readErrors++;
         }
 
-        private static int identity(Aweme item) {
-            return item == null ? 0 : System.identityHashCode(item);
-        }
-
-        private static String aid(Aweme item) {
-            if (item == null) return "";
-            String aid = item.getAid();
-            return aid == null ? "" : aid;
+        String toMessage(long windowMs) {
+            return "AI summary"
+                + " windowMs=" + windowMs
+                + " hideAiContent=" + lastEnabled
+                + " calls=" + calls
+                + " evaluated=" + evaluated
+                + " matched=" + matched
+                + " removed=" + removed
+                + " creatorLabel=" + creatorLabels
+                + " tiktokLabel=" + tiktokLabels
+                + " createdByAi=" + createdByAi
+                + " moderatorLabel=" + moderatorLabels
+                + " unknownLabel=" + unknownLabels
+                + " readError=" + readErrors
+                + " callbackError=" + callbackErrors
+                + " installFailed=" + installFailed
+                + " staleSnapshot=" + staleSnapshots
+                + " coalescedCalls=" + coalescedCalls
+                + " lastSource=" + lastSource
+                + " lastInstallation=" + lastInstallation;
         }
     }
 }

@@ -53,6 +53,12 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
                 "Hide image video", "Hide image video from feed.",
                 Settings.HIDE_IMAGE
         ));
+        addPreference(new TogglePreference(
+                context,
+                "Hide AI content",
+                "Hide posts marked as AI-generated or AI-modified by TikTok or their creators. Unmarked AI content may still appear.",
+                Settings.HIDE_AI_CONTENT
+        ));
 
         addPreference(group(context, "Popularity limits"));
         addPreference(new RangeValuePreference(
@@ -70,7 +76,7 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
         addPreference(new TogglePreference(
                 context,
                 "Filter offline fallback videos",
-                "Also apply these filters to downloaded videos TikTok uses when the feed cannot load enough new items.",
+                "Apply the other content and popularity filters to downloaded fallback videos. Hide AI content always applies.",
                 Settings.FILTER_OFFLINE_FALLBACK_VIDEOS
         ));
     }
