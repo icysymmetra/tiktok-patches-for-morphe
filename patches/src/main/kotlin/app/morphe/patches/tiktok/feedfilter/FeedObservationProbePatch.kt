@@ -79,8 +79,17 @@ internal val feedObservationProbeHooksPatch = bytecodePatch {
         val profileItemsRegister = if (AccessFlags.STATIC.isSet(profileTransform.accessFlags)) "p0" else "p1"
         profileTransform.addInstruction(0,
             "invoke-static {$profileItemsRegister}, Lapp/morphe/extension/tiktok/diagnostics/FeedObservationProbe;->profileNativeTransform(Ljava/lang/Object;)V")
+        val finalInsertion = FinalFeedInsertionFingerprint.method
+        val finalInsertionReturns = finalInsertion.implementation!!.instructions.withIndex()
+            .filter { it.value.opcode == Opcode.RETURN_VOID }.map { it.index }
+        if (finalInsertionReturns.isEmpty()) {
+            throw PatchException("Final feed insertion has no return to observe")
+        }
+        finalInsertionReturns.asReversed().forEach { index ->
+            finalInsertion.addInstructionsAtControlFlowLabel(index,
+                "invoke-static/range {p1 .. p1}, Lapp/morphe/extension/tiktok/diagnostics/FeedObservationProbe;->finalInsert(Ljava/lang/Object;)V")
+        }
         listOf(CacheChainDeliveryFingerprint.method to "cacheChain",
-            FinalFeedInsertionFingerprint.method to "finalInsert",
             FollowFeedPresenterPostProcessFingerprint.method to "followPost",
             ProfileDetailAdEventFingerprint.method to "profileDetail").forEach { (method, callback) ->
             method.addInstruction(0,

@@ -139,6 +139,17 @@ public final class FeedItemsFilter {
         FeedItemList feedItemList,
         List originalReturnList
     ) {
+        List returned = filterFeedItemListOnReadCore(feedItemList, originalReturnList);
+        app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.mainEffectiveGetter(
+            feedItemList, returned
+        );
+        return returned;
+    }
+
+    private static List filterFeedItemListOnReadCore(
+        FeedItemList feedItemList,
+        List originalReturnList
+    ) {
         if (feedItemList == null || originalReturnList == null) return originalReturnList;
 
         try {
@@ -191,6 +202,14 @@ public final class FeedItemsFilter {
     }
 
     public static List filterLateResult(FollowFeedList followFeedList, List originalReturnList) {
+        List returned = filterLateResultCore(followFeedList, originalReturnList);
+        app.morphe.extension.tiktok.diagnostics.FeedObservationProbe.followEffectiveGetter(
+            followFeedList, returned
+        );
+        return returned;
+    }
+
+    private static List filterLateResultCore(FollowFeedList followFeedList, List originalReturnList) {
         if (followFeedList == null || originalReturnList == null) return originalReturnList;
         ContentListFilter.Outcome outcome = filterContainerList(
             "FollowFeedList:getItems",

@@ -74,8 +74,10 @@ public final class FeedObservationProbe {
         if(t.decisions.length()<8192)t.decisions.append('[').append(reason).append(']');
         else t.session.count("gap.DECISION_LIMIT");
     }
-    public static void mainGetter(Object list){observe("MAIN_EFFECTIVE_GETTER",null,list);}
-    public static void followGetter(Object list){observe("FOLLOW_EFFECTIVE_GETTER",null,list);}
+    public static void mainGetter(Object list){observe("MAIN_PRE_FILTER_GETTER",null,list);}
+    public static void followGetter(Object list){observe("FOLLOW_PRE_FILTER_GETTER",null,list);}
+    public static void mainEffectiveGetter(Object owner,Object list){observe("MAIN_EFFECTIVE_GETTER",owner,list);}
+    public static void followEffectiveGetter(Object owner,Object list){observe("FOLLOW_EFFECTIVE_GETTER",owner,list);}
     public static void profileNativeTransform(Object list){observe("PROFILE_NATIVE_TRANSFORM_INPUT",null,list);}
     public static void cacheChain(Object payload){observe("CACHE_CHAIN_PAYLOAD",payload,null);}
     public static void reachBottom(Object payload){observe("REACH_BOTTOM_PAYLOAD",payload,null);}
@@ -186,7 +188,8 @@ public final class FeedObservationProbe {
         void export(OutputStream out)throws IOException {
             StringBuilder h=new StringBuilder("MORPHE FEED OBSERVATION PROBE schema=4\n");
             h.append("session=").append(id).append(" startedUtcMillis=").append(wall).append(" stoppedUtcMillis=").append(stopped)
-                .append("\ninstalledHooks=EXTENSION_FILTER_BOUNDARIES,MAIN_EFFECTIVE_GETTER,FOLLOW_EFFECTIVE_GETTER,PROFILE_NATIVE_TRANSFORM_INPUT,CACHE_CHAIN_PAYLOAD,FINAL_INSERT_PAYLOAD,FOLLOW_NATIVE_POST_INPUT,PROFILE_DETAIL_EVENT,WHY_THIS_POST_REQUEST,WHY_THIS_POST_RESPONSE,WHY_THIS_POST_PANEL_INPUT,WHY_THIS_POST_RESPONSE_CONSUMED,WHY_THIS_POST_LAYOUT")
+                .append("\ninstalledHooks=MAIN_PRE_FILTER_GETTER,FOLLOW_PRE_FILTER_GETTER,PROFILE_NATIVE_TRANSFORM_INPUT,CACHE_CHAIN_PAYLOAD,FINAL_INSERT_PAYLOAD,FOLLOW_NATIVE_POST_INPUT,PROFILE_DETAIL_EVENT,WHY_THIS_POST_REQUEST,WHY_THIS_POST_RESPONSE,WHY_THIS_POST_PANEL_INPUT,WHY_THIS_POST_RESPONSE_CONSUMED,WHY_THIS_POST_LAYOUT")
+                .append("\nconditionalHooks=EXTENSION_FILTER_BOUNDARIES,MAIN_EFFECTIVE_GETTER,FOLLOW_EFFECTIVE_GETTER requireFeedFilterOrHideAiOrHideFypPatch=true")
                 .append("\ntiktok=").append(Utils.getAppVersionName()).append(" bundle=").append(Utils.getPatchesReleaseVersion())
                 .append("\nadditionalHooks=WHY_THIS_POST_PANEL_INPUT,WHY_THIS_POST_RESPONSE_CONSUMED,WHY_THIS_POST_LAYOUT")
                 .append("\nhookSemantics=CONSTRUCTORS_ARE_NOT_NETWORK_COMPLETION PANEL_INPUT_IS_NOT_PROOF_OF_DISPLAY")
