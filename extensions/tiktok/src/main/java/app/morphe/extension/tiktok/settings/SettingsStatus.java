@@ -38,6 +38,12 @@ public class SettingsStatus {
     public static boolean shareSheetEnabled = false;
     public static boolean autoScrollEnabled = false;
 
+    // Patched load() marks the features included in this APK. Run it before
+    // any feature reads these flags, including feed hooks reached at startup.
+    static {
+        load();
+    }
+
     public static void enableFeedFilter() {
         feedFilterEnabled = true;
     }
