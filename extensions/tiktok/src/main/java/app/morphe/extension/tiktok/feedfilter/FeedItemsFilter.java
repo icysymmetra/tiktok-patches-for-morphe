@@ -131,9 +131,9 @@ public final class FeedItemsFilter {
     }
 
     /**
-     * Rechecks the concrete items field when TikTok reads a FeedItemList after the
-     * response hook. Other getItems() return paths, such as CameoData, are left
-     * untouched because they are not the owner's items field.
+     * Rechecks ads and AI labels in the concrete items field when TikTok reads a
+     * FeedItemList after the response hook. Other getItems() return paths, such
+     * as CameoData, are left untouched because they are not the owner's items field.
      */
     public static List filterFeedItemListOnRead(
         FeedItemList feedItemList,
@@ -164,10 +164,10 @@ public final class FeedItemsFilter {
             originalReturnList,
             container -> container instanceof Aweme ? (Aweme) container : null,
             null,
-            List.of(),
+            List.of(ADS_FILTER),
             List.of(),
             false,
-            "feed-item-list-getter-ai"
+            "feed-item-list-getter-ads-ai"
         );
         if (!outcome.changed()) {
             recordAiOutcome(
