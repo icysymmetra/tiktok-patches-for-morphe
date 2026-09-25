@@ -1,3 +1,25 @@
+# [0.8.0-dev.12](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.11...v0.8.0-dev.12) (2026-09-25)
+
+
+### Bug Fixes
+
+* **tiktok:** activate installed features on first use ([4da92b5](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/4da92b530a2fe9f9cf571abe1c8253eee46c6e2c))
+* **tiktok:** keep feed debugger observations after filter hooks ([dab81e3](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/dab81e3820024953ed43b85a9a695ce0828cdc4d))
+* **tiktok:** recheck ads when feed items are read ([0ec3cab](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/0ec3cab045fb003d9e9b755217e4f2b81ad58323))
+
+
+### Features
+
+* hide AI-labelled posts across feed delivery paths ([b612614](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/b6126148b8bba777d781f6ff790ddb8638ce50dd))
+* **tiktok:** add themed feed debugger to diagnostic tools ([c16aef7](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/c16aef7edcfa5ed148c3b6f7b83c1bfd518a4304))
+* **tiktok:** hide FYP unpersonalized slop videos ([fa71265](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/fa712650d411eb830eff5ea0a23526706db457a2))
+
+
+
+
+
+## 0.8.0-dev.12
+
 # [0.8.0-dev.11](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0-dev.10...v0.8.0-dev.11) (2026-09-14)
 
 
