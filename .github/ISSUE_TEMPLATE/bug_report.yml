@@ -16,16 +16,21 @@ body:
     attributes:
       label: Bug description
       description: |
-        - Describe your bug in detail
-        - Add steps to reproduce the bug if possible (Step 1. ... Step 2. ...)
-        - Add images and videos if possible
+        Describe what happened, what you expected, and the steps to reproduce it. Add images or video when they help.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: App, patches, and settings
+      description: |
+        Give the TikTok package and version, the Morphe bundle version, selected patches, and relevant toggle values. For feed issues, include Hide image video, Min/Max views, Min/Max likes, Remove feed ads, Hide livestreams, Hide AI content, and Hide FYP unpersonalized slop videos. Say whether disabling the suspected patch or toggle changes the result, if tested.
     validations:
       required: true
   - type: textarea
     attributes:
       label: Error logs
-      description: Exceptions can be captured by running `logcat | grep AndroidRuntime` in a shell.
-      render: shell
+      description: |
+        Attach the in-app diagnostic report when available. For feed issues, start Feed debugger before reproducing and attach its original saved file too. Note the approximate time of the event. See the feed debugging guide in docs/feed-controls-and-debugging.md. For crashes, AndroidRuntime logcat output also helps. Review logs for personal information before public upload.
   - type: textarea
     attributes:
       label: Solution

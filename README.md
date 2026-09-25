@@ -42,7 +42,7 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Disable long-press quick share` | Keeps long-pressing Share from opening TikTok's quick-share interaction. |
 | `Disable long-press repost` | Keeps holding Like from opening TikTok's repost action without disabling TikTok's wider repost and upvote systems. |
 | `Disable screen capture detection` | Disables capture detection and secure-window screenshot protection, including Circle to Search blocking. |
-| `Diagnostic tools` | Adds optional structured Morphe logs, TikTok crash capture, clipboard or file report export, and a rolling feed debugger. |
+| `Diagnostic tools` | Adds optional structured Morphe logs, TikTok crash capture, clipboard or file report export, and a rolling [feed debugger](docs/feed-controls-and-debugging.md). |
 | `Downloads` | Adds watermark-free downloads, separate media destinations, filename templates, video quality selection, and comment sticker saving with animated-media preservation. |
 | `Enable Live search` | Shows TikTok's search entry in the Live drawer where supported. |
 | `Enable non-personalized search` | Uses TikTok's non-personalized search mode instead of its saved account choice. |
@@ -60,7 +60,7 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Hide feed LIVE button` | Adds an option to hide the LIVE button at the top left of video feeds. |
 | `Hide feed save button` | Adds an option to hide the save/favourites button from video feeds. |
 | `Hide feed search button` | Adds an option to hide the search button at the top right of video feeds. |
-| `Hide FYP unpersonalized slop videos` | Seeing sudden batches of seemingly unrelated posts in For You? This hides posts from the observed batch source when their feed data has no recommendation reasons. Photo posts are included; other unrelated posts may still appear. |
+| `Hide FYP unpersonalized slop videos` | Hides certain batches of unpersonalized slop posts that appear in your For You feed. |
 | `Hide quick comment reactions` | Hides TikTok's exposed quick emoji row in supported comment inputs. |
 | `Hide suggested accounts` | Removes suggested-account cards from profile and inbox surfaces. |
 | `Hold-and-slide 2x lock` | Enables TikTok's native hold, slide down, and release gesture for locking playback at 2x speed. |
@@ -76,8 +76,6 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Show seekbar thumbnail` | Shows TikTok's video preview thumbnail while dragging the seekbar. |
 | `Stop video looping` | Stops a completed video instead of automatically replaying it. |
 | `Translate comments` | Adds comment translation controls using TikTok's translation system, with selectable language exclusions. |
-
-To use the feed debugger, select `Diagnostic tools`, then open Morphe settings > Diagnostics > Feed debugger. Start a capture, reproduce the feed issue, and choose Stop and save. The rolling report is saved under Downloads/Morphe.
 
 <br>
 

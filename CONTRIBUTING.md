@@ -4,11 +4,13 @@ Feature ideas, bug reports, and pull requests are welcome.
 
 If you open an issue, include:
 
-- the TikTok package name and version
-- the patch or setting involved
-- what you expected to happen
-- what actually happened
-- logs or screenshots if the issue is visual or crash related
+- the TikTok package name and version, and the Morphe patch bundle version
+- the selected patches and relevant in-app toggle values
+- steps to reproduce, what you expected, and what actually happened
+- whether the same action works with the suspected patch or toggle disabled, if you tested it
+- screenshots or a short recording for visual issues; a diagnostic report for crashes
+
+For feed issues, follow the [feed debugging guide](docs/feed-controls-and-debugging.md) and attach the original feed debugger export if you captured one. Start it before reproducing the problem. A report started after an affected item appeared may miss the decisive event. Review reports for personal information before posting them publicly.
 
 Small focused pull requests are easier to test than large mixed changes.
 

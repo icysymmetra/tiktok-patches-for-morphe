@@ -68,7 +68,7 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
             addPreference(new TogglePreference(
                     context,
                     "Hide FYP unpersonalized slop videos",
-                    "Seeing sudden batches of seemingly unrelated posts in For You? This hides posts from the observed batch source when their feed data has no recommendation reasons. Photo posts are included; other unrelated posts may still appear.",
+                    "Hides certain batches of unpersonalized slop posts that appear in your For You feed.",
                     Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES
             ));
         }
