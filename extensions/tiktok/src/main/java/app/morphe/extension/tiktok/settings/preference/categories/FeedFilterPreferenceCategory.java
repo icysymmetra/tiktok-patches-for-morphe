@@ -68,7 +68,7 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
             addPreference(new TogglePreference(
                     context,
                     "Hide FYP unpersonalized slop videos",
-                    "Experimental: hide posts from an observed FYP source when TikTok provides no recommendation details. Also includes photo posts.",
+                    "Seeing sudden batches of seemingly unrelated posts in For You? This hides posts from the observed batch source when their feed data has no recommendation reasons. Photo posts are included; other unrelated posts may still appear.",
                     Settings.HIDE_ALTERNATE_FOR_YOU_BATCHES
             ));
         }

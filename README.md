@@ -60,7 +60,7 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 | `Hide feed LIVE button` | Adds an option to hide the LIVE button at the top left of video feeds. |
 | `Hide feed save button` | Adds an option to hide the save/favourites button from video feeds. |
 | `Hide feed search button` | Adds an option to hide the search button at the top right of video feeds. |
-| `Hide FYP unpersonalized slop videos` | Hides posts from an observed FYP source when TikTok provides no recommendation details. Photo posts are included. |
+| `Hide FYP unpersonalized slop videos` | Seeing sudden batches of seemingly unrelated posts in For You? This hides posts from the observed batch source when their feed data has no recommendation reasons. Photo posts are included; other unrelated posts may still appear. |
 | `Hide quick comment reactions` | Hides TikTok's exposed quick emoji row in supported comment inputs. |
 | `Hide suggested accounts` | Removes suggested-account cards from profile and inbox surfaces. |
 | `Hold-and-slide 2x lock` | Enables TikTok's native hold, slide down, and release gesture for locking playback at 2x speed. |
