@@ -2,7 +2,6 @@
  * Forked from:
  * https://github.com/ReVanced/revanced-patches/blob/377d4e15016296b45d809697f7f69bce74badd3a/extensions/tiktok/stub/src/main/java/com/ss/android/ugc/aweme/feed/model/Aweme.java
  */
-
 package com.ss.android.ugc.aweme.feed.model;
 
 import java.util.List;
@@ -36,6 +35,10 @@ public class Aweme {
     }
 
     public boolean isSoftAd() {
+        throw new UnsupportedOperationException("Stub");
+    }
+
+    public AwemeRawAd getAwemeRawAd() {
         throw new UnsupportedOperationException("Stub");
     }
 
@@ -83,4 +86,3 @@ public class Aweme {
         throw new UnsupportedOperationException("Stub");
     }
 }
-
