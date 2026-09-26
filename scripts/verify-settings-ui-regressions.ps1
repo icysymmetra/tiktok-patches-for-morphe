@@ -61,7 +61,7 @@ Require-Match $supportUiPath 'SUPPORT_URL\s*=\s*"https://ko-fi\.com/P5P5YOUU7"' 
     'The Support pill and support row must share the canonical support destination.'
 
 $expectedGroups = [ordered]@{
-    'DownloadsPreferenceCategory.java' = @('Video downloads', 'Story downloads', 'Save locations', 'File names', 'Offline viewing')
+    'DownloadsPreferenceCategory.java' = @('Video downloads', 'Save locations', 'File names', 'Offline viewing')
     'FeedFilterPreferenceCategory.java' = @('Content types', 'Popularity limits', 'Offline fallback')
     'FeedNavigationPreferenceCategory.java' = @('Feed tabs', 'Bottom navigation', 'Other navigation')
     'InterfacePreferenceCategory.java' = @('Feed controls', 'Promotions and dialogs', 'Video information')

@@ -16,8 +16,27 @@ $extensionPath = Join-Path $repoRoot 'extensions/tiktok/src/main/java/app/morphe
 $settingsPath = Join-Path $repoRoot 'extensions/tiktok/src/main/java/app/morphe/extension/tiktok/settings/Settings.java'
 $settingsStatusPath = Join-Path $repoRoot 'extensions/tiktok/src/main/java/app/morphe/extension/tiktok/settings/SettingsStatus.java'
 $commentsPreferencePath = Join-Path $repoRoot 'extensions/tiktok/src/main/java/app/morphe/extension/tiktok/settings/preference/categories/CommentsPreferenceCategory.java'
-$dexPath = Join-Path (Resolve-Path -LiteralPath $DexDirectory).Path 'classes17.dex'
+$resolvedDexDirectory = (Resolve-Path -LiteralPath $DexDirectory).Path
 $dexClasspath = $DexInspectDirectory + [IO.Path]::PathSeparator + $MorpheJar
+
+function Read-DexMethod {
+    param([string]$Class, [string]$Method)
+
+    $classMatches = @(& java -cp $dexClasspath FindDexClass $resolvedDexDirectory $Class)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to locate $Class in $resolvedDexDirectory"
+    }
+    $match = $classMatches | Where-Object { ($_ -split "`t")[1] -eq $Class } | Select-Object -First 1
+    if (-not $match) {
+        throw "Class $Class was not found in $resolvedDexDirectory"
+    }
+    $dexPath = Join-Path $resolvedDexDirectory (($match -split "`t")[0])
+    $output = @(& java -cp $dexClasspath DumpDexMethod $dexPath $Class $Method)
+    if ($LASTEXITCODE -ne 0 -or $output.Count -eq 0) {
+        throw "Method $Class->$Method was not found in $dexPath"
+    }
+    return $output -join "`n"
+}
 
 function Assert-TextContains {
     param(
@@ -49,17 +68,17 @@ function Assert-FileContains {
     Assert-TextContains (Get-Content -Raw -LiteralPath $Path) $Needle $Description
 }
 
-$enumCode = (java -cp $dexClasspath DumpDexMethod $dexPath 'LX/0nqo;' '<clinit>') -join "`n"
+$enumCode = Read-DexMethod 'LX/0nqo;' '<clinit>'
 foreach ($sortName in @('DEFAULT_SORT', 'TIME_SORT', 'MEDIA_SORT', 'CREATOR_SORT')) {
     Assert-TextContains $enumCode $sortName "TikTok native enum contains $sortName"
 }
 
-$telemetryCode = (java -cp $dexClasspath DumpDexMethod $dexPath 'LX/0nsA;' 'LIZ') -join "`n"
+$telemetryCode = Read-DexMethod 'LX/0nsA;' 'LIZ'
 foreach ($wireName in @('hot', 'time', 'media', 'creator')) {
     Assert-TextContains $telemetryCode "; $wireName" "TikTok maps a native sort mode to '$wireName'"
 }
 
-$menuCode = (java -cp $dexClasspath DumpDexMethod $dexPath 'Lcom/ss/android/ugc/aweme/commentv2/commentlist/ui/CommentPowerListAssem;' 'Ye0') -join "`n"
+$menuCode = Read-DexMethod 'Lcom/ss/android/ugc/aweme/commentv2/commentlist/ui/CommentPowerListAssem;' 'Ye0'
 foreach ($sortName in @('DEFAULT_SORT', 'TIME_SORT', 'MEDIA_SORT', 'CREATOR_SORT')) {
     Assert-TextContains $menuCode "LX/0nqo;->$sortName" "TikTok native sort sheet builds the $sortName row"
 }
@@ -67,11 +86,11 @@ Assert-TextContains $menuCode 'Lkotlin/jvm/internal/AwS289S0300000_22;-><init>' 
 Assert-TextContains $menuCode 'hasMediaComment' 'media row remains guarded by TikTok content capability'
 Assert-TextContains $menuCode 'hasCreatorComment' 'creator row remains guarded by TikTok content capability'
 
-$styleCode = (java -cp $dexClasspath DumpDexMethod $dexPath 'Lkotlin/jvm/internal/AFwS216S0000000_22;' 'invoke$200') -join "`n"
+$styleCode = Read-DexMethod 'Lkotlin/jvm/internal/AFwS216S0000000_22;' 'invoke$200'
 Assert-TextContains $styleCode 'comment_sort_opt_style' 'comment sorter presentation A/B setting is present'
 Assert-TextContains $styleCode 'literal=0x1' 'stock comment sorter presentation defaults to style 1'
 
-$eligibilityCode = (java -cp $dexClasspath DumpDexMethod $dexPath 'LX/0nmj;' 'LIZ') -join "`n"
+$eligibilityCode = Read-DexMethod 'LX/0nmj;' 'LIZ'
 Assert-TextContains $eligibilityCode 'AwemeExtKt;->getAuthorUid' 'stock sorter eligibility reads the video author'
 Assert-TextContains $eligibilityCode 'LX/0NqH;->LIZLLL(Ljava/lang/String;)Z' 'stock sorter eligibility checks the current user against the author'
 
