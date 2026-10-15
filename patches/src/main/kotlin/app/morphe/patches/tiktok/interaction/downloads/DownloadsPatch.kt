@@ -29,6 +29,7 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/download/DownloadsPatch;"
 private const val STICKER_EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/download/StickerGallerySaver;"
 private const val FILENAME_FORMATTER_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/download/DownloadFilenameFormatter;"
+private const val STAGED_IMAGE_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/download/StagedImageNormalizer;"
 
 @Suppress("unused")
 val downloadsPatch = bytecodePatch(
@@ -40,7 +41,7 @@ val downloadsPatch = bytecodePatch(
 ) {
     dependsOn(sharedExtensionPatch)
 
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
@@ -112,7 +113,11 @@ val downloadsPatch = bytecodePatch(
         }
 
         // Add local gallery saving to the comment sticker/image preview sheet.
-        StickerPreviewBinderFingerprint.method.apply {
+        val stickerBinder = StickerPreviewBinderFingerprint.method
+        val stickerBinderClass = stickerBinder.definingClass
+        val stickerBinderName = stickerBinder.name
+        val stickerPreviewModelType = stickerBinder.parameterTypes.first().toString()
+        stickerBinder.apply {
             val returnIndex = findInstructionIndicesReversedOrThrow { opcode == Opcode.RETURN_VOID }.first()
             addInstructions(
                 returnIndex,
@@ -127,9 +132,9 @@ val downloadsPatch = bytecodePatch(
             val bindCallIndices = implementation!!.instructions.withIndex()
                 .filter { (_, instruction) ->
                     instruction.getReference<MethodReference>()?.let { reference ->
-                        reference.definingClass == "LX/0ULN;" &&
-                            reference.name == "LIZ" &&
-                            reference.parameterTypes.firstOrNull() == "LX/0ULM;"
+                        reference.definingClass == stickerBinderClass &&
+                            reference.name == stickerBinderName &&
+                            reference.parameterTypes.firstOrNull() == stickerPreviewModelType
                     } == true
                 }
                 .map { it.index }
@@ -137,7 +142,7 @@ val downloadsPatch = bytecodePatch(
 
             if (bindCallIndices.isEmpty()) {
                 throw app.morphe.patcher.patch.PatchException(
-                    "Downloads: could not find 46.2.3 sticker preview bind calls.",
+                    "Downloads: could not find sticker preview bind calls.",
                 )
             }
 
@@ -337,12 +342,19 @@ val downloadsPatch = bytecodePatch(
         }
 
         // Image posts use a direct media-copy helper instead of the ordinary photo wrapper.
+        // Parameters: (Context, staged file path, display name, isVideo, mime type, flags).
+        // TikTok 47 stages the watermark-free photo-post images as HEIF/VVC files that
+        // gallery apps cannot open, so the staged file is re-encoded before the copy.
         ImagePostMediaCopyFingerprint.method.apply {
             addInstructions(
                 0,
                 """
                     invoke-static/range {p2 .. p2}, $FILENAME_FORMATTER_CLASS_DESCRIPTOR->consumeDestinationName(Ljava/lang/String;)Ljava/lang/String;
                     move-result-object p2
+                    invoke-static/range {p1 .. p3}, $STAGED_IMAGE_CLASS_DESCRIPTOR->normalize(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+                    move-result-object p2
+                    invoke-static {p1, p4}, $STAGED_IMAGE_CLASS_DESCRIPTOR->mimeType(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+                    move-result-object p4
                 """,
             )
             findInstructionIndicesReversedOrThrow {

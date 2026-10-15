@@ -3,7 +3,7 @@ group = "app.morphe"
 patches {
     about {
         name = "Metra TikTok Patches"
-        description = "Metra patches for TikTok 46.2.3, built for Morphe."
+        description = "Metra patches for TikTok 47.1.4, built for Morphe."
         source = "https://github.com/icysymmetra/tiktok-patches-for-morphe"
         author = "icysymmetra"
         contact = "na"

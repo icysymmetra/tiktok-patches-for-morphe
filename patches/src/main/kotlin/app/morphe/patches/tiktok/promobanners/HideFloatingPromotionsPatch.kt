@@ -44,7 +44,7 @@ val hideFloatingPromotionsPatch = bytecodePatch(
     default = true,
 ) {
     dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(

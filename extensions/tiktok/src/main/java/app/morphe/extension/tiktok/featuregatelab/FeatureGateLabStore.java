@@ -23,7 +23,7 @@ import java.util.Map;
 import app.morphe.extension.shared.Utils;
 
 public final class FeatureGateLabStore {
-    public static final String TARGET_VERSION = "46.2.3";
+    public static final String TARGET_VERSION = "47.1.4";
     public static final String MANAGER_ABMOCK = "abmock";
     public static final String MANAGER_PLAYER_CONFIG = "player_config";
     public static final String MANAGER_LIVE = "live";

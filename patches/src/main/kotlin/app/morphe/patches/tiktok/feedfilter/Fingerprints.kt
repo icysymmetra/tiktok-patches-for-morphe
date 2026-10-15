@@ -212,7 +212,6 @@ internal object FollowFeedFingerprint : Fingerprint(
 internal object FollowFeedListGetItemsFingerprint : Fingerprint(
     definingClass = "Lcom/ss/android/ugc/aweme/follow/presenter/FollowFeedList;",
     name = "getItems",
-    accessFlags = listOf(AccessFlags.PUBLIC),
     returnType = "Ljava/util/List;",
     parameters = emptyList(),
 )
@@ -287,28 +286,42 @@ internal object FinalFeedInsertionFingerprint : Fingerprint(
     },
 )
 
+/**
+ * Cold-start cache hit checks. TikTok 46.2.3 handled the local, golden-house and offline caches in one
+ * static method (X.0ppO.LJII); 47.1.4 splits them into X.04iI.LJI, X.0DKS.LIZ and X.0bY1.LIZ. Each
+ * fingerprint resolves to the method holding its cache; on 46.2.3 all three resolve to the same method.
+ */
 internal object ColdStartCachedFeedFingerprint : Fingerprint(
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
     returnType = "Z",
     parameters = emptyList(),
-    strings = listOf(
-        "processGoldenVideoHitCache hitCache , time cost ",
-        "processOfflineVideoHitCache error",
-    ),
-    custom = { method, _ ->
-        method.implementation?.instructions?.count {
-            it.opcode == com.android.tools.smali.dexlib2.Opcode.SPUT_OBJECT &&
-                it.getReference<FieldReference>()?.type ==
-                "Lcom/ss/android/ugc/aweme/feed/model/FeedItemList;"
-        } == 4
-    },
+    strings = listOf("hitCache localCache:", "data_cache_is_expired", "feed_cache_exit_when_used"),
 )
 
+internal object ColdStartGoldenCacheFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    returnType = "Z",
+    parameters = emptyList(),
+    strings = listOf("processGoldenVideoHitCache hitCache"),
+)
+
+internal object ColdStartOfflineCacheFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    returnType = "Z",
+    parameters = emptyList(),
+    strings = listOf("processOfflineVideoHitCache"),
+)
+
+/**
+ * Callback that receives one cache source's result and either delivers it or dispatches the next linked
+ * source (X.0pqs.LIZ in TikTok 46.2.3, X.0DLk.LIZ in 47.1.4). 47.1.4 added an AtomicBoolean guard field
+ * and no longer launches a coroutine for the delivery.
+ */
 internal object CacheChainDeliveryFingerprint : Fingerprint(
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
     returnType = "V",
     custom = custom@{ method, classDef ->
-        if (method.parameterTypes.size != 1 || classDef.fields.count() != 2) return@custom false
+        if (method.parameterTypes.size != 1 || classDef.fields.count() !in 2..3) return@custom false
 
         val resultType = method.parameterTypes.single().toString()
         val instructions = method.implementation?.instructions ?: return@custom false
@@ -329,12 +342,14 @@ internal object CacheChainDeliveryFingerprint : Fingerprint(
                 reference.parameterTypes.size == 2 &&
                 reference.parameterTypes.all { it.toString() in ownFieldTypes }
         }
-        val launchesCoroutine = methodReferences.any { reference ->
-            reference.parameterTypes.any { it.toString() == "Lkotlin/jvm/functions/Function2;" }
+        // 46.2.3 launches a coroutine for the delivery; 47.1.4 guards it with an AtomicBoolean instead.
+        val guardsDelivery = methodReferences.any { reference ->
+            reference.parameterTypes.any { it.toString() == "Lkotlin/jvm/functions/Function2;" } ||
+                (reference.definingClass == "Ljava/util/concurrent/atomic/AtomicBoolean;" &&
+                    reference.name == "compareAndSet")
         }
 
-        readsResultPayload && followsLinkedCacheSource &&
-            dispatchesNextCacheSource && launchesCoroutine
+        readsResultPayload && followsLinkedCacheSource && dispatchesNextCacheSource && guardsDelivery
     },
 )
 
@@ -476,11 +491,12 @@ internal object ProfileDetailAdEventFingerprint : Fingerprint(
     },
 )
 
+/** TakoAssem visibility setter (bq in TikTok 46.2.3, obfuscated differently in 47.1.4); it registers the "right_container_chat_gpt" slot. */
 internal object TakoAiFeedButtonSetVisibleFingerprint : Fingerprint(
     definingClass = "/feed/assem/tikbot/TakoAssem;",
-    name = "bq",
     returnType = "V",
     parameters = listOf("Z"),
+    strings = listOf("right_container_chat_gpt"),
 )
 
 internal object FollowFeedPresenterPostProcessFingerprint : Fingerprint(

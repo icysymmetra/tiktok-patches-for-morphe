@@ -123,6 +123,20 @@ public final class FeatureControls {
         return Settings.HIDE_COMMENT_QUICK_REACTIONS.get() || original;
     }
 
+    /** TikTok 47.1.4 decides visibility with "show" polarity (CommentPanelFakeInput.rt()). */
+    public static boolean overrideShowQuickCommentEmoji(boolean original) {
+        return !Settings.HIDE_COMMENT_QUICK_REACTIONS.get() && original;
+    }
+
+    /** PersonalizedEmojiExperiment "hide exposed emoji" gate in TikTok 47.1.4 ("hide" polarity). */
+    public static boolean overrideHideExposedEmojiGate(boolean original) {
+        return Settings.HIDE_COMMENT_QUICK_REACTIONS.get() || original;
+    }
+
+    public static boolean hideQuickCommentEmoji() {
+        return Settings.HIDE_COMMENT_QUICK_REACTIONS.get();
+    }
+
     public static int hideFeedFollowButtonVisibility(int originalVisibility) {
         return Settings.HIDE_FEED_FOLLOW_BUTTON.get() ? 8 : originalVisibility;
     }

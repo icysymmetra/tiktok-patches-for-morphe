@@ -2,18 +2,14 @@ package app.morphe.patches.tiktok.misc.foldable
 
 import app.morphe.patcher.Fingerprint
 
-// Real dex class is X.0oq9; jadx renamed it to C1488600oq9 for decompilation only.
+// Static helper class X.0oq9 in TikTok 46.2.3, X.08AB in 47.1.4; matched by log strings instead of the name.
 internal object CommentSplitLiveCheckFingerprint : Fingerprint(
-    definingClass = "LX/0oq9;",
-    name = "LIZ",
     returnType = "Z",
     parameters = listOf("Landroid/app/Activity;", "Landroid/content/res/Configuration;"),
     strings = listOf("isOptCommentSplit"),
 )
 
 internal object CommentSplitContainerCheckFingerprint : Fingerprint(
-    definingClass = "LX/0oq9;",
-    name = "LIZJ",
     returnType = "Z",
     parameters = listOf(),
     strings = listOf("isOptSplitContainer"),

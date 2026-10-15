@@ -25,7 +25,7 @@ val playbackSpeedPatch = bytecodePatch(
 ) {
     dependsOn(sharedExtensionPatch)
 
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         PlaybackSpeedSelectionBoundaryFingerprint.method.addInstruction(
@@ -35,15 +35,16 @@ val playbackSpeedPatch = bytecodePatch(
         )
 
         val controllerSetSpeed = PlayerControllerSetSpeedFingerprint.method
+        // The player-manager speed setter was named setSpeed in 46.2.3 and is obfuscated in 47.1.4,
+        // so resolve it by shape: the last interface call taking a single float.
         val playerManagerSetSpeed = controllerSetSpeed.implementation!!.instructions
-            .firstNotNullOfOrNull { instruction ->
+            .mapNotNull { instruction ->
                 instruction.getReference<MethodReference>()?.takeIf { reference ->
                     instruction.opcode == Opcode.INVOKE_INTERFACE &&
-                        reference.name == "setSpeed" &&
                         reference.parameterTypes == listOf("F") &&
                         reference.returnType == "V"
                 }
-            } ?: throw PatchException(
+            }.lastOrNull() ?: throw PatchException(
             "Playback speed: player-manager speed boundary was not resolved.",
         )
 
@@ -106,12 +107,13 @@ val playbackSpeedPatch = bytecodePatch(
             }
         }
 
+        // The controller setter is named setSpeed in 46.2.3 and obfuscated in 47.1.4; use the resolved method.
         OnRenderFirstFrameFingerprint.method.addInstructions(
             0,
             """
                 invoke-static {}, Lapp/morphe/extension/tiktok/speed/PlaybackSpeedPatch;->getPlaybackSpeed()F
                 move-result v0
-                invoke-virtual {p0, v0}, Lcom/ss/android/ugc/aweme/feed/controller/PlayerController;->setSpeed(F)V
+                invoke-virtual {p0, v0}, ${controllerSetSpeed.definingClass}->${controllerSetSpeed.name}(F)V
             """,
         )
     }

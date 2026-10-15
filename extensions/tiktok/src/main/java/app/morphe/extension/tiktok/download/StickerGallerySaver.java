@@ -194,7 +194,7 @@ public final class StickerGallerySaver {
             connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
             connection.setReadTimeout(READ_TIMEOUT_MS);
             connection.setInstanceFollowRedirects(true);
-            connection.setRequestProperty("User-Agent", "TikTok 46.2.3 Morphe");
+            connection.setRequestProperty("User-Agent", "TikTok 47.1.4 Morphe");
 
             int responseCode = connection.getResponseCode();
             if (responseCode < 200 || responseCode >= 300) {

@@ -181,8 +181,8 @@ public class DownloadsPatch {
             }
         }
 
-        addCandidate(candidates, new Candidate("h264PlayAddr", video.h264PlayAddr, 0, null, false, 2));
-        addCandidate(candidates, new Candidate("playAddr", video.playAddr, 0, null, false, 0));
+        addCandidate(candidates, new Candidate("h264PlayAddr", video.getH264PlayAddr(), 0, null, false, 2));
+        addCandidate(candidates, new Candidate("playAddr", video.getPlayAddr(), 0, null, false, 0));
 
         if (candidates.isEmpty()) {
             return null;
@@ -225,7 +225,7 @@ public class DownloadsPatch {
             return video.getRawBitRate();
         } catch (Throwable ignored) {
             try {
-                return video.bitRate;
+                return video.getBitRate();
             } catch (Throwable ignoredAgain) {
                 return null;
             }

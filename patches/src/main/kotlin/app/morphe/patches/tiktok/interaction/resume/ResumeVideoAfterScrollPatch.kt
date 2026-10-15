@@ -7,6 +7,7 @@ package app.morphe.patches.tiktok.interaction.resume
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -14,6 +15,9 @@ import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
 import app.morphe.util.getReference
 import app.morphe.util.indexOfFirstInstructionReversedOrThrow
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val EXTENSION_DESCRIPTOR =
@@ -27,7 +31,7 @@ val resumeVideoAfterScrollPatch = bytecodePatch(
 ) {
     dependsOn(sharedExtensionPatch)
 
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
@@ -52,6 +56,35 @@ val resumeVideoAfterScrollPatch = bytecodePatch(
             )
         }
 
+        // Resolve the play-progress holder (X.0Lze in TikTok 46.2.3, X.08Vu in 47.1.4) from the progress
+        // callback: its last LruCache.put is fed by the holder's lazily created cache and stores the holder's
+        // current progress record; the holder's String lookup method reveals the cached aid field.
+        val progressMethod = FeedPlayProgressFingerprint.method
+        val cachePutIndex = progressMethod.indexOfFirstInstructionReversedOrThrow {
+            val reference = getReference<MethodReference>()
+            reference?.definingClass == "Landroid/util/LruCache;" &&
+                reference.name == "put" &&
+                reference.parameterTypes.size == 2
+        }
+        val cachePut = progressMethod.getInstruction<FiveRegisterInstruction>(cachePutIndex)
+        val progressInstructions = progressMethod.implementation!!.instructions
+        val progressRecordField = (cachePutIndex - 1 downTo 0).firstNotNullOfOrNull { index ->
+            progressInstructions[index].takeIf { it.opcode == Opcode.SPUT_OBJECT }?.getReference<FieldReference>()
+        } ?: throw PatchException("Resume videos after scrolling: progress record field was not resolved.")
+        val holderType = progressRecordField.definingClass
+        val cacheLazyField = (cachePutIndex - 1 downTo 0).firstNotNullOfOrNull { index ->
+            progressInstructions[index].takeIf { it.opcode == Opcode.SGET_OBJECT }?.getReference<FieldReference>()
+                ?.takeIf { it.definingClass == holderType && it.name != progressRecordField.name }
+        } ?: throw PatchException("Resume videos after scrolling: progress cache field was not resolved.")
+        val lazyType = cacheLazyField.type
+        val progressLookup = classDefBy(holderType).methods.firstOrNull { method ->
+            method.parameterTypes == listOf("Ljava/lang/String;") && method.returnType == progressRecordField.type
+        } ?: throw PatchException("Resume videos after scrolling: progress lookup was not resolved.")
+        val progressAidField = progressLookup.implementation?.instructions?.firstNotNullOfOrNull { instruction ->
+            instruction.takeIf { it.opcode == Opcode.SGET_OBJECT }?.getReference<FieldReference>()
+                ?.takeIf { it.definingClass == holderType && it.type == "Ljava/lang/String;" }
+        } ?: throw PatchException("Resume videos after scrolling: cached aid field was not resolved.")
+
         FeedPlayCompletedFingerprint.method.apply {
             addInstructionsWithLabels(
                 0,
@@ -59,39 +92,36 @@ val resumeVideoAfterScrollPatch = bytecodePatch(
                     invoke-static {}, $EXTENSION_DESCRIPTOR->shouldResumeVideoAfterScroll()Z
                     move-result v0
                     if-eqz v0, :continue_completion
-                    sget-object v0, LX/0Lze;->LIZLLL:LX/01xP;
-                    invoke-interface {v0}, LX/01xP;->getValue()Ljava/lang/Object;
+                    sget-object v0, $cacheLazyField
+                    invoke-interface {v0}, $lazyType->getValue()Ljava/lang/Object;
                     move-result-object v0
                     check-cast v0, Landroid/util/LruCache;
                     move-object/from16 v1, p1
                     invoke-virtual {v0, v1}, Landroid/util/LruCache;->remove(Ljava/lang/Object;)Ljava/lang/Object;
                     const/4 v0, 0x0
-                    sput-object v0, LX/0Lze;->LJ:LX/0LxV;
-                    sput-object v0, LX/0Lze;->LJFF:Ljava/lang/String;
+                    sput-object v0, $progressRecordField
+                    sput-object v0, $progressAidField
                 """,
                 ExternalLabel("continue_completion", getInstruction(0)),
             )
         }
 
-        FeedPlayProgressFingerprint.method.apply {
-            val cachePutIndex = indexOfFirstInstructionReversedOrThrow {
-                val reference = getReference<MethodReference>()
-                reference?.definingClass == "Landroid/util/LruCache;" &&
-                    reference.name == "put" &&
-                    reference.parameterTypes.size == 2
-            }
+        progressMethod.apply {
             val continueInstruction = getInstruction(cachePutIndex + 1)
+            val cacheRegister = cachePut.registerC
+            val keyRegister = cachePut.registerD
+            val scratchRegister = cachePut.registerE
 
             addInstructionsWithLabels(
                 cachePutIndex + 1,
                 """
                     invoke-static/range {p2 .. p5}, $EXTENSION_DESCRIPTOR->shouldClearCompletedProgress(JJ)Z
-                    move-result v5
-                    if-eqz v5, :continue_progress
-                    invoke-virtual {v14, v6}, Landroid/util/LruCache;->remove(Ljava/lang/Object;)Ljava/lang/Object;
-                    const/4 v5, 0x0
-                    sput-object v5, LX/0Lze;->LJ:LX/0LxV;
-                    sput-object v5, LX/0Lze;->LJFF:Ljava/lang/String;
+                    move-result v$scratchRegister
+                    if-eqz v$scratchRegister, :continue_progress
+                    invoke-virtual {v$cacheRegister, v$keyRegister}, Landroid/util/LruCache;->remove(Ljava/lang/Object;)Ljava/lang/Object;
+                    const/4 v$scratchRegister, 0x0
+                    sput-object v$scratchRegister, $progressRecordField
+                    sput-object v$scratchRegister, $progressAidField
                 """,
                 ExternalLabel("continue_progress", continueInstruction),
             )

@@ -209,10 +209,24 @@ internal object CommentListLoadedFingerprint : Fingerprint(
     },
 )
 
+/**
+ * Completion callback of the native multi-comment translation batch.
+ * 46.2.3: static synthetic run$N(self) on a shared runnable class; 47.1.4: dedicated Runnable.run().
+ * The text variant (Comment.setText) is selected over the audio-transcript variant.
+ */
 internal object MultiCommentTranslationCompleteFingerprint : Fingerprint(
+    name = "run",
     returnType = "V",
-    parameters = listOf("L"),
+    parameters = emptyList(),
     strings = listOf("MultiCommentTranslationTask startTranslate onComplete "),
+    custom = { method, _ ->
+        method.implementation?.instructions?.any { instruction ->
+            instruction.getReference<MethodReference>()?.let { reference ->
+                reference.definingClass == "Lcom/ss/android/ugc/aweme/comment/model/Comment;" &&
+                    reference.name == "setText"
+            } == true
+        } == true
+    },
 )
 
 internal object MultiCommentTranslationCacheCopyFingerprint : Fingerprint(

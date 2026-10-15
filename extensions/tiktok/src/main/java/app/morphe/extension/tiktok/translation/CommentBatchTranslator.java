@@ -150,8 +150,11 @@ public final class CommentBatchTranslator {
     public static void onNativeBatchComplete(Object runner) {
         if (!BaseSettings.DEBUG.get()) return;
 
-        Object results = readFieldQuiet(runner, "l0");
-        Object task = readFieldQuiet(runner, "l1");
+        // Runnable fields are l0/l1 on the shared synthetic runnable (46.2.3) or LIZ/LIZIZ on the dedicated one (47.1.4).
+        Object sharedResults = readFieldQuiet(runner, "l0");
+        Object results = sharedResults != null ? sharedResults : readFieldQuiet(runner, "LIZ");
+        Object sharedTask = readFieldQuiet(runner, "l1");
+        Object task = sharedTask != null ? sharedTask : readFieldQuiet(runner, "LIZIZ");
         Object requested = readFieldQuiet(task, "LIZ");
         Logger.printInfo(() -> "[Morphe CommentBatchTranslator] native.complete"
                 + " requestedSize=" + collectionSize(requested)

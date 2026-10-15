@@ -22,11 +22,12 @@ internal object PlaybackSpeedSelectionBoundaryFingerprint : Fingerprint(
     ),
 )
 
+/** PlayerController.setSpeed(F): named in TikTok 46.2.3, obfuscated (LJJIJLIJ) in 47.1.4. Logs "speed_begin". */
 internal object PlayerControllerSetSpeedFingerprint : Fingerprint(
     definingClass = "/feed/controller/PlayerController;",
-    name = "setSpeed",
     returnType = "V",
     parameters = listOf("F"),
+    strings = listOf("stage", "speed_begin", "begin_speed"),
 )
 
 internal object SetSpeedFingerprint : Fingerprint(

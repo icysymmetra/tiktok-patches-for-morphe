@@ -3,6 +3,7 @@ package app.morphe.patches.tiktok.interaction.offlinevideos
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.util.getReference
 import app.morphe.util.indexOfFirstInstructionOrThrow
@@ -22,7 +23,7 @@ val customOfflineVideosLimitPatch = bytecodePatch(
     description = "Adds a custom entry to TikTok's offline videos menu with a configurable limit from 1 to 1000 videos.",
     default = true,
 ) {
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         OfflineModeSheetOptionsFingerprint.method.apply {
@@ -48,15 +49,19 @@ val customOfflineVideosLimitPatch = bytecodePatch(
         }
 
         OfflineModeOptionConfigFingerprint.method.apply {
-            fun postProcessOptionsField(fieldName: String) {
-                val fieldWriteIndex = indexOfFirstInstructionOrThrow {
-                    opcode == Opcode.SPUT_OBJECT &&
-                        getReference<FieldReference>()?.let { field ->
-                            field.definingClass == "LX/0sIr;" &&
-                                field.name == fieldName &&
-                                field.type == "Ljava/util/List;"
-                        } == true
+            // Every static List written by the initializer is a video-count option list (the field names are
+            // obfuscated and their number grew from two in 46.2.3 to four in 47.1.4).
+            val optionListWriteIndices = implementation!!.instructions.withIndex()
+                .filter { (_, instruction) ->
+                    instruction.opcode == Opcode.SPUT_OBJECT &&
+                        instruction.getReference<FieldReference>()?.type == "Ljava/util/List;"
                 }
+                .map { it.index }
+            if (optionListWriteIndices.isEmpty()) {
+                throw PatchException("Custom offline videos limit: no option list writes were found.")
+            }
+
+            optionListWriteIndices.asReversed().forEach { fieldWriteIndex ->
                 val moveResultIndex = indexOfFirstInstructionReversedOrThrow(fieldWriteIndex - 1) {
                     opcode == Opcode.MOVE_RESULT_OBJECT
                 }
@@ -70,18 +75,16 @@ val customOfflineVideosLimitPatch = bytecodePatch(
                     """,
                 )
             }
-
-            postProcessOptionsField("LJ")
-            postProcessOptionsField("LJFF")
         }
 
         OfflineModeOptionEnumFingerprint.method.apply {
+            val enumType = definingClass
             val customEnumFieldWriteIndex = indexOfFirstInstructionOrThrow {
                 opcode == Opcode.SPUT_OBJECT &&
                     getReference<FieldReference>()?.let { field ->
-                        field.definingClass == "LX/0mE9;" &&
+                        field.definingClass == enumType &&
                             field.name == "DOWNLOAD_200_VIDEOS" &&
-                            field.type == "LX/0mE9;"
+                            field.type == enumType
                     } == true
             }
             val customEnumConstructorIndex = indexOfFirstInstructionReversedOrThrow(
@@ -89,7 +92,7 @@ val customOfflineVideosLimitPatch = bytecodePatch(
             ) {
                 (opcode == Opcode.INVOKE_DIRECT || opcode == Opcode.INVOKE_DIRECT_RANGE) &&
                     getReference<MethodReference>()?.let { reference ->
-                        reference.definingClass == "LX/0mE9;" &&
+                        reference.definingClass == enumType &&
                             reference.name == "<init>" &&
                             reference.returnType == "V" &&
                             reference.parameterTypes.size == 5

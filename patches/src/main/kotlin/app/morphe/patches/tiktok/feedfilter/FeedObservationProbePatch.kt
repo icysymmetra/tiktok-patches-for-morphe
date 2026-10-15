@@ -53,7 +53,7 @@ private object WhyThisPostValidationResponseCtorFingerprint : Fingerprint(
 )
 internal val feedObservationProbeHooksPatch = bytecodePatch {
     dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
     execute {
         val layout = WhyThisPostLayoutFingerprint.method
         val reasonRead = layout.implementation!!.instructions.withIndex().singleOrNull {

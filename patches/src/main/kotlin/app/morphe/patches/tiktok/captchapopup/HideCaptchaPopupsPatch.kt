@@ -14,6 +14,8 @@ import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
 
 private const val FEATURE_CONTROLS_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/featurecontrols/FeatureControls;"
 
+// Callback parameter types are obfuscated (X.13fZ / X.1Cc3 in 46.2.3, X.1Dza / X.1UyS in 47.1.4) and are read
+// from the matched methods instead of being hard-coded.
 private object CaptchaPopupFingerprint : Fingerprint(
     definingClass = "/sec/SecApiImpl;",
     name = "popCaptchaV2",
@@ -21,8 +23,9 @@ private object CaptchaPopupFingerprint : Fingerprint(
     parameters = listOf(
         "Landroid/app/Activity;",
         "Ljava/lang/String;",
-        "LX/13fZ;",
+        "L",
         "Landroidx/fragment/app/Fragment;",
+        "Ljava/lang/String;",
     ),
     strings = listOf("popCaptchaV2 - riskInfo ="),
 )
@@ -31,7 +34,7 @@ private object LegacyCaptchaPopupFingerprint : Fingerprint(
     definingClass = "/sec/SecApiImpl;",
     name = "popCaptcha",
     returnType = "V",
-    parameters = listOf("Landroid/app/Activity;", "I", "LX/13fZ;"),
+    parameters = listOf("Landroid/app/Activity;", "I", "L"),
     strings = listOf("popCaptcha - errorcode = "),
 )
 
@@ -39,7 +42,7 @@ private object OecCaptchaPopupFingerprint : Fingerprint(
     definingClass = "Lcom/tts/oecverify/verify/RiskControlService;",
     name = "execute",
     returnType = "Z",
-    parameters = listOf("LX/13eU;", "Lcom/tts/oecverify/BdTuringCallback;"),
+    parameters = listOf("L", "Lcom/tts/oecverify/BdTuringCallback;"),
 )
 
 private object LiveHostCaptchaPopupFingerprint : Fingerprint(
@@ -49,7 +52,7 @@ private object LiveHostCaptchaPopupFingerprint : Fingerprint(
     parameters = listOf(
         "Landroid/app/Activity;",
         "Ljava/lang/String;",
-        "LX/1Cc3;",
+        "L",
         "Landroidx/fragment/app/Fragment;",
     ),
 )
@@ -60,7 +63,7 @@ private object BdTuringCaptchaPopupFingerprint : Fingerprint(
     returnType = "V",
     parameters = listOf(
         "Landroid/app/Activity;",
-        "LX/13eU;",
+        "L",
         "Lcom/tts/oecverify/BdTuringCallback;",
     ),
 )
@@ -72,13 +75,17 @@ val hideCaptchaPopupsPatch = bytecodePatch(
     default = true,
 ) {
     dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,
             "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableCaptchaPopupSuppression()V",
         )
+
+        val captchaCallbackType = CaptchaPopupFingerprint.method.parameterTypes[2]
+        val legacyCallbackType = LegacyCaptchaPopupFingerprint.method.parameterTypes[2]
+        val liveCallbackType = LiveHostCaptchaPopupFingerprint.method.parameterTypes[2]
 
         CaptchaPopupFingerprint.method.addInstructions(
             0,
@@ -87,7 +94,7 @@ val hideCaptchaPopupsPatch = bytecodePatch(
                 move-result v0
                 if-eqz v0, :morphe_show_captcha_popup
                 if-eqz p3, :morphe_hide_captcha_popup_return
-                invoke-virtual {p3}, LX/13fZ;->LIZJ()V
+                invoke-virtual {p3}, $captchaCallbackType->LIZJ()V
                 :morphe_hide_captcha_popup_return
                 return-void
                 :morphe_show_captcha_popup
@@ -102,7 +109,7 @@ val hideCaptchaPopupsPatch = bytecodePatch(
                 move-result v0
                 if-eqz v0, :morphe_show_legacy_captcha_popup
                 if-eqz p3, :morphe_hide_legacy_captcha_popup_return
-                invoke-virtual {p3}, LX/13fZ;->LIZJ()V
+                invoke-virtual {p3}, $legacyCallbackType->LIZJ()V
                 :morphe_hide_legacy_captcha_popup_return
                 return-void
                 :morphe_show_legacy_captcha_popup
@@ -134,7 +141,7 @@ val hideCaptchaPopupsPatch = bytecodePatch(
                 move-result v0
                 if-eqz v0, :morphe_show_live_captcha_popup
                 if-eqz p3, :morphe_hide_live_captcha_popup_return
-                invoke-interface {p3}, LX/1Cc3;->LIZIZ()V
+                invoke-interface {p3}, $liveCallbackType->LIZIZ()V
                 :morphe_hide_live_captcha_popup_return
                 return-void
                 :morphe_show_live_captcha_popup

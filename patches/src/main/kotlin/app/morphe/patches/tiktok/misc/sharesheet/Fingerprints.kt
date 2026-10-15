@@ -2,10 +2,10 @@ package app.morphe.patches.tiktok.misc.sharesheet
 
 import app.morphe.patcher.Fingerprint
 
-// Real dex class is X.0oVo; jadx renamed it to C1475990oVo for decompilation only.
+// Share panel snapshot holder: X.0oVo(X.0oVp) in TikTok 46.2.3, X.0IKT(X.0ID0) in 47.1.4.
 internal object SharePanelSnapshotConstructorFingerprint : Fingerprint(
-    definingClass = "LX/0oVo;",
     name = "<init>",
     returnType = "V",
-    parameters = listOf("LX/0oVp;"),
+    parameters = listOf("L"),
+    strings = listOf("click_to_respond_duration", "config_duration"),
 )

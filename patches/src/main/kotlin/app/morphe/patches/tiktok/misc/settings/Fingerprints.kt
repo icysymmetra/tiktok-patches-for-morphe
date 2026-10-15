@@ -75,6 +75,14 @@ internal object OpenDebugCellVmDefaultStateFingerprint : Fingerprint(
     },
 )
 
+/** Vector icon resource wrapper used by settings cells (X.08EY in 46.2.3, X.05yK in 47.1.4). */
+internal object VectorResourceToStringFingerprint : Fingerprint(
+    name = "toString",
+    returnType = "Ljava/lang/String;",
+    parameters = emptyList(),
+    strings = listOf("VectorResource(resId="),
+)
+
 internal object OpenDebugCellClickWrapperFingerprint : Fingerprint(
     custom = { method, classDef ->
         classDef.endsWith("Lkotlin/jvm/internal/AwS350S0200000_2;") &&

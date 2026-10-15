@@ -44,12 +44,12 @@ private data class OpenDebugTargets(
 @Suppress("unused")
 val settingsPatch = bytecodePatch(
     name = "Settings",
-    description = "Adds the Metra patches settings menu to TikTok. Supports TikTok 46.2.3.",
+    description = "Adds the Metra patches settings menu to TikTok. Supports TikTok 47.1.4.",
     default = true,
 ) {
     dependsOn(sharedExtensionPatch)
 
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         addLegacySettingsEntryFallback()
@@ -373,8 +373,9 @@ val settingsPatch = bytecodePatch(
             }
             val constructor = stateConstructor
                 ?: throw PatchException("Settings: OpenDebug state constructor was not found.")
+            val iconType = VectorResourceToStringFingerprint.originalClassDef.type
             val iconLoadIndex = constructor.indexOfFirstInstructionOrThrow {
-                opcode == Opcode.SGET_OBJECT && getReference<FieldReference>()?.type == "LX/08EY;"
+                opcode == Opcode.SGET_OBJECT && getReference<FieldReference>()?.type == iconType
             }
             val iconRegister = constructor.getInstruction<OneRegisterInstruction>(iconLoadIndex).registerA
             val tempRegister = constructor.findFreeRegister(iconLoadIndex + 1, iconRegister)
@@ -382,9 +383,9 @@ val settingsPatch = bytecodePatch(
             constructor.addInstructions(
                 iconLoadIndex + 1,
                 """
-                    new-instance v$iconRegister, LX/08EY;
+                    new-instance v$iconRegister, $iconType
                     const v$tempRegister, 0x7f010088
-                    invoke-direct {v$iconRegister, v$tempRegister}, LX/08EY;-><init>(I)V
+                    invoke-direct {v$iconRegister, v$tempRegister}, $iconType-><init>(I)V
                 """,
             )
         }

@@ -23,6 +23,7 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -36,7 +37,7 @@ private val feedListHooksPatch = bytecodePatch {
         sharedExtensionPatch,
     )
 
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
         fun requirePublicClass(type: String) = classDefBy(type).also { classDef ->
@@ -211,11 +212,10 @@ private val feedListHooksPatch = bytecodePatch {
         val insertionPayloadType = finalFeedInsertionMethod.parameterTypes.single().toString()
         val insertionPayloadConstructors = mutableClassDefBy(insertionPayloadType).methods.filter { method ->
             method.name == "<init>" &&
-                method.parameterTypes.map(CharSequence::toString) == listOf(
-                    "I",
-                    "Ljava/lang/String;",
-                    "Ljava/util/List;",
-                ) &&
+                method.parameterTypes.map(CharSequence::toString).let { types ->
+                    // Parameter order differs per build: (I, String, List) in 46.2.3, (I, List, String) in 47.1.4.
+                    types.size == 3 && types.containsAll(listOf("I", "Ljava/lang/String;", "Ljava/util/List;"))
+                } &&
                 method.returnType == "V"
         }
         if (insertionPayloadConstructors.size != 1) {
@@ -284,6 +284,11 @@ private val feedListHooksPatch = bytecodePatch {
             field.type.startsWith("L") &&
                 field.type != "Ljava/lang/String;" &&
                 field.type != "Ljava/util/List;"
+        }.filter { field ->
+            // 47.1.4 added a second object field (the insertion plan); only the cache entry holds the Aweme.
+            runCatching { classDefBy(field.type) }.getOrNull()?.fields?.count { nested ->
+                nested.type == "Lcom/ss/android/ugc/aweme/feed/model/Aweme;"
+            } == 1
         }
         if (cachePayloadFields.size != 1) {
             throw PatchException(
@@ -378,61 +383,45 @@ private val feedListHooksPatch = bytecodePatch {
             )
         }
 
-        ColdStartCachedFeedFingerprint.method.let { method ->
+        // Cold-start cache: 46.2.3 hit every cache from one method; 47.1.4 splits it into the local-cache,
+        // golden-house and offline-mode methods. Every FeedItemList store is filtered, and stores placed after
+        // the OFFLINE_MODE marker of their method use the offline filter.
+        val coldStartMethods = listOf(
+            ColdStartCachedFeedFingerprint,
+            ColdStartGoldenCacheFingerprint,
+            ColdStartOfflineCacheFingerprint,
+        ).mapNotNull { it.methodOrNull }
+            .distinctBy { "${it.definingClass}->${it.name}${it.parameterTypes}" }
+        if (coldStartMethods.isEmpty()) {
+            throw PatchException("No cold-start cache method was found")
+        }
+
+        var coldStoreCount = 0
+        var offlineStoreCount = 0
+        coldStartMethods.forEach { method ->
             val instructions = method.implementation!!.instructions
             val cacheStoreIndices = instructions.withIndex()
-                .filter {
-                    it.value.opcode == Opcode.SPUT_OBJECT &&
-                        (it.value as? com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction)
-                            ?.reference
-                            ?.let { reference ->
-                                reference is FieldReference &&
-                                    reference.type == "Lcom/ss/android/ugc/aweme/feed/model/FeedItemList;"
-                            } == true
-                }
-                .map { it.index }
-                .toList()
-            if (cacheStoreIndices.size != 4) {
-                throw PatchException(
-                    "Expected four cold-start cached FeedItemList stores, " +
-                        "found ${cacheStoreIndices.size}",
-                )
-            }
-
-            val offlineMarkers = instructions.withIndex()
                 .filter { (_, instruction) ->
-                    instruction.getReference<FieldReference>()?.let { reference ->
-                        instruction.opcode == Opcode.SGET_OBJECT &&
-                            reference.name == "OFFLINE_MODE" &&
-                            reference.type == reference.definingClass
-                    } == true
+                    instruction.opcode == Opcode.SPUT_OBJECT &&
+                        instruction.getReference<FieldReference>()?.type ==
+                        "Lcom/ss/android/ugc/aweme/feed/model/FeedItemList;"
                 }
                 .map { it.index }
                 .toList()
-            if (offlineMarkers.size != 1) {
-                throw PatchException(
-                    "Expected one OFFLINE_MODE marker in cold-start cache method, " +
-                        "found ${offlineMarkers.size}",
-                )
-            }
-            val offlineMarker = offlineMarkers.single()
-            val offlineStoreIndices = cacheStoreIndices.filter { it > offlineMarker }
-            if (offlineStoreIndices.size != 1) {
-                throw PatchException(
-                    "Expected one offline FeedItemList store after OFFLINE_MODE, " +
-                        "found ${offlineStoreIndices.size}",
-                )
-            }
-            val offlineStoreIndex = offlineStoreIndices.single()
+            val offlineMarker = instructions.withIndex().firstOrNull { (_, instruction) ->
+                instruction.getReference<FieldReference>()?.let { reference ->
+                    instruction.opcode == Opcode.SGET_OBJECT &&
+                        reference.name == "OFFLINE_MODE" &&
+                        reference.type == reference.definingClass
+                } == true
+            }?.index
 
             cacheStoreIndices.asReversed().forEachIndexed { ordinal, storeIndex ->
                 val listRegister =
                     (method.implementation!!.instructions[storeIndex] as OneRegisterInstruction).registerA
-                val filterMethod = if (storeIndex == offlineStoreIndex) {
-                    "filterOfflineFeedList"
-                } else {
-                    "filterCachedFeedList"
-                }
+                val isOfflineStore = offlineMarker != null && storeIndex > offlineMarker
+                val filterMethod = if (isOfflineStore) "filterOfflineFeedList" else "filterCachedFeedList"
+                if (isOfflineStore) offlineStoreCount++ else coldStoreCount++
                 method.addInstructionsWithLabels(
                     storeIndex,
                     """
@@ -449,6 +438,12 @@ private val feedListHooksPatch = bytecodePatch {
                 )
             }
         }
+        if (coldStoreCount == 0 || offlineStoreCount == 0) {
+            throw PatchException(
+                "Expected cold-start cached and offline FeedItemList stores, " +
+                    "found $coldStoreCount cached and $offlineStoreCount offline",
+            )
+        }
 
     }
 }
@@ -460,7 +455,7 @@ val feedFilterPatch = bytecodePatch(
     default = true,
 ) {
     dependsOn(feedListHooksPatch, settingsPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,
@@ -539,7 +534,7 @@ val hideAiContentPatch = bytecodePatch(
     default = true,
 ) {
     dependsOn(feedListHooksPatch, settingsPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,
@@ -555,7 +550,7 @@ val hideFypSlopPatch = bytecodePatch(
     default = true,
 ) {
     dependsOn(feedListHooksPatch, settingsPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,
@@ -587,6 +582,23 @@ private fun MutableMethod.filterResponseAfterCast(targetType: String, extensionM
     )
 }
 
+/** Resolves the instruction index a branch instruction jumps to. */
+private fun MutableMethod.indexOfBranchTarget(branchIndex: Int): Int {
+    val instructions = implementation?.instructions?.toList()
+        ?: throw PatchException("Branch resolution on a method without implementation")
+    val offsets = IntArray(instructions.size)
+    var offset = 0
+    instructions.forEachIndexed { index, instruction ->
+        offsets[index] = offset
+        offset += instruction.codeUnits
+    }
+    val branch = instructions[branchIndex] as? OffsetInstruction
+        ?: throw PatchException("Instruction $branchIndex is not a branch")
+    val targetOffset = offsets[branchIndex] + branch.codeOffset
+    return offsets.indexOf(targetOffset).takeIf { it >= 0 }
+        ?: throw PatchException("Branch target at code offset $targetOffset was not found")
+}
+
 private fun MutableMethod.filterChainedCacheDelivery(
     cachePayloadField: FieldReference,
     cachedAwemeField: FieldReference,
@@ -611,9 +623,12 @@ private fun MutableMethod.filterChainedCacheDelivery(
     val payloadRead = getInstruction<TwoRegisterInstruction>(payloadReadIndex)
     val payloadRegister = payloadRead.registerA
     val resultRegister = payloadRead.registerB
-    val nextSourceIndex = payloadReadIndex + 2
-    if (instructions.getOrNull(payloadReadIndex + 1)?.opcode != Opcode.IF_NEZ) {
-        throw PatchException("Chained cache delivery no longer branches on its payload")
+    // 46.2.3 branches on a non-null payload (if-nez -> deliver, fall through -> next source);
+    // 47.1.4 branches on a null payload (if-eqz -> next source, fall through -> deliver).
+    val nextSourceIndex = when (instructions.getOrNull(payloadReadIndex + 1)?.opcode) {
+        Opcode.IF_NEZ -> payloadReadIndex + 2
+        Opcode.IF_EQZ -> indexOfBranchTarget(payloadReadIndex + 1)
+        else -> throw PatchException("Chained cache delivery no longer branches on its payload")
     }
 
     addInstructionsWithLabels(
@@ -699,11 +714,16 @@ private fun MutableMethod.filterLateInsertedItems(payloadType: String) {
         )
     }
 
+    // Non-static constructor: p0 is `this`, so parameter i lives in p(i + 1).
+    val parameterTypeNames = parameterTypes.map(CharSequence::toString)
+    val sourceRegister = "p${parameterTypeNames.indexOf("Ljava/lang/String;") + 1}"
+    val listRegister = "p${parameterTypeNames.indexOf("Ljava/util/List;") + 1}"
+
     addInstructions(
         listStoreIndices.single(),
         """
-            invoke-static/range {p2 .. p3}, $EXTENSION_CLASS_DESCRIPTOR->filterLateInsertedItems(Ljava/lang/String;Ljava/util/List;)Ljava/util/List;
-            move-result-object p3
+            invoke-static {$sourceRegister, $listRegister}, $EXTENSION_CLASS_DESCRIPTOR->filterLateInsertedItems(Ljava/lang/String;Ljava/util/List;)Ljava/util/List;
+            move-result-object $listRegister
         """,
     )
 }

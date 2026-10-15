@@ -9,15 +9,20 @@ import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.shared.compat.AppCompatibilities
-import app.morphe.patches.tiktok.misc.absettings.APP_AB_DESCRIPTOR
 import app.morphe.patches.tiktok.misc.absettings.APP_AB_INT_KEY_REGISTER
-import app.morphe.patches.tiktok.misc.absettings.APP_AB_INT_METHOD
 import app.morphe.patches.tiktok.misc.absettings.APP_AB_INT_PARAMETERS
+import app.morphe.patches.tiktok.misc.absettings.AppAbIntBoundaryFingerprint
 import app.morphe.patches.tiktok.misc.settings.settingsPatch
 import app.morphe.util.cloneMutableAndPreserveParameters
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
+/**
+ * Placeholder for the obfuscated App AB manager class (X.0BYX in TikTok 46.2.3, X.02yF in 47.1.4). It is
+ * resolved at patch time from [AppAbIntBoundaryFingerprint]; its typed getters are matched by signature only
+ * because their names are obfuscated too.
+ */
+private const val APP_AB_PLACEHOLDER = "<app-ab>"
 private const val ABMOCK_SETTINGS_MANAGER_DESCRIPTOR = "Lcom/bytedance/ies/abmock/SettingsManager;"
 private const val LIVE_SETTINGS_DESCRIPTOR = "Lcom/bytedance/android/live_settings/SettingsManager;"
 private const val ACTIVITY_CENTER_DESCRIPTOR = "Lcom/ss/android/ugc/tiktok/pns/activitycenter/EnterActivityCenterAction;"
@@ -28,7 +33,8 @@ private const val RUNTIME_DESCRIPTOR = "Lapp/morphe/extension/tiktok/featuregate
 
 private data class TypedBoundary(
     val targetDescriptor: String,
-    val methodName: String,
+    /** Method name, or null to match by signature only (obfuscated App AB getters). */
+    val methodName: String?,
     val returnType: String,
     val parameters: List<String>,
     val keyParameter: String,
@@ -40,12 +46,12 @@ private data class TypedBoundary(
 )
 
 private val boundaries = listOf(
-    TypedBoundary(APP_AB_DESCRIPTOR, "LIZ", "Z", listOf("I", "Ljava/lang/String;", "Z", "Z"), "p2", Opcode.RETURN, "overrideBoolean", "(Ljava/lang/String;Z)Z"),
-    TypedBoundary(APP_AB_DESCRIPTOR, "LIZJ", "D", listOf("D", "I", "Ljava/lang/String;", "Z"), "p4", Opcode.RETURN_WIDE, "overrideDouble", "(Ljava/lang/String;D)D", true),
-    TypedBoundary(APP_AB_DESCRIPTOR, "LIZLLL", "F", listOf("I", "Ljava/lang/String;", "Z", "F"), "p2", Opcode.RETURN, "overrideFloat", "(Ljava/lang/String;F)F"),
-    TypedBoundary(APP_AB_DESCRIPTOR, APP_AB_INT_METHOD, "I", APP_AB_INT_PARAMETERS, APP_AB_INT_KEY_REGISTER, Opcode.RETURN, "overrideInt", "(Ljava/lang/String;I)I"),
-    TypedBoundary(APP_AB_DESCRIPTOR, "LJII", "J", listOf("I", "J", "Ljava/lang/String;", "Z"), "p4", Opcode.RETURN_WIDE, "overrideLong", "(Ljava/lang/String;J)J", true),
-    TypedBoundary(APP_AB_DESCRIPTOR, "LJIIIIZZ", "Ljava/lang/String;", listOf("I", "Ljava/lang/String;", "Ljava/lang/String;", "Z"), "p2", Opcode.RETURN_OBJECT, "overrideString", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", keyScratchRegister = "v0"),
+    TypedBoundary(APP_AB_PLACEHOLDER, null, "Z", listOf("I", "Ljava/lang/String;", "Z", "Z"), "p2", Opcode.RETURN, "overrideBoolean", "(Ljava/lang/String;Z)Z"),
+    TypedBoundary(APP_AB_PLACEHOLDER, null, "D", listOf("D", "I", "Ljava/lang/String;", "Z"), "p4", Opcode.RETURN_WIDE, "overrideDouble", "(Ljava/lang/String;D)D", true),
+    TypedBoundary(APP_AB_PLACEHOLDER, null, "F", listOf("I", "Ljava/lang/String;", "Z", "F"), "p2", Opcode.RETURN, "overrideFloat", "(Ljava/lang/String;F)F"),
+    TypedBoundary(APP_AB_PLACEHOLDER, null, "I", APP_AB_INT_PARAMETERS, APP_AB_INT_KEY_REGISTER, Opcode.RETURN, "overrideInt", "(Ljava/lang/String;I)I"),
+    TypedBoundary(APP_AB_PLACEHOLDER, null, "J", listOf("I", "J", "Ljava/lang/String;", "Z"), "p4", Opcode.RETURN_WIDE, "overrideLong", "(Ljava/lang/String;J)J", true),
+    TypedBoundary(APP_AB_PLACEHOLDER, null, "Ljava/lang/String;", listOf("I", "Ljava/lang/String;", "Ljava/lang/String;", "Z"), "p2", Opcode.RETURN_OBJECT, "overrideString", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", keyScratchRegister = "v0"),
     TypedBoundary(ABMOCK_SETTINGS_MANAGER_DESCRIPTOR, "LIZ", "Z", listOf("Ljava/lang/String;", "Z"), "p0", Opcode.RETURN, "overrideBoolean", "(Ljava/lang/String;Z)Z"),
     TypedBoundary(ABMOCK_SETTINGS_MANAGER_DESCRIPTOR, "LIZIZ", "D", listOf("Ljava/lang/String;", "D"), "p0", Opcode.RETURN_WIDE, "overrideDouble", "(Ljava/lang/String;D)D", true),
     TypedBoundary(ABMOCK_SETTINGS_MANAGER_DESCRIPTOR, "LIZJ", "F", listOf("Ljava/lang/String;", "F"), "p0", Opcode.RETURN, "overrideFloat", "(Ljava/lang/String;F)F"),
@@ -72,25 +78,32 @@ val featureGateLabPatch = bytecodePatch(
     default = true,
 ) {
     dependsOn(settingsPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok4714())
 
     execute {
+        val appAbDescriptor = AppAbIntBoundaryFingerprint.originalClassDef.type
+
         boundaries.forEach { boundary ->
-            val target = mutableClassDefBy(boundary.targetDescriptor)
+            val targetDescriptor = if (boundary.targetDescriptor == APP_AB_PLACEHOLDER) appAbDescriptor else boundary.targetDescriptor
+            val target = mutableClassDefBy(targetDescriptor)
             val method = target.methods.singleOrNull {
-                it.name == boundary.methodName &&
+                (boundary.methodName == null || it.name == boundary.methodName) &&
                     it.returnType == boundary.returnType &&
                     it.parameterTypes == boundary.parameters
-            } ?: throw PatchException("Feature Gate Lab boundary not found: ${boundary.targetDescriptor}->${boundary.methodName}${boundary.parameters}")
+            } ?: throw PatchException("Feature Gate Lab boundary not found: $targetDescriptor->${boundary.methodName ?: "<by signature>"}${boundary.parameters}")
             method.patchBoundary(boundary)
         }
 
-        val rawAbmock = mutableClassDefBy(APP_AB_DESCRIPTOR)
-        val rawGetter = rawAbmock.methods.singleOrNull {
-            it.name == "LJIIJJI" &&
-                it.returnType == "Ljava/lang/Object;" &&
+        val rawAbmock = mutableClassDefBy(appAbDescriptor)
+        // 46.2.3 had one (String, Z) object getter; 47.1.4 added a second variant that forces the
+        // "return string for object" flag, so prefer the original one (LJIIJJI) when several match.
+        val rawGetterCandidates = rawAbmock.methods.filter {
+            it.returnType == "Ljava/lang/Object;" &&
                 it.parameterTypes == listOf("Ljava/lang/String;", "Z")
-        } ?: throw PatchException("Feature Gate Lab raw App AB boundary not found")
+        }
+        val rawGetter = rawGetterCandidates.singleOrNull()
+            ?: rawGetterCandidates.singleOrNull { it.name == "LJIIJJI" }
+            ?: throw PatchException("Feature Gate Lab raw App AB boundary not found")
         rawGetter.patchRawAbBoundary()
 
         val settingsManager = mutableClassDefBy(ABMOCK_SETTINGS_MANAGER_DESCRIPTOR)
@@ -157,10 +170,13 @@ val featureGateLabPatch = bytecodePatch(
         playerGetter.patchPlayerSettingBoundary()
 
         val activityCenter = mutableClassDefBy(ACTIVITY_CENTER_DESCRIPTOR)
+        // getSchema(String, String, String) in 46.2.3 gained a trailing Uri parameter in 47.1.4; only the
+        // returned schema string is transformed, so match on the leading parameters.
         val getSchema = activityCenter.methods.singleOrNull {
             it.name == "getSchema" &&
                 it.returnType == "Ljava/lang/String;" &&
-                it.parameterTypes == listOf(
+                it.parameterTypes.size >= 3 &&
+                it.parameterTypes.take(3).map(CharSequence::toString) == listOf(
                     "Ljava/lang/String;",
                     "Ljava/lang/String;",
                     "Ljava/lang/String;",
