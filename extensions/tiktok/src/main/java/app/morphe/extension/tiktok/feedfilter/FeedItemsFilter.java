@@ -107,6 +107,9 @@ public final class FeedItemsFilter {
             return;
         }
 
+        feedItemList.hasAd = false;
+        feedItemList.preloadAds = null;
+
         if (verbose && shouldLogBatch()) {
             debugLogBatch(
                 "FeedItemList",
@@ -443,6 +446,10 @@ public final class FeedItemsFilter {
     }
 
     public static FeedItemList filterCachedFeedList(FeedItemList feedItemList) {
+        if (feedItemList != null) {
+            feedItemList.hasAd = false;
+            feedItemList.preloadAds = null;
+        }
         if (feedItemList == null || feedItemList.items == null) return null;
         filterCachedFeedItems("FeedItemList:cold-cache", feedItemList, true);
         return feedItemList.items.isEmpty() ? null : feedItemList;
