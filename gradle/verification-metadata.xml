@@ -3193,12 +3193,15 @@
       <component group="app.morphe" name="morphe-patcher" version="2.0.0">
          <artifact name="morphe-patcher-2.0.0.jar">
             <sha256 value="251dc5997abb7e9ffef986f452842480c2ef9999489b6eb3ec922ecdf9c9f86c" origin="Local official source build 8c7ff9f29d4cf6395fcbe42a4ceddd034d71fecf" />
+            <sha256 value="c7517e315251b6cc48ac01610bcaa15a84c019b6738eb9e4d34ee957880a921a" origin="Official GitHub Packages 2.0.0; all code entries match source build 8c7ff9f29d4cf6395fcbe42a4ceddd034d71fecf; Actions 39936906647" />
          </artifact>
          <artifact name="morphe-patcher-2.0.0.module">
             <sha256 value="5f8f10a9fd5862a5177545af7d3837adacf9ab9e761cadd295f67b7d3a51fe44" origin="Local official source build 8c7ff9f29d4cf6395fcbe42a4ceddd034d71fecf" />
+            <sha256 value="39e45da664dc32bce7047e833d43195a069298da4c0ebae943c61f81eacedb22" origin="Official GitHub Packages 2.0.0; variants and dependencies match source build; Actions 39936906647" />
          </artifact>
          <artifact name="morphe-patcher-2.0.0.pom">
             <sha256 value="b100ccbc127f628fcb2a318f664dc728b50e8d155fba402412f43958f55531e3" origin="Local official source build 8c7ff9f29d4cf6395fcbe42a4ceddd034d71fecf" />
+            <sha256 value="9d449e30c103cd26a2d79d1f353c8654a7b49bdf239e0c23f90c1c2392e509f3" origin="Official GitHub Packages 2.0.0; POM content matches source build; Actions 39936906647" />
          </artifact>
       </component>
       <component group="com.github.MorpheApp.smali" name="smali-dexlib2" version="4220ae75f7">
