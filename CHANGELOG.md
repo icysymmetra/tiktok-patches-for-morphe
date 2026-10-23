@@ -1,3 +1,22 @@
+# [0.9.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.1...v0.9.0-dev.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* **build:** verify Linux tools and generate release metadata ([c890bad](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/c890badc10bbee6415dffcfbc83f7f7886dcb7c6))
+* **build:** verify the official Patcher 2.0 package ([5f03ac6](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/5f03ac60d01bc5fc427302aacdd908f4be08f1f0))
+
+
+### Features
+
+* **tiktok:** add expanded 47.4.3 patches on Patcher 2.0 ([2b68243](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/2b68243b279877129e76a2bab68c9a8e7512198e))
+
+
+
+
+
+## 0.9.0-dev.1
+
 ## [0.8.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.0...v0.8.1) (2026-10-15)
 
 
