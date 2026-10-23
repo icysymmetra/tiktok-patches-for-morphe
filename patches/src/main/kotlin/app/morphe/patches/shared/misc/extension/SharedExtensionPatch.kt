@@ -5,12 +5,15 @@
 package app.morphe.patches.shared.misc.extension
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
+import app.morphe.util.addInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.util.returnEarly
 import com.android.tools.smali.dexlib2.iface.Method
-import java.net.URLDecoder
+import java.io.File
+import java.net.URI
+import java.net.URL
+import java.nio.file.Paths
 import java.util.jar.JarFile
 
 internal const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/shared/Utils;"
@@ -61,16 +64,7 @@ fun sharedExtensionPatch(
             fun getCurrentJarFilePath(): String {
                 val className = object {}::class.java.enclosingClass.name.replace('.', '/') + ".class"
                 val classUrl = object {}::class.java.classLoader?.getResource(className)
-                if (classUrl != null) {
-                    val urlString = classUrl.toString()
-
-                    if (urlString.startsWith("jar:file:")) {
-                        val end = urlString.lastIndexOf('!')
-
-                        return URLDecoder.decode(urlString.substring("jar:file:".length, end), "UTF-8")
-                    }
-                }
-                throw IllegalStateException("Not running from inside a JAR file.")
+                return localBundleFile(classUrl).path
             }
 
             /**
@@ -89,6 +83,16 @@ fun sharedExtensionPatch(
     }
 }
 
+/** Resolve only a local file URI. No URL connection or JAR handle is opened here. */
+internal fun localBundleFile(classUrl: URL?): File {
+    val location = classUrl?.toExternalForm()
+    if (location == null || !location.startsWith("jar:file:")) {
+        throw IllegalStateException("Not running from inside a local JAR file.")
+    }
+    val separator = location.lastIndexOf('!')
+    return Paths.get(URI(location.substring("jar:".length, separator))).toFile()
+}
+
 /**
  * Handles passing the application context to the extension code. Typically, the main activity
  * onCreate() method is hooked, but sometimes additional hooks are required if extension code
@@ -98,18 +102,28 @@ open class ExtensionHook(
     internal val fingerprint: Fingerprint,
     private val insertIndexResolver: BytecodePatchContext.(Method) -> Int = { 0 },
     private val contextRegisterResolver: BytecodePatchContext.(Method) -> String = { "p0" },
+    private val postContextClassDescriptor: String? = null,
+    private val postContextMethodName: String? = null,
 ) {
-    context(BytecodePatchContext)
+    context(patchContext: BytecodePatchContext)
     operator fun invoke(extensionClassDescriptor: String) {
-        fingerprint.method.apply {
-            val insertIndex = insertIndexResolver(this)
-            val contextRegister = contextRegisterResolver(this)
+        fingerprint.clearMatch()
+        with(patchContext) { fingerprint.method }.apply {
+            val insertIndex = with(patchContext) { insertIndexResolver(this@apply) }
+            val contextRegister = with(patchContext) { contextRegisterResolver(this@apply) }
 
             addInstruction(
                 insertIndex,
                 "invoke-static/range { $contextRegister .. $contextRegister }, " +
                         "$extensionClassDescriptor->setContext(Landroid/content/Context;)V",
             )
+            if (postContextClassDescriptor != null && postContextMethodName != null) {
+                addInstruction(
+                    insertIndex + 1,
+                    "invoke-static/range { $contextRegister .. $contextRegister }, " +
+                            "$postContextClassDescriptor->$postContextMethodName(Landroid/content/Context;)V",
+                )
+            }
         }
     }
 }

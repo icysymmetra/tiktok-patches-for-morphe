@@ -1,3 +1,25 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# The settings translation tables are tab separated. Turning tabs into spaces here, or
+# trimming a trailing one, silently breaks a row.
+[*.tsv]
+indent_style = tab
+trim_trailing_whitespace = false
+
 [*.{kt,kts}]
 ktlint_code_style = intellij_idea
 ktlint_standard_no-wildcard-imports = disabled
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.bat]
+end_of_line = crlf

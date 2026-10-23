@@ -5,8 +5,7 @@
 package app.morphe.patches.tiktok.interaction.searchfeatures
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.util.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.bytecodePatch
@@ -14,6 +13,8 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.absettings.hookAppAbIntBoundary
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
+import app.morphe.patches.tiktok.misc.settings.settingsPatch
+import app.morphe.util.addInstructionsAtControlFlowLabel
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
@@ -25,16 +26,23 @@ private fun BytecodePatchContext.patchBooleanGate(
     extensionMethod: String,
 ) {
     fingerprint.method.apply {
-        implementation!!.instructions.withIndex()
+        val returns = implementation!!.instructions.withIndex()
             .filter { it.value.opcode == Opcode.RETURN }
             .map { it.index }
-            .asReversed()
+        // A gate with no boolean return, because it throws or boxes its answer, would leave
+        // the switch applied and doing nothing.
+        check(returns.isNotEmpty()) {
+            "Search features: $definingClass->$name has no boolean return to hook for $extensionMethod."
+        }
+        returns.asReversed()
             .forEach { returnIndex ->
+                // The range form names any register a return can hold, so a wide frame is no
+                // reason to refuse the gate.
                 val register = getInstruction<OneRegisterInstruction>(returnIndex).registerA
-                addInstructions(
+                addInstructionsAtControlFlowLabel(
                     returnIndex,
                     """
-                        invoke-static {v$register}, $FEATURE_CONTROLS_DESCRIPTOR->$extensionMethod(Z)Z
+                        invoke-static/range {v$register .. v$register}, $FEATURE_CONTROLS_DESCRIPTOR->$extensionMethod(Z)Z
                         move-result v$register
                     """,
                 )
@@ -44,12 +52,14 @@ private fun BytecodePatchContext.patchBooleanGate(
 
 @Suppress("unused")
 val enableNonPersonalizedSearchPatch = bytecodePatch(
-    name = "Enable non-personalized search",
-    description = "Uses TikTok's non-personalized search mode instead of its saved account choice.",
+    name = "Use non-personalized search",
+    description = "Shows search results that aren't tailored to your account. Starts off. " +
+        "Turn it on in Metra settings > App behavior.",
     default = true,
 ) {
-    dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    category("Search")
+    dependsOn(settingsPatch, sharedExtensionPatch)
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
@@ -68,12 +78,14 @@ val enableNonPersonalizedSearchPatch = bytecodePatch(
 
 @Suppress("unused")
 val enableLiveSearchPatch = bytecodePatch(
-    name = "Enable Live search",
-    description = "Shows TikTok's search entry in the Live drawer where supported.",
+    name = "Show LIVE search",
+    description = "Adds TikTok's search button inside the LIVE section where TikTok supports " +
+        "it, so you can look for LIVEs. Starts off. Turn it on in Metra settings > App behavior.",
     default = true,
 ) {
+    category("Search")
     dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(

@@ -5,8 +5,9 @@
 package app.morphe.patches.tiktok.promobanners
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.fieldAccess
+import app.morphe.util.addInstruction
+import app.morphe.util.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
@@ -14,8 +15,11 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
-import app.morphe.util.getReference
+import app.morphe.patches.tiktok.misc.settings.settingsPatch
+import app.morphe.util.addInstructionsAtControlFlowLabel
+import app.morphe.patcher.util.getReference
 import app.morphe.util.indexOfFirstInstructionOrThrow
+import app.morphe.util.moveResultRegisterAfter
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
@@ -23,6 +27,9 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 private const val FEATURE_CONTROLS_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/featurecontrols/FeatureControls;"
+private const val PROFILE_ACTIVITY_ICON_DESCRIPTOR =
+    "Lcom/bytedance/touchpoint/api/model/ProfileActivityIcon;"
+private const val TUX_ICON_VIEW_DESCRIPTOR = "Lcom/bytedance/tux/icon/TuxIconView;"
 
 private object TouchPointPendantParserFingerprint : Fingerprint(
     returnType = "V",
@@ -37,14 +44,42 @@ private object TouchPointPendantParserFingerprint : Fingerprint(
     },
 )
 
+/** The 47.0.3 binder that creates the purple rewards shortcut beside Add friends. */
+internal fun isProfileRewardsIconBinder(method: com.android.tools.smali.dexlib2.iface.Method): Boolean {
+    val instructions = method.implementation?.instructions ?: return false
+    val hasProfileModel = instructions.any {
+        it.getReference<FieldReference>()?.definingClass == PROFILE_ACTIVITY_ICON_DESCRIPTOR
+    }
+    val hasIconView = instructions.any {
+        it.opcode == Opcode.CHECK_CAST &&
+            it.getReference<TypeReference>()?.type == TUX_ICON_VIEW_DESCRIPTOR
+    }
+    val assignsViewId = instructions.any {
+        it.getReference<MethodReference>()?.let { call ->
+            call.name == "setId" && call.definingClass == "Landroid/view/View;" && call.returnType == "V" &&
+                call.parameterTypes.singleOrNull() == "I"
+        } == true
+    }
+    return method.returnType == "Ljava/lang/Object;" && hasProfileModel && hasIconView && assignsViewId
+}
+
+internal object ProfileRewardsIconBinderFingerprint : Fingerprint(
+    returnType = "Ljava/lang/Object;",
+    // The filter repeats a reference the custom block requires, so the patcher reads only the
+    // classes that make it (#54).
+    filters = listOf(fieldAccess(definingClass = PROFILE_ACTIVITY_ICON_DESCRIPTOR)),
+    custom = { method, _ -> isProfileRewardsIconBinder(method) },
+)
+
 @Suppress("unused")
 val hideFloatingPromotionsPatch = bytecodePatch(
     name = "Hide floating promotions",
-    description = "Removes floating promotional badges, coin icons, and timer banners from the Home feed.",
+    description = "Hides the floating promotion badges, coins and timers on the feed, and can hide the rewards button on your profile. Starts off. Turn it on in Metra settings > Interface, and App behavior for the rewards button.",
     default = true,
 ) {
-    dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    category("Feed")
+    dependsOn(settingsPatch, sharedExtensionPatch)
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
@@ -59,11 +94,11 @@ val hideFloatingPromotionsPatch = bytecodePatch(
                         reference.returnType == "Ljava/lang/Object;"
                 } == true
             }
-            val resultRegister = method.getInstruction<OneRegisterInstruction>(parseIndex + 1).registerA
+            val resultRegister = method.moveResultRegisterAfter(parseIndex, "Hide floating promotions")
             method.addInstructions(
                 parseIndex + 2,
                 """
-                    invoke-static {v$resultRegister}, $FEATURE_CONTROLS_CLASS_DESCRIPTOR->filterNormalPendant(Ljava/lang/Object;)Ljava/lang/Object;
+                    invoke-static/range {v$resultRegister .. v$resultRegister}, $FEATURE_CONTROLS_CLASS_DESCRIPTOR->filterNormalPendant(Ljava/lang/Object;)Ljava/lang/Object;
                     move-result-object v$resultRegister
                 """,
             )
@@ -95,6 +130,22 @@ val hideFloatingPromotionsPatch = bytecodePatch(
             modelGetter.filterPromotionalTouchPoint()
             launchPlanGetter.filterPromotionalTouchPoint()
         }
+
+        ProfileRewardsIconBinderFingerprint.method.let { method ->
+            val iconCastIndex = method.indexOfFirstInstructionOrThrow {
+                opcode == Opcode.CHECK_CAST &&
+                    getReference<TypeReference>()?.type == TUX_ICON_VIEW_DESCRIPTOR
+            }
+            val iconRegister = method.getInstruction<OneRegisterInstruction>(iconCastIndex).registerA
+            val returnIndex = method.indexOfFirstInstructionOrThrow {
+                opcode == Opcode.RETURN_OBJECT
+            }
+            method.addInstruction(
+                returnIndex,
+                "invoke-static/range {v$iconRegister .. v$iconRegister}, " +
+                    "$FEATURE_CONTROLS_CLASS_DESCRIPTOR->hideProfileRewardsShortcut(Landroid/view/View;)V",
+            )
+        }
     }
 }
 
@@ -109,10 +160,10 @@ private fun MutableMethod.filterPromotionalTouchPoint() {
         ?: throw PatchException("TouchPoint promotional getter has no implementation")
 
     returnIndices.asReversed().forEach { (index, register) ->
-        addInstructions(
+        addInstructionsAtControlFlowLabel(
             index,
             """
-                invoke-static {v$register}, $FEATURE_CONTROLS_CLASS_DESCRIPTOR->filterPromotionalTouchPoint(Ljava/lang/Object;)Ljava/lang/Object;
+                invoke-static/range {v$register .. v$register}, $FEATURE_CONTROLS_CLASS_DESCRIPTOR->filterPromotionalTouchPoint(Ljava/lang/Object;)Ljava/lang/Object;
                 move-result-object v$register
                 check-cast v$register, $returnType
             """,

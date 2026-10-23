@@ -4,6 +4,7 @@
  */
 package app.morphe.extension.tiktok.settings.preference;
 
+import app.morphe.extension.tiktok.settings.L10n;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,7 +16,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.preference.Preference;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,34 +28,69 @@ import android.widget.TextView;
 public final class SettingsMenuPreference extends Preference {
     public enum Icon {
         FILTER,
+        SEARCH,
         TABS,
         LAYOUT,
         COMMENTS,
         DOWNLOADS,
+        PLAYBACK,
+        SCREEN_TIME,
+        INBOX,
+        SHARE,
         REGION,
+        PRIVACY,
         BEHAVIOR,
         LAB,
         DIAGNOSTICS,
-        SHARE
+        BACKUP,
+        NEWS,
+        ABOUT,
+        REPORT,
+        SUPPORT
     }
 
     private static final int ACCESSORY_TAG = 0x4D4D454E;
-    private final int activeCount;
+    private final Icon menuIcon;
+    private boolean compact;
 
     public SettingsMenuPreference(
             Context context,
             String title,
             String summary,
             Icon icon,
-            int activeCount,
             OnPreferenceClickListener listener
     ) {
         super(context);
-        this.activeCount = activeCount;
+        this.menuIcon = icon;
         setTitle(title);
         setSummary(summary);
-        setIcon(new MenuIconDrawable(icon));
+        setIcon(new MenuIconDrawable(context, icon));
         setOnPreferenceClickListener(listener);
+    }
+
+    /** The same icon language for compact routes on the master page. */
+    public static Drawable iconDrawable(Context context, Icon icon) {
+        return new MenuIconDrawable(context, icon);
+    }
+
+    public static Drawable lineIconDrawable(Context context, Icon icon) {
+        return new MenuIconDrawable(context, icon, true);
+    }
+
+    /** Home's denser grouped rows; the card layout is What's new on About. */
+    public void setCompact(boolean compact) {
+        if (this.compact == compact) return;
+        this.compact = compact;
+        setIcon(new MenuIconDrawable(getContext(), menuIcon));
+        notifyChanged();
+    }
+
+    public boolean isCompact() {
+        return compact;
+    }
+
+    boolean isAbout() {
+        return menuIcon == Icon.ABOUT;
     }
 
     @Override
@@ -76,6 +111,7 @@ public final class SettingsMenuPreference extends Preference {
         iconFrame.setId(android.R.id.icon_frame);
         ImageView icon = new ImageView(context);
         icon.setId(android.R.id.icon);
+        icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         iconFrame.addView(icon, new FrameLayout.LayoutParams(
                 SettingsUi.dp(context, 40),
                 SettingsUi.dp(context, 40),
@@ -90,21 +126,23 @@ public final class SettingsMenuPreference extends Preference {
         labels.setGravity(Gravity.CENTER_VERTICAL);
         labels.setOrientation(LinearLayout.VERTICAL);
 
-        TextView title = SettingsUi.text(context, "", 15.5f, SettingsUi.textPrimary(), 1);
+        TextView title = SettingsUi.text(context, "", 16, SettingsUi.textPrimary(), 1);
         title.setId(android.R.id.title);
-        title.setSingleLine(true);
-        title.setEllipsize(TextUtils.TruncateAt.END);
+        title.setSingleLine(false);
+        title.setEllipsize(null);
         labels.addView(title, new LinearLayout.LayoutParams(-1, -2));
 
-        TextView summary = SettingsUi.text(context, "", 12.8f, SettingsUi.textSecondary(), 0);
+        TextView summary = SettingsUi.text(context, "", 13, SettingsUi.textSecondary(), 0);
         summary.setId(android.R.id.summary);
-        summary.setSingleLine(true);
-        summary.setEllipsize(TextUtils.TruncateAt.END);
+        summary.setSingleLine(false);
+        summary.setEllipsize(null);
         labels.addView(summary, new LinearLayout.LayoutParams(-1, -2));
 
         LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(0, -2, 1);
-        labelParams.leftMargin = SettingsUi.dp(context, 14);
-        labelParams.rightMargin = SettingsUi.dp(context, 10);
+        // Start and end rather than left and right: in an RTL layout the icon is on the right
+        // and this gap belongs between the icon and the text, not stranded on the far side.
+        labelParams.setMarginStart(SettingsUi.dp(context, 14));
+        labelParams.setMarginEnd(SettingsUi.dp(context, 10));
         row.addView(labels, labelParams);
 
         LinearLayout widget = new LinearLayout(context);
@@ -124,20 +162,23 @@ public final class SettingsMenuPreference extends Preference {
         addAccessory(view);
     }
 
+    /**
+     * Wrapping, which a long translation needs. The sizes are deliberately not set here: the
+     * list adapter settles those after this runs, so a number written here would be read as
+     * the one on screen and never be it.
+     */
     private void styleText(View view) {
         TextView title = view.findViewById(android.R.id.title);
         if (title != null) {
-            title.setTextSize(15.5f);
             title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-            title.setSingleLine(true);
-            title.setEllipsize(TextUtils.TruncateAt.END);
+            title.setSingleLine(false);
+            title.setEllipsize(null);
         }
 
         TextView summary = view.findViewById(android.R.id.summary);
         if (summary != null) {
-            summary.setTextSize(12.8f);
-            summary.setSingleLine(true);
-            summary.setEllipsize(TextUtils.TruncateAt.END);
+            summary.setSingleLine(false);
+            summary.setEllipsize(null);
         }
     }
 
@@ -147,6 +188,13 @@ public final class SettingsMenuPreference extends Preference {
             return;
         }
         int size = SettingsUi.dp(getContext(), 40);
+        View iconFrame = view.findViewById(android.R.id.icon_frame);
+        if (iconFrame != null) {
+            ViewGroup.LayoutParams frameParams = iconFrame.getLayoutParams();
+            frameParams.width = size;
+            frameParams.height = size;
+            iconFrame.setLayoutParams(frameParams);
+        }
         ViewGroup.LayoutParams params = icon.getLayoutParams();
         params.width = size;
         params.height = size;
@@ -175,83 +223,67 @@ public final class SettingsMenuPreference extends Preference {
         accessory.setGravity(Gravity.CENTER_VERTICAL);
         accessory.setOrientation(LinearLayout.HORIZONTAL);
 
-        if (activeCount > 0) {
-            TextView badge = SettingsUi.text(
-                    getContext(),
-                    activeCount + " on",
-                    11.5f,
-                    SettingsUi.ACCENT,
-                    1
-            );
-            badge.setGravity(Gravity.CENTER);
-            badge.setPadding(
-                    SettingsUi.dp(getContext(), 9),
-                    SettingsUi.dp(getContext(), 3),
-                    SettingsUi.dp(getContext(), 9),
-                    SettingsUi.dp(getContext(), 3)
-            );
-            badge.setBackground(new BadgeDrawable());
-            accessory.addView(badge);
-        }
-
         ImageView chevron = new ImageView(getContext());
-        chevron.setImageDrawable(new ChevronDrawable());
+        chevron.setImageDrawable(new ChevronDrawable(getContext()));
+        // Decorative, like the one the list adapter adds to every other row.
+        chevron.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         LinearLayout.LayoutParams chevronParams = new LinearLayout.LayoutParams(
                 SettingsUi.dp(getContext(), 18),
                 SettingsUi.dp(getContext(), 18)
         );
-        chevronParams.leftMargin = SettingsUi.dp(getContext(), activeCount > 0 ? 9 : 0);
         accessory.addView(chevron, chevronParams);
         frame.addView(accessory);
     }
 
-    private static final class BadgeDrawable extends Drawable {
+    public static final class ChevronDrawable extends Drawable {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final int enabledColor;
+        private final int disabledColor;
 
-        BadgeDrawable() {
-            paint.setColor(Color.argb(SettingsUi.isDarkMode() ? 38 : 24, 240, 45, 99));
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            RectF bounds = new RectF(getBounds());
-            canvas.drawRoundRect(bounds, bounds.height() / 2f, bounds.height() / 2f, paint);
-        }
-
-        @Override
-        public void setAlpha(int alpha) {
-            paint.setAlpha(alpha);
-        }
-
-        @Override
-        public void setColorFilter(ColorFilter colorFilter) {
-            paint.setColorFilter(colorFilter);
-        }
-
-        @Override
-        public int getOpacity() {
-            return PixelFormat.TRANSLUCENT;
-        }
-    }
-
-    private static final class ChevronDrawable extends Drawable {
-        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-        ChevronDrawable() {
-            paint.setColor(SettingsUi.textDisabled());
+        public ChevronDrawable(Context context) {
+            setLayoutDirection(context.getResources().getConfiguration().getLayoutDirection());
+            enabledColor = SettingsUi.textSecondary();
+            disabledColor = SettingsUi.textDisabled();
+            paint.setColor(enabledColor);
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(1.8f);
+            paint.setStrokeWidth(SettingsUi.strokePx(context, 1.8f));
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeJoin(Paint.Join.ROUND);
+        }
+
+        @Override
+        public boolean isAutoMirrored() {
+            return true;
+        }
+
+        @Override
+        public boolean isStateful() {
+            return true;
+        }
+
+        @Override
+        protected boolean onStateChange(int[] state) {
+            boolean enabled = false;
+            for (int s : state) {
+                if (s == android.R.attr.state_enabled) { enabled = true; break; }
+            }
+            int color = enabled ? enabledColor : disabledColor;
+            if (paint.getColor() != color) {
+                paint.setColor(color);
+                invalidateSelf();
+                return true;
+            }
+            return false;
         }
 
         @Override
         public void draw(Canvas canvas) {
             float centerX = getBounds().exactCenterX();
             float centerY = getBounds().exactCenterY();
-            float offset = Math.min(getBounds().width(), getBounds().height()) * 0.22f;
-            canvas.drawLine(centerX - offset, centerY - offset, centerX + offset, centerY, paint);
-            canvas.drawLine(centerX + offset, centerY, centerX - offset, centerY + offset, paint);
+            float size = Math.min(getBounds().width(), getBounds().height()) * 0.22f;
+            float offset = getLayoutDirection() == View.LAYOUT_DIRECTION_RTL ? -size : size;
+            canvas.drawLine(centerX - offset, centerY - size, centerX + offset, centerY, paint);
+            canvas.drawLine(centerX + offset, centerY, centerX - offset, centerY + size, paint);
         }
 
         @Override
@@ -276,22 +308,27 @@ public final class SettingsMenuPreference extends Preference {
         private final Paint border = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path path = new Path();
+        private final boolean compact;
 
-        MenuIconDrawable(Icon icon) {
+        /** Tiles take their corner from the radius scale, by size, rather than a fifth of their width. */
+        private final float density;
+
+        MenuIconDrawable(Context context, Icon icon) {
+            this(context, icon, false);
+        }
+
+        MenuIconDrawable(Context context, Icon icon, boolean compact) {
             this.icon = icon;
-            fill.setColor(SettingsUi.isDarkMode()
-                    ? Color.argb(255, 23, 23, 29)
-                    : Color.argb(255, 246, 246, 248));
-            border.setColor(SettingsUi.isDarkMode()
-                    ? Color.argb(255, 48, 48, 56)
-                    : Color.argb(255, 224, 224, 228));
+            this.compact = compact;
+            density = context.getResources().getDisplayMetrics().density;
+            fill.setColor(SettingsUi.isDarkMode() ? Color.rgb(23, 23, 29) : Color.rgb(246, 246, 248));
+            border.setColor(SettingsUi.isDarkMode() ? Color.rgb(48, 48, 56) : Color.rgb(224, 224, 228));
             border.setStyle(Paint.Style.STROKE);
-            border.setStrokeWidth(1f);
-            line.setColor(SettingsUi.isDarkMode()
-                    ? Color.argb(255, 207, 207, 215)
-                    : Color.argb(255, 72, 72, 78));
+            border.setStrokeWidth(SettingsUi.strokePx(context, 1f));
+            line.setColor(icon == Icon.SEARCH ? SettingsUi.textSecondary()
+                    : SettingsUi.isDarkMode() ? Color.rgb(207, 207, 215) : Color.rgb(72, 72, 78));
             line.setStyle(Paint.Style.STROKE);
-            line.setStrokeWidth(1.8f);
+            line.setStrokeWidth(SettingsUi.strokePx(context, 1.8f));
             line.setStrokeCap(Paint.Cap.ROUND);
             line.setStrokeJoin(Paint.Join.ROUND);
         }
@@ -299,9 +336,18 @@ public final class SettingsMenuPreference extends Preference {
         @Override
         public void draw(Canvas canvas) {
             RectF bounds = new RectF(getBounds());
+            // A fifth of the width made 10.4dp on a row's 52dp tile and 6.4dp on a quick route's
+            // 32dp one, neither on the scale. Row tiles take the card radius, small ones the
+            // control radius.
             float radius = bounds.width() * 0.28f;
-            canvas.drawRoundRect(bounds, radius, radius, fill);
-            canvas.drawRoundRect(bounds, radius, radius, border);
+            if (compact) {
+                // Existing glyphs occupy the middle of a tile. Expand their drawing coordinate
+                // space to retain a readable 20dp mark inside the compact 24dp image.
+                bounds.inset(-bounds.width() * 0.425f, -bounds.height() * 0.425f);
+            } else {
+                canvas.drawRoundRect(bounds, radius, radius, fill);
+                canvas.drawRoundRect(bounds, radius, radius, border);
+            }
 
             float left = bounds.left + bounds.width() * 0.27f;
             float right = bounds.right - bounds.width() * 0.27f;
@@ -322,17 +368,57 @@ public final class SettingsMenuPreference extends Preference {
                     path.close();
                     canvas.drawPath(path, line);
                     break;
+                case SEARCH:
+                    canvas.drawCircle(cx - bounds.width() * 0.05f, cy - bounds.height() * 0.05f,
+                            bounds.width() * 0.18f, line);
+                    canvas.drawLine(cx + bounds.width() * 0.08f, cy + bounds.height() * 0.08f,
+                            right, bottom, line);
+                    break;
                 case TABS:
-                case LAYOUT:
-                    canvas.drawRoundRect(new RectF(left, top, right, bottom), 2, 2, line);
-                    canvas.drawLine(left, cy - bounds.height() * 0.07f, right, cy - bounds.height() * 0.07f, line);
-                    if (icon == Icon.TABS) {
-                        canvas.drawLine(cx - bounds.width() * 0.1f, top, cx - bounds.width() * 0.1f,
-                                cy - bounds.height() * 0.07f, line);
-                    } else {
-                        canvas.drawLine(cx - bounds.width() * 0.07f, cy - bounds.height() * 0.07f,
-                                cx - bounds.width() * 0.07f, bottom, line);
-                    }
+                    float gap = bounds.width() * 0.05f;
+                    canvas.drawRoundRect(new RectF(left, top, cx - gap, cy - gap), 1, 1, line);
+                    canvas.drawRoundRect(new RectF(cx + gap, top, right, cy - gap), 1, 1, line);
+                    canvas.drawRoundRect(new RectF(left, cy + gap, cx - gap, bottom), 1, 1, line);
+                    canvas.drawRoundRect(new RectF(cx + gap, cy + gap, right, bottom), 1, 1, line);
+                    break;
+                case PLAYBACK:
+                    path.reset();
+                    path.moveTo(left + bounds.width() * 0.06f, top);
+                    path.lineTo(right, cy);
+                    path.lineTo(left + bounds.width() * 0.06f, bottom);
+                    path.close();
+                    canvas.drawPath(path, line);
+                    break;
+                case INBOX:
+                    path.reset();
+                    path.moveTo(left, cy);
+                    path.lineTo(left + bounds.width() * 0.07f, top);
+                    path.lineTo(right - bounds.width() * 0.07f, top);
+                    path.lineTo(right, cy);
+                    path.lineTo(right, bottom);
+                    path.lineTo(left, bottom);
+                    path.close();
+                    canvas.drawPath(path, line);
+                    path.reset();
+                    path.moveTo(left, cy);
+                    path.lineTo(cx - bounds.width() * 0.09f, cy);
+                    path.lineTo(cx - bounds.width() * 0.05f, cy + bounds.width() * 0.09f);
+                    path.lineTo(cx + bounds.width() * 0.05f, cy + bounds.width() * 0.09f);
+                    path.lineTo(cx + bounds.width() * 0.09f, cy);
+                    path.lineTo(right, cy);
+                    canvas.drawPath(path, line);
+                    break;
+                case SHARE:
+                    path.reset();
+                    path.moveTo(cx, top + bounds.width() * 0.08f);
+                    path.lineTo(left, top + bounds.width() * 0.08f);
+                    path.lineTo(left, bottom);
+                    path.lineTo(right - bounds.width() * 0.08f, bottom);
+                    path.lineTo(right - bounds.width() * 0.08f, cy);
+                    canvas.drawPath(path, line);
+                    canvas.drawLine(cx, cy, right, top, line);
+                    canvas.drawLine(cx + bounds.width() * 0.04f, top, right, top, line);
+                    canvas.drawLine(right, top, right, cy - bounds.width() * 0.04f, line);
                     break;
                 case COMMENTS:
                     path.reset();
@@ -357,6 +443,56 @@ public final class SettingsMenuPreference extends Preference {
                     canvas.drawLine(left, cy, right, cy, line);
                     canvas.drawOval(new RectF(cx - bounds.width() * 0.1f, top, cx + bounds.width() * 0.1f, bottom), line);
                     break;
+                case PRIVACY:
+                    // A shield with a tick in it.
+                    path.reset();
+                    path.moveTo(cx, top);
+                    path.lineTo(right, top + bounds.height() * 0.08f);
+                    path.lineTo(right, cy);
+                    path.quadTo(right, bottom - bounds.height() * 0.05f, cx, bottom);
+                    path.quadTo(left, bottom - bounds.height() * 0.05f, left, cy);
+                    path.lineTo(left, top + bounds.height() * 0.08f);
+                    path.close();
+                    canvas.drawPath(path, line);
+                    canvas.drawLine(cx - bounds.width() * 0.1f, cy, cx - bounds.width() * 0.02f,
+                            cy + bounds.height() * 0.08f, line);
+                    canvas.drawLine(cx - bounds.width() * 0.02f, cy + bounds.height() * 0.08f,
+                            cx + bounds.width() * 0.11f, cy - bounds.height() * 0.09f, line);
+                    break;
+                case LAYOUT:
+                    // A screen with the right column's buttons down its edge and a caption
+                    // line at the foot: the feed as it is drawn.
+                    canvas.drawRoundRect(new RectF(left, top, right, bottom),
+                            bounds.width() * 0.06f, bounds.width() * 0.06f, line);
+                    // Inside the frame with room to spare: on the tile's edge the three dots
+                    // merged with the border and read as a bite out of the screen.
+                    float railX = right - bounds.width() * 0.17f;
+                    float railDot = bounds.width() * 0.025f;
+                    canvas.drawCircle(railX, cy - bounds.height() * 0.13f, railDot, line);
+                    canvas.drawCircle(railX, cy, railDot, line);
+                    canvas.drawCircle(railX, cy + bounds.height() * 0.13f, railDot, line);
+                    canvas.drawLine(left + bounds.width() * 0.1f, bottom - bounds.height() * 0.1f,
+                            cx - bounds.width() * 0.02f, bottom - bounds.height() * 0.1f, line);
+                    break;
+                case SCREEN_TIME:
+                    // A clock face.
+                    canvas.drawCircle(cx, cy, bounds.width() * 0.23f, line);
+                    canvas.drawLine(cx, cy, cx, cy - bounds.height() * 0.14f, line);
+                    canvas.drawLine(cx, cy, cx + bounds.width() * 0.1f, cy + bounds.height() * 0.06f, line);
+                    break;
+                case BACKUP:
+                    // An open box with an arrow rising out of it. Downloads is the arrow going
+                    // the other way onto a line, so the two read as a pair.
+                    path.reset();
+                    path.moveTo(left, cy);
+                    path.lineTo(left, bottom);
+                    path.lineTo(right, bottom);
+                    path.lineTo(right, cy);
+                    canvas.drawPath(path, line);
+                    canvas.drawLine(cx, top, cx, cy + bounds.height() * 0.1f, line);
+                    canvas.drawLine(cx, top, cx - bounds.width() * 0.1f, top + bounds.height() * 0.1f, line);
+                    canvas.drawLine(cx, top, cx + bounds.width() * 0.1f, top + bounds.height() * 0.1f, line);
+                    break;
                 case BEHAVIOR:
                     canvas.drawLine(left, top + bounds.height() * 0.05f, right, top + bounds.height() * 0.05f, line);
                     canvas.drawLine(left, cy, right, cy, line);
@@ -364,6 +500,12 @@ public final class SettingsMenuPreference extends Preference {
                     canvas.drawCircle(cx + bounds.width() * 0.09f, top + bounds.height() * 0.05f, bounds.width() * 0.045f, line);
                     canvas.drawCircle(cx - bounds.width() * 0.08f, cy, bounds.width() * 0.045f, line);
                     canvas.drawCircle(cx + bounds.width() * 0.02f, bottom - bounds.height() * 0.05f, bounds.width() * 0.045f, line);
+                    break;
+                case ABOUT:
+                    canvas.drawCircle(cx, cy, bounds.width() * 0.23f, line);
+                    canvas.drawLine(cx, cy - bounds.height() * 0.02f,
+                            cx, cy + bounds.height() * 0.12f, line);
+                    canvas.drawPoint(cx, cy - bounds.height() * 0.11f, line);
                     break;
                 case LAB:
                     path.reset();
@@ -377,6 +519,17 @@ public final class SettingsMenuPreference extends Preference {
                     canvas.drawLine(left + bounds.width() * 0.08f, cy + bounds.height() * 0.09f,
                             right - bounds.width() * 0.08f, cy + bounds.height() * 0.09f, line);
                     break;
+                case NEWS:
+                    // A four-point sparkle: each arm bows in toward the centre.
+                    path.reset();
+                    path.moveTo(cx, top);
+                    path.quadTo(cx, cy, right, cy);
+                    path.quadTo(cx, cy, cx, bottom);
+                    path.quadTo(cx, cy, left, cy);
+                    path.quadTo(cx, cy, cx, top);
+                    path.close();
+                    canvas.drawPath(path, line);
+                    break;
                 case DIAGNOSTICS:
                     canvas.drawCircle(cx, cy, bounds.width() * 0.16f, line);
                     canvas.drawLine(cx, top, cx, cy - bounds.height() * 0.16f, line);
@@ -384,20 +537,33 @@ public final class SettingsMenuPreference extends Preference {
                     canvas.drawLine(left, cy, cx - bounds.width() * 0.16f, cy, line);
                     canvas.drawLine(cx + bounds.width() * 0.16f, cy, right, cy, line);
                     break;
-                case SHARE: {
-                    float nodeRadius = bounds.width() * 0.055f;
-                    float startX = left;
-                    float startY = cy;
-                    float endX = right;
-                    float upperY = top + bounds.height() * 0.04f;
-                    float lowerY = bottom - bounds.height() * 0.04f;
-                    canvas.drawLine(startX, startY, endX, upperY, line);
-                    canvas.drawLine(startX, startY, endX, lowerY, line);
-                    canvas.drawCircle(startX, startY, nodeRadius, line);
-                    canvas.drawCircle(endX, upperY, nodeRadius, line);
-                    canvas.drawCircle(endX, lowerY, nodeRadius, line);
+                case REPORT:
+                    // A flag on a pole: something to raise.
+                    float pole = left + bounds.width() * 0.04f;
+                    canvas.drawLine(pole, top, pole, bottom, line);
+                    path.reset();
+                    path.moveTo(pole, top);
+                    path.lineTo(right, top);
+                    path.lineTo(right - bounds.width() * 0.1f, top + bounds.height() * 0.12f);
+                    path.lineTo(right, cy);
+                    path.lineTo(pole, cy);
+                    canvas.drawPath(path, line);
                     break;
-                }
+                case SUPPORT:
+                    // A cup with its handle, for the coffee.
+                    float rim = top + bounds.height() * 0.08f;
+                    float cupRight = right - bounds.width() * 0.12f;
+                    path.reset();
+                    path.moveTo(left, rim);
+                    path.lineTo(cupRight, rim);
+                    path.lineTo(cupRight, cy + bounds.height() * 0.06f);
+                    path.quadTo(cupRight, bottom, cx - bounds.width() * 0.06f, bottom);
+                    path.quadTo(left, bottom, left, cy + bounds.height() * 0.06f);
+                    path.close();
+                    canvas.drawPath(path, line);
+                    canvas.drawArc(new RectF(cupRight - bounds.width() * 0.06f, rim + bounds.height() * 0.06f,
+                            right + bounds.width() * 0.04f, cy + bounds.height() * 0.08f), -90, 180, false, line);
+                    break;
             }
         }
 
@@ -422,12 +588,22 @@ public final class SettingsMenuPreference extends Preference {
 
         @Override
         public int getIntrinsicWidth() {
-            return 40;
+            return Math.round((compact ? 24 : 40) * density);
         }
 
         @Override
         public int getIntrinsicHeight() {
-            return 40;
+            return Math.round((compact ? 24 : 40) * density);
         }
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle(L10n.t(getContext(), title));
+    }
+
+    @Override
+    public void setSummary(CharSequence summary) {
+        super.setSummary(L10n.t(getContext(), summary));
     }
 }

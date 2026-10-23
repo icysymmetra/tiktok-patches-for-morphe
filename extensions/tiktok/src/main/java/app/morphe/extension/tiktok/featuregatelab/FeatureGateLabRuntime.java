@@ -7,6 +7,8 @@ package app.morphe.extension.tiktok.featuregatelab;
 import android.net.Uri;
 import android.util.Log;
 
+import app.morphe.extension.shared.diagnostics.DiagnosticRedactor;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -15,17 +17,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.lang.reflect.Type;
+
+import app.morphe.extension.shared.settings.Setting;
 
 public final class FeatureGateLabRuntime {
     private static final String TAG = "MorpheFeatureGateLab";
     private static volatile Snapshot snapshot;
+    /** Bumped by every rule change, so a snapshot built from older rules is not published. */
+    private static final java.util.concurrent.atomic.AtomicInteger generation =
+            new java.util.concurrent.atomic.AtomicInteger();
+    /** Monitor entries, so the boundary test can show a gate read is not taking the lock. */
+    static volatile int snapshotMonitorEntries;
     private static final ThreadLocal<Boolean> buildingSnapshot = new ThreadLocal<>();
     private static final Set<String> triggered = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private static final Map<String, String> firstCallers = new ConcurrentHashMap<>();
     private static final Map<String, String> originalValues = new ConcurrentHashMap<>();
-    private static final Map<String, String> structuredFailures = new ConcurrentHashMap<>();
-    private static final Map<String, Object> observedPlayerValues = new ConcurrentHashMap<>();
+    private static final Map<String, FeatureGateFailure> structuredFailures =
+            new ConcurrentHashMap<>();
+    // Declared as the class rather than Map: putIfAbsent on the Map interface is an API 24
+    // default method D8 cannot backport, and this is read on the host's own gate threads.
+    private static final ConcurrentHashMap<String, Object> observedPlayerValues = new ConcurrentHashMap<>();
 
     private FeatureGateLabRuntime() {
     }
@@ -34,7 +47,17 @@ public final class FeatureGateLabRuntime {
         return false;
     }
 
+    /**
+     * Marks the rules changed.
+     *
+     * <p>The generation is what makes this safe against a gate thread that is already inside
+     * {@link #buildSnapshot}. Clearing the field alone was not: the builder had read the old
+     * rules, and it published them over the null a moment later, so the change stayed invisible
+     * until something happened to reload again. A builder now publishes only if the generation
+     * it started from is still current.
+     */
     public static void reloadRules() {
+        generation.incrementAndGet();
         snapshot = null;
     }
 
@@ -50,6 +73,7 @@ public final class FeatureGateLabRuntime {
         firstCallers.clear();
         originalValues.clear();
         structuredFailures.clear();
+        observedPlayerValues.clear();
     }
 
     public static boolean isTriggered(String manager, String key, String type) {
@@ -64,7 +88,7 @@ public final class FeatureGateLabRuntime {
         return originalValues.get(FeatureGateLabStore.idFor(manager, key, type));
     }
 
-    public static String structuredFailure(String manager, String key, String type) {
+    public static FeatureGateFailure structuredFailure(String manager, String key, String type) {
         return structuredFailures.get(FeatureGateLabStore.idFor(manager, key, type));
     }
 
@@ -107,13 +131,17 @@ public final class FeatureGateLabRuntime {
     }
 
     private static boolean overrideBooleanFor(String manager, String key, boolean original) {
+        FeatureGateLearnMode.observe(manager, key, "BOOLEAN", original);
         FeatureGateLabStore.Rule rule = activeRule(manager, key, "BOOLEAN");
         if (rule == null) {
             return original;
         }
-        boolean forced = Boolean.parseBoolean(rule.value);
-        markTriggered(rule, String.valueOf(original), String.valueOf(forced));
-        return forced;
+        Boolean forced = parseBoolean(rule.value);
+        if (forced == null) {
+            return original;
+        }
+        markTriggered(rule, original, forced);
+        return forced.booleanValue();
     }
 
     public static int overrideInt(String key, int original) {
@@ -129,13 +157,14 @@ public final class FeatureGateLabRuntime {
     }
 
     private static int overrideIntFor(String manager, String key, int original) {
+        FeatureGateLearnMode.observe(manager, key, "INT", original);
         FeatureGateLabStore.Rule rule = activeRule(manager, key, "INT");
         if (rule == null) {
             return original;
         }
         try {
             int forced = Integer.parseInt(rule.value);
-            markTriggered(rule, String.valueOf(original), String.valueOf(forced));
+            markTriggered(rule, original, forced);
             return forced;
         } catch (NumberFormatException ignored) {
             return original;
@@ -155,13 +184,14 @@ public final class FeatureGateLabRuntime {
     }
 
     private static long overrideLongFor(String manager, String key, long original) {
+        FeatureGateLearnMode.observe(manager, key, "LONG", original);
         FeatureGateLabStore.Rule rule = activeRule(manager, key, "LONG");
         if (rule == null) {
             return original;
         }
         try {
             long forced = Long.parseLong(rule.value);
-            markTriggered(rule, String.valueOf(original), String.valueOf(forced));
+            markTriggered(rule, original, forced);
             return forced;
         } catch (NumberFormatException ignored) {
             return original;
@@ -181,6 +211,7 @@ public final class FeatureGateLabRuntime {
     }
 
     private static float overrideFloatFor(String manager, String key, float original) {
+        FeatureGateLearnMode.observe(manager, key, "FLOAT", original);
         FeatureGateLabStore.Rule rule = activeRule(manager, key, "FLOAT");
         if (rule == null) {
             return original;
@@ -190,7 +221,7 @@ public final class FeatureGateLabRuntime {
             if (!Float.isFinite(forced)) {
                 return original;
             }
-            markTriggered(rule, String.valueOf(original), String.valueOf(forced));
+            markTriggered(rule, original, forced);
             return forced;
         } catch (NumberFormatException ignored) {
             return original;
@@ -206,6 +237,7 @@ public final class FeatureGateLabRuntime {
     }
 
     private static double overrideDoubleFor(String manager, String key, double original) {
+        FeatureGateLearnMode.observe(manager, key, "DOUBLE", original);
         FeatureGateLabStore.Rule rule = activeRule(manager, key, "DOUBLE");
         if (rule == null) {
             return original;
@@ -215,7 +247,7 @@ public final class FeatureGateLabRuntime {
             if (!Double.isFinite(forced)) {
                 return original;
             }
-            markTriggered(rule, String.valueOf(original), String.valueOf(forced));
+            markTriggered(rule, original, forced);
             return forced;
         } catch (NumberFormatException ignored) {
             return original;
@@ -235,6 +267,7 @@ public final class FeatureGateLabRuntime {
     }
 
     public static Object overrideRawAbValue(String key, Object original, boolean returnStringForObject) {
+        FeatureGateLearnMode.observe(FeatureGateLabStore.MANAGER_ABMOCK, key, "RAW", original);
         if (returnStringForObject) {
             return original;
         }
@@ -244,7 +277,7 @@ public final class FeatureGateLabRuntime {
             if (original != null) {
                 return original;
             }
-            rule = uniqueActiveAbRule(key);
+            rule = catalogAgrees(key, uniqueActiveAbRule(key));
         } else {
             rule = activeRule(FeatureGateLabStore.MANAGER_ABMOCK, key, type);
         }
@@ -255,11 +288,12 @@ public final class FeatureGateLabRuntime {
         if (forced == null) {
             return original;
         }
-        markTriggered(rule, original == null ? "null" : String.valueOf(original), String.valueOf(forced));
+        markTriggered(rule, original, forced);
         return forced;
     }
 
     public static Object overridePlayerValue(String key, Type declaredType, Object original) {
+        FeatureGateLearnMode.observe(FeatureGateLabStore.MANAGER_PLAYER_CONFIG, key, String.valueOf(declaredType), original);
         String type = scalarTypeOf(declaredType, original);
         if (type == null || key == null) {
             return original;
@@ -279,7 +313,7 @@ public final class FeatureGateLabRuntime {
         if (forced == null) {
             return original;
         }
-        markTriggered(rule, original == null ? "null" : String.valueOf(original), String.valueOf(forced));
+        markTriggered(rule, original, forced);
         return forced;
     }
 
@@ -372,10 +406,6 @@ public final class FeatureGateLabRuntime {
         return SettingsManagerObservationRecorder.exportJson();
     }
 
-    public static int settingsManagerObservationCount() {
-        return SettingsManagerObservationRecorder.size();
-    }
-
     private static Object overrideSettingsObject(
             String key,
             Class<?> requestedClass,
@@ -437,14 +467,33 @@ public final class FeatureGateLabRuntime {
         return value == null ? null : String.valueOf(value);
     }
 
+    /*
+     * DataCenter's two lookups, found once. The Lab sits on TikTok's LIVE settings getter, which
+     * is on by default and runs whenever LIVE reads a setting, and each read used to load the
+     * class by name and look the method up again, twice. A missing class or method is kept as
+     * missing, so it is not asked for again either.
+     */
+    private static final Object NO_METHOD = new Object();
+    private static final ConcurrentHashMap<String, Object> DATA_CENTER_METHODS = new ConcurrentHashMap<>();
+
     private static Object liveObjectForClass(String methodName, Class<?> requestedClass) {
+        Object method = DATA_CENTER_METHODS.get(methodName);
+        if (method == null) {
+            try {
+                Class<?> dataCenter = Class.forName(
+                        "com.bytedance.android.live_settings.DataCenter",
+                        false,
+                        FeatureGateLabRuntime.class.getClassLoader()
+                );
+                method = dataCenter.getMethod(methodName, Class.class);
+            } catch (Throwable missing) {
+                method = NO_METHOD;
+            }
+            DATA_CENTER_METHODS.put(methodName, method);
+        }
+        if (method == NO_METHOD) return null;
         try {
-            Class<?> dataCenter = Class.forName(
-                    "com.bytedance.android.live_settings.DataCenter",
-                    false,
-                    FeatureGateLabRuntime.class.getClassLoader()
-            );
-            return dataCenter.getMethod(methodName, Class.class).invoke(null, requestedClass);
+            return ((java.lang.reflect.Method) method).invoke(null, requestedClass);
         } catch (Throwable ignored) {
             return null;
         }
@@ -499,6 +548,7 @@ public final class FeatureGateLabRuntime {
     }
 
     private static String overrideStringFor(String manager, String key, String original) {
+        FeatureGateLearnMode.observe(manager, key, "STRING", original);
         FeatureGateLabStore.Rule rule = activeRule(manager, key, "STRING");
         if (rule == null) {
             return original;
@@ -511,15 +561,19 @@ public final class FeatureGateLabRuntime {
         try {
             switch (rule.type) {
                 case "BOOLEAN":
-                    return Boolean.parseBoolean(rule.value);
+                    return parseBoolean(rule.value);
                 case "INT":
                     return Integer.parseInt(rule.value);
                 case "LONG":
                     return Long.parseLong(rule.value);
-                case "FLOAT":
-                    return Float.parseFloat(rule.value);
-                case "DOUBLE":
-                    return Double.parseDouble(rule.value);
+                case "FLOAT": {
+                    float value = Float.parseFloat(rule.value);
+                    return Float.isFinite(value) ? value : null;
+                }
+                case "DOUBLE": {
+                    double value = Double.parseDouble(rule.value);
+                    return Double.isFinite(value) ? value : null;
+                }
                 case "STRING":
                     return rule.value;
                 default:
@@ -534,7 +588,7 @@ public final class FeatureGateLabRuntime {
         try {
             switch (rule.type) {
                 case "BOOLEAN":
-                    return Boolean.valueOf(rule.value);
+                    return parseBoolean(rule.value);
                 case "INT":
                     return Integer.valueOf(rule.value);
                 case "LONG":
@@ -571,6 +625,13 @@ public final class FeatureGateLabRuntime {
         return parsed;
     }
 
+    private static Boolean parseBoolean(String value) {
+        if (!"true".equalsIgnoreCase(value) && !"false".equalsIgnoreCase(value)) {
+            return null;
+        }
+        return Boolean.valueOf(value);
+    }
+
     private static String scalarTypeOf(Object value) {
         if (value instanceof Boolean) return "BOOLEAN";
         if (value instanceof Integer) return "INT";
@@ -593,6 +654,84 @@ public final class FeatureGateLabRuntime {
         if (declaredType == Float.TYPE || declaredType == Float.class) return "FLOAT";
         if (declaredType == Double.TYPE || declaredType == Double.class) return "DOUBLE";
         if (declaredType == String.class) return "STRING";
+        return null;
+    }
+
+    /** So the background catalogue load below is asked for once in a process, not per read. */
+    private static final AtomicBoolean catalogRequested = new AtomicBoolean();
+
+    /** Puts a test back on a process that has not asked for the catalogue yet. */
+    static void clearCatalogRequestForTests() {
+        catalogRequested.set(false);
+    }
+
+    /**
+     * Refuses a rule whose type the catalogue disagrees with.
+     *
+     * <p>Only the null-cached path needs this. Everywhere else the value TikTok already holds
+     * names the type, and the rule is looked up by it; here there is nothing to check against,
+     * so a rule matched by key alone can hand the host a String where its caller casts to a
+     * Number, and the ClassCastException lands in TikTok's own frame.
+     *
+     * <p>Nothing but the Lab's own screen used to load the catalogue, so on a fresh launch this
+     * check could not refuse anything until that screen was opened, which is the case it exists
+     * for. Reaching it with nothing cached now asks for the catalogue in the background and takes
+     * the rule as it stands this once; every later read has something to check against. The load
+     * is asked for only where a rule of this shape exists, so a phone with no AB rules saved
+     * never pays for it, and only once per process either way.
+     */
+    private static FeatureGateLabStore.Rule catalogAgrees(String key, FeatureGateLabStore.Rule rule) {
+        if (rule == null) {
+            return null;
+        }
+        // One string per AB key rather than the whole 16,052 entry snapshot. This runs on a
+        // launch where the Lab screen may never be opened, and whatever it holds it holds for
+        // the life of the process. The Lab screen still loads the snapshot, and that fills this.
+        Map<String, String> catalogTypes = FeatureGateCatalog.cachedAbTypes();
+        if (catalogTypes == null) {
+            if (catalogRequested.compareAndSet(false, true)) {
+                // Nothing to do when it lands: the next read reads the map it fills.
+                FeatureGateCatalog.loadAbTypesAsync(new FeatureGateCatalog.AbTypesCallback() {
+                    @Override public void onLoaded(Map<String, String> abTypes) { }
+
+                    @Override public void onError(String message) {
+                        // Let the next read ask again. Left set, one failed load would have put
+                        // the process back to where it was before this existed, silently.
+                        catalogRequested.set(false);
+                        Log.w(TAG, DiagnosticRedactor.redact(
+                                "catalog load for the AB fallback failed: " + message));
+                    }
+                });
+            }
+            return rule;
+        }
+        String catalogType = catalogTypes.get(key);
+        if (catalogType == null) {
+            return refuse(rule, FeatureGateFailure.of(
+                    FeatureGateFailure.Reason.NOT_IN_CATALOGUE));
+        }
+        if (!FeatureGateLabStore.normalizeType(catalogType)
+                .equals(FeatureGateLabStore.normalizeType(rule.type))) {
+            return refuse(rule, FeatureGateFailure.of(
+                    FeatureGateFailure.Reason.TYPE_MISMATCH, catalogType, rule.type));
+        }
+        structuredFailures.remove(rule.id);
+        return rule;
+    }
+
+    /**
+     * Records why a rule was not used, and says so in the log.
+     *
+     * <p>The record is filed under the rule's own identity, which includes the type the rule
+     * carries. The detail screen looks a rule up by the catalogue's type, so for the one refusal
+     * that is about a type disagreeing it finds no rule at all and says the gate is using
+     * TikTok's value. The log line is the only place this is visible, which is why it is here.
+     */
+    private static FeatureGateLabStore.Rule refuse(FeatureGateLabStore.Rule rule,
+            FeatureGateFailure reason) {
+        structuredFailures.put(rule.id, reason);
+        Log.i(TAG, DiagnosticRedactor.redact("refused manager=" + rule.manager + " key=" + rule.key
+                + " type=" + rule.type + " reason=" + reason.text()));
         return null;
     }
 
@@ -638,46 +777,85 @@ public final class FeatureGateLabRuntime {
     }
 
     private static Snapshot currentSnapshot() {
+        int wanted = generation.get();
         Snapshot current = snapshot;
-        if (current != null) {
+        if (current != null && current.generation == wanted && usable(current)) {
             return current;
         }
         if (Boolean.TRUE.equals(buildingSnapshot.get())) {
             return null;
         }
         synchronized (FeatureGateLabRuntime.class) {
+            snapshotMonitorEntries++;
+            wanted = generation.get();
             current = snapshot;
-            if (current == null) {
-                buildingSnapshot.set(Boolean.TRUE);
-                try {
-                    current = buildSnapshot();
-                    if (current != null) {
-                        snapshot = current;
-                    }
-                } finally {
-                    buildingSnapshot.remove();
+            if (current != null && current.generation == wanted && usable(current)) {
+                return current;
+            }
+            buildingSnapshot.set(Boolean.TRUE);
+            try {
+                current = buildSnapshot(wanted);
+                // Only if nothing changed the rules while they were being read. Otherwise this
+                // would put the rules it started from back over a change that has already
+                // happened, and that change would not be seen until the next reload.
+                //
+                // This and the generation comparison on the read path above cover each other:
+                // remove either one alone and the tests still pass, because the other catches
+                // the stale snapshot. The read path is the one that has to be right; this one
+                // saves a rebuild by not caching what is already known to be out of date.
+                if (generation.get() == wanted) {
+                    snapshot = current;
                 }
+            } finally {
+                buildingSnapshot.remove();
             }
         }
         return current;
     }
 
-    private static Snapshot buildSnapshot() {
+    /**
+     * Whether a cached snapshot can still be served without rebuilding.
+     *
+     * <p>A snapshot built before TikTok gave the extension a context carries no rules and is
+     * cached anyway, so process start does not put every gate read on every thread through the
+     * monitor. It stops being usable the moment storage appears, which is one static read.
+     */
+    private static boolean usable(Snapshot current) {
+        return !current.unavailable || !FeatureGateLabStore.runtimeStorageAvailable();
+    }
+
+    private static Snapshot buildSnapshot(int builtAt) {
         if (!FeatureGateLabStore.runtimeStorageAvailable()) {
-            return null;
+            // Not null: a null was rebuilt on every read, and every one of those took the class
+            // monitor, at the point in start-up where the host reads gates hardest.
+            return new Snapshot(builtAt, true, false, Collections.emptyMap());
         }
         Map<String, FeatureGateLabStore.Rule> active = new HashMap<>();
-        for (FeatureGateLabStore.Rule rule : FeatureGateLabStore.rules()) {
+        // Rules another TikTok build saved wait until the main process has checked them against
+        // this build's catalog. A secondary process opens the store without doing that.
+        boolean forThisBuild = FeatureGateLabStore.storedForRunningBuild();
+        for (FeatureGateLabStore.Rule rule : forThisBuild
+                ? FeatureGateLabStore.rules() : Collections.<FeatureGateLabStore.Rule>emptyList()) {
             if (rule.enabled && FeatureGateLabStore.supportsOverride(rule.manager, rule.type)) {
                 active.put(identity(rule.manager, rule.key, rule.type), rule);
             }
         }
-        boolean masterEnabled = FeatureGateLabStore.masterEnabled();
-        Log.i(TAG, "snapshot master=" + masterEnabled
+        // The Lab's master switch lives in its own store, outside the settings Pause Hushfeed
+        // answers for, so a paused process turns it off here.
+        boolean masterEnabled = FeatureGateLabStore.masterEnabled() && !Setting.isPaused();
+        Log.i(TAG, DiagnosticRedactor.redact("snapshot master=" + masterEnabled
                 + " active_rules=" + active.size()
-                + " identities=" + summarizeRules(active));
-        return new Snapshot(masterEnabled, Collections.unmodifiableMap(active));
+                + " identities=" + summarizeRules(active)));
+        // Between reading the rules above and returning, a save on another thread may have
+        // already moved the generation on. The publisher checks that; this seam exists so a
+        // test can create that overlap deterministically.
+        Runnable overlap = rulesReadHook;
+        if (overlap != null) overlap.run();
+        return new Snapshot(builtAt, false, masterEnabled, Collections.unmodifiableMap(active));
     }
+
+    /** Runs inside a snapshot build, after the rules are read. Set only by tests. */
+    static volatile Runnable rulesReadHook;
 
     private static String summarizeRules(Map<String, FeatureGateLabStore.Rule> rules) {
         if (rules.isEmpty()) {
@@ -697,41 +875,35 @@ public final class FeatureGateLabRuntime {
         return manager + "\n" + key + "\n" + FeatureGateLabStore.normalizeType(type);
     }
 
-    private static void markTriggered(FeatureGateLabStore.Rule rule, String original, String forced) {
-        originalValues.put(rule.id, original == null ? "null" : original);
+    /**
+     * Records that a rule replaced a value, on every read the rule answers.
+     *
+     * <p>Takes the values rather than their text: this runs on the host's gate threads, and the
+     * forced value is only ever read by the line logged once per rule below. The original is
+     * still written every time, because the detail screen calls it the <em>last</em> original
+     * value, but only when it differs from what is already there, which for a gate read over and
+     * over with the same original is never after the first.
+     */
+    private static void markTriggered(FeatureGateLabStore.Rule rule, Object original, Object forced) {
+        String originalText = original == null ? "null" : String.valueOf(original);
+        if (!originalText.equals(originalValues.get(rule.id))) {
+            originalValues.put(rule.id, originalText);
+        }
         if (!triggered.add(rule.id)) {
             return;
         }
         String caller = findCaller();
         firstCallers.put(rule.id, caller);
-        Log.i(TAG, "manager=" + rule.manager
+        Log.i(TAG, DiagnosticRedactor.redact("manager=" + rule.manager
                 + " key=" + rule.key
                 + " type=" + rule.type
-                + " original=" + safeLog(original)
-                + " forced=" + safeLog(forced)
-                + " caller=" + caller);
+                + " original=" + safeLog(originalText)
+                + " forced=" + safeLog(String.valueOf(forced))
+                + " caller=" + caller));
     }
 
     private static String findCaller() {
-        for (StackTraceElement frame : Thread.currentThread().getStackTrace()) {
-            String className = frame.getClassName();
-            if (className.startsWith("app.morphe.extension.tiktok.featuregatelab")
-                    || className.startsWith("java.lang.Thread")
-                    || className.startsWith("dalvik.system.VMStack")
-                    || className.equals("X.0BPv")
-                    || className.equals("X.0BPb")
-                    || className.equals("X.0BP8")
-                    || className.equals("X.090T")
-                    || className.equals("X.0b13")
-                    || className.equals("com.bytedance.ies.abmock.SettingsManager")
-                    || className.equals("com.bytedance.android.live_settings.SettingsManager")
-                    || className.equals("com.ss.android.vesdk.VEConfigCenter")
-                    || className.equals("com.ss.android.ugc.aweme.video.simplayer.PlayerSettingServiceImpl")) {
-                continue;
-            }
-            return className + "#" + frame.getMethodName();
-        }
-        return "unknown";
+        return GateCallers.hostCaller(Thread.currentThread().getStackTrace());
     }
 
     private static String safeLog(String value) {
@@ -743,10 +915,17 @@ public final class FeatureGateLabRuntime {
     }
 
     private static final class Snapshot {
+        /** The rule generation this was built from. */
+        final int generation;
+        /** True when it was built with no context, so it holds no rules and stands in for null. */
+        final boolean unavailable;
         final boolean masterEnabled;
         final Map<String, FeatureGateLabStore.Rule> rules;
 
-        Snapshot(boolean masterEnabled, Map<String, FeatureGateLabStore.Rule> rules) {
+        Snapshot(int generation, boolean unavailable, boolean masterEnabled,
+                Map<String, FeatureGateLabStore.Rule> rules) {
+            this.generation = generation;
+            this.unavailable = unavailable;
             this.masterEnabled = masterEnabled;
             this.rules = rules;
         }

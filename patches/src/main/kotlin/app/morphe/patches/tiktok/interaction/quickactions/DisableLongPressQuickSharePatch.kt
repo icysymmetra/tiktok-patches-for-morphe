@@ -4,26 +4,32 @@
  */
 package app.morphe.patches.tiktok.interaction.quickactions
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.util.addInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
+import app.morphe.patches.tiktok.misc.settings.settingsPatch
+import app.morphe.util.addInstructionsAtControlFlowLabel
+import app.morphe.util.findInstructionIndicesReversedOrThrow
 import app.morphe.util.indexOfFirstInstructionOrThrow
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val FEATURE_CONTROLS_DESCRIPTOR =
     "Lapp/morphe/extension/tiktok/featurecontrols/FeatureControls;"
 
 @Suppress("unused")
 val disableLongPressQuickSharePatch = bytecodePatch(
-    name = "Disable long-press quick share",
-    description = "Keeps long-pressing Share from opening TikTok's quick-share interaction.",
+    name = "Disable the long press quick share",
+    description = "Stops a long press on Share from opening TikTok's quick share, so you don't send a video by accident. Starts off. Turn it on in Metra settings > Interface.",
     default = true,
 ) {
-    dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    category("Interaction")
+    dependsOn(settingsPatch, sharedExtensionPatch)
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
@@ -32,17 +38,25 @@ val disableLongPressQuickSharePatch = bytecodePatch(
                 "Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableDisableLongPressQuickShare()V",
         )
 
-        LongPressQuickShareGateFingerprint.method.apply {
-            val returnIndex = indexOfFirstInstructionOrThrow {
-                opcode == Opcode.RETURN
+        resolveLongPressQuickShareGate().apply {
+            // The register the gate is actually returning in, and every return of it. v0 was
+            // right only because this compiles to a single register today, and nothing said so.
+            findInstructionIndicesReversedOrThrow { opcode == Opcode.RETURN }.forEach { returnIndex ->
+                val gateRegister = getInstruction<OneRegisterInstruction>(returnIndex).registerA
+                if (gateRegister > 15) {
+                    throw PatchException(
+                        "Long press quick share: the gate returns in v$gateRegister, which a " +
+                            "plain invoke cannot name.",
+                    )
+                }
+                addInstructionsAtControlFlowLabel(
+                    returnIndex,
+                    """
+                        invoke-static {v$gateRegister}, $FEATURE_CONTROLS_DESCRIPTOR->overrideLongPressQuickShare(I)I
+                        move-result v$gateRegister
+                    """,
+                )
             }
-            addInstructions(
-                returnIndex,
-                """
-                    invoke-static {v0}, $FEATURE_CONTROLS_DESCRIPTOR->overrideLongPressQuickShare(I)I
-                    move-result v0
-                """,
-            )
         }
     }
 }

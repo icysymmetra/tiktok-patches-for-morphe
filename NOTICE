@@ -1,15 +1,27 @@
-Morphe NOTICE
-=============
+Hushfeed NOTICE
+===============
 
-This file contains Section 7 notices of the GNU General Public License v3
-as they apply to Morphe code. These notices apply to all code authored by
-Morphe, including any modifications of code that may have originated
-outside this repository, and do not change the terms of the GPLv3 license.
-For the full license text, see the LICENSE file or:
+This file contains Section 7 notices of the GNU General Public License v3 as
+they apply to the code in this repository and to the upstream projects it is
+derived from. These notices do not change the terms of the GPLv3 licence. For
+the full licence text, see the LICENSE file or:
 https://www.gnu.org/licenses/gpl-3.0.html
 
-7c. Project Name Restriction
-----------------------------
+Hushfeed is built on icysymmetra/tiktok-patches-for-morphe, which is built on
+Morphe, which hard forked ReVanced. The notices below are reproduced from those
+projects. Morphe requires its text to be carried in derivative works and shown
+to the person using the software, so it is also reachable in the app itself,
+under Settings, About, Licenses.
+
+  Hushfeed                https://github.com/SysAdminDoc/hushfeed
+  tiktok-patches-for-morphe  https://github.com/icysymmetra/tiktok-patches-for-morphe
+  morphe-patches          https://github.com/MorpheApp/morphe-patches
+  morphe-patches-library  https://github.com/MorpheApp/morphe-patches-library
+  ReVanced                https://gitlab.com/ReVanced/revanced-patches
+
+
+Hushfeed: Project Name Restriction
+----------------------------------
 
 This license does not grant permission to use the name "Morphe", or any name, logo, or branding that is confusingly similar, as the name or primary identifying mark of any modified version, fork, or derivative work.
 
@@ -20,3 +32,105 @@ References to Morphe are permitted solely for descriptive compatibility purposes
 - Are accurate, factual, and non-misleading;
 - Do not suggest authorship by the Morphe project; and
 - Appear only in a secondary or descriptive context, not as part of the product or project name.
+
+
+Morphe NOTICE
+
+https://github.com/MorpheApp/morphe-patches
+
+=============
+
+GPLv3 Section 7b: Preservation of User Notices
+
+All derivative works (source code and binaries) must include this
+NOTICE text and provide it to the software user.
+
+Portions of this software are provided "AS IS" by the Morphe software project.
+Any express or implied warranties, including the implied warranties of
+merchantability and fitness for a particular purpose, are disclaimed.
+
+
+GPLv3 Section 7c: Prohibiting Misrepresentation of Origin
+
+You are prohibited from misrepresenting the origin of the Program,
+and modified versions of the Program must be identified and marked in
+reasonable ways as different from the original version so as not to cause
+confusion regarding their origin.
+
+
+GPLv3 Section 7e: Declining Grant of Trademark Rights
+
+This License does not grant any rights or permission under trademark law
+to use the name "Morphe" or any of the Program's trade names, trademarks,
+service marks, or logos.
+
+
+Morphe NOTICE
+
+https://github.com/MorpheApp/morphe-patches-library
+
+=============
+
+Portions of this software are provided "AS IS" by the Morphe software project.
+Any express or implied warranties, including the implied warranties of
+merchantability and fitness for a particular purpose, are disclaimed.
+
+
+GPLv3 Section 7c: Prohibiting Misrepresentation of Origin
+
+You are prohibited from misrepresenting the origin of the Program,
+and modified versions of the Program must be identified and marked in
+reasonable ways as different from the original version so as not to cause
+confusion regarding their origin.
+
+
+GPLv3 Section 7e: Declining Grant of Trademark Rights
+
+This License does not grant any rights or permission under trademark law
+to use the name "Morphe" or any of the Program's trade names, trademarks,
+service marks, or logos.
+
+Unicode CLDR 48 integer cardinal plural rules
+Copyright © 1991-2025 Unicode, Inc.
+Source: https://github.com/unicode-org/cldr/blob/acd6d88ae493633240e19a87a721076a8a75c310/common/supplemental/plurals.xml
+UNICODE LICENSE V3
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright © 2004-2025 Unicode, Inc.
+
+NOTICE TO USER: Carefully read the following legal agreement. BY
+DOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING DATA FILES, AND/OR
+SOFTWARE, YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, ALL OF THE
+TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT
+DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of data files and any associated documentation (the "Data Files") or
+software and any associated documentation (the "Software") to deal in the
+Data Files or Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, and/or sell
+copies of the Data Files or Software, and to permit persons to whom the
+Data Files or Software are furnished to do so, provided that either (a)
+this copyright and permission notice appear with all copies of the Data
+Files or Software, or (b) this copyright and permission notice appear in
+associated Documentation.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF
+THIRD PARTY RIGHTS.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE
+BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES,
+OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE DATA
+FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder shall
+not be used in advertising or otherwise to promote the sale, use or other
+dealings in these Data Files or Software without prior written
+authorization of the copyright holder.
+
+SPDX-License-Identifier: Unicode-3.0

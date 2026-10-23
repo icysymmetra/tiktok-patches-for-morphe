@@ -1,5 +1,6 @@
 # Gradle files
 .gradle/
+.kotlin/
 build/
 !patches/src/main/kotlin/app/morphe/patches/all/misc/build/
 !patches/src/main/kotlin/app/morphe/patches/all/misc/build/**
@@ -37,6 +38,11 @@ google-services.json
 
 # NPM modules
 node_modules/
+
+# Local Python caches and generated release receipts
+__pycache__/
+*.pyc
+release-receipt-*.json
 
 # Legacy local graph metadata; Codebase Memory uses an external cache
 .codegraph/

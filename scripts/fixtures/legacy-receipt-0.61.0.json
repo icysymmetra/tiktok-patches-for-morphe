@@ -1,0 +1,1033 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-27T01:08:22Z",
+  "release": {
+    "version": "0.61.0",
+    "tag": "v0.61.0",
+    "commit": "5abaa467107e28e6800637718a1270d3635210d8",
+    "commitTimestamp": 1790470579,
+    "patchCount": 96
+  },
+  "bundle": {
+    "file": "bundle-0.61.0.mpp",
+    "sizeBytes": 3474133,
+    "sha256": "94D61FFC416C5F961B3633570553FF78D428D65037274C52CC9BABF3B6C78BAE",
+    "timestamp": 1790470579000
+  },
+  "toolchain": {
+    "patcherVersion": "1.13.0",
+    "managerFloor": "1.30.0"
+  },
+  "extension": {
+    "dexPayloads": [
+      {
+        "name": "extensions/shared.mpe",
+        "sizeBytes": 182992,
+        "sha256": "34BBEF1A69E1831E08564B345D1DBF0795CDE1CA927E11AA6CD0EB5E5DA38436"
+      },
+      {
+        "name": "extensions/tiktok.mpe",
+        "sizeBytes": 2379696,
+        "sha256": "F111E7345812BC2B0BB8DD95262EDB97CAB20EB108C51E1E1046F46B95DED3E2"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "source": {
+        "file": "com.zhiliaoapp.musically_47.0.3-2024700030_minAPI23(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk",
+        "package": "com.zhiliaoapp.musically",
+        "versionName": "47.0.3",
+        "versionCode": "2024700030",
+        "sha256": "F4D853F6CCAF145A9B5F106B8E63767E2345E17AE829B6CC6B272FDF0161389C",
+        "forced": false
+      },
+      "patches": [
+        {
+          "name": "AMOLED dark theme",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Advanced downloads",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Allow Duet and Stitch",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Allow screenshots and Circle to Search",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Always show publish date",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Automatic video advance",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block P2P video relay",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block author button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block contact list access",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block installed app scanning",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Camera and microphone indicator",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment publish diagnostics",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment send fix",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment sort controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Confirm feed interactions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Copy comments without username",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Custom offline videos limit",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Device privacy guard",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Diagnostic tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable login requirement",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable screen capture detection",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable telemetry",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable the long press quick share",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable the long press repost",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Double-tap controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Downloads",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Drop the animated image cache",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Enable voice comments",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Expand activity list",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feature Gate Lab",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feature Gate Recorder",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feed filter",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feed tab navigation",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Fit the video to the screen",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Fix Google login",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Foldable split comment view",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Follow diagnostics",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Ghost mode",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide CAPTCHA popups",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide Play Store update offer",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide already seen videos",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide comment popup ads",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide comment typing suggestions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed LIVE button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed follow button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed save button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed search button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide floating promotions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide inbox items",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide inbox stories",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide search suggestions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide suggested accounts",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide the launcher shortcuts",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide the risk control CAPTCHA",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide video overlays",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hold-and-slide 2x lock",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "In-app browser privacy guard",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Keep the Favorites tab",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Keep the screen's refresh rate",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Limit background traffic",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Location access governor",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Long-press controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Network request report",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Not interested button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Notification controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Open external links directly",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Playback quality",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Playback speed",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Region spoof",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remember clear display",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove LIVE extras",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove content credential and card scanner assets",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove creation tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove unused language packs",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Repost diagnostics",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Resource and battery governor",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Resume videos after scrolling",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "SIM spoof",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Sanitize sharing links",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Settings",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Share sheet tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show LIVE search",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show author region",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show the progress bar",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show the progress bar thumbnail",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Skip content warnings",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Skip the splash ad",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Skip update checks",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Stop on-device AI profiling",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Stop video looping",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Subtitle tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Swipe-left controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Translate comments",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Use non-personalized search",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Use system font",
+          "applied": true,
+          "reason": null
+        }
+      ],
+      "manifestDelta": {
+        "permissionsAdded": [],
+        "permissionsRemoved": [],
+        "exportedComponentsAdded": [],
+        "exportedComponentsRemoved": []
+      }
+    },
+    {
+      "source": {
+        "file": "tiktok-47.1.3.apk",
+        "package": "com.zhiliaoapp.musically",
+        "versionName": "47.1.3",
+        "versionCode": "2024701030",
+        "sha256": "8B5569F592A5534652AE460EF1D9E7F7394B5B7FDDE44AE64F106D76767E2622",
+        "forced": false
+      },
+      "patches": [
+        {
+          "name": "AMOLED dark theme",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Advanced downloads",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Allow Duet and Stitch",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Allow screenshots and Circle to Search",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Always show publish date",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Automatic video advance",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block P2P video relay",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block author button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block contact list access",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Block installed app scanning",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Camera and microphone indicator",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment publish diagnostics",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment send fix",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment sort controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Comment tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Confirm feed interactions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Copy comments without username",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Custom offline videos limit",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Device privacy guard",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Diagnostic tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable login requirement",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable screen capture detection",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable telemetry",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable the long press quick share",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Disable the long press repost",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Double-tap controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Downloads",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Drop the animated image cache",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Enable voice comments",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Expand activity list",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feature Gate Lab",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feature Gate Recorder",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feed filter",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Feed tab navigation",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Fit the video to the screen",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Fix Google login",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Foldable split comment view",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Follow diagnostics",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Ghost mode",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide CAPTCHA popups",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide Play Store update offer",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide already seen videos",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide comment popup ads",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide comment typing suggestions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed LIVE button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed follow button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed save button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide feed search button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide floating promotions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide inbox items",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide inbox stories",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide search suggestions",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide suggested accounts",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide the launcher shortcuts",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide the risk control CAPTCHA",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hide video overlays",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Hold-and-slide 2x lock",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "In-app browser privacy guard",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Keep the Favorites tab",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Keep the screen's refresh rate",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Limit background traffic",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Location access governor",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Long-press controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Network request report",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Not interested button",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Notification controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Open external links directly",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Playback quality",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Playback speed",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Region spoof",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remember clear display",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove LIVE extras",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove content credential and card scanner assets",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove creation tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Remove unused language packs",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Repost diagnostics",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Resource and battery governor",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Resume videos after scrolling",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "SIM spoof",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Sanitize sharing links",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Settings",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Share sheet tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show LIVE search",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show author region",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show the progress bar",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Show the progress bar thumbnail",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Skip content warnings",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Skip the splash ad",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Skip update checks",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Stop on-device AI profiling",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Stop video looping",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Subtitle tools",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Swipe-left controls",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Translate comments",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Use non-personalized search",
+          "applied": true,
+          "reason": null
+        },
+        {
+          "name": "Use system font",
+          "applied": true,
+          "reason": null
+        }
+      ],
+      "manifestDelta": {
+        "permissionsAdded": [],
+        "permissionsRemoved": [],
+        "exportedComponentsAdded": [],
+        "exportedComponentsRemoved": []
+      }
+    }
+  ]
+}

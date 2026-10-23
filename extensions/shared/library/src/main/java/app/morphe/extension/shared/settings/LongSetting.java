@@ -1,10 +1,16 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared.settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -45,11 +51,6 @@ public class LongSetting extends Setting<Long> {
     }
 
     @Override
-    protected Long readFromJSON(JSONObject json, String importExportKey) throws JSONException {
-        return json.getLong(importExportKey);
-    }
-
-    @Override
     protected void setValueFromString(@NonNull String newValue) {
         value = Long.valueOf(Objects.requireNonNull(newValue));
     }
@@ -57,11 +58,5 @@ public class LongSetting extends Setting<Long> {
     @Override
     public void saveToPreferences() {
         preferences.saveLongString(key, value);
-    }
-
-    @NonNull
-    @Override
-    public Long get() {
-        return value;
     }
 }

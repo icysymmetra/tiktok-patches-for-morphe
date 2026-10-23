@@ -34,7 +34,11 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew :patches:buildAndroid generatePatchesList clean
+        run: |
+          ./gradlew :patches:buildAndroid generatePatchesList clean --console=plain || {
+            find . -path '*/dependency-verification/*/dependency-verification-report.html' -type f -exec cat {} \;
+            exit 1
+          }
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
