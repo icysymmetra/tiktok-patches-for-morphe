@@ -40,6 +40,31 @@ jobs:
             exit 1
           }
 
+      - name: Capture official Patcher verification inputs
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("gradle/libs.versions.toml", "rb"))["versions"]["morphe-patcher"])')
+          destination="$RUNNER_TEMP/patcher-verification"
+          mkdir -p "$destination"
+          for extension in module pom jar; do
+            filename="morphe-patcher-$version.$extension"
+            curl --fail --silent --show-error --location --max-time 60 \
+              --user "$GITHUB_ACTOR:$GITHUB_TOKEN" \
+              "https://maven.pkg.github.com/MorpheApp/registry/app/morphe/morphe-patcher/$version/$filename" \
+              --output "$destination/$filename"
+          done
+          sha256sum "$destination"/*
+
+      - name: Upload Patcher verification inputs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: patcher-verification
+          path: ${{ runner.temp }}/patcher-verification
+          retention-days: 3
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
