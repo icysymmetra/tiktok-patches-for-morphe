@@ -1,3 +1,11 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared.settings.preference;
 
 import android.annotation.SuppressLint;
@@ -35,17 +43,30 @@ public class SharedPrefCategory {
 
     private void removeConflictingPreferenceKeyValue(@NonNull String key) {
         Logger.printException(() -> "Found conflicting preference: " + key);
-        removeKey(key);
+        try {
+            removeKey(key);
+        } catch (RuntimeException failure) {
+            Logger.printException(() -> "Could not remove conflicting preference: " + key, failure);
+        }
+    }
+
+    private boolean canWrite() {
+        if (Utils.isMainProcess()) return true;
+        Logger.printInfo(() -> "Ignored persistent write from a secondary process: " + name);
+        return false;
     }
 
     @SuppressLint("ApplySharedPref") // Must use commit to ensure default value is not saved to preferences.
     private void saveObjectAsString(@NonNull String key, @Nullable Object value) {
-        preferences.edit().putString(key, (value == null ? null : value.toString())).commit();
+        if (!canWrite()) return;
+        requireCommit(key,
+                preferences.edit().putString(key, (value == null ? null : value.toString())).commit());
     }
 
     @SuppressLint("ApplySharedPref") // Must use commit to ensure default value is not saved to preferences.
     public void clear() {
-        preferences.edit().clear().commit();
+        if (!canWrite()) return;
+        requireCommit("all values", preferences.edit().clear().commit());
     }
 
     /**
@@ -53,12 +74,20 @@ public class SharedPrefCategory {
      */
     @SuppressLint("ApplySharedPref") // Must use commit to ensure default value is not saved to preferences.
     public void removeKey(@NonNull String key) {
-        preferences.edit().remove(Objects.requireNonNull(key)).commit();
+        if (!canWrite()) return;
+        requireCommit(key, preferences.edit().remove(Objects.requireNonNull(key)).commit());
     }
 
     @SuppressLint("ApplySharedPref") // Must use commit to ensure default value is not saved to preferences.
     public void saveBoolean(@NonNull String key, boolean value) {
-        preferences.edit().putBoolean(key, value).commit();
+        if (!canWrite()) return;
+        requireCommit(key, preferences.edit().putBoolean(key, value).commit());
+    }
+
+    private void requireCommit(@NonNull String key, boolean committed) {
+        if (!committed) {
+            throw new IllegalStateException("Could not persist preference " + key + " in " + name);
+        }
     }
 
     /**

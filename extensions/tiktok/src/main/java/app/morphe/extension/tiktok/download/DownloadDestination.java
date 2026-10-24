@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Metra TikTok Patches
+ * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
  * https://github.com/icysymmetra/tiktok-patches-for-morphe
  */
 package app.morphe.extension.tiktok.download;
@@ -7,6 +7,8 @@ package app.morphe.extension.tiktok.download;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+
+import app.morphe.extension.tiktok.settings.L10n;
 
 import java.util.Locale;
 
@@ -27,15 +29,16 @@ public final class DownloadDestination {
         String[] segments = normalized.split("/");
         for (String segment : segments) {
             if (segment.isEmpty() || ".".equals(segment) || "..".equals(segment)) {
-                throw new IllegalArgumentException("The destination contains an invalid folder name");
+                throw new IllegalArgumentException(
+                        L10n.t("That folder name has a character Android doesn't allow. Use letters, numbers, spaces or dashes."));
             }
         }
 
         String root = canonicalRoot(segments[0]);
         if (!isAllowedRoot(root, kind)) {
-            throw new IllegalArgumentException(
-                    kindLabel(kind) + " destinations must start with " + allowedRoots(kind)
-            );
+            throw new IllegalArgumentException(L10n.f(
+                    "%1$s destinations must start with %2$s",
+                    kindLabel(kind), allowedRoots(kind)));
         }
 
         segments[0] = root;
@@ -50,14 +53,22 @@ public final class DownloadDestination {
         }
     }
 
+    /** The folders each kind may go under, as Android names them. */
+    private static final String[] VIDEO_ROOTS = {"DCIM", "Movies", "Download", "Documents"};
+    private static final String[] PHOTO_ROOTS = {"DCIM", "Pictures", "Download", "Documents"};
+    private static final String[] STICKER_ROOTS = {"DCIM", "Download", "Documents"};
+
     public static String allowedRoots(Kind kind) {
         switch (kind) {
+            // One key per list shape, so the language writes the whole list: the names are
+            // what Android calls those folders and stay as they are, and the word between the
+            // last two used to be a key on its own, which fixed the shape to English.
             case VIDEO:
-                return "DCIM, Movies, Download, or Documents";
+                return L10n.f("%1$s, %2$s, %3$s or %4$s", (Object[]) VIDEO_ROOTS);
             case PHOTO:
-                return "DCIM, Pictures, Download, or Documents";
+                return L10n.f("%1$s, %2$s, %3$s or %4$s", (Object[]) PHOTO_ROOTS);
             case STICKER:
-                return "DCIM, Download, or Documents";
+                return L10n.f("%1$s, %2$s or %3$s", (Object[]) STICKER_ROOTS);
             default:
                 throw new IllegalArgumentException("Unknown destination kind");
         }
@@ -86,15 +97,12 @@ public final class DownloadDestination {
         if (normalized.startsWith(storagePrefix)) {
             normalized = normalized.substring(storagePrefix.length());
         }
-        while (normalized.startsWith("/")) {
-            normalized = normalized.substring(1);
-        }
-        while (normalized.endsWith("/")) {
-            normalized = normalized.substring(0, normalized.length() - 1);
-        }
-        while (normalized.contains("//")) {
-            normalized = normalized.replace("//", "/");
-        }
+        // One pass for each step: trimming a slash at a time copied the rest of the path per
+        // slash, which a restored folder of slashes turned into seconds on the main thread.
+        normalized = normalized.replaceAll("/{2,}", "/");
+        int start = normalized.startsWith("/") ? 1 : 0;
+        int end = normalized.endsWith("/") ? normalized.length() - 1 : normalized.length();
+        normalized = start < end ? normalized.substring(start, end) : "";
         if (normalized.isEmpty()) {
             return DEFAULT_PATH;
         }
@@ -149,13 +157,13 @@ public final class DownloadDestination {
     private static String kindLabel(Kind kind) {
         switch (kind) {
             case VIDEO:
-                return "Video";
+                return L10n.t("Video");
             case PHOTO:
-                return "Photo";
+                return L10n.t("Photo");
             case STICKER:
-                return "Sticker";
+                return L10n.t("Sticker");
             default:
-                return "Media";
+                return L10n.t("Media");
         }
     }
 

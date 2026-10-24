@@ -11,9 +11,11 @@
 package app.morphe.patches.tiktok.misc.extension
 
 import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.shared.misc.extension.ExtensionHook
-import app.morphe.patches.shared.misc.extension.sharedExtensionPatch
-import app.morphe.util.getReference
+import app.morphe.patches.shared.misc.extension.sharedExtensionPatch as extendShared
+import app.morphe.patches.tiktok.misc.diagnostics.buildDetailsPatch
+import app.morphe.patcher.util.getReference
 import app.morphe.util.indexOfFirstInstructionOrThrow
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
@@ -50,8 +52,12 @@ internal object StoreRegionInitTaskRunFingerprint : Fingerprint(
     parameters = listOf("Landroid/content/Context;"),
 )
 
+// The Home tab's long press into Hushfeed's settings follows the main activity from here; it
+// stays inert unless Feed tab navigation is in the bundle.
 private val initHook = ExtensionHook(
     fingerprint = MainActivityOnCreateFingerprint,
+    postContextClassDescriptor = "Lapp/morphe/extension/tiktok/MetraStartup;",
+    postContextMethodName = "onActivity",
 )
 
 private val hostApplicationInitHook = ExtensionHook(
@@ -66,6 +72,8 @@ private val hostApplicationInitHook = ExtensionHook(
         } + 1
     },
     contextRegisterResolver = { "p1" },
+    postContextClassDescriptor = "Lapp/morphe/extension/tiktok/MetraStartup;",
+    postContextMethodName = "onContextReady",
 )
 
 private val jatoInitHook = ExtensionHook(
@@ -78,7 +86,7 @@ private val storeRegionInitHook = ExtensionHook(
     contextRegisterResolver = { "p1" },
 )
 
-val sharedExtensionPatch = sharedExtensionPatch(
+private val tiktokExtensionPatch = extendShared(
     extensionName = "tiktok",
     isYouTubeOrYouTubeMusic = false,
     hostApplicationInitHook,
@@ -87,3 +95,6 @@ val sharedExtensionPatch = sharedExtensionPatch(
     storeRegionInitHook,
 )
 
+val sharedExtensionPatch = bytecodePatch {
+    dependsOn(buildDetailsPatch, tiktokExtensionPatch)
+}

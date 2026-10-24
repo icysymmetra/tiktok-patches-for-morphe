@@ -1,14 +1,19 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared.settings;
 
 import static app.morphe.extension.shared.StringRef.str;
 
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,8 +24,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import app.morphe.extension.shared.Logger;
-import app.morphe.extension.shared.ResourceType;
-import app.morphe.extension.shared.ResourceUtils;
 import app.morphe.extension.shared.StringRef;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.preference.SharedPrefCategory;
@@ -50,7 +53,7 @@ public abstract class Setting<T> {
         return new Availability() {
             @Override
             public boolean isAvailable() {
-                return parent.get();
+                return parent.savedValue();
             }
 
             @Override
@@ -67,7 +70,7 @@ public abstract class Setting<T> {
         return new Availability() {
             @Override
             public boolean isAvailable() {
-                return !parent.get();
+                return !parent.savedValue();
             }
 
             @Override
@@ -85,7 +88,7 @@ public abstract class Setting<T> {
             @Override
             public boolean isAvailable() {
                 for (BooleanSetting parent : parents) {
-                    if (!parent.get()) return false;
+                    if (!parent.savedValue()) return false;
                 }
                 return true;
             }
@@ -105,7 +108,7 @@ public abstract class Setting<T> {
             @Override
             public boolean isAvailable() {
                 for (BooleanSetting parent : parents) {
-                    if (parent.get()) return true;
+                    if (parent.savedValue()) return true;
                 }
                 return false;
             }
@@ -115,30 +118,6 @@ public abstract class Setting<T> {
                 return Collections.unmodifiableList(Arrays.asList(parents));
             }
         };
-    }
-
-    /**
-     * Callback for importing/exporting settings.
-     */
-    public interface ImportExportCallback {
-        /**
-         * Called after all settings have been imported.
-         */
-        void settingsImported(@Nullable Context context);
-
-        /**
-         * Called after all settings have been exported.
-         */
-        void settingsExported(@Nullable Context context);
-    }
-
-    private static final List<ImportExportCallback> importExportCallbacks = new ArrayList<>();
-
-    /**
-     * Adds a callback for {@link #importFromJSON(Context, String)} and {@link #exportToJson(Context)}.
-     */
-    public static void addImportExportCallback(ImportExportCallback callback) {
-        importExportCallbacks.add(Objects.requireNonNull(callback));
     }
 
     /**
@@ -153,9 +132,15 @@ public abstract class Setting<T> {
     private static final Map<String, Setting<?>> PATH_TO_SETTINGS = new HashMap<>();
 
     /**
+     * The preferences file every setting is saved to. A constant, so code that runs before
+     * Hushfeed has a context can name the file without loading this class.
+     */
+    public static final String PREFERENCES_NAME = "morphe_prefs";
+
+    /**
      * Preference all instances are saved to.
      */
-    public static final SharedPrefCategory preferences = new SharedPrefCategory("morphe_prefs");
+    public static final SharedPrefCategory preferences = new SharedPrefCategory(PREFERENCES_NAME);
 
     @Nullable
     public static Setting<?> getSettingFromPath(String str) {
@@ -169,13 +154,12 @@ public abstract class Setting<T> {
         return Collections.unmodifiableList(SETTINGS);
     }
 
-    /**
-     * @return All settings that have been created, sorted by keys.
-     */
-    private static List<Setting<?>> allLoadedSettingsSorted() {
-        //noinspection ComparatorCombinators
-        Collections.sort(SETTINGS, (Setting<?> o1, Setting<?> o2) -> o1.key.compareTo(o2.key));
-        return allLoadedSettings();
+    /** Reload only keys changed by an already committed upgrade, including settings loaded early. */
+    public static void reloadAfterMigration(java.util.Collection<String> keys) {
+        for (String key : keys) {
+            Setting<?> setting = PATH_TO_SETTINGS.get(key);
+            if (setting != null) setting.load();
+        }
     }
 
     /**
@@ -217,6 +201,37 @@ public abstract class Setting<T> {
      * The value of the setting.
      */
     protected volatile T value;
+
+    /**
+     * Pause Hushfeed, decided once when the process starts (see {@link HushfeedPause}). While it
+     * is on, every setting that changes TikTok answers the value that leaves TikTok as it ships.
+     */
+    private static volatile boolean pausedForProcess;
+
+    /** Hushfeed's own state rather than a change to TikTok: it keeps its value while paused. */
+    private volatile boolean keptWhenPaused;
+
+    /** Whether this process runs with Hushfeed paused. */
+    public static boolean isPaused() {
+        return pausedForProcess;
+    }
+
+    static void setPausedForProcess(boolean paused) {
+        pausedForProcess = paused;
+    }
+
+    /**
+     * Marks settings that hold Hushfeed's own state (a remembered position, an observed list, a
+     * counter, a diagnostics option) so they keep answering their value while Hushfeed is paused.
+     * Every other setting answers {@link #pausedValue()} then.
+     */
+    public static void keepWhenPaused(Setting<?>... settings) {
+        for (Setting<?> setting : settings) setting.keptWhenPaused = true;
+    }
+
+    public boolean isKeptWhenPaused() {
+        return keptWhenPaused;
+    }
 
     public Setting(String key, T defaultValue) {
         this(key, defaultValue, false, true, null, null);
@@ -281,12 +296,16 @@ public abstract class Setting<T> {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void migrateFromOldPreferences(SharedPrefCategory oldPrefs, Setting setting) {
+        if (!Utils.isMainProcess()) {
+            Logger.printInfo(() -> "Ignored settings migration from a secondary process: " + setting.key);
+            return;
+        }
         String settingKey = setting.key;
         if (!oldPrefs.preferences.contains(settingKey)) {
             return; // Nothing to do.
         }
 
-        Object newValue = setting.get();
+        Object newValue = setting.savedValue();
         final Object migratedValue;
         if (setting instanceof BooleanSetting) {
             migratedValue = oldPrefs.getBoolean(settingKey, (Boolean) newValue);
@@ -305,14 +324,18 @@ public abstract class Setting<T> {
             return;
         }
 
-        oldPrefs.preferences.edit().remove(settingKey).apply(); // Remove the old setting.
         if (migratedValue.equals(newValue)) {
             Logger.printDebug(() -> "Value does not need migrating: " + settingKey);
+            oldPrefs.removeKey(settingKey);
             return; // Old value is already equal to the new setting value.
         }
 
         Logger.printDebug(() -> "Migrating old preference value into current preference: " + settingKey);
-        setting.save(migratedValue);
+        if (setting.save(migratedValue)) {
+            oldPrefs.removeKey(settingKey);
+        } else {
+            Logger.printException(() -> "Kept old preference after migration failed: " + settingKey);
+        }
     }
 
     /**
@@ -329,7 +352,13 @@ public abstract class Setting<T> {
         // the default for a future release.  Without this after upgrading
         // the saved value will be whatever was the default when the app was first installed.
         if (setting.isSetToDefault()) {
-            setting.removeFromPreferences();
+            try {
+                setting.removeFromPreferences();
+            } catch (RuntimeException failure) {
+                // The framework already stored the selected default. Leaving that explicit value
+                // is semantically correct, even if the cleanup that normally removes it failed.
+                Logger.printException(() -> "Could not clear explicit default: " + setting.key, failure);
+            }
         }
     }
 
@@ -339,6 +368,36 @@ public abstract class Setting<T> {
     protected abstract void setValueFromString(String newValue);
 
     /**
+     * The value this setting will really hold, given one it has been asked to hold. A
+     * setting with a range gives back the nearest value inside it; every other setting gives
+     * back what it was handed.
+     *
+     * <p>Every path that assigns {@link #value} goes through this, because a value arrives
+     * from a restored backup file as readily as from a dialog, and only the dialog asks
+     * questions about it.
+     */
+    @NonNull
+    protected T coerce(@NonNull T newValue) {
+        return newValue;
+    }
+
+    /**
+     * The value as saving it would store it, for a caller that compares what it recorded with
+     * what was saved: a restore writes what {@link #coerce} returns, not the file's own number.
+     * A value this setting would refuse comes back as it was.
+     */
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public final Object savedFormOf(@Nullable Object value) {
+        if (value == null) return null;
+        try {
+            return coerce((T) value);
+        } catch (RuntimeException refused) {
+            return value;
+        }
+    }
+
+    /**
      * Load and set the value of {@link #value}.
      */
     protected abstract void load();
@@ -346,19 +405,45 @@ public abstract class Setting<T> {
     /**
      * Persistently saves the value.
      */
-    public final void save(T newValue) {
-        if (value.equals(newValue)) {
-            return;
-        }
+    public final boolean save(T newValue) {
+        // Every Setting shares one preference file. Keep the live-value swap, disk commit and
+        // possible rollback in the same class lock as saveAll(), so a failed write cannot roll a
+        // newer successful write back after the newer caller has already returned.
+        synchronized (Setting.class) {
+            if (!Utils.isMainProcess()) {
+                Logger.printInfo(() -> "Ignored persistent setting write from a secondary process: " + key);
+                return false;
+            }
+            newValue = coerce(Objects.requireNonNull(newValue));
+            if (value.equals(newValue)) {
+                return true;
+            }
 
-        // Must set before saving to preferences (otherwise importing fails to update UI correctly).
-        value = Objects.requireNonNull(newValue);
-
-        if (defaultValue.equals(newValue)) {
-            removeFromPreferences();
-        } else {
-            saveToPreferences();
+            // Must set before saving to preferences (otherwise importing fails to update UI correctly).
+            T previousValue = value;
+            value = newValue;
+            try {
+                persistCurrentValue();
+                return true;
+            } catch (RuntimeException failure) {
+                // A failed commit means the value that survives a restart is still the old one.
+                // Keep the live process on that same value, then make a best effort to restore
+                // storage in case a platform implementation reports failure after touching it.
+                value = previousValue;
+                try {
+                    persistCurrentValue();
+                } catch (RuntimeException rollbackFailure) {
+                    failure.addSuppressed(rollbackFailure);
+                }
+                Logger.printException(() -> "Could not save setting: " + key, failure);
+                return false;
+            }
         }
+    }
+
+    private void persistCurrentValue() {
+        if (defaultValue.equals(value)) removeFromPreferences();
+        else saveToPreferences();
     }
 
     /**
@@ -374,8 +459,42 @@ public abstract class Setting<T> {
         preferences.removeKey(key);
     }
 
+    /**
+     * What the setting says now, which is what every hook reads. While Hushfeed is paused, a
+     * setting that changes TikTok answers {@link #pausedValue()}; the saved value is untouched.
+     */
     @NonNull
-    public abstract T get();
+    public final T get() {
+        return pausedForProcess && !keptWhenPaused ? pausedValue() : currentValue();
+    }
+
+    /**
+     * What {@link #get()} answers when the setting isn't paused. That's the saved value, unless
+     * a setting adds something the reader turned on for a while without saving it, as a timed
+     * diagnostic capture does for {@link BaseSettings#DEBUG}.
+     */
+    @NonNull
+    protected T currentValue() {
+        return value;
+    }
+
+    /**
+     * The value this setting holds, paused or not. The settings screen, backups and undo read
+     * this: they show and keep what the user chose, not what a paused TikTok is answered.
+     */
+    @NonNull
+    public final T savedValue() {
+        return value;
+    }
+
+    /**
+     * The answer while paused. For a value setting the default is the unpatched behaviour: an
+     * empty list, a zero limit, "auto", "default". A switch answers false instead.
+     */
+    @NonNull
+    protected T pausedValue() {
+        return defaultValue;
+    }
 
     /**
      * Identical to calling {@link #save(Object)} using {@link #defaultValue}.
@@ -385,6 +504,81 @@ public abstract class Setting<T> {
     public T resetToDefault() {
         save(defaultValue);
         return defaultValue;
+    }
+
+    /** Apply a validated batch in one preference transaction. Call on a worker thread. */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static synchronized void saveAll(Map<Setting<?>, Object> updates) throws java.io.IOException {
+        saveAll(updates, false);
+    }
+
+    /**
+     * @param deviceState the values are this device's own earlier state: an undo copy, a rollback,
+     *                    a change put back after an interruption. A bound that refuses one of
+     *                    those is newer than the value, which was already in effect, so it goes
+     *                    back as it was rather than failing the way back. A value equal to the one
+     *                    already stored is kept the same way whoever writes it.
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static synchronized void saveAll(Map<Setting<?>, Object> updates, boolean deviceState)
+            throws java.io.IOException {
+        if (!Utils.isMainProcess()) {
+            throw new java.io.IOException("Persistent settings are writable only from the main process");
+        }
+        Map<Setting<?>, Object> previous = new HashMap<>();
+        Map<Setting<?>, Object> bounded = new HashMap<>();
+        for (var entry : updates.entrySet()) {
+            Setting setting = entry.getKey();
+            Object next = entry.getValue();
+            Class<?> type = setting.defaultValue instanceof Enum
+                    ? ((Enum) setting.defaultValue).getDeclaringClass() : setting.defaultValue.getClass();
+            if (next == null || !type.isInstance(next)) {
+                throw new IllegalArgumentException("Invalid value for " + setting.key);
+            }
+            // A backup file is not a dialog and was never asked to stay in range. Into a copy
+            // rather than back into the caller's map, which need not accept being written to.
+            Object value;
+            try {
+                value = setting.coerce(next);
+            } catch (IllegalArgumentException refused) {
+                if (!deviceState && !next.equals(setting.savedValue())) throw refused;
+                value = next;
+            }
+            bounded.put(setting, value);
+            previous.put(setting, setting.savedValue());
+        }
+        java.io.IOException failure;
+        try {
+            if (writeBatch(bounded)) return;
+            failure = new java.io.IOException("Could not save settings");
+        } catch (RuntimeException refused) {
+            failure = new java.io.IOException("Could not save settings", refused);
+        }
+        // Restore all live values before touching storage again: even creating an editor or
+        // adding its first key can throw, leaving a later value from the attempted batch live.
+        for (var entry : previous.entrySet()) ((Setting) entry.getKey()).value = entry.getValue();
+        try {
+            if (!writeBatch(previous)) {
+                failure.addSuppressed(new java.io.IOException("Could not roll back settings; use Undo"));
+            }
+        } catch (RuntimeException rollbackFailure) {
+            failure.addSuppressed(rollbackFailure);
+        }
+        throw failure;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static boolean writeBatch(Map<Setting<?>, Object> values) {
+        var editor = preferences.preferences.edit();
+        for (var entry : values.entrySet()) {
+            Setting setting = entry.getKey();
+            Object next = entry.getValue();
+            setting.value = next;
+            if (setting.defaultValue.equals(next)) editor.remove(setting.key);
+            else if (next instanceof Boolean) editor.putBoolean(setting.key, (Boolean) next);
+            else editor.putString(setting.key, next instanceof Enum ? ((Enum) next).name() : next.toString());
+        }
+        return editor.commit();
     }
 
     /**
@@ -415,139 +609,9 @@ public abstract class Setting<T> {
     @NonNull
     @Override
     public String toString() {
-        return key + "=" + get();
+        return key + "=" + savedValue();
     }
 
     // region Import / export
-
-    /**
-     * If a setting path has this prefix, then remove it before importing/exporting.
-     */
-    private static final String OPTIONAL_MORPHE_SETTINGS_PREFIX = "morphe_";
-
-    /**
-     * The path, minus any 'morphe' prefix to keep JSON concise.
-     */
-    private String getImportExportKey() {
-        if (key.startsWith(OPTIONAL_MORPHE_SETTINGS_PREFIX)) {
-            return key.substring(OPTIONAL_MORPHE_SETTINGS_PREFIX.length());
-        }
-        return key;
-    }
-
-    /**
-     * @param importExportKey The JSON key. The JSONObject parameter will contain data for this key.
-     * @return the value stored using the import/export key.  Do not set any values in this method.
-     */
-    protected abstract T readFromJSON(JSONObject json, String importExportKey) throws JSONException;
-
-    /**
-     * Saves this instance to JSON.
-     * <p>
-     * To keep the JSON simple and readable,
-     * subclasses should not write out any embedded types (such as JSON Array or Dictionaries).
-     * <p>
-     * If this instance is not a type supported natively by JSON (ie: it's not a String/Integer/Float/Long),
-     * then subclasses can override this method and write out a String value representing the value.
-     */
-    protected void writeToJSON(JSONObject json, String importExportKey) throws JSONException {
-        json.put(importExportKey, value);
-    }
-
-    public static String exportToJson(@Nullable Context alertDialogContext) {
-        try {
-            JSONObject json = new JSONObject();
-            for (Setting<?> setting : allLoadedSettingsSorted()) {
-                String importExportKey = setting.getImportExportKey();
-                if (json.has(importExportKey)) {
-                    throw new IllegalArgumentException("duplicate key found: " + importExportKey);
-                }
-
-                final boolean exportDefaultValues = false; // Enable to see what all settings look like in the UI.
-                //noinspection ConstantValue
-                if (setting.includeWithImportExport && (!setting.isSetToDefault() || exportDefaultValues)) {
-                    setting.writeToJSON(json, importExportKey);
-                }
-            }
-
-            for (ImportExportCallback callback : importExportCallbacks) {
-                callback.settingsExported(alertDialogContext);
-            }
-
-            if (json.length() == 0) {
-                return "";
-            }
-
-            String export = json.toString(0);
-
-            // Remove the outer JSON braces to make the output more compact,
-            // and leave less chance of the user forgetting to copy it
-            return export.substring(2, export.length() - 2);
-        } catch (JSONException e) {
-            Logger.printException(() -> "Export failure", e); // should never happen
-            return "";
-        }
-    }
-
-    /**
-     * @return if any settings that require a reboot were changed.
-     */
-    public static boolean importFromJSON(Context alertDialogContext, String settingsJsonString) {
-        try {
-            if (!settingsJsonString.matches("[\\s\\S]*\\{")) {
-                settingsJsonString = '{' + settingsJsonString + '}'; // Restore outer JSON braces
-            }
-            JSONObject json = new JSONObject(settingsJsonString);
-
-            boolean rebootSettingChanged = false;
-            int numberOfSettingsImported = 0;
-            //noinspection rawtypes
-            for (Setting setting : SETTINGS) {
-                String key = setting.getImportExportKey();
-                if (json.has(key)) {
-                    Object value = setting.readFromJSON(json, key);
-                    if (!setting.get().equals(value)) {
-                        rebootSettingChanged |= setting.rebootApp;
-                        //noinspection unchecked
-                        setting.save(value);
-                    }
-                    numberOfSettingsImported++;
-                } else if (setting.includeWithImportExport && !setting.isSetToDefault()) {
-                    Logger.printDebug(() -> "Resetting to default: " + setting);
-                    rebootSettingChanged |= setting.rebootApp;
-                    setting.resetToDefault();
-                }
-            }
-
-            for (ImportExportCallback callback : importExportCallbacks) {
-                callback.settingsImported(alertDialogContext);
-            }
-
-            // Check if patch resource strings are available.
-            String resetKey = "morphe_settings_import_reset";
-            // Use a delay, otherwise the toast can move about on screen from the dismissing dialog.
-            if (ResourceUtils.getIdentifier(ResourceType.STRING, resetKey) != 0) {
-                final int numberOfSettingsImportedFinal = numberOfSettingsImported;
-                Utils.runOnMainThreadDelayed(() -> Utils.showToastLong(numberOfSettingsImportedFinal == 0
-                                ? str(resetKey)
-                                : str("morphe_settings_import_success", numberOfSettingsImportedFinal)),
-                        150);
-            }
-
-            return rebootSettingChanged;
-        } catch (JSONException | IllegalArgumentException ex) {
-            String failureKey = "morphe_settings_import_failure_parse";
-            String toastFormat = ResourceUtils.getIdentifier(ResourceType.STRING, failureKey) != 0
-                    ? str(failureKey)
-                    : "Import failed: %s";
-            Utils.showToastLong(String.format(toastFormat, ex.getMessage()));
-            Logger.printInfo(() -> "", ex);
-        } catch (Exception ex) {
-            Logger.printException(() -> "Import failure: " + ex.getMessage(), ex); // Should never happen.
-        }
-        return false;
-    }
-
-    // End import / export
 
 }

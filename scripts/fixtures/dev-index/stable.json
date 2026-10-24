@@ -1,0 +1,7 @@
+{
+  "created_at": "2026-10-11T23:25:46",
+  "description": "Local stable metadata fixture for Hushfeed 0.71.2.",
+  "download_url": "https://github.com/SysAdminDoc/HushFeed/releases/download/v0.71.2/patches-0.71.2.mpp",
+  "signature_download_url": "",
+  "version": "0.71.2"
+}

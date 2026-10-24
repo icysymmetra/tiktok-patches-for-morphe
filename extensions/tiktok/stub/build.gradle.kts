@@ -3,11 +3,10 @@ plugins {
 }
 
 android {
-    namespace = "app.morphe.extension"
+    namespace = "app.morphe.extension.tiktok.stub"
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 22
+        minSdk = 23
     }
 }
-

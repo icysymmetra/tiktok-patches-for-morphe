@@ -4,90 +4,18 @@
  */
 package app.morphe.extension.tiktok.featurecontrols;
 
-import android.app.Activity;
-import android.content.Intent;
+import android.view.View;
 
+import app.morphe.extension.shared.diagnostics.HookStatus;
 import app.morphe.extension.tiktok.settings.Settings;
 
 public final class FeatureControls {
     private static final int DEFAULT_LONG_PRESS_LOCK_DISTANCE_DP = 140;
-    private static final String ACCOUNT_ACTIVITY_PREFIX = "com.ss.android.ugc.aweme.account.";
-    private static final String SERVICE_MANAGER_CLASS =
-            "com.ss.android.ugc.aweme.framework.services.ServiceManager";
-    private static final String ACCOUNT_USER_SERVICE_CLASS =
-            "com.ss.android.ugc.aweme.IAccountUserService";
+    static final String SIDEBAR_BUTTON_FAMILY = "side menu button";
+    static final String NON_PERSONALIZED_SEARCH_FAMILY = "non-personalized search";
+    static final String LIVE_SEARCH_FAMILY = "LIVE search";
 
     private FeatureControls() {
-    }
-
-    public static boolean shouldHideCaptchaPopup() {
-        return Settings.HIDE_CAPTCHA_POPUPS.get() && isLoggedIn();
-    }
-
-    public static boolean shouldHideCaptchaPopup(Activity activity) {
-        return shouldHideCaptchaPopup(activity, null);
-    }
-
-    public static boolean shouldHideCaptchaPopup(Activity activity, String riskInfo) {
-        if (!Settings.HIDE_CAPTCHA_POPUPS.get() || !isLoggedIn()) return false;
-        if (activity == null) return !isAccountRoute(riskInfo);
-
-        // Account flows must be able to present server-required verification.
-        if (activity.getClass().getName().startsWith(ACCOUNT_ACTIVITY_PREFIX)) return false;
-
-        Intent intent = activity.getIntent();
-        String intentRoute = intent == null ? null : intent.getDataString();
-        return !isAccountRoute(intentRoute) && !isAccountRoute(riskInfo);
-    }
-
-    public static boolean shouldHideCaptchaPopup(Activity activity, Object verifyRequest) {
-        if (!Settings.HIDE_CAPTCHA_POPUPS.get() || !isLoggedIn()) return false;
-        if (activity != null && activity.getClass().getName().startsWith(ACCOUNT_ACTIVITY_PREFIX)) {
-            return false;
-        }
-
-        String scene = readVerificationScene(verifyRequest);
-        if (scene == null) return false;
-
-        Intent intent = activity == null ? null : activity.getIntent();
-        String intentRoute = intent == null ? null : intent.getDataString();
-        return !isAccountRoute(intentRoute) && !isAccountRoute(scene);
-    }
-
-    private static String readVerificationScene(Object verifyRequest) {
-        if (verifyRequest == null) return null;
-        try {
-            Object value = verifyRequest.getClass().getMethod("LJIIJ").invoke(verifyRequest);
-            return value instanceof String ? (String) value : null;
-        } catch (Throwable ignored) {
-            return null;
-        }
-    }
-
-    private static boolean isLoggedIn() {
-        try {
-            Class<?> serviceManagerClass = Class.forName(SERVICE_MANAGER_CLASS);
-            Object serviceManager = serviceManagerClass.getMethod("get").invoke(null);
-            Class<?> accountServiceClass = Class.forName(ACCOUNT_USER_SERVICE_CLASS);
-            Object accountService = serviceManagerClass
-                    .getMethod("getService", Class.class)
-                    .invoke(serviceManager, accountServiceClass);
-            return accountService != null
-                    && Boolean.TRUE.equals(accountServiceClass.getMethod("isLogin").invoke(accountService));
-        } catch (Throwable ignored) {
-            return false;
-        }
-    }
-
-    private static boolean isAccountRoute(String value) {
-        if (value == null) return false;
-        String normalized = value.toLowerCase(java.util.Locale.ROOT);
-        return normalized.equals("login")
-                || normalized.equals("passport")
-                || normalized.contains("/passport/")
-                || normalized.contains("/login/")
-                || normalized.contains("\"passport\"")
-                || normalized.contains("\"login\"");
     }
 
     public static Object filterNormalPendant(Object pendant) {
@@ -110,6 +38,13 @@ public final class FeatureControls {
         }
     }
 
+    /** Runs after TikTok has attached and configured its profile rewards icon. */
+    public static void hideProfileRewardsShortcut(View shortcut) {
+        if (shortcut != null && Settings.HIDE_PROFILE_REWARDS_SHORTCUT.get()) {
+            shortcut.setVisibility(View.GONE);
+        }
+    }
+
     public static boolean overrideLongPressSpeedUpEnabled(boolean enabled) {
         return Settings.ENABLE_LONG_PRESS_SPEED_LOCK.get() || enabled;
     }
@@ -119,28 +54,53 @@ public final class FeatureControls {
         return distanceDp > 0 ? distanceDp : DEFAULT_LONG_PRESS_LOCK_DISTANCE_DP;
     }
 
-    public static boolean overrideHideQuickCommentEmoji(boolean original, int followStatus) {
-        return Settings.HIDE_COMMENT_QUICK_REACTIONS.get() || original;
+    public static int hideQuickCommentReactionsVisibility(int originalVisibility) {
+        return Settings.HIDE_COMMENT_QUICK_REACTIONS.get() ? View.GONE : originalVisibility;
+    }
+
+    /**
+     * The comment box's emoji row is added by a trigger rather than shown by a visibility
+     * write, so the same switch answers the trigger before its own checks run.
+     */
+    public static boolean hideQuickCommentReactions() {
+        return Settings.HIDE_COMMENT_QUICK_REACTIONS.get();
     }
 
     public static int hideFeedFollowButtonVisibility(int originalVisibility) {
-        return Settings.HIDE_FEED_FOLLOW_BUTTON.get() ? 8 : originalVisibility;
+        return Settings.HIDE_FEED_FOLLOW_BUTTON.get() ? View.GONE : originalVisibility;
     }
 
     public static int hideFeedSaveButtonVisibility(int originalVisibility) {
-        return Settings.HIDE_FEED_SAVE_BUTTON.get() ? 8 : originalVisibility;
+        return Settings.HIDE_FEED_SAVE_BUTTON.get() ? View.GONE : originalVisibility;
     }
 
+    /**
+     * Answers TikTok's own question of whether the feed's LIVE button is enabled, so false
+     * is what hides it. Shares {@code HIDE_LIVE_ENTRANCE} with the video overlay hider, so the
+     * switch keeps its stored value and both mechanisms answer to it.
+     */
     public static boolean hideFeedLiveButtonEnabled(boolean originalEnabled) {
-        return !Settings.HIDE_FEED_LIVE_BUTTON.get() && originalEnabled;
+        boolean hide = Settings.HIDE_LIVE_ENTRANCE.get();
+        LiveButtonReport.record(hide ? LiveButtonReport.Route.SWITCH_HID
+                : originalEnabled ? LiveButtonReport.Route.SHOWN : LiveButtonReport.Route.TIKTOK_OFF);
+        return !hide && originalEnabled;
     }
 
+    /** The same question for the search button: false hides it. */
     public static boolean hideFeedSearchButtonEnabled(boolean originalEnabled) {
         return !Settings.HIDE_FEED_SEARCH_BUTTON.get() && originalEnabled;
     }
 
-    public static boolean hideSuggestedAccounts() {
-        return Settings.HIDE_SUGGESTED_ACCOUNTS.get();
+    /**
+     * The same question for the side menu button beside LIVE (#128), the one that opens
+     * TikTok's drawer with Your orders, TikTok Minis and the rest: false hides it. The toolbar
+     * asks as it builds the feed's top bar. The icon has no view id, so the Hook status line is
+     * the one sign in a report that this check ran.
+     */
+    public static boolean hideFeedSidebarButtonEnabled(boolean originalEnabled) {
+        boolean hide = Settings.HIDE_FEED_SIDEBAR_BUTTON.get();
+        HookStatus.bound(SIDEBAR_BUTTON_FAMILY, hide ? "hidden" : "left to TikTok");
+        return !hide && originalEnabled;
     }
 
     public static int overrideLongPressQuickShare(int originalMode) {
@@ -151,8 +111,15 @@ public final class FeatureControls {
         return Settings.DISABLE_LONG_PRESS_REPOST.get();
     }
 
+    /**
+     * TikTok's own "is non-personalized search on" gates, both of them. The settings read under
+     * them still answers TikTok's value, so a gate recorder shows 0 there even while this forces
+     * the gate. The Hook status line is the sign in a report that the gate was asked.
+     */
     public static boolean enableNonPersonalizedSearch(boolean original) {
-        return Settings.ENABLE_NON_PERSONALIZED_SEARCH.get() || original;
+        boolean on = Settings.ENABLE_NON_PERSONALIZED_SEARCH.get();
+        HookStatus.bound(NON_PERSONALIZED_SEARCH_FAMILY, on ? "gate forced" : "left to TikTok");
+        return on || original;
     }
 
     public static int forceNonPersonalizedSearchGate(String key, int value) {
@@ -160,7 +127,10 @@ public final class FeatureControls {
         return Settings.ENABLE_NON_PERSONALIZED_SEARCH.get() ? 1 : value;
     }
 
+    /** The LIVE drawer's "show search" setting, asked as the drawer builds its top bar. */
     public static boolean enableLiveSearch(boolean original) {
-        return Settings.ENABLE_LIVE_SEARCH.get() || original;
+        boolean on = Settings.ENABLE_LIVE_SEARCH.get();
+        HookStatus.bound(LIVE_SEARCH_FAMILY, on ? "search shown" : "left to TikTok");
+        return on || original;
     }
 }

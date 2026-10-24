@@ -1,16 +1,17 @@
 /*
  * Forked from:
  * https://github.com/ReVanced/revanced-patches/blob/377d4e15016296b45d809697f7f69bce74badd3a/extensions/tiktok/src/main/java/app/revanced/extension/tiktok/settings/preference/DownloadPathPreference.java
+ * Mirror, since GitHub blocks the original: https://gitlab.com/ReVanced/revanced-patches/-/blob/main/extensions/tiktok/src/main/java/app/revanced/extension/tiktok/settings/preference/DownloadPathPreference.java
  */
 
 package app.morphe.extension.tiktok.settings.preference;
 
+import app.morphe.extension.tiktok.settings.L10n;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.DialogPreference;
 import android.text.Editable;
 import android.text.InputType;
@@ -32,6 +33,8 @@ public class DownloadPathPreference extends DialogPreference {
 
     private boolean mValueSet;
     private String downloadPathValue;
+    /** The box the dialog is showing, so a refused path can be said under it. */
+    private EditText pathField;
     private final DownloadDestination.Kind kind;
 
     public DownloadPathPreference(
@@ -43,9 +46,9 @@ public class DownloadPathPreference extends DialogPreference {
         super(context);
         this.kind = kind;
         setTitle(title);
-        setSummary(Environment.getExternalStorageDirectory().getPath() + "/" + setting.get());
+        setSummary(setting.savedValue());
         setKey(setting.key);
-        setValue(setting.get());
+        setValue(setting.savedValue());
     }
 
     public String getValue() {
@@ -54,7 +57,7 @@ public class DownloadPathPreference extends DialogPreference {
 
     public void setValue(String value) {
         String normalizedValue = normalizePath(value);
-        setSummary(Environment.getExternalStorageDirectory().getPath() + "/" + normalizedValue);
+        setSummary(normalizedValue);
         final boolean changed = !TextUtils.equals(mValue, normalizedValue);
         if (changed || !mValueSet) {
             mValue = normalizedValue;
@@ -68,11 +71,32 @@ public class DownloadPathPreference extends DialogPreference {
     }
 
     public void applyPickedPath(String path) {
+        if (path == null) {
+            String error = app.morphe.extension.tiktok.settings.L10n.t(
+                    "Choose a folder on internal storage. SD cards aren't supported.");
+            if (pathField != null && getDialog() != null && getDialog().isShowing()) {
+                SettingsUi.reportFieldError(pathField, error);
+            } else {
+                app.morphe.extension.shared.Utils.showToastLong(error);
+            }
+            return;
+        }
         try {
-            setValue(DownloadDestination.validate(path, kind));
-            app.morphe.extension.shared.Utils.showToastShort("Download path updated");
+            String validated = DownloadDestination.validate(path, kind);
+            if (pathField != null && getDialog() != null && getDialog().isShowing()) {
+                pathField.setText(validated);
+                SettingsUi.clearFieldError(pathField);
+            } else {
+                setValue(validated);
+                app.morphe.extension.shared.Utils.showToastShort(
+                app.morphe.extension.tiktok.settings.L10n.t("Destination updated"));
+            }
         } catch (IllegalArgumentException ex) {
-            app.morphe.extension.shared.Utils.showToastLong(ex.getMessage());
+            if (pathField != null && getDialog() != null && getDialog().isShowing()) {
+                SettingsUi.reportFieldError(pathField, ex.getMessage());
+            } else {
+                app.morphe.extension.shared.Utils.showToastLong(ex.getMessage());
+            }
         }
     }
 
@@ -87,7 +111,16 @@ public class DownloadPathPreference extends DialogPreference {
         int padding = SettingsUi.dp(context, 22);
         dialogView.setPadding(padding, padding, padding, SettingsUi.dp(context, 8));
 
-        TextView title = SettingsUi.text(context, "Download path", 20, SettingsUi.textPrimary(), Typeface.BOLD);
+        // The row's own title, not a literal. All three destinations opened a dialog headed
+        // "Download path", so nothing on the screen said which of the three was being edited.
+        TextView title = SettingsUi.text(
+                context,
+                getTitle() == null ? "" : getTitle().toString(),
+                SettingsUi.TEXT_HEADLINE,
+                SettingsUi.textPrimary(),
+                Typeface.BOLD
+        );
+        SettingsUi.markDialogHeading(title);
         dialogView.addView(title, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -95,8 +128,9 @@ public class DownloadPathPreference extends DialogPreference {
 
         TextView helper = SettingsUi.text(
                 context,
-                "Choose a subfolder under " + DownloadDestination.allowedRoots(kind) + ".",
-                14,
+                L10n.f(context, "Choose a subfolder under %1$s.",
+                        DownloadDestination.allowedRoots(kind)),
+                SettingsUi.TEXT_BODY_SMALL,
                 SettingsUi.textSecondary(),
                 Typeface.NORMAL
         );
@@ -110,9 +144,13 @@ public class DownloadPathPreference extends DialogPreference {
         EditText downloadPath = new EditText(context);
         downloadPath.setInputType(InputType.TYPE_CLASS_TEXT);
         downloadPath.setSingleLine(true);
+        // Left as it is on purpose. This is an example of what to type, and every part of it
+        // is a folder name Android fixes: "DCIM/TikTok" is the same on a German phone.
         downloadPath.setHint("DCIM/TikTok");
         downloadPath.setText(downloadPathValue);
         SettingsUi.styleEditText(downloadPath);
+        SettingsUi.labelEditor(title, downloadPath);
+        pathField = downloadPath;
         downloadPath.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -145,19 +183,23 @@ public class DownloadPathPreference extends DialogPreference {
 
     @Override
     protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-        builder.setPositiveButton("Save", (dialog, which) -> this.onClick(dialog, DialogInterface.BUTTON_POSITIVE));
-        builder.setNegativeButton(android.R.string.cancel, null);
-        builder.setNeutralButton("Browse", null);
+        builder.setPositiveButton(L10n.t(getContext(), "Save"), (dialog, which) -> this.onClick(dialog, DialogInterface.BUTTON_POSITIVE));
+        builder.setNegativeButton(L10n.t(getContext(), "Cancel"), null);
+        builder.setNeutralButton(L10n.t(getContext(), "Browse"), null);
     }
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
-        if (positiveResult) {
-            try {
-                setValue(DownloadDestination.validate(downloadPathValue, kind));
-            } catch (IllegalArgumentException ex) {
-                app.morphe.extension.shared.Utils.showToastLong(ex.getMessage());
-            }
+        if (positiveResult) saveTypedPath();
+    }
+
+    /** Null when the path saved, otherwise what is wrong with it. */
+    private String saveTypedPath() {
+        try {
+            setValue(DownloadDestination.validate(downloadPathValue, kind));
+            return null;
+        } catch (IllegalArgumentException refused) {
+            return refused.getMessage();
         }
     }
 
@@ -165,12 +207,31 @@ public class DownloadPathPreference extends DialogPreference {
     protected void showDialog(Bundle state) {
         super.showDialog(state);
         SettingsUi.styleFramedDialog(getDialog());
+        // The fourth row of the same shape as the three the item named: it validated after the
+        // dialog had gone and then said what was wrong over whatever was behind it.
+        SettingsUi.keepOpenOnInvalidInput(getDialog(), new SettingsUi.DialogCheck() {
+            @Override public String problem() {
+                try {
+                    DownloadDestination.validate(downloadPathValue, kind);
+                    return null;
+                } catch (IllegalArgumentException refused) {
+                    return refused.getMessage();
+                }
+            }
+
+            @Override public void report(String problem) {
+                SettingsUi.reportFieldError(pathField, problem);
+            }
+
+            @Override public boolean accept() {
+                return saveTypedPath() == null;
+            }
+        });
         AlertDialog dialog = (AlertDialog) getDialog();
         TextView browseButton = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
         if (browseButton != null) {
             browseButton.setOnClickListener(view -> {
                 TikTokPreferenceFragment.openDownloadPathFolderPicker(this);
-                dialog.dismiss();
             });
         }
     }
@@ -178,5 +239,14 @@ public class DownloadPathPreference extends DialogPreference {
     private String normalizePath(String path) {
         return DownloadDestination.resolve(path, kind);
     }
-}
 
+    @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle(L10n.t(getContext(), title));
+    }
+
+    @Override
+    public void setSummary(CharSequence summary) {
+        super.setSummary(L10n.t(getContext(), summary));
+    }
+}
