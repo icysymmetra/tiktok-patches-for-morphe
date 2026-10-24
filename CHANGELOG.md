@@ -1,3 +1,16 @@
+# [0.9.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.2...v0.9.0-dev.3) (2026-10-24)
+
+
+### Bug Fixes
+
+* **tiktok:** retain Java-loaded libraries used by photo comments ([0b947b5](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/0b947b58d6579a6884d075c5c4e9030025933b55)), closes [#201](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/201) [#201](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/201)
+
+
+
+
+
+## 0.9.0-dev.3
+
 # [0.9.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.1...v0.9.0-dev.2) (2026-10-24)
 
 
