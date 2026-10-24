@@ -194,8 +194,10 @@ public final class VideoFit {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (!(params instanceof FrameLayout.LayoutParams)) return false;
         FrameLayout.LayoutParams frame = (FrameLayout.LayoutParams) params;
+        PreviousGravity previous = GRAVITY_BEFORE.get(view);
+        if (previous != null && previous.params != frame) GRAVITY_BEFORE.remove(view);
         if (frame.gravity == Gravity.CENTER) return true;
-        GRAVITY_BEFORE.put(view, frame.gravity);
+        GRAVITY_BEFORE.put(view, new PreviousGravity(frame, frame.gravity));
         frame.gravity = Gravity.CENTER;
         view.setLayoutParams(frame);
         return true;
@@ -208,7 +210,17 @@ public final class VideoFit {
      * earlier video was centred twice, and a video TikTok had cropped showed an edge instead of
      * the middle. Weak, because a view that is gone has nothing to give back.
      */
-    private static final Map<View, Integer> GRAVITY_BEFORE =
+    private static final class PreviousGravity {
+        final FrameLayout.LayoutParams params;
+        final int gravity;
+
+        PreviousGravity(FrameLayout.LayoutParams params, int gravity) {
+            this.params = params;
+            this.gravity = gravity;
+        }
+    }
+
+    private static final Map<View, PreviousGravity> GRAVITY_BEFORE =
             Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
@@ -220,13 +232,15 @@ public final class VideoFit {
      */
     private static void uncentre(View view) {
         if (GRAVITY_BEFORE.isEmpty()) return;
-        Integer before = GRAVITY_BEFORE.remove(view);
+        PreviousGravity before = GRAVITY_BEFORE.remove(view);
         if (before == null) return;
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (!(params instanceof FrameLayout.LayoutParams)) return;
         FrameLayout.LayoutParams frame = (FrameLayout.LayoutParams) params;
+        // A recycled cell can have new, already-centred host parameters. Its gravity is not ours.
+        if (frame != before.params) return;
         if (frame.gravity != Gravity.CENTER) return;
-        frame.gravity = before;
+        frame.gravity = before.gravity;
         view.setLayoutParams(frame);
     }
 

@@ -15,6 +15,20 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 class VerifiedResourceStripperTest {
+    @Test
+    fun `shared comment photo editor libraries cannot be emptied even with reviewed digests`() {
+        for ((index, name) in listOf("libeffect.so", "libeffect_plugin.so", "libttvesdk.so", "libttvesdk_plugin.so").withIndex()) {
+            val root = temporary.newFolder("shared-photo-$index")
+            val path = "lib/arm64-v8a/$name"
+            val file = root.write(path, "shared editor dependency")
+            val profile = ResourceProfile("reviewed shared editor", listOf(ResourceFileContract(path, sha256("shared editor dependency"))))
+            val error = assertThrows(PatchException::class.java) {
+                stripVerifiedResources(root, "Creation resources", emptyList(), listOf(path), listOf(profile))
+            }
+            assertTrue(error.message.orEmpty(), error.message.orEmpty().contains("shared"))
+            assertArrayEquals("shared editor dependency".toByteArray(), file.readBytes())
+        }
+    }
     @get:Rule
     val temporary = TemporaryFolder()
 

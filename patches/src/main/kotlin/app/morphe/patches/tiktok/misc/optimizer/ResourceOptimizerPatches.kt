@@ -138,10 +138,9 @@ val languagePackPurgerPatch = rawResourcePatch(
 @Suppress("unused")
 val studioCreationDebloatPatch = rawResourcePatch(
     name = "Remove creation tools",
-    description = "Removes TikTok's camera, editing and effects files, saving about 38 MB of " +
-        "storage. The catch: the Create tab and every recording, editing and effects tool stop " +
-        "working, and opening one, like effect search, can close TikTok. Leave it out if you " +
-        "make videos.",
+    description = "Removes the bundled face-detection model and effect-creation component. " +
+        "Keeps the shared photo and video editor needed by comment pictures. Face effects and " +
+        "effect creation may stop working. Patch again without this to restore the removed files.",
     default = false,
 ) {
     category("Performance")
@@ -149,15 +148,12 @@ val studioCreationDebloatPatch = rawResourcePatch(
     dependsOn(buildChoicePatch(BuildChoice.CREATION))
 
     execute {
-        // The camera feature dex stays, like every lib/*/libdex_*.so: TikTok injects them all at
-        // start-up, and an empty one left its own strings in English on a Spanish phone (#125).
+        // Keep feature DEX and the shared effect/VE libraries. Their *_plugin.so filenames
+        // export the core libeffect.so / libttvesdk.so SONAMEs that the comment image editor's
+        // retained NLE libraries need. Filename-only dependency audits missed those aliases.
         val nativeFiles = listOf(
             "lib/arm64-v8a/libEffectCreatorJni.so",
-            "lib/arm64-v8a/libeffect_plugin.so",
-            "lib/arm64-v8a/libttvesdk_plugin.so",
             "lib/armeabi-v7a/libEffectCreatorJni.so",
-            "lib/armeabi-v7a/libeffect_plugin.so",
-            "lib/armeabi-v7a/libttvesdk_plugin.so",
         )
         decode("assets/model/ttfacemodel/**")
         val result = stripVerifiedResources(
@@ -294,8 +290,6 @@ internal val coreAssetProfiles = listOf(
 private val studioArm64Files = listOf(
     file("assets/model/ttfacemodel/tt_face_v11.1.model", "c4b081d04f6829f7cd5849abca0941891f1a7f2cb250efd7f0e42fece5426610"),
     file("lib/arm64-v8a/libEffectCreatorJni.so", "b7db28436aa1ccd85e3d52d1f916817397be6b35dfff40d1bb69d0d5251a3293"),
-    file("lib/arm64-v8a/libeffect_plugin.so", "2990d5bf76d832b4a6c25bbd9540f3191e86aa8342c54a638fad26ada2806be3"),
-    file("lib/arm64-v8a/libttvesdk_plugin.so", "0f1cc7737330f8a9b81e03f3ab15eecea197254c16c23b5492c5424aaf51d6c0"),
 )
 
 private val studioAssets = ResourceProfile(
@@ -303,8 +297,6 @@ private val studioAssets = ResourceProfile(
     studioArm64Files +
         listOf(
             file("lib/armeabi-v7a/libEffectCreatorJni.so", "d3ae58712413c2d1d06dcf508eb7850452f58c93b9befd57867cd029421c9482"),
-            file("lib/armeabi-v7a/libeffect_plugin.so", "f89bd50e941392fee2e47d031711fdce3520dae7f3e531da59dd0afbbec9d91c"),
-            file("lib/armeabi-v7a/libttvesdk_plugin.so", "42ab2be66f2b02622f52062fc3ff1b4862f44f0098faecfac3996afe3e7cf1f9"),
         ),
 )
 
@@ -312,11 +304,7 @@ internal val studioAssetProfiles = listOf(
     studioAssets,
     bundleOf(
         studioAssets,
-        "lib/arm64-v8a/libeffect_plugin.so",
-        "lib/arm64-v8a/libttvesdk_plugin.so",
         "lib/armeabi-v7a/libEffectCreatorJni.so",
-        "lib/armeabi-v7a/libeffect_plugin.so",
-        "lib/armeabi-v7a/libttvesdk_plugin.so",
     ),
 )
 

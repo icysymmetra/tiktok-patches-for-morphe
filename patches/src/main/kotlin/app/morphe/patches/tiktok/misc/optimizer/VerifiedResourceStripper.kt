@@ -86,6 +86,14 @@ internal fun stripVerifiedResources(
         .firstOrNull(::isStartupDex)?.let { path ->
             throw PatchException("$patchName: $path is a feature dex TikTok loads at start-up, so it can't be emptied.")
         }
+    // These plugin filenames export core SONAMEs required by the retained NLE comment-photo
+    // editor. A reviewed digest identifies a file; it does not make removing it safe.
+    (standaloneFiles + profiles.flatMap { profile -> profile.files.map(ResourceFileContract::path) })
+        .firstOrNull { path ->
+            Regex("^lib/[^/]+/lib(effect|ttvesdk)(_plugin)?\\.so$").matches(path)
+        }?.let { path ->
+            throw PatchException("$patchName: $path is a shared comment photo editor dependency, so it can't be emptied.")
+        }
 
     val actual = linkedMapOf<String, File>()
     scanDirectories.forEach { path ->

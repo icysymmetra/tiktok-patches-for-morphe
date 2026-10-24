@@ -288,6 +288,51 @@ public class VideoFitTest {
         return ((FrameLayout.LayoutParams) view.getLayoutParams()).gravity;
     }
 
+    @Test public void aRecycledSquareVideoKeepsItsReplacementLayoutCentredInTheFeed() {
+        replacementSquareStaysCentred(false);
+    }
+
+    @Test public void aRecycledSquareVideoKeepsItsReplacementLayoutCentredInStories() {
+        replacementSquareStaysCentred(true);
+    }
+
+    private void replacementSquareStaysCentred(boolean story) {
+        try (var controller = Robolectric.buildActivity(android.app.Activity.class).setup().visible()) {
+            var activity = controller.get();
+            Utils.setContext(activity);
+            FrameLayout container = new FrameLayout(activity);
+            View video = new View(activity);
+            container.addView(video, new FrameLayout.LayoutParams(1440, 2560, android.view.Gravity.BOTTOM));
+            container.layout(0, 0, 1080, 2200);
+            Settings.FIT_VIDEO_TO_SCREEN.save(true);
+            // The previous video gave the extension ownership of these layout parameters.
+            VideoFit.fitted(video, new Result(1440, 2560, 0f, 0f, null));
+            assertEquals(android.view.Gravity.CENTER, gravityOf(video));
+
+            // A recycled cell receives fresh host-owned layout parameters for a 1:1 video.
+            var replacement = new FrameLayout.LayoutParams(1080, 1080, android.view.Gravity.CENTER);
+            video.setLayoutParams(replacement);
+            Result square = new Result(1080, 1080, 0f, 0f, null);
+            if (story) {
+                assertEquals(VideoFit.LEAVE, VideoFit.fitWidthFor(square, video));
+            } else {
+                assertSame(square, VideoFit.fitted(video, square));
+            }
+            // TikTok's applier retains dimensions that already match and applies its offsets.
+            video.setTranslationX(square.getTranslateX());
+            video.setTranslationY(square.getTranslateY());
+            int exact = View.MeasureSpec.EXACTLY;
+            container.measure(View.MeasureSpec.makeMeasureSpec(1080, exact),
+                    View.MeasureSpec.makeMeasureSpec(2200, exact));
+            container.layout(0, 0, 1080, 2200);
+            assertEquals("the square video moved below the centre after recycling", 560, video.getTop());
+            assertSame(replacement, video.getLayoutParams());
+            assertEquals(android.view.Gravity.CENTER, gravityOf(video));
+        } finally {
+            Settings.FIT_VIDEO_TO_SCREEN.save(false);
+        }
+    }
+
     @Test public void thePageKeepsFitAndFillApart() {
         try (var controller = Robolectric.buildActivity(TestActivity.class).setup().visible()) {
             var activity = controller.get();
