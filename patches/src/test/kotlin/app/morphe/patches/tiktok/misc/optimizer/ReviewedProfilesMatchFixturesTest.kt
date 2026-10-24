@@ -36,6 +36,13 @@ class ReviewedProfilesMatchFixturesTest {
     )
 
     @Test
+    fun `core asset removal preserves Java-loaded content credential and runtime libraries`() {
+        val protected = Regex("^lib/[^/]+/lib(tt_c2pa_sdk(_d)?|artlog_monitor)\\.so$")
+        val removed = coreAssetProfiles.flatMap { it.files }.map { it.path }.filter(protected::matches)
+        assertEquals("Java loads these libraries without a native DT_NEEDED edge (#201)", emptyList<String>(), removed)
+    }
+
+    @Test
     fun `every fixture matches one reviewed profile of every strip, byte for byte`() {
         val apks = fixtures()
         val wanted = groups.values.flatten().flatMap { it.files }.map { it.path }.toSet()

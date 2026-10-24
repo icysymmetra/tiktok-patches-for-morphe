@@ -49,10 +49,10 @@ val p2pRelayBlockerPatch = rawResourcePatch(
 
 @Suppress("unused")
 val coreAssetDebloatPatch = rawResourcePatch(
-    name = "Remove content credential and card scanner assets",
-    description = "Removes TikTok's payment card scanner and content credential files, saving " +
-        "about 11 MB of storage. Anything in TikTok that needs them may stop working. Only " +
-        "patching again without it brings them back.",
+    name = "Remove card scanner assets",
+    description = "Removes TikTok's bundled payment card scanner files. Keeps the content " +
+        "credential and runtime libraries loaded by other features, including photo comments. " +
+        "Card scanning may stop working. Patch again without this to restore the removed files.",
     default = false,
 ) {
     category("Performance")
@@ -60,23 +60,10 @@ val coreAssetDebloatPatch = rawResourcePatch(
     dependsOn(buildChoicePatch(BuildChoice.CORE))
 
     execute {
-        // Only libraries nothing else in the APK links against. An emptied .so that another
-        // library names in its DT_NEEDED list fails that library's dlopen ("file offset >=
-        // file size: 0 >= 0"), and TikTok's Librarian turns that into an uncaught error.
-        // libbytemonitor is needed by libbytebench, which the whole video editor stack loads,
-        // so emptying it killed the app the moment the Create tab opened (S22, 2026-09-17);
-        // libprofiler is needed by the crash handler's npth_ref_monitor and reschecker. Both stay.
-        // So do Pitaya (its feature dex, its libraries and the Python runtime it loads) and the
-        // live cast feature dex: every lib/*/libdex_*.so is injected at start-up, and an empty one
-        // left TikTok's own strings in English on a Spanish phone (#125).
-        val nativeFiles = listOf(
-            "lib/arm64-v8a/libtt_c2pa_sdk.so",
-            "lib/arm64-v8a/libtt_c2pa_sdk_d.so",
-            "lib/armeabi-v7a/libtt_c2pa_sdk.so",
-            "lib/armeabi-v7a/libtt_c2pa_sdk_d.so",
-            "lib/arm64-v8a/libartlog_monitor.so",
-            "lib/armeabi-v7a/libartlog_monitor.so",
-        )
+        // No DT_NEEDED edge does not mean a library is unused: Java loads C2PA during photo
+        // comments (#201), and ArtLogVerbosity loads artlog_monitor in its static initializer.
+        // Keep every native library in this group and remove only the reviewed scanner assets.
+        val nativeFiles = emptyList<String>()
         decode("assets/microblink/**")
         val result = stripVerifiedResources(
             get("."),
@@ -233,29 +220,6 @@ private val microblinkFiles = listOf(
     file("assets/microblink/blinkcard/device_list_mb.json", "07b3a400c1246e09de51fc15c57308d5ff0feeb09ae2bbfa3511fdd4afe06aed"),
 )
 
-// One reviewed path set per strip for the declared build, read off its universal APK and its
-// split bundle. The log monitor, camera, relay and link mic libraries are rebuilt from one
-// TikTok build to the next, so a strip refuses any other build's files ("no
-// reviewed path set matched"), and a build the bundle moves to needs its own sets read off its
-// fixtures. The Microblink files and the C2PA debug libraries have been byte-identical on every
-// build read so far, and 47.4.3 rebuilt the main C2PA library.
-private val c2paArm64Files = listOf(
-    file("lib/arm64-v8a/libtt_c2pa_sdk.so", "930a55727f14497d1e4bbc2756282eae8e11140e2495ab8bbed8c10099e80c45"),
-    file("lib/arm64-v8a/libtt_c2pa_sdk_d.so", "a64ce0fb43e7c22e2d95d8bbfcaede522d585c5d51dbae87d24db1359c27a01a"),
-)
-
-private val c2paArmeabiFiles = listOf(
-    file("lib/armeabi-v7a/libtt_c2pa_sdk.so", "1dd736b9620a9a6e01dc7692ed8a7f141ca6e344bf632b2d93cd0e88e0251957"),
-    file("lib/armeabi-v7a/libtt_c2pa_sdk_d.so", "a96af4a99de68503234e3ab658d9702ac436ae1e0650dc5551e4e29a89700b0c"),
-)
-
-// 47.4.3 (APKMirror's universal APK, read on 2026-10-17). Its split bundle holds the universal
-// APK's bytes for every file it carries.
-private val monitorFiles = listOf(
-    file("lib/arm64-v8a/libartlog_monitor.so", "58ef4dc22fbbfae9ed1099ceba0f9c8549bdf6ecdb46c7a52b92ad0102fb19d3"),
-    file("lib/armeabi-v7a/libartlog_monitor.so", "2f5810cf024b209e0c6de883af8ca92325217571a39d4ad58035cb8c3ea0c251"),
-)
-
 // APKMirror also sells TikTok as a split bundle (tiktok-47-4-3, "arm64-v8a + armeabi-v7a",
 // 120-640dpi, read on 2026-10-17). Morphe Manager and the desktop CLI merge every split in one,
 // and every file the merged APK shares with the universal APK is byte-identical: the arm64
@@ -273,18 +237,10 @@ private fun bundleOf(profile: ResourceProfile, vararg absent: String): ResourceP
     return ResourceProfile("${profile.label} split bundle", profile.files.filterNot { it.path in absent })
 }
 
-private val coreAssets = ResourceProfile(
-    "TikTok 47.4.3",
-    microblinkFiles + c2paArm64Files + c2paArmeabiFiles + monitorFiles,
-)
-
 internal val coreAssetProfiles = listOf(
-    coreAssets,
-    bundleOf(
-        coreAssets,
-        "lib/arm64-v8a/libtt_c2pa_sdk_d.so",
-        "lib/armeabi-v7a/libtt_c2pa_sdk_d.so",
-    ),
+    // The universal APK and split bundle have the same scanner assets. Java-loaded C2PA and
+    // runtime libraries stay intact regardless of ABI; their absence from DT_NEEDED is unsafe.
+    ResourceProfile("TikTok 47.4.3", microblinkFiles),
 )
 
 private val studioArm64Files = listOf(

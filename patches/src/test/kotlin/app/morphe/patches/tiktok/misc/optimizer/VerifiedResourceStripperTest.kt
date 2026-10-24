@@ -16,6 +16,23 @@ import org.junit.rules.TemporaryFolder
 
 class VerifiedResourceStripperTest {
     @Test
+    fun `Java-loaded content credential and runtime libraries cannot be emptied`() {
+        val names = listOf("libtt_c2pa_sdk.so", "libtt_c2pa_sdk_d.so", "libartlog_monitor.so")
+        for (abi in listOf("arm64-v8a", "armeabi-v7a")) {
+            for ((index, name) in names.withIndex()) {
+                val root = temporary.newFolder("java-loaded-$abi-$index")
+                val path = "lib/$abi/$name"
+                val file = root.write(path, "Java-loaded native library")
+                val profile = ResourceProfile("reviewed runtime", listOf(ResourceFileContract(path, sha256("Java-loaded native library"))))
+                assertThrows(PatchException::class.java) {
+                    stripVerifiedResources(root, "Core assets", emptyList(), listOf(path), listOf(profile))
+                }
+                assertArrayEquals("Java-loaded native library".toByteArray(), file.readBytes())
+            }
+        }
+    }
+
+    @Test
     fun `shared comment photo editor libraries cannot be emptied even with reviewed digests`() {
         for ((index, name) in listOf("libeffect.so", "libeffect_plugin.so", "libttvesdk.so", "libttvesdk_plugin.so").withIndex()) {
             val root = temporary.newFolder("shared-photo-$index")

@@ -31,7 +31,7 @@ class DefaultSelectionPolicyTest {
         "Network request report" to "a research tool that counts every API request, with no switch",
         "Region spoof" to "rewrites every locale and timezone read, sign-in included, and its store region switch is experimental",
         "Remove LIVE extras" to "takes files out of the APK while patching",
-        "Remove content credential and card scanner assets" to "takes files out of the APK while patching",
+        "Remove card scanner assets" to "takes files out of the APK while patching",
         "Remove creation tools" to "takes files out of the APK while patching",
         "Remove unused language packs" to "takes files out of the APK while patching",
         "Run beside the store app" to "registers a cloned package under TikTok's own name",

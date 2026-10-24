@@ -94,6 +94,14 @@ internal fun stripVerifiedResources(
         }?.let { path ->
             throw PatchException("$patchName: $path is a shared comment photo editor dependency, so it can't be emptied.")
         }
+    // Java loads these directly, so an ELF DT_NEEDED-only audit cannot see their consumers.
+    // Empty C2PA caused the comment picture loader to throw EOFException in #201.
+    (standaloneFiles + profiles.flatMap { profile -> profile.files.map(ResourceFileContract::path) })
+        .firstOrNull { path ->
+            Regex("^lib/[^/]+/lib(tt_c2pa_sdk(_d)?|artlog_monitor)\\.so$").matches(path)
+        }?.let { path ->
+            throw PatchException("$patchName: $path is loaded directly by Java, so it can't be emptied.")
+        }
 
     val actual = linkedMapOf<String, File>()
     scanDirectories.forEach { path ->
