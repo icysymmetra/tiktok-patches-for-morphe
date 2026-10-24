@@ -1,3 +1,16 @@
+# [0.9.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.1...v0.9.0-dev.2) (2026-10-24)
+
+
+### Bug Fixes
+
+* **tiktok:** preserve comment editor libraries and recycled video layout ([228f052](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/228f052a0dbf068d307d5eed2f9af10375380b26))
+
+
+
+
+
+## 0.9.0-dev.2
+
 # [0.9.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.1...v0.9.0-dev.1) (2026-10-23)
 
 
