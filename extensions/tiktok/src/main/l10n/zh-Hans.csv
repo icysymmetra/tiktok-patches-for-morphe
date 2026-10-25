@@ -1,0 +1,2182 @@
+source,target
+%1$d already matched,%1$d 已匹配
+%1$d areas were checked and everything they need is here.,检查了 %1$d 区域，他们需要的一切都在这里.
+%1$d comments and replies loaded,%1$d 评论和回复已加载
+%1$d fields overridden,%1$d 字段被覆盖
+%1$d fields will be overridden when requested,%1$d 字段将在请求时被覆盖
+%1$d filtered out,%1$d 已过滤掉
+%1$d gates selected,已选择 %1$d 门
+%1$d minutes left,还剩 %1$d 分钟
+%1$d overrides were turned off because the Lab couldn't confirm their gates are unchanged in TikTok %2$s. Review them before turning them back on.,%1$d 覆盖已关闭，因为实验室无法确认其门在 TikTok %2$s 中未更改。在重新打开它们之前检查它们.
+%1$d rejected,%1$d 被拒绝
+%1$d results,%1$d 结果
+%1$d results so far,到目前为止 %1$d 结果
+"%1$d results so far, and more not counted",到目前为止 %1$d 结果，还有更多结果未计算在内
+"%1$d results, filtered to %2$s",%1$d 结果，过滤为 %2$s
+%1$d setting in that file can't be restored here and was skipped,该文件中的 %1$d 设置无法在此处恢复并已被跳过
+%1$d setting wasn't in that file and was left as it is,%1$d 设置不在该文件中，并保持原样
+%1$d settings in that file can't be restored here and were skipped,该文件中的 %1$d 设置无法在此处恢复并已被跳过
+%1$d settings weren't in that file and were left as they are,%1$d 设置不在该文件中，并保持原样
+%1$d unavailable,%1$d 不可用
+%1$s (%2$s),%1$s (%2$s)
+%1$s (TikTok value),%1$s（TikTok 值）
+"%1$s (custom, unverified)",%1$s（自定义，未经验证）
+%1$s (override returned),%1$s（覆盖返回）
+%1$s (will be returned when requested),%1$s（将根据要求返回）
+%1$s and above,%1$s 及以上
+%1$s appears more than once in this file.,%1$s 在此文件中出现多次.
+%1$s day,%1$s 天
+%1$s days,%1$s 天
+%1$s destinations must start with %2$s,%1$s 目的地必须以 %2$s 开头
+%1$s dp,%1$s dp
+%1$s entries skipped.,跳过 %1$s 条目.
+%1$s entry skipped.,%1$s 条目已跳过.
+"%1$s has type %2$s, but the file says %3$s.",%1$s 的类型为 %2$s，但文件显示为 %3$s.
+"%1$s hid everything TikTok sent, %2$d times in a row. Turn it off if that's not what you wanted.",%1$s 连续 %2$d 次隐藏了 TikTok 发送的所有内容。如果这不是您想要的，请将其关闭.
+%1$s is a kind of value the Lab can't override.,%1$s 是实验室无法覆盖的一种值.
+%1$s is already hidden,%1$s 已隐藏
+%1$s is imported. Restart TikTok to see it.,%1$s 已导入。重新启动 TikTok 即可看到.
+%1$s is imported. Turn on Use an imported font to see it.,%1$s 已导入。打开“使用导入的字体”即可查看它.
+%1$s is removed,%1$s 已删除
+%1$s is removed. Restart TikTok to see the change.,%1$s 已删除。重新启动 TikTok 以查看更改.
+"%1$s is too long for a settings backup. Shorten it, then save the backup again.",%1$s 对于设置备份来说太长。缩短它，然后再次保存备份.
+"%1$s isn't a country code, so no video would ever match it. Use two letters, like GB, IE or US.",%1$s 不是国家/地区代码，因此没有视频与其匹配。使用两个字母，例如 GB、IE 或 US.
+"%1$s isn't a language code, so no video would ever match it. Use two letters, like en, es or de.",%1$s 不是语言代码，因此没有视频可以匹配它。使用两个字母，例如 en、es 或 de.
+"%1$s isn't a language code. Use two letters, like en, es or de.",%1$s 不是语言代码。使用两个字母，例如 en、es 或 de.
+%1$s isn't in this Lab catalog.,%1$s 不在该实验室目录中.
+%1$s isn't installed or doesn't take links,%1$s 未安装或未获取链接
+%1$s items loaded,%1$s 物品已加载
+%1$s left,%1$s 左
+%1$s millisecond,%1$s 毫秒
+%1$s milliseconds,%1$s 毫秒
+%1$s min left,%1$s 还剩几分钟
+%1$s minute,%1$s 分钟
+%1$s minutes,%1$s 分钟
+%1$s more saves waiting,%1$s 更节省等待
+%1$s needs fixing. %2$s,%1$s 需要修复。 %2$s
+%1$s of %2$s,%1$s 的 %2$s
+%1$s older seen video was dropped to keep the newest %2$s.,%1$s 旧的观看视频已被删除，以保留最新的 %2$s.
+%1$s older seen videos were dropped to keep the newest %2$s.,%1$s 较旧的观看视频已被删除，以保留最新的 %2$s.
+%1$s picked,%1$s 已选中
+%1$s point,%1$s 点
+%1$s points,%1$s 点
+%1$s s,%1$s s
+%1$s second,%1$s 第二
+%1$s seconds,%1$s 秒
+%1$s time,%1$s 时间
+%1$s times,%1$s次
+%1$s to %2$s,%1$s 至 %2$s
+%1$s video,%1$s 视频
+%1$s video didn't fit in the newest %2$s.,%1$s 视频不适合最新的 %2$s.
+%1$s video had a date later than this phone's clock.,%1$s 视频的日期晚于此手机的时钟.
+%1$s video was already recorded.,%1$s 视频已录制.
+%1$s video was older than Forget seen videos after allows.,%1$s 视频早于允许后忘记看过的视频.
+%1$s videos,%1$s 视频
+%1$s videos didn't fit in the newest %2$s.,%1$s 视频不适合最新的 %2$s.
+%1$s videos had dates later than this phone's clock.,%1$s 视频的日期晚于此手机的时钟.
+%1$s videos left,剩余 %1$s 视频
+%1$s videos were already recorded.,%1$s 视频已录制.
+%1$s videos were older than Forget seen videos after allows.,%1$s 视频早于允许后忘记看过的视频.
+%1$s videos were recorded before each account kept its own list. They hide nothing until you add them here.,%1$s 视频是在每个帐户保留自己的列表之前录制的。在您将它们添加到此处之前，它们不会隐藏任何内容.
+%1$s view per comment,%1$s 每条评论的浏览量
+%1$s view per like,%1$s 每次点赞的观看次数
+%1$s views per comment,每条评论的 %1$s 浏览次数
+%1$s views per like,%1$s 每次点赞的观看次数
+%1$s was rejected. %2$s,%1$s 被拒绝。 %2$s
+%1$s watched video added.,%1$s 已添加观看视频.
+%1$s watched videos added.,%1$s 观看了已添加的视频.
+%1$s were already saved,%1$s 已保存
+%1$s · Metra's list only,仅 %1$s · Metra 的列表
+%1$s · current value only,%1$s · 仅当前值
+%1$s · declared by TikTok,%1$s · 由 TikTok 声明
+"%1$s · declared by TikTok, with a current value",%1$s · 由 TikTok 声明，具有当前值
+%1$s%%,%1$s%%
+"%1$s, %2$s or %3$s",%1$s、%2$s 或 %3$s
+"%1$s, %2$s, %3$s or %4$s",%1$s、%2$s、%3$s 或 %4$s
+"%1$s, %2$s, %3$s, %4$s, %5$s",%1$s、%2$s、%3$s、%4$s、%5$s
+"%1$s, about %2$s",%1$s，关于 %2$s
+"%1$s, selected",%1$s，已选择
+"%1$s, size unknown",%1$s，尺寸未知
+%1$s. %2$s,%1$s。 %2$s
+"%1$s: %2$d found, %3$d missing",%1$s：找到 %2$d，%3$d 丢失
+"%1$s: %2$d found, %3$d missing, and more it stopped counting",%1$s：找到%2$d，%3$d失踪，还有更多已停止计数
+"%1$s: %2$d found, %3$d missing, and more it stopped counting. First missing: %4$s",%1$s：找到%2$d，%3$d失踪，还有更多已停止计数。第一个失踪：%4$s
+"%1$s: %2$d found, %3$d missing. First missing: %4$s",%1$s：找到 %2$d，%3$d 丢失。第一个失踪：%4$s
+%1$s: %2$s,%1$s：%2$s
+%1$s: %2$s of %3$s files didn't finish,%1$s：%3$s 文件中的 %2$s 未完成
+%1$s: %2$s of %3$s files might not have finished,%1$s：%3$s 文件中的 %2$s 可能尚未完成
+%1$s: didn't finish,%1$s：未完成
+%1$s: might not have finished,%1$s：可能尚未完成
+%1$s: one of %3$s files didn't finish,%1$s：%3$s 文件之一未完成
+%1$s: one of %3$s files might not have finished,%1$s：%3$s 文件之一可能尚未完成
+1 comment or reply loaded,已加载 1 条评论或回复
+1 field overridden,1 个字段被覆盖
+1 field will be overridden when requested,1 个字段将在请求时被覆盖
+1 filtered out,1 过滤掉
+1 gate selected,已选择 1 个登机门
+1 min left,还剩 1 分钟
+1 override was turned off because the Lab couldn't confirm its gate is unchanged in TikTok %2$s. Review it before turning it back on.,1 覆盖已关闭，因为实验室无法确认其门在 TikTok %2$s 中未更改。重新打开之前请先检查一下.
+1 result,1 个结果
+1 result so far,到目前为止 1 个结果
+1 video left,还剩 1 个视频
+"2, from Keep playing in the background",2、从后台继续播放
+A LIVE in the feed can count down and take you into the room on its own. This keeps you in the feed until you tap it.,信息流中的 LIVE 可以倒计时并自行带您进入房间。这会让您一直处于信息流状态，直到您点击它为止.
+A LIVE room shows how many people are watching as a rounded number like 1.2K. This shows the exact count instead.,LIVE 房间以舍入数字（如 1.2K）显示正在观看的人数。这显示了确切的计数.
+A Lab change is already running,实验室变更已在运行
+"A change that makes your budget looser waits until the day starts over, and a stricter one applies at once. Looser means a higher or no budget, a shorter hold, more times to open the feed anyway, a new start hour, or turning this off. A restored backup follows the same rule, and Start today over is off while this is on.",一项让你的预算变得更宽松的改变要等到这一天重新开始时才适用，而更严格的改变则立即适用。宽松意味着更高的预算或没有预算、更短的保留时间、更多的时间打开信息流、新的开始时间或关闭此功能。还原的备份遵循相同的规则，当此选项打开时，“今天开始”将关闭.
+A comment poll shows how many picked each answer before you vote. Tapping an answer still votes.,评论民意调查显示您投票前有多少人选择了每个答案。点击答案仍然可以投票.
+A diagnostic report is already being saved,诊断报告已保存
+"A different account is signed in. Switch back to the one you set this up on, or enter who to message again.",已登录另一帐户。切换回您设置的帐户，或再次输入要向谁发送消息.
+A double tap on a message no longer adds a heart to it. A single tap and a long press work as before.,双击消息不再为其添加爱心。单击并长按即可像以前一样工作.
+A few seconds,几秒钟
+A field value couldn't be read. Check the values and try again.,无法读取字段值。检查这些值并重试.
+A file named hushfeed-safe-mode in TikTok's folder under Android/data paused Metra. Your settings stay as they are.,Android/data 下 TikTok 的文件夹中名为 hushfeed-safe-mode 的文件已暂停 Metra。您的设置保持原样.
+A forced value applies to this copy of TikTok whichever account is signed in. It can't get past a check the server makes.,无论登录哪个帐户，强制值都会应用于 TikTok 的此副本。它无法通过服务器进行的检查.
+"A good place to stop, if you want one.",如果你想要的话，这是一个停下来的好地方.
+"A green square in the top corner while TikTok has the camera open, and an orange diamond while it records sound. They go when the access ends.",当 TikTok 打开相机时，顶部角落会出现一个绿色方块，而在录制声音时，会出现一个橙色菱形。当访问结束时他们就会离开.
+"A link to one video opens just that video, and the feed won't swipe past it. It swipes again once another video plays, like after a refresh or a tap on Following, or when you come back to TikTok after %1$d minutes or more away. Auto-advance doesn't move on from it either.",指向一个视频的链接只会打开该视频，并且信息流不会滑过它。一旦另一个视频播放，例如刷新或点击“关注”后，或者当您在 %1$d 分钟或更长时间后返回到 TikTok 时，它会再次滑动。自动前进也不会继续.
+A long press on Comment plays the video at the hold speed instead of opening the emoji row. It needs Long press on TikTok default and Seek from the edges off.,长按“评论”会以保持速度播放视频，而不是打开表情符号行。需要将“长按 TikTok”设为“默认”，并关闭“从边缘拖动”.
+A long press on Favorites plays the video at the hold speed instead of offering a new collection. It needs Long press on TikTok default and Seek from the edges off.,长按“收藏夹”会以保持速度播放视频，而不是提供新的收藏。需要将“长按 TikTok”设为“默认”，并关闭“从边缘拖动”.
+A long press on Share plays the video at the hold speed instead of opening the quick share row. It needs Long press on TikTok default and Seek from the edges off.,长按“分享”会以保持速度播放视频，而不是打开快速分享栏。需要将“长按 TikTok”设为“默认”，并关闭“从边缘拖动”.
+A long press on a video you opened from search opens the same menu as on For You. It needs Long press on TikTok default.,长按从搜索中打开的视频会打开与“为您推荐”相同的菜单。默认需要长按TikTok.
+"A long press on a video you opened from someone's profile opens the same menu as on For You, not the small share sheet. It needs Long press on TikTok default.",长按您从某人的个人资料中打开的视频会打开与“为您”相同的菜单，而不是小共享表。默认需要长按TikTok.
+A message is already on its way,一条消息已经在路上
+A name of your own under this tab's icon. Leave it empty to keep TikTok's.,此选项卡图标下有您自己的名称。将其留空以保留 TikTok.
+A port is a whole number from 1 to 65535,端口是 1 到 65535 之间的整数
+A press on Share under a video copies its link instead of opening the share sheet. Press Share again right after to open the sheet.,按视频下的“共享”会复制其链接，而不是打开共享表。之后再次按“共享”即可打开工作表.
+"A profile's share sheet gets an Account facts button. It shows what TikTok already sent about the account: when it joined, its region and language, when its username and display name last changed, whether it's private and whether its liked videos are public. Nothing extra is fetched.",个人资料的共享表有一个帐户事实按钮。它显示 TikTok 已发送的有关该帐户的内容：加入时间、区域和语言、用户名和显示名称上次更改时间、是否是私人的以及其喜欢的视频是否是公开的。没有获取任何额外的内容.
+"A screen's layout is recorded. Export the diagnostic report to send it, or tap to record another.",屏幕的布局被记录。导出诊断报告以发送它，或点击以记录另一个报告.
+"A small label on the feed shows the minutes or videos left of today's budget, whichever is closer to running out.",信息流上的一个小标签显示了今天预算剩余的分钟或视频，以接近耗尽的为准.
+A tap on Home or on the For You tab while For You is showing no longer reloads it. The video you're on stays.,当“为您推荐”显示时，点击“主页”或“为您推荐”选项卡不再重新加载它。您正在观看的视频将保留.
+A video you paused stays paused when you come back to the app instead of starting again. One you left playing starts as usual. It works on Android 10 and newer.,当您返回应用程序而不是重新开始时，您暂停的视频将保持暂停状态。您留下的游戏将照常开始。它适用于 Android 10 及更高版本.
+A web address someone left in a comment can be tapped instead of copied out by hand. Tapping anywhere else in the comment still does what it did.,可以点击某人在评论中留下的网址，而无需手动复制。点击评论中的其他任何地方仍然会执行它所做的操作.
+AI Self,人工智能自我
+AI-generated posts,AI 生成的帖子
+About,关于
+About %1$s of storage at this limit,在此限制下大约有 %1$s 的存储空间
+About Metra,关于Hushfeed
+About overrides,关于覆盖
+Account facts,账户事实
+Account facts copied,已复制帐户事实
+Account facts on profiles,个人资料上的帐户事实
+Account region,账户区域
+Active,活跃
+Activity,活动
+Activity center (PIA),活动中心（PIA）
+Add,添加
+Add a button beside the block control that turns the feed's sound off and on.,在块控件旁边添加一个按钮，用于关闭和打开信息流的声音.
+Add a button beside the block control to send feedback about the current video.,在块控件旁边添加一个按钮以发送有关当前视频的反馈.
+Add a button that hides the current creator on this phone without blocking them.,添加一个按钮，隐藏此手机上的当前创建者而不阻止他们.
+Add a creator,添加创作者
+Add a seen-history file saved by Metra to the videos @%1$s has seen. A video in both keeps the newer date.,将 Metra 保存的观看历史文件添加到 @%1$s 看过的视频中。两者中的视频都保留了最新的日期.
+Add a seen-history file saved by Metra to this account's seen videos. A video in both keeps the newer date.,将 Metra 保存的观看历史记录文件添加到此帐户的观看视频中。两者中的视频都保留了最新的日期.
+Add a separate button that skips videos using the current sound.,添加一个单独的按钮，使用当前声音跳过视频.
+"Add a thin line along the bottom of a video story that you can drag to go back or skip ahead. The time shows while you drag, and a tap on it still moves between stories.",沿着视频故事的底部添加一条细线，您可以拖动该细线来返回或向前跳过。拖动时会显示时间，并且点击它仍然会在故事之间移动.
+Add apps to Share via,添加应用程序以通过以下方式共享
+Add hidden creator,添加隐藏的创建者
+Add older seen videos to this account,将较早看过的视频添加到此帐户
+Added %1$s,添加了 %1$s
+Added %1$s older seen videos to this account,已将 %1$s 较早看过的视频添加到此帐户
+Added %1$s seen videos,添加了 %1$s 看过的视频
+Added %1$s seen videos.,添加了 %1$s 看过的视频.
+Added 1 seen video,添加了 1 个看过的视频
+Added 1 seen video.,添加了 1 个看过的视频.
+Added one older seen video to this account,向此帐户添加了一个较早看过的视频
+Added to this account.,添加到此帐户.
+"Adds Export CSV and Export JSON buttons under the search box, so Search within comments must be on. They save the comments and replies loaded so far to a file you pick. Open the reply threads you want first.",在搜索框下方添加“导出 CSV”和“导出 JSON”按钮，因此必须打开“在评论中搜索”。这些按钮会把目前已加载的评论和回复保存到您选择的文件中。请先打开需要保存的回复串.
+"Adds Save cover next to Download when you share a video, so you save the cover only when you want it. While this is on, Download saves just the video, even with Save the cover as well on.",分享视频时，在“下载”旁边添加“保存封面”，让您只在需要时保存封面。启用后，“下载”只保存视频，即使“封面也保存下来”已开启.
+"Adds TikTok's translate button next to the comment count. One tap translates every comment, and another shows the originals again.",在评论计数旁边添加 TikTok 的翻译按钮。只需轻按一下即可翻译每条评论，再轻按一下即可再次显示原文.
+Adds a Record button to LIVE rooms. A recording starts when you tap it and ends when you tap Stop or leave the room. Nothing before that is saved.,向 LIVE 房间添加一个录制按钮。当您点击它时录音开始，当您点击停止或离开房间时录音结束。在此之前没有任何内容被保存.
+"Adds a search box that finds comments already loaded on this video, by words or username. It doesn't search all of TikTok.",添加一个搜索框，可按单词或用户名查找已加载到该视频的评论。它不会搜索整个 TikTok.
+Ads,广告
+Advanced,高级
+Advanced JSON value,高级 JSON 值
+Advanced. Find and force the hidden switches TikTok uses to test features.,先进。查找并强制 TikTok 用于测试功能的隐藏开关.
+After 1 minute,1分钟后
+After 15 minutes,15分钟后
+After 5 minutes,5分钟后
+All,全部
+All available languages,所有可用语言
+All events,所有活动
+All loaded tabs,所有加载的选项卡
+Allow Duet and Stitch anyway,无论如何都允许 Duet 和 Stitch
+Allow screenshots and Circle to Search,允许截图和圈选即搜
+Allow storage for TikTok in Android settings to record LIVEs,允许在 Android 设置中存储 TikTok 以录制 LIVE
+Allow storage for TikTok in Android settings to save covers,允许在 Android 设置中存储 TikTok 以保存封面
+Allow storage for TikTok in Android settings to save frames,允许在 Android 设置中存储 TikTok 以保存帧
+Allow storage for TikTok in Android settings to save profile pictures,允许在 Android 设置中存储 TikTok 以保存个人资料图片
+Allow storage for TikTok in Android settings to save sounds,允许在 Android 设置中存储 TikTok 以保存声音
+Allow storage for TikTok in Android settings to save stories,允许在 Android 设置中存储 TikTok 以保存故事
+Allow storage for TikTok in Android settings to save the live photo's clip,允许在 Android 设置中存储 TikTok 以保存实时照片的剪辑
+Allow voice comments,允许语音评论
+Already active,已经活跃
+Already marked as not interested,已标记为不感兴趣
+Also apply these filters to downloaded videos TikTok uses when the feed can't load enough new items.,当信息流无法加载足够的新项目时，还可以将这些过滤器应用于 TikTok 使用的下载视频.
+Also change the region TikTok reports internally. Keeps your interface language. Your IP address and your account's own rules still apply.,还要在内部更改区域 TikTok 报告。保留您的界面语言。您的 IP 地址和您帐户自身的规则仍然适用.
+Also hide videos whose text stickers match a blocked caption word. Text stickers are the words a creator types over the video in TikTok's editor. Text that's part of the picture itself can't be read.,还隐藏文本贴纸与被阻止的字幕词匹配的视频。文本贴纸是创作者在 TikTok 的编辑器中在视频上输入的文字。无法读取属于图片本身的文本.
+"Also on a block list, so still hidden: %1$s",也在阻止列表中，因此仍然隐藏：%1$s
+Also on opened videos,也在打开的视频上
+Also replaces the saved region and country code TikTok sends with every request. Signing in still sends your real region. Your IP address and your account's own rules still apply.,还替换随每个请求发送的保存的区域和国家/地区代码 TikTok。登录后仍会发送您的真实区域。您的 IP 地址和您帐户自身的规则仍然适用.
+Also turns on TikTok's own Auto scroll for videos opened from search. Restart TikTok to apply this.,还为从搜索中打开的视频打开 TikTok 自己的自动滚动功能。重新启动 TikTok 以应用此操作.
+Always show publish date,始终显示发布日期
+Always show the publish date in video author information. Restart TikTok to apply this.,始终在视频作者信息中显示发布日期。重新启动 TikTok 以应用此操作.
+Always upload in HD,始终以高清格式上传
+Amazon Appstore,亚马逊应用商店
+"An exception names one creator, so a pattern can't be one: %1$s",异常指定了一位创建者，因此模式不能是：%1$s
+"An exception takes a handle or id, not a display name: %1$s",异常采用句柄或 ID，而不是显示名称：%1$s
+"An interrupted settings change couldn't be recovered, so its record was set aside. Check your settings or restore a backup.",中断的设置更改无法恢复，因此其记录被搁置。检查您的设置或恢复备份.
+"An operator code is five or six digits, like 310260",操作员代码为五位或六位数字，例如 310260
+An override changes the value TikTok reads from this gate. It doesn't change TikTok's saved copy or prove the named feature changed.,覆盖会更改 TikTok 从此门读取的值。它不会更改 TikTok 的已保存副本或证明指定功能已更改.
+And %1$s more saves,并且 %1$s 更多节省
+And one more save,还有一个保存
+"Android stops telling TikTok a VPN is on, and the VPN's tunnel is left out of the network list. TikTok can still see the VPN's IP address. Leave this off if you need a feature that checks for a VPN.",Android 停止告诉 TikTok VPN 已打开，并且 VPN 的隧道被排除在网络列表之外。 TikTok 仍然可以看到 VPN 的 IP 地址。如果您需要检查 VPN 的功能，请保留此选项.
+Animated sticker format,动画贴纸格式
+"Animated stickers and GIFs decode each frame as it's shown instead of a few ahead, so they use a little less memory. Applies to the next ones that load.",动画贴纸和 GIF 在显示时解码每一帧，而不是前面的几帧，因此它们使用的内存较少。适用于下一个加载的内容.
+App,应用程序
+App AB,应用程序AB
+App lock,应用锁
+AppGallery,应用程序库
+Appearance,外观
+"Applies to Save the sound as well and to Save the original sound on a long press. Opus makes a smaller file, but the sound is encoded again from TikTok's copy.",也适用于保存声音以及长按时保存原始声音。 Opus 制作了一个较小的文件，但声音是从 TikTok 的副本中再次编码的.
+Applies to both video and photo downloads.,适用于视频和照片下载.
+Apply,申请
+Apply enables these overrides. Undo last Lab change puts your previous rules back until you change anything else in the Lab.,应用启用这些覆盖。撤消上次实验室更改会恢复之前的规则，直到您更改实验室中的其他任何内容.
+Apply overrides,应用覆盖
+"Apply saves these overrides. Turn on overrides in the Lab to use them. Turning them on is a Lab change too, so after that Undo turns them off rather than putting your previous rules back.",应用保存这些覆盖。在实验室中打开覆盖即可使用它们。打开它们也是实验室更改，因此在撤消之后将它们关闭，而不是恢复之前的规则.
+Applying Calm feed,正在应用平静信息流
+Around the video,围绕视频
+Arrange your feed and bottom tabs,整理信息流和底部标签页
+As TikTok sent it (M4A or MP3),正如 TikTok 发送的那样（M4A 或 MP3）
+"Ask TikTok for search results that aren't personalized to your account. This changes results, not search buttons or suggestions.",向 TikTok 询问未针对您的帐户进行个性化的搜索结果。这会更改结果，而不是搜索按钮或建议.
+Ask for the quality on each save,询问每次保存的质量
+"Ask for the unlock your phone uses, like a fingerprint or a PIN, when TikTok starts and when you come back to it. A link you open from another app still goes to its video once you unlock. While this is on, TikTok's preview in recent apps stays blank. Needs a screen lock on the phone.",当 TikTok 启动和返回时，要求您的手机使用解锁方式，例如指纹或 PIN。解锁后，您从其他应用程序打开的链接仍会转到其视频。启用此功能后，TikTok 在最近的应用程序中的预览保持空白。需要手机屏幕锁定.
+Attention,注意
+Audio,音频
+Author text size,作者文字大小
+Auto translate comments,自动翻译评论
+Auto-advance,自动前进
+Auto-advance in search results,搜索结果自动前进
+Auto-advance session limit,自动提前会话限制
+Auto-advance stopped after %1$d videos,自动前进在 %1$d 视频后停止
+Auto-advance stopped after one video,播放完一个视频后自动前进停止
+Auto-advance videos,自动播放视频
+Automatic,自动
+Automatic (TikTok's file),自动（TikTok 的文件）
+Automatic Clear display,自动清除显示
+Avatar and follow button,头像和关注按钮
+Back,返回
+Back to defaults,恢复默认设置
+Back up settings,备份设置
+Backup and restore,备份和恢复
+Bigger progress bar handle,更大的进度条手柄
+Bio copied,简历已复制
+Black,黑色
+Block clipboard reads,阻止剪贴板读取
+Block contact list access,阻止联系人列表访问
+Block from a comment's menu,阻止评论菜单
+Block installed app scanning,阻止已安装的应用程序扫描
+Block location,街区位置
+Block motion sensors,块运动传感器
+Block new bottom tabs,阻止新的底部标签
+Block new feed tabs,阻止新的信息流标签页
+Block popups,阻止弹出窗口
+Block suggested video notifications,阻止建议的视频通知
+Block the advertising ID,屏蔽广告ID
+"Block the creator in one tap. Once TikTok confirms, skip to the next video. A small Unblock button appears at the top left for two seconds. You can also unblock later in TikTok's Privacy > Blocked accounts.",一键屏蔽创作者。 TikTok 确认后，跳至下一个视频。左上角会出现一个小的“解除阻止”按钮，持续两秒钟。您也可以稍后在 TikTok 的隐私 > 阻止的帐户中取消阻止.
+Block this commenter,屏蔽该评论者
+Block this creator,阻止该创作者
+Block this sound,阻止此声音
+Blocked,被阻止
+Blocked %1$s,已屏蔽 %1$s
+Blocked %1$s. Unblock,已阻止 %1$s。解锁
+Blocked account,帐户被冻结
+Blocked accounts,帐户被冻结
+Blocked and hidden creators,被屏蔽和隐藏的创作者
+Blocked caption words,屏蔽的标题文字
+Blocked comment words,被屏蔽的评论词
+Blocked creators,被屏蔽的创作者
+Blocked sound ids,被阻止的声音 ID
+Blocked sound names,被阻止的声音名称
+Blocked sounds,受阻的声音
+Blocking,阻塞
+Bottom tabs to keep,要保留的底部选项卡
+Brightness,亮度
+"Brings back the translation rows on TikTok's Language page, under Settings and privacy, for accounts that only see App language there.",对于仅在那里看到应用程序语言的帐户，在 TikTok 的语言页面上的“设置和隐私”下返回翻译行.
+For accounts TikTok took translation away from. Brings back See translation under video descriptions and in captions. Restart TikTok to see the change.,适用于被 TikTok 取消翻译的帐户。恢复视频描述下方和字幕中的“查看翻译”。重新启动 TikTok 以查看更改.
+"For accounts TikTok took translation away from. Brings back See translation under video descriptions and in captions, and the translation rows on the Language page in Settings and privacy. Restart TikTok to see it on videos.",适用于被 TikTok 取消翻译的帐户。恢复视频描述下方和字幕中的“查看翻译”，以及“设置和隐私”下语言页面上的翻译行。重新启动 TikTok 以在视频中查看.
+Browse,浏览
+Budgets and reminders,预算和提醒
+Build details,构建细节
+Build details copied to the clipboard,构建详细信息已复制到剪贴板
+Burn-in guard,老化防护
+Buttons on videos,视频上的按钮
+Calm feed,平静信息流
+Calm feed couldn't be applied. Nothing was changed.,无法应用平静信息流. 未进行任何更改.
+Calm feed couldn't start. Try again in a moment.,无法启动平静信息流. 请稍后重试.
+Calm feed is on.,平静信息流已开启.
+Calm feed is on. Restart TikTok to apply all changes.,平静信息流已开启。重新启动 TikTok 以应用所有更改.
+Camera and microphone in use,使用中的摄像头和麦克风
+Camera in use,相机使用中
+Can't check yet: %1$s,尚无法检查：%1$s
+Cancel,取消
+Caption above comments,评论上方的标题
+Caption background,标题背景
+Caption languages,字幕语言
+Caption text size,标题文字大小
+Captions,字幕
+"Captions, gestures and on-screen controls",字幕、手势和屏幕控制
+Capture crash reports locally,本地捕获崩溃报告
+Capture the feed,捕获信息流
+Changed,改变了
+Changed %1$d settings,更改了 %1$d 设置
+Changed 1 setting,更改了 1 个设置
+Changes in Metra %1$s,Metra %1$s 的变化
+Changes to %1$s at %2$s,更改为 %1$s（位于 %2$s）
+Check for already-saved videos,检查已保存的视频
+Choose %1$d to %2$d videos. Values outside this range use the nearest valid limit. Restart TikTok to apply this.,选择 %1$d 到 %2$d 视频。超出此范围的值使用最接近的有效限值。重新启动 TikTok 以应用此操作.
+Choose a backup file. Your current settings are kept for Undo.,选择一个备份文件。您当前的设置将保留以供撤消.
+Choose a folder on internal storage. SD cards aren't supported.,选择内部存储上的文件夹。不支持 SD 卡.
+Choose a preset to fill the SIM details.,选择一个预设来填充 SIM 卡详细信息.
+Choose a subfolder under %1$s.,选择 %1$s 下的子文件夹.
+Choose counts for this signed-in account. Leave a field empty to use TikTok's count. Zero shows zero. Choices stay on this phone.,选择此登录帐户的计数。将字段留空以使用 TikTok 的计数。零表示零。选择保留在这款手机上.
+Choose what reaches your feed,选择哪些内容进入您的信息流
+Choose which bottom tabs stay visible.,选择哪些底部选项卡保持可见.
+"Choose which feed tabs stay visible. If only For You is left, its tab name is hidden.",选择保留哪些信息流标签页. 如果只剩“为你”，其标签名称会隐藏.
+Choose which rows and controls appear,选择显示哪些行和控件
+Clean up shared links,清理共享链接
+Clear,清除
+Clear all,全部清除
+"Clear all Lab data (overrides, switch, recordings)",清除所有实验室数据（覆盖、切换、录音）
+Clear all suggested accounts,清除所有建议的帐户
+Clear diagnostic data,清除诊断数据
+Clear display,显示清晰
+Clear display delay,清晰显示延迟
+Clear preset,清除预设
+"Clear screen hides a LIVE's chat, gifts and buttons so only the stream shows. TikTok puts it in the menu of only some rooms. This adds it to the others.",清晰的屏幕隐藏了 LIVE 的聊天、礼物和按钮，因此只有流显示。 TikTok 仅将其放入某些房间的菜单中。这将其添加到其他内容中.
+Clear search,清除搜索
+Clear seen videos,清除看过的视频
+Clear the search,清除搜索
+Cleared. Tap to undo before TikTok closes.,清除。在 TikTok 关闭之前点击以撤消.
+Clearing,清算
+Clearing seen videos,清除已看过的视频
+Clearing suggested accounts,清除建议帐户
+"Clearing, %1$d so far",清算，到目前为止%1$d
+"Clears the recent events, saved crash reports, a recorded screen layout and the Hook status results above.",清除最近的事件、保存的崩溃报告、记录的屏幕布局和上面的 Hook 状态结果.
+Close,关闭
+Close TikTok after,之后关闭 TikTok
+Color commenter names,颜色评论者姓名
+"Comma separated names exactly as the row under a profile's bio shows them, such as TikTok Studio or Your orders. Restart TikTok to apply this.",逗号分隔的名称与个人资料简介下的行显示的名称完全相同，例如 TikTok Studio 或您的订单。重新启动 TikTok 以应用此操作.
+Comment export failed,评论导出失败
+Comment media filename,评论媒体文件名
+Comment sort and dislike styles,评论排序和不喜欢的风格
+"Comment with live photos, the camera or audio",使用实时照片、相机或音频进行评论
+Comments,评论
+Comments aren't available for this video,该视频无法发表评论
+Comments beside the video,视频旁边的评论
+Comments range,评论范围
+Compact comment header,紧凑的评论标题
+Compare gate reads with their previous values.,将门读数与其之前的值进行比较.
+Completed an interrupted settings change. Restart TikTok to apply this.,完成了中断的设置更改。重新启动 TikTok 以应用此操作.
+Config,配置
+Config (Settings Manager),配置（设置管理器）
+Confirm before a quick repost,快速重新发布之前先确认
+Confirm before following,关注前确认
+Confirm before liking,点赞前先确认
+Confirm before liking a comment,点赞评论前先确认
+Confirm before liking a story,喜欢故事之前先确认
+Continue supported videos from where you stopped when you scroll back to them.,当您滚动回支持的视频时，可以从停止处继续播放这些视频.
+Controls,控制
+Conversations,聊天
+Copy,复制
+Copy a quick report or save the full report as a file.,复制快速报告或将完整报告保存为文件.
+Copy bio and IDs,复制个人简介和 ID
+Copy build details,复制构建详细信息
+Copy comments without username,复制评论，无需用户名
+Copy only the comment text when using TikTok's copy comment action.,使用 TikTok 的复制评论操作时仅复制评论文本.
+Copy or save which patches and options this Metra was built with.,复制或保存构建此 Metra 所使用的补丁和选项.
+Copy quick report,复制快速报告
+Copy report,复印报告
+Copy the full link for short links,复制短链接的完整链接
+Copy the link with one press on Share,一键分享即可复制链接
+Copy the sound link,复制声音链接
+Copy the video link,复制视频链接
+Copy user ID,复制用户 ID
+Copy username,复制用户名
+Copy video ID,复制视频 ID
+Couldn't add the older seen videos. Try again.,无法添加较早看过的视频。再试一次.
+Couldn't change the Lab settings. Try again.,无法更改实验室设置。再试一次.
+Couldn't clear seen videos. Try again.,无法清除已看过的视频。再试一次.
+Couldn't clear the suggested accounts. Reopen the Inbox and try again.,无法清除建议的帐户。重新打开收件箱并重试.
+Couldn't confirm the block for %1$s. Open their profile to check.,无法确认 %1$s 的区块。打开他们的个人资料进行检查.
+Couldn't confirm the unblock for %1$s. Open their profile to check.,无法确认 %1$s 的解锁。打开他们的个人资料进行检查.
+Couldn't copy the build details. Use Save build details instead.,无法复制构建详细信息。请改用“保存构建详细信息”.
+Couldn't copy the report. Use Save report instead.,无法复制报告。请改用“保存报告”.
+Couldn't find this LIVE's stream to record. Leave the room and open it again.,找不到要录制的 LIVE 流。离开房间并再次打开它.
+Couldn't forget the saved videos. Try again.,无法忘记保存的视频。再试一次.
+Couldn't import watch history. Your saved history is unchanged.,无法导入观看历史记录。您保存的历史记录没有改变.
+Couldn't list your apps. Tap here to try again.,无法列出您的应用。点击此处重试.
+Couldn't open settings search. Reopen settings and try again.,无法打开设置搜索。重新打开设置并重试.
+Couldn't open that settings section. Reopen settings and try again.,无法打开该设置部分。重新打开设置并重试.
+Couldn't open the file picker to export. Try again.,无法打开要导出的文件选择器。再试一次.
+Couldn't open the file picker to import. Try again.,无法打开要导入的文件选择器。再试一次.
+Couldn't put back the diagnostic data. Try again.,无法恢复诊断数据。再试一次.
+Couldn't put the saved videos back. Try again.,无法恢复保存的视频。再试一次.
+Couldn't reach the proxy at %1$s. TikTok may not load until it's back or you turn the proxy off.,无法到达 %1$s 的代理。 TikTok 可能无法加载，直到它返回或您关闭代理.
+Couldn't read TikTok's current values (%1$s). Refresh values from the menu to try again.,无法读取 TikTok 的当前值 (%1$s)。从菜单中刷新值以重试.
+Couldn't read that file. Choose it again.,无法读取该文件。再选择一次.
+Couldn't read this list. Close it and try again.,无法阅读此列表。关闭它并重试.
+Couldn't read who posted this comment. Open their profile and block them there.,无法读取谁发表了此评论。打开他们的个人资料并在那里阻止他们.
+Couldn't record the screen's layout. Start again from Diagnostics.,无法记录屏幕布局。从诊断重新开始.
+Couldn't remove the imported font. Try again.,无法删除导入的字体。再试一次.
+Couldn't reset the settings. Try again.,无法重置设置。再试一次.
+Couldn't reset this override. Try again.,无法重置此覆盖。再试一次.
+Couldn't restart TikTok. Close it and open it again.,无法重新启动 TikTok。关闭它并再次打开它.
+Couldn't restore seen history. Your saved history is unchanged.,无法恢复可见的历史记录。您保存的历史记录没有改变.
+Couldn't restore the settings. Try again.,无法恢复设置。再试一次.
+Couldn't save the change. Try again.,无法保存更改。再试一次.
+Couldn't save the font in TikTok's storage. Free up some space and try again.,无法将字体保存到 TikTok 的存储中。释放一些空间并重试.
+Couldn't save the seen-history file. Try again.,无法保存查看的历史记录文件。再试一次.
+Couldn't save the settings backup. Try again.,无法保存设置备份。再试一次.
+Couldn't save these choices. Try again.,无法保存这些选择。再试一次.
+Couldn't save this override. Try again.,无法保存此覆盖。再试一次.
+Couldn't send the feedback. Try again in a moment.,无法发送反馈。稍后再试一次.
+Couldn't start saving the feed capture. Try again in a moment.,无法开始保存信息流捕获。稍后再试一次.
+Couldn't start the Lab change. Try again in a moment.,无法开始实验室更改。稍后再试一次.
+Couldn't start the export. Try again in a moment.,无法开始导出。稍后再试一次.
+Couldn't start the import. Try again in a moment.,无法开始导入。稍后再试一次.
+Couldn't start the report export. Try again in a moment.,无法开始报告导出。稍后再试一次.
+Couldn't start the settings change. Try again in a moment.,无法开始设置更改。稍后再试一次.
+Couldn't tell which folder to update. Choose it again.,无法判断要更新哪个文件夹。再选择一次.
+Couldn't translate this draft. Try again in a moment.,无法翻译此草稿。稍后再试一次.
+Couldn't translate this message. Try again in a moment.,无法翻译此消息。稍后再试一次.
+Couldn't undo that. Try again.,无法撤消该操作。再试一次.
+Couldn't undo the clear. Try again.,无法撤消清除。再试一次.
+Couldn't undo the last change. Try again.,无法撤消最后的更改。再试一次.
+Couldn't write the caption on this video. Saving it without.,无法为此视频编写字幕。保存它没有.
+Count a video as seen after,统计一段视频后看到的内容
+Country and network preferences,国家和网络偏好
+Country code,国家代码
+Country filters,国家过滤器
+Counts under the buttons,按钮下方的计数
+Cover saved to %1$s,封面保存至 %1$s
+Create,创建
+Creator exceptions,创作者例外
+Creators and sounds,创作者和声音
+Creators hidden on this phone,此手机上隐藏的创作者
+Creators you hid from a video. Search the list and remove one at a time.,您在视频中隐藏的创作者。搜索列表并一次删除一个.
+Crop the video until it covers the whole window. On a tall phone the black strip TikTok leaves under a video goes and so does a little of each side.,裁剪视频直到覆盖整个窗口。在高手机上，视频下方的黑色条带 TikTok 会消失，每一面都会消失.
+Current,当前
+Current %1$s,当前%1$s
+Current state,目前状态
+Current: %1$s,当前：%1$s
+Custom SIM details,自定义 SIM 卡详细信息
+Custom value,定制值
+Custom value…,自定义值…
+Cuts the tracking bits out of links you share.,从您共享的链接中删除跟踪位.
+DM translation preview,DM 翻译预览
+Daily budget,每日预算
+"Daily budgets, reminders and the hold",每日预算、提醒和保留
+Daily time budget,每日时间预算
+Daily video budget,每日视频预算
+Dark,黑暗
+Dark Favorites popup,深色收藏夹弹出窗口
+Days to remember a video. Zero removes the age limit. History keeps at most %1$s videos.,记住视频的日子。零消除了年龄限制。历史最多保留 %1$s 个视频.
+"Days. Zero keeps every age. Posts without a usable timestamp, including future posts, stay visible.",天。零保留着每个年龄。没有可用时间戳的帖子（包括未来的帖子）保持可见.
+Default,默认
+Default playback speed,默认播放速度
+Deletes %1$s from TikTok's storage.,从 TikTok 的存储中删除 %1$s.
+Delivery unconfirmed: %1$d/%2$d chats. Remaining chats still need a message.,交货未确认：%1$d/%2$d 聊天。剩余的聊天仍然需要消息.
+Delivery unconfirmed: %1$d/%2$d chats. Those chats won't be retried today.,交货未确认：%1$d/%2$d 聊天。今天不会重试这些聊天.
+Description text size,描述文字大小
+Destination updated,目的地已更新
+Details: %1$s,详细信息：%1$s
+Device access,设备接入
+"Device language, then original",设备语言，然后是原始语言
+Diagnostic data cleared. Tap again to put it back.,诊断数据已清除。再次点击即可将其放回去.
+Diagnostic data put back,诊断数据放回
+Diagnostic report copied to the clipboard,诊断报告已复制到剪贴板
+Diagnostics,诊断
+Dim when idle,空闲时变暗
+Dim when idle and shift,闲置和换档时变暗
+Disable,禁用
+Disabled,残疾人
+Discard edits,放弃编辑
+Dismissed %1$s suggested accounts,已驳回 %1$s 建议帐户
+Dismissed one suggested account,已关闭 1 个建议帐户
+Display name last changed,上次更改的显示名称
+Do nothing,什么也不做
+Doesn't follow you back,不跟着你回来
+Don't auto translate these languages,不要自动翻译这些语言
+Don't decode animated frames ahead,不要解码前面的动画帧
+Don't save new searches,不保存新搜索
+Don't start the feed on returning,返回时不要启动信息流
+Don't start the first video,不要开始第一个视频
+Done,完成
+Double tap,双击
+"Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.",下载列出了该视频的质量，以及每个视频的大小 TikTok 给出的大小，并保存您选择的一个。上述质量在下次保存时保持不变.
+Download original photos,下载原始照片
+Downloads,下载
+"Drag to move, release to place",拖动即可移动，松开即可放置
+Drag up or down along the left or right edge of a video to change what that edge strip is set to below. By default that's the screen brightness on the left and the volume on the right. Swiping anywhere else still scrolls the feed.,沿着视频的左边缘或右边缘向上或向下拖动以更改边缘条在下方的设置。默认情况下，左侧是屏幕亮度，右侧是音量。在其他地方滑动仍然会滚动信息流.
+Drama and Series,戏剧和连续剧
+"Draw a larger handle and a slightly thicker line on the progress bar, so it's easier to see where you are.",在进度条上画一个更大的手柄和一条稍粗的线，这样就更容易看到您所在的位置.
+Draw spoken captions at regular weight instead of TikTok's bold. Applies to the next caption.,以常规粗细绘制语音字幕，而不是 TikTok 的粗体。适用于下一个标题.
+Each area shows how many of the things Metra looks for were found in this TikTok and how many are missing.,每个区域显示在这个 TikTok 中找到了 Metra 寻找的东西以及丢失了多少东西.
+Easier comment likes,评论点赞更简单
+Edge strip width,封边条宽度
+Empty,空
+"Empty the menu that opens when you press and hold TikTok's icon on the home screen. Turning this off asks TikTok to build them again. Tapping the icon still opens the app, and a shortcut you pinned yourself stays where you put it.",清空按住主屏幕上的 TikTok 图标时打开的菜单。关闭此功能会要求 TikTok 再次构建它们。点击图标仍然会打开应用程序，并且您自己固定的快捷方式会保留在您放置的位置.
+Enable,启用
+Enabled,启用
+Enter a JSON object or array.,输入 JSON 对象或数组.
+Enter a creator handle or id,输入创建者句柄或 ID
+Enter a finite number.,输入一个有限的数字.
+Enter a number.,输入一个数字.
+"Enter a server name or IP address, without http:// or a port number",输入服务器名称或 IP 地址，不带 http:// 或端口号
+Enter a valid structured value.,输入有效的结构化值.
+Enter a valid two-letter country code,输入有效的两个字母的国家/地区代码
+"Enter a whole number, or one like 20K, 1.5M or 2B",输入整数，或 20K、1.5M 或 2B 等数字
+Enter a whole number.,输入一个整数.
+"Enter an hour, like 6 or 06:00.",输入一个小时，例如 6 或 06:00.
+Enter true or false.,输入真或假.
+Enter up to %1$d comma-separated speeds from %2$s to %3$s,输入从 %2$s 到 %3$s 的最多 %1$d 逗号分隔速度
+Enter who to message below to start.,在下方输入要向谁发送消息即可开始.
+Entry %1$d has a field with the wrong data type.,条目 %1$d 有一个数据类型错误的字段.
+Entry %1$d isn't an object.,条目 %1$d 不是对象.
+Errors,错误
+Everything this list has loaded is picked or saved. Scroll down to load more.,此列表已加载的所有内容都会被选取或保存。向下滚动以加载更多.
+Expand activity list,展开活动列表
+Explore or Community,探索或社区
+Export CSV,导出CSV
+Export JSON,导出JSON
+Export comments,导出评论
+Export diagnostic report,导出诊断报告
+Export loaded values,导出加载的值
+Exported %1$d comments and %2$d replies,已导出 %1$d 评论和 %2$d 回复
+Exported %1$d loaded values,导出的 %1$d 加载值
+Exported 1 loaded value,导出 1 个加载值
+"Fade the buttons, caption and tabs over the video to this level instead of hiding them. 100 leaves them as TikTok draws them. Faded controls still take taps. At 0 the buttons and caption are hidden, and the tabs stay at 10.",将视频上的按钮、标题和选项卡淡入淡出至此级别，而不是隐藏它们。 100 留下它们，因为 TikTok 绘制它们。褪色的控件仍然需要点击。为 0 时，按钮和标题被隐藏，选项卡保持为 10.
+Fade the feed out before the hold,在保持之前淡出信息流
+Fade the video controls,淡入淡出视频控件
+Fall back to the watermarked copy,退回到带水印的副本
+Favorites range,收藏范围
+Feature Gate Lab,功能开关实验室
+Feature gate override reset,功能门覆盖重置
+Feature gate override saved,功能门覆盖已保存
+Feature gate report copied,已复制功能门报告
+Feed and navigation,信息流和导航
+Feed button size,信息流按钮尺寸
+Feed capture saved to %1$s. Read it before you share it.,信息流捕获保存到 %1$s。在分享之前先阅读它.
+"Feed capture started. Scroll until the problem shows up, then come back here to stop.",信息流捕获开始。滚动直到出现问题，然后返回此处停止.
+Feed filter,信息流过滤器
+Feed screen,信息流界面
+Feed tabs,信息流标签页
+Feed tabs to keep,要保留的信息流选项卡
+"Field %1$s can't be changed on this build. Take it out of the override, or reset the override.",在此版本中无法更改字段 %1$s。将其从超驰中取出，或重置超驰.
+Field edits were discarded,字段编辑被丢弃
+Field edits weren't saved,字段编辑未保存
+Files,文件
+Fill the screen with the video,让视频填满屏幕
+Filter TikTok's offline videos,过滤TikTok的离线视频
+Filter bottom tabs,过滤器底部选项卡
+Filter comments by keyword,按关键字过滤评论
+Filter feed tabs,过滤信息流标签页
+Filter location-tagged videos,过滤带有位置标签的视频
+Filter settings,过滤器设置
+Filter the LIVE feed,过滤 LIVE 信息流
+Filter the list,过滤列表
+Filter: %1$s,过滤器：%1$s
+"Filters, translation and copy options",过滤器、翻译和复制选项
+Find the sound on YouTube Music,在 YouTube Music 上查找声音
+First caller,第一个来电者
+First rejection:,第一次拒绝:
+Fit the video to the screen,让视频适合屏幕
+Floating bottom bar,浮动底栏
+Focus,焦点
+Follow probe,跟随探头
+Followers,追随者
+Following,正在关注
+Follows you,跟着你
+"For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.",对于OLED屏幕。 5 秒没有触摸后，视频上的按钮、标题和选项卡会变暗四分之一，您的下一次触摸会将它们恢复。 Shift 还会每 2 分钟将信息流上的所有内容移动几个像素.
+For You,为你
+"For You, Following and the other feed tabs stay behind a calm panel and won't swipe. Messages, profiles and search work as usual, a link to one video still opens that video, and the app opens on Inbox instead of the feed.",对于您来说，关注和其他信息流选项卡保留在平静的面板后面并且不会滑动。消息、个人资料和搜索照常工作，指向一个视频的链接仍然会打开该视频，并且应用程序会在收件箱而不是信息流中打开.
+Forced %1$d gates of %2$d. The rest don't take a true or false value. Restart TikTok to apply this.,强制 %2$d 的 %1$d 门。其余的不采用 true 或 false 值。重新启动 TikTok 以应用此操作.
+Forced %1$d gates. Restart TikTok to apply this.,强制 %1$d 门。重新启动 TikTok 以应用此操作.
+Forced 1 gate of %2$d. The rest don't take a true or false value. Restart TikTok to apply this.,强制 %2$d 的 1 个门。其余的不采用 true 或 false 值。重新启动 TikTok 以应用此操作.
+Forced 1 gate. Restart TikTok to apply this.,强行1门。重新启动 TikTok 以应用此操作.
+Forced result,强制结果
+Forget saved videos,忘记保存的视频
+Forget seen videos after,忘记看过的视频
+Forget the %1$s seen videos.,忘记 %1$s 看过的视频.
+Forget the %1$s videos @%2$s has seen.,忘记 @%2$s 看过的 %1$s 视频.
+Forget the seen video.,忘记看过的视频了.
+Forget the video @%2$s has seen.,忘记@%2$s 看过的视频.
+Forget what has been counted today and end any hold. The budgets themselves are left alone.,忘记今天已计算的内容并结束任何保留。预算本身就不用管了.
+"Forget which videos Metra saved here, so the already-saved check starts over. The saved files and your settings stay. Turning the check off doesn't erase this record.",忘记 Metra 保存在此处的视频，因此已保存的检查会重新开始。保存的文件和您的设置将保留。关闭检查并不会删除该记录.
+Forgetting saved videos,忘记保存的视频
+Forgotten. Tap to put them back.,被遗忘了。点击将它们放回去.
+Found %1$s in your chats.,在您的聊天中发现%1$s.
+Frame saved to %1$s,帧保存到 %1$s
+Friends,朋友
+Friends tab name,好友选项卡名称
+"Friends won't see a green dot or Active now while you're in TikTok. Needs Ghost mode on. Their status may stop updating for you, and your last status can linger.",当您处于 TikTok 时，朋友现在不会看到绿点或“活动”。需要开启幽灵模式。他们的状态可能会停止为您更新，并且您的最后状态可能会持续存在.
+Full changelog,完整变更日志
+Full comment sort options,完整评论排序选项
+Full license,全牌照
+Full link copied,完整链接已复制
+Full long-press menu in search results,搜索结果中的完整长按菜单
+Full long-press menu on a creator's videos,创作者视频上的完整长按菜单
+Full report saved to %1$s,完整报告保存至 %1$s
+GIF,动图
+Galaxy Store,银河商店
+Gate data unavailable,门数据不可用
+Gate details,登机门详情
+Generated defaults,生成的默认值
+Gestures,手势
+Ghost mode,幽灵模式
+Ghost mode diagnostics,幽灵模式诊断
+"Give each commenter's name a color of its own, the same one every time you see that account, so a long thread is easier to follow.",为每个评论者的名字赋予自己的颜色，每次您看到该帐户时都使用相同的颜色，这样很长的线索就更容易理解.
+Go to the screen now. Metra records its layout in %1$d seconds.,现在转到屏幕。 Metra 在 %1$d 秒内记录其布局.
+Got it,明白了
+"HDR videos light the screen extra bright. This plays the standard (SDR) version instead, so the screen doesn't jump to full brightness. Videos with no standard version still play in HDR.",HDR 视频使屏幕显得格外明亮。这会播放标准 (SDR) 版本，因此屏幕不会跳至全亮度。无标准版本的视频仍以 HDR 格式播放.
+HTTP,HTTP协议
+Hand-off,交接
+Handle or id,句柄或 ID
+Hidden %1$s on this phone,此手机上隐藏了 %1$s
+Hidden LIVE categories,隐藏的 LIVE 类别
+Hidden commenters,隐藏评论者
+Hidden. Tap to show it again.,隐藏。点击即可再次显示.
+Hidden: %1$s,隐藏：%1$s
+Hide,隐藏
+Hide AI-generated videos,隐藏 AI 生成的视频
+Hide Add friends,隐藏 添加好友
+Hide Bulletin board,隐藏公告板
+Hide CAPTCHA popups,隐藏验证码弹出窗口
+Hide Check your sources warnings,隐藏检查来源警告
+Hide Footnotes,隐藏脚注
+Hide LIVE replays,隐藏 LIVE 重播
+Hide LIVE videos,隐藏 LIVE 视频
+Hide LIVE videos from the feed.,隐藏信息流中的 LIVE 视频.
+Hide LIVEs hosted by verified accounts.,隐藏由经过验证的帐户托管的直播.
+Hide LIVEs that TikTok labels as a paid partnership or promotional content.,隐藏 TikTok 标记为付费合作伙伴或促销内容的直播.
+Hide LIVEs that TikTok tags with a game or a gaming category.,隐藏带有游戏或游戏类别标记的 TikTok 的 LIVE.
+Hide LIVEs that sell products or carry a TikTok Shop tag.,隐藏销售产品或带有 TikTok 商店标签的 LIVE.
+Hide Search this image prompts,隐藏搜索此图片提示
+Hide Series,隐藏系列
+Hide Thoughts on profiles,隐藏对个人资料的想法
+Hide TikTok Shop,隐藏 TikTok 商店
+Hide TikTok Shop in search,隐藏 TikTok 搜索中的商店
+Hide TikTok Shop posts from the feed.,隐藏信息流中的 TikTok 商店帖子.
+"Hide TikTok's ""Search: ..."" banner above the comment count. This doesn't hide the comments or Metra's comment-search box.",隐藏评论计数上方 TikTok 的“搜索：...”横幅。这不会隐藏评论或 Metra 的评论搜索框.
+Hide TikTok's Auto scroll button,隐藏 TikTok 的自动滚动按钮
+Hide TikTok's short drama episodes and the cards that promote them.,隐藏 TikTok 的短剧剧集和宣传它们的卡片.
+Hide TikTok's wind-down screens,隐藏 TikTok 的放松屏幕
+Hide a VPN connection,隐藏 VPN 连接
+Hide activity,隐藏活动
+Hide activity status,隐藏活动状态
+"Hide ads, Shop posts, LIVE videos and replays, promotional music, and paid partnerships.",隐藏广告、商店帖子、LIVE 视频和重播、促销音乐和付费合作伙伴关系.
+Hide archive,隐藏存档
+Hide bottom tabs TikTok adds later unless you allow them.,隐藏底部选项卡 TikTok 稍后添加，除非您允许.
+Hide buttons in the right column,隐藏右栏中的按钮
+Hide call buttons,隐藏通话按钮
+Hide comment box buttons,隐藏评论框按钮
+Hide comment polls,隐藏评论投票
+Hide comment popup ads,隐藏评论弹出广告
+Hide comment surveys,隐藏评论调查
+Hide comment typing suggestions,隐藏评论输入建议
+Hide comments made of an image or a sticker instead of words.,隐藏由图像或贴纸而不是文字组成的评论.
+"Hide comments that contain any of the words below, or that come from the accounts below.",隐藏包含以下任何单词或来自以下帐户的评论.
+Hide controls after each video starts. Tap to restore them.,每个视频开始后隐藏控件。点击即可恢复它们.
+Hide conversations,隐藏对话
+Hide effect and template tags,隐藏效果和模板标签
+Hide every direct message conversation. Leaves the Inbox empty apart from whatever else is still turned on.,隐藏每条私信对话。除了仍然打开的其他内容之外，将收件箱留空.
+"Hide feed videos with place badges, even when they aren't paid ads. To keep the video and hide only its badge, use Hide location labels in Feed screen.",隐藏带有地点徽章的信息流视频，即使它们不是付费广告。要保留视频并仅隐藏其徽章，请使用“信息流”屏幕中的“隐藏位置标签”.
+"Hide floating promotion badges, coins, and timer banners on the feed.",隐藏动态上的浮动促销徽章、硬币和计时器横幅.
+Hide floating promotions,隐藏浮动促销
+Hide gaming LIVEs,隐藏游戏直播
+Hide inserted cards,隐藏插入的卡片
+Hide location labels,隐藏位置标签
+Hide message requests,隐藏消息请求
+Hide message streaks,隐藏消息条纹
+Hide mini dramas,隐藏迷你剧
+Hide new follower notifications,隐藏新关注者通知
+Hide new followers,隐藏新关注者
+Hide online status,隐藏在线状态
+Hide paid partnerships,隐藏付费合作伙伴关系
+Hide people and options by name,按姓名隐藏人员和选项
+Hide photo posts,隐藏照片帖子
+Hide photo posts from the feed.,隐藏信息流中的照片帖子.
+Hide picture comments,隐藏图片评论
+Hide reply previews,隐藏回复预览
+Don't open a reply under each comment. View replies still shows all of them.,不在每条评论下展开一条回复。查看回复仍会显示全部回复.
+"Hide place badges on videos, including cards with multiple places. Videos and your location permissions stay unchanged.",隐藏视频上的地点徽章，包括具有多个地点的卡片。视频和您的位置权限保持不变.
+Hide playlist videos,隐藏播放列表视频
+Hide profile shortcuts,隐藏个人资料快捷方式
+Hide profile shortcuts by name,按名称隐藏配置文件快捷方式
+Hide profile views,隐藏个人资料视图
+Hide promotional music,隐藏促销音乐
+Hide recommended searches before you type on TikTok's search page. Your search history stays. This doesn't hide suggestions above comments.,在 TikTok 的搜索页面上键入内容之前隐藏推荐的搜索。您的搜索历史记录会保留。这不会隐藏评论上方的建议.
+Hide recorded LIVE broadcasts from the feed.,隐藏信息流中录制的 LIVE 广播.
+Hide root,隐藏根目录
+Hide root status and details about root tools from TikTok.,从 TikTok 隐藏 root 状态和有关 root 工具的详细信息.
+Hide rows by title,按标题隐藏行
+Hide search rewards,隐藏搜索奖励
+Hide search suggestions above comments,隐藏评论上方的搜索建议
+Hide share actions,隐藏分享操作
+Hide sharing apps,隐藏共享应用程序
+Hide shopping LIVEs,隐藏购物直播
+Hide sponsored LIVEs,隐藏赞助的 LIVE
+Hide sticker suggestions,隐藏贴纸建议
+Hide stories,隐藏故事
+Hide stories from the feed.,隐藏信息流中的故事.
+Hide stories tray,隐藏故事托盘
+Hide suggested accounts,隐藏建议帐户
+Hide suggested replies,隐藏建议的回复
+Hide suggestions on the search page,隐藏搜索页面上的建议
+Hide surveys,隐藏调查
+Hide tabs TikTok adds later unless you allow them.,隐藏选项卡 TikTok 稍后添加，除非您允许.
+"Hide the ""Search this image"" prompt shown over videos. The feed search button and suggestions above comments are separate settings.",隐藏视频上显示的“搜索此图片”提示。信息流搜索按钮和评论上方的建议是单独的设置.
+Hide the Add friends button at the top of your profile. The menu button stays where it is.,隐藏个人资料顶部的“添加朋友”按钮。菜单按钮保持在原来的位置.
+"Hide the Check sources banner TikTok puts on videos it marks as unverified, and the warnings it shows when you share one.",隐藏 TikTok 在其标记为未经验证的视频上放置的“检查来源”横幅，以及在您共享视频时显示的警告.
+"Hide the Check your sources banner TikTok puts across the top of some videos, and the prompt it shows when you share one.",隐藏某些视频顶部的“检查来源”横幅 TikTok 以及共享视频时显示的提示.
+Hide the Clear display controls,隐藏清除显示控件
+Hide the Footnotes banner TikTok shows on a video that has a note attached. The video and its comments stay as they are.,隐藏附有注释的视频上显示的脚注横幅 TikTok。视频及其评论保持原样.
+Hide the Full screen button,隐藏全屏按钮
+Hide the Full screen button over videos. Playback and automatic rotation keep working as before.,隐藏视频上的全屏按钮。播放和自动旋转继续像以前一样工作.
+Hide the Inbox search button,隐藏收件箱搜索按钮
+Hide the LIVE bubble,隐藏 LIVE 气泡
+Hide the LIVE button,隐藏 LIVE 按钮
+Hide the LIVE button in the top left corner of the feed.,隐藏信息流左上角的 LIVE 按钮.
+Hide the Products block and product cards in search results.,隐藏搜索结果中的产品块和产品卡.
+Hide the Report button on videos,隐藏视频上的举报按钮
+Hide the Send to row,隐藏发送至行
+Hide the Share via row.,隐藏共享通过行.
+"Hide the Tako AI bubble above the profile button or in the bottom corner of videos, the Ask bar under videos, the Ask Tako button on the search page, the Ask Tako tab on search results and the Tako bar above comments.",隐藏个人资料按钮上方或视频下角的 Tako AI 气泡、视频下的询问栏、搜索页面上的询问 Tako 按钮、搜索结果上的询问 Tako 选项卡以及评论上方的 Tako 栏.
+Hide the Tako bubble,隐藏 Tako 气泡
+Hide the Tako chat,隐藏 Tako 聊天记录
+"Hide the Thoughts bubble TikTok shows above a profile picture, and the prompt to share one on your own profile. Restart TikTok to apply this.",隐藏个人资料图片上方显示的想法气泡 TikTok，以及在您自己的个人资料上分享一张的提示。重新启动 TikTok 以应用此操作.
+Hide the actions row of the share sheet.,隐藏共享表的操作行.
+Hide the add people icon,隐藏添加人员图标
+Hide the bottom tab names,隐藏底部选项卡名称
+"Hide the button at the top left of the feed that opens TikTok's side menu, with Your orders, TikTok Minis and more.",隐藏信息流左上角的按钮，该按钮可打开 TikTok 的侧面菜单，其中包含您的订单、TikTok 迷你等.
+Hide the caption,隐藏文案
+Hide the comment bar on opened videos,隐藏打开视频的评论栏
+Hide the description under the creator's name on the feed.,隐藏信息流中创建者姓名下的描述.
+Hide the event badge,隐藏活动徽章
+"Hide the fill-in videos TikTok sends to For You without picking them for you. When a whole batch is fill-in, it stays so the feed doesn't run dry.",隐藏 TikTok 发送给 For You 的填充视频，而不为您挑选。当整批信息流填满后，它会留下来，这样信息流就不会干涸.
+Hide the flag button TikTok puts above the creator's picture in some regions. You can still report a video from the share menu.,在某些地区隐藏创作者图片上方的标志按钮 TikTok。您仍然可以从共享菜单举报视频.
+Hide the floating promotional badge over the feed.,将浮动促销徽章隐藏在信息流上方.
+Hide the follow button on the feed,隐藏信息流上的关注按钮
+Hide the friend recommendation card and the other cards TikTok slots between videos.,隐藏好友推荐卡和视频之间的其他卡 TikTok 插槽.
+Hide the group chat prompt,隐藏群聊提示
+Hide the launcher shortcuts,隐藏启动器快捷方式
+Hide the magnifying glass at the top of Inbox. Search on the feed and in comments is unchanged.,隐藏收件箱顶部的放大镜。信息流和评论中的搜索没有变化.
+Hide the magnifying glass at the top right of the feed. Search in Inbox and suggestions above comments stay unchanged.,隐藏信息流右上角的放大镜。收件箱中的搜索和评论上面的建议保持不变.
+Hide the music line,隐藏音乐线
+"Hide the notification saying somebody new followed you before it reaches the drawer. Every other notification is left alone, and the follower still appears in the Inbox.",在通知到达抽屉之前隐藏表示有新人关注您的通知。所有其他通知均保持不变，关注者仍显示在收件箱中.
+"Hide the photo, @ and gift buttons in the box where you write a comment. Emoji and sending work as before.",将照片、@ 和礼物按钮隐藏在您撰写评论的框中。表情符号和发送工作和以前一样.
+Hide the playlist bar,隐藏播放列表栏
+Hide the playlist bar along the bottom of videos that belong to a series.,隐藏属于系列的视频底部的播放列表栏.
+Hide the plus button under the creator's picture in the right column. Ticking Avatar and follow button above hides the picture with it.,隐藏右栏中创建者图片下方的加号按钮。勾选上面的头像和关注按钮即可隐藏其图片.
+"Hide the points banner under the search box and the coin counter floating over search results, which TikTok shows in some regions. Searching works as before.",隐藏搜索框下方的积分横幅和浮动在搜索结果上方的硬币计数器，在某些地区会显示 TikTok。搜索工作与以前一样.
+Hide the profile views button at the top of your profile. Your profile view history setting doesn't change.,隐藏个人资料顶部的个人资料视图按钮。您的个人资料查看历史记录设置不会更改.
+Hide the purple rewards button beside Add friends on your profile.,隐藏个人资料中“添加朋友”旁边的紫色奖励按钮.
+Hide the question cards TikTok slides over a video near its end.,将问题卡 TikTok 隐藏在视频接近结尾处的幻灯片上.
+Hide the question cards TikTok sometimes puts in a comment list to ask what you think.,隐藏问题卡 TikTok 有时会放入评论列表来询问您的想法.
+Hide the quick emoji row and automatic sticker suggestions that appear while you type. The emoji and sticker buttons still work.,隐藏键入时出现的快速表情符号行和自动贴纸建议。表情符号和贴纸按钮仍然有效.
+"Hide the red counts and dots on every bottom tab, Inbox and Profile included, and the bubble over Inbox that counts new likes, followers, comments and who's LIVE. The inbox itself still shows what came in.",隐藏每个底部选项卡（包括收件箱和个人资料）上的红色计数和点，以及收件箱上用于统计新点赞、关注者、评论和 LIVE 的人的气泡。收件箱本身仍然显示收到的内容.
+Hide the restriction notice on your own profile on this phone. TikTok's restrictions and appeals still apply.,在此手机上隐藏您自己的个人资料中的限制通知。 TikTok 的限制和上诉仍然适用.
+Hide the rewards shortcut,隐藏奖励快捷方式
+Hide the right column,隐藏右列
+Hide the row of friends at the top of the share sheet.,隐藏共享表顶部的好友行.
+Hide the save button in the right column. Ticking Save in the list above hides it too.,隐藏右栏中的保存按钮。在上面的列表中勾选“保存”也会将其隐藏.
+Hide the save button on the feed,隐藏信息流上的保存按钮
+"Hide the search bar at the top of videos you open from search, a profile or your watch history. The Back button stays.",隐藏通过搜索、个人资料或观看历史记录打开的视频顶部的搜索栏。返回按钮保留.
+Hide the search bar below videos,隐藏视频下方的搜索栏
+Hide the search button on the feed,隐藏信息流上的搜索按钮
+Hide the share prompt after a like,点赞后隐藏分享提示
+Hide the side menu button,隐藏侧面菜单按钮
+Hide the status bar,隐藏状态栏
+Hide the status bar in LIVE rooms,隐藏 LIVE 房间的状态栏
+Hide the streak button in a chat and the reminder message that goes with it.,隐藏聊天中的连击按钮以及随之而来的提醒消息.
+Hide the suggested-search strip above the bottom tabs and let video details and side controls use its space. The top search button and comments stay unchanged.,隐藏底部选项卡上方的建议搜索条，让视频详细信息和侧面控件使用其空间。顶部搜索按钮和评论保持不变.
+Hide the tab names above the feed,隐藏信息流上方的选项卡名称
+"Hide the tags above a video's description that invite you to try an effect, a template, CapCut or an AI style. Location labels and the music line have their own switches.",隐藏视频描述上方的标签，邀请您尝试效果、模板、CapCut 或 AI 风格。位置标签和音乐线有自己的开关.
+Hide the track name beside the caption.,隐藏标题旁边的曲目名称.
+Hide the unread badges on the bottom tabs,隐藏底部选项卡上的未读徽章
+"Hide the whole column on the right, from the avatar down to the music disc.",隐藏右侧的整个列，从头像到音乐光盘.
+Hide this creator on this phone,在此手机上隐藏此创作者
+Hide unpersonalized For You videos,隐藏非个性化的 For You 视频
+Hide unverified content notices,隐藏未经验证的内容通知
+Hide verified accounts,隐藏已验证的帐户
+Hide verified creators' LIVEs,隐藏经过验证的创作者的 LIVE
+Hide video actions,隐藏视频动作
+Hide videos marked as paid partnership or branded content.,隐藏标记为付费合作伙伴或品牌内容的视频.
+Hide videos marked as using promotional music.,隐藏标记为使用促销音乐的视频.
+Hide videos posted as part of a playlist.,隐藏作为播放列表的一部分发布的视频.
+Hide videos posted by verified accounts.,隐藏已验证帐户发布的视频.
+Hide videos that belong to a paid Series.,隐藏属于付费系列的视频.
+"Hide videos that use a sound blocked with the player's sound button, or named below.",隐藏使用播放器声音按钮阻止的声音或如下命名的视频.
+"Hide videos with TikTok's AI-generated label, AI content credentials, a TikTok AI effect such as AI Alive, or a tag like #ai or #aigenerated.",使用 TikTok 的 AI 生成标签、AI 内容凭据、TikTok AI 效果（例如 AI Alive）或 #ai 或 #aigenerate 等标签隐藏视频.
+Hide videos with a lot of views and few comments. Works the same way as views per like. Zero turns it off.,隐藏观看次数多、评论少的视频。其工作方式与按赞观看次数相同。零将其关闭.
+"Hide videos with a lot of views and few likes. Lower numbers are stricter, zero turns the rule off, and one video is kept back if everything the feed just sent would go.",隐藏观看次数多但点赞少的视频。数字越低越严格，零会关闭规则，如果刚刚发送的所有内容都会消失，则保留一个视频.
+Hide videos with blocked sounds,隐藏声音被屏蔽的视频
+Hide videos you have already seen,隐藏您已经看过的视频
+"Hide voting cards and poll results above the comments, including polls that have ended.",将投票卡和民意调查结果隐藏在评论上方，包括已结束的民意调查.
+Hide your account warning,隐藏您的帐户警告
+"Hides rooms in the LIVE feed you swipe through, using the rules below. Blocked creators, Creators hidden on this phone and Creator exceptions apply here too, and Blocked caption words are checked against each LIVE's title. The first room the LIVE button opens isn't filtered. If every room would be hidden, one gets through so the feed keeps loading.",使用以下规则隐藏您滑动浏览的 LIVE 动态中的房间。“被屏蔽的创作者”、“此手机上隐藏的创作者”和“创作者例外”也适用于此处，并且会用“屏蔽的标题文字”检查每个 LIVE 的标题。通过 LIVE 按钮打开的第一个房间不会被过滤。如果所有房间都会被隐藏，则会保留一个房间，以便动态继续加载.
+"Hides the comment count, the sort and close buttons and the suggestions above them. Use Back or swipe down to close comments.",隐藏评论计数、排序和关闭按钮以及它们上方的建议。使用“后退”或向下滑动来关闭评论.
+Hiding,隐藏
+Highest,最高
+Historical,历史
+Historical values,历史价值
+Hold a gate to choose several,守门选几
+Hold a photo story,举行照片故事
+Hold speed on Comment,保持评论速度
+Hold speed on Favorites,在收藏夹上保持速度
+Hold speed on Share,保持共享速度
+Hold the feed after the budget,在预算之后保留信息流
+"Hold the music disc at the bottom of the right column still, even where TikTok turns it. This overrides Spin the music disc.",保持右栏底部的音乐光盘不动，即使 TikTok 转动它。这会覆盖旋转音乐光盘.
+Home,首页
+Home tab name,主页选项卡名称
+Hook status,挂钩状态
+How far each edge press moves the video.,每次边缘按压会使视频移动多远.
+How long each photo stays on screen in a video made from a photo post.,由照片帖子制作的视频中每张照片在屏幕上停留的时间.
+How much of a video you watch before it's hidden next time. Zero counts it after a few seconds.,下次视频被隐藏之前您观看了多少视频。几秒钟后零开始计数.
+"How wide each edge strip is, as a percent of the screen width.",每个边缘条的宽度，以屏幕宽度的百分比表示.
+Metra,Metra
+Metra blocked TikTok's reports here. It hasn't confirmed that you stay off viewer lists.,Metra 在此屏蔽了 TikTok 的报告。它尚未确认您是否不在观看者列表中.
+Metra can't read the creator pattern %1$s,Metra 无法读取创建者模式 %1$s
+Metra hid a TikTok CAPTCHA. Turn off Hide CAPTCHA popups if something stops working.,Metra 隐藏了 TikTok 验证码。如果某些功能停止工作，请关闭隐藏验证码弹出窗口.
+Metra is active,Metra 处于活动状态
+Metra is paused,Metra 已暂停
+Metra is paused. Ghost mode isn't active.,Metra 已暂停。幽灵模式未激活.
+Metra turns back on when TikTok restarts.,当 TikTok 重新启动时，Metra 将重新打开.
+"Metra's downloader doesn't fill this in, so it's kept as typed: %1$s",Metra 的下载器不会填写此内容，因此它保留为键入的内容：%1$s
+Metra's downloader: %1$s,Metra 的下载器：%1$s
+"Metra's switches are paused. Your settings stay saved. Changes made when you patched, like the app's name or icon, stay.",Metra 的开关已暂停。您的设置将保持保存。修补时所做的更改（例如应用程序的名称或图标）将保留.
+"If that name is taken, Android adds a number to the new file.",如果该名称已被使用，Android 会向新文件添加一个数字.
+"If that name is taken, Metra adds a number to the new file.",如果该名称已被使用，Metra 会向新文件添加一个数字.
+Import a font file,导入字体文件
+Import finished,导入完成
+Import loaded values,导入加载的值
+Import watch history,导入观看记录
+Imported %1$d values,导入的 %1$d 值
+Imported %1$d values. Undo last Lab change is in the menu.,导入的 %1$d 值。撤消上次实验室更改位于菜单中.
+Imported: %1$s. Pick another file to replace it.,进口：%1$s。选择另一个文件来替换它.
+Importing new history ended Undo for the earlier clear. You can clear the imported history.,导入新历史记录结束 撤消之前的清除。您可以清除导入的历史记录.
+Importing watch history,导入观看历史记录
+In a chat,在聊天中
+Inbox,收件箱
+Inbox tab name,收件箱选项卡名称
+Include diagnostic events,包括诊断事件
+Included diagnostics,包含诊断
+Includes all diagnostic events.,包括所有诊断事件.
+Includes these events: %1$s,包括以下事件：%1$s
+Inserted cards,已插入卡片
+"Install one, then come back here.",安装一个，然后回到这里.
+Joined,已加入
+Keep For You on a Home tap,通过主页点击“为您保留”
+Keep For You on a pull down,为您保留下拉菜单
+Keep a local record of what you have watched and hide those videos when the feed sends them again.,保留您观看过的内容的本地记录，并在信息流再次发送这些视频时隐藏这些视频.
+Keep a paused video paused,使暂停的视频保持暂停状态
+"Keep a photo story on screen until you tap or swipe, instead of moving on after a few seconds.",将照片故事保留在屏幕上，直到您点击或滑动，而不是在几秒钟后继续.
+Keep a streak going,保持连胜
+Keep captions in Clear display,保持字幕清晰显示
+Keep faded controls in Clear display,使褪色的控件保持清晰显示
+Keep going,继续前进
+Keep long press from quick sharing,长按可快速分享
+Keep long press from reposting,长按禁止转发
+Keep offline videos out of the feed,将离线视频排除在信息流之外
+Keep offline videos until you delete them,保留离线视频，直到您将其删除
+Keep playing in the background,继续在后台播放
+"Keep playing in the background is on in Metra's Playback settings, so TikTok gets 2 for this key and an override here has no effect until that switch is off.",在 Metra 的播放设置中，“继续在后台播放”处于打开状态，因此 TikTok 该键的值为 2，并且在该开关关闭之前，此处的覆盖不会产生任何效果.
+Keep the Favorites tab,保留收藏夹选项卡
+Keep the LIVE quality after TikTok restarts,TikTok 重新启动后保持 LIVE 质量
+Keep the clock and status icons off the screen while TikTok is open. Swipe down from the top to peek at them.,当 TikTok 打开时，使时钟和状态图标远离屏幕。从顶部向下滑动即可查看它们.
+Keep the language picked in TikTok,将所选语言保留在 TikTok 中
+Keep the music disc still,保持音乐光盘静止
+Keep the screen's refresh rate,保持屏幕刷新率
+"Keep the speed you chose for the next video. Off, each new video starts at 1x and a manual choice lasts for that video only.",保持您为下一个视频选择的速度。关闭时，每个新视频都会以 1x 开始，并且手动选择仅适用于该视频.
+Keep this string to %1$s characters or fewer.,将此字符串保留为 %1$s 个字符或更少.
+Keep this structured value to %1$s KB or less.,将此结构化值保持在 %1$s KB 或更小.
+Keep videos out of Watch history,将视频排除在观看历史记录之外
+Keep watching in a small window,继续在小窗口观看
+"Keep what you search for out of the search history TikTok saves on this phone. Searches already there stay until you delete them, and TikTok's servers may still keep their own record.",将您搜索的内容保留在此手机上保存的搜索历史记录 TikTok 之外。已有的搜索将一直保留到您删除它们为止，并且 TikTok 的服务器可能仍保留其自己的记录.
+"Keeps logging until you turn it off, even after a restart. TikTok can feel slower while it's on.",持续记录直到您将其关闭，即使在重新启动后也是如此。 TikTok 在开启时会感觉变慢.
+"Kept to %1$s, the nearest value this row allows",保留为 %1$s，该行允许的最接近的值
+Kinds of post,帖子种类
+LIVE,LIVE
+LIVE chat auto-translate,LIVE 聊天自动翻译
+"The Translate comments button in a LIVE room also needs a Japanese SIM. Turn on Override SIM details in Metra settings > Region spoof, set SIM country preset to Japan, NTT DOCOMO (44010), then restart TikTok.","LIVE 直播间里的“翻译评论”按钮还需要日本 SIM 卡。在 Metra 设置 > 地区中开启“覆盖 SIM 卡详细信息”，将“SIM 卡国家/地区预设”设为 Japan, NTT DOCOMO (44010)，然后重启 TikTok."
+LIVE feed,LIVE 信息流
+LIVE followers range,LIVE 关注者范围
+LIVE recording saved to %1$s,LIVE 录音已保存到 %1$s
+LIVE replays,LIVE 重播
+LIVE settings,LIVE 设置
+LIVE share actions,LIVE 分享操作
+LIVE videos,LIVE 视频
+LIVE viewers range,LIVE 观众范围
+Lab data reset. Undo last Lab change is in the menu. Restart TikTok to apply this.,实验室数据重置。撤消上次实验室更改位于菜单中。重新启动 TikTok 以应用此操作.
+"Lab data was over its rule limit, so it was cleared without an undo copy. Restart TikTok to apply this.",实验室数据超出了其规则限制，因此在没有撤消副本的情况下被清除。重新启动 TikTok 以应用此操作.
+Lab overrides reset. Undo last Lab change is in the menu. Restart TikTok to apply this.,实验室覆盖重置。撤消上次实验室更改位于菜单中。重新启动 TikTok 以应用此操作.
+Lab settings put back. Restart TikTok to apply this.,放回实验室设置。重新启动 TikTok 以应用此操作.
+Language,语言
+Larger (1.25x),更大 (1.25x)
+Last change put back. Restart TikTok to apply all changes.,上次更改已放回。重新启动 TikTok 以应用所有更改.
+Last change put back. The Feature Gate Lab rules were for another TikTok version and were left out. Restart TikTok to apply all changes.,上次更改已放回。功能门实验室规则适用于另一个 TikTok 版本，因此被排除在外。重新启动 TikTok 以应用所有更改.
+Last original value,最后原始值
+Last recording: %1$d gates.,最后记录：%1$d 门.
+Last recording: 1 gate.,最后记录：1 个门.
+Later,后来
+Layout,布局
+"Layout, search, profile and system",布局、搜索、配置文件和系统
+Leave maximum empty to keep it unlimited.,将最大数量留空以保持无限.
+"Leave out the interest picker, the language and gender questions, the creators to follow, the swipe up tutorial and TikTok's notification page when TikTok runs its setup. Consent, age and sign-in screens still show.",省略兴趣选择器、语言和性别问题、要关注的创建者、向上滑动教程以及 TikTok 运行其设置时 TikTok 的通知页面。同意、年龄和登录屏幕仍然显示.
+Leave the sound out of the saved video. Save the sound as well still writes the sound file beside it if you want both.,保存视频时不包含声音。如果还需要单独的声音文件，“也保存声音”仍会把它写在视频旁边.
+Leave when TikTok says time is up,当 TikTok 说时间到时离开
+Left edge strip,左边缘条
+Length and views per like,每个点赞的长度和观看次数
+Less than a minute left,还剩不到一分钟
+Let a LIVE fill the screen up to the top edge. The status bar comes back when you leave the LIVE. Swipe down from the top to peek at it.,让 LIVE 填充屏幕直至顶部边缘。当您离开 LIVE 时，状态栏会返回。从顶部向下滑动即可查看.
+"Let a LIVE reach the top edge with the clock and status icons over it, instead of a black strip. Hide the status bar in LIVE rooms takes them away instead.",让 LIVE 延伸到顶部边缘，并让时钟和状态图标显示在画面上，而不是留下黑条。“隐藏 LIVE 房间的状态栏”会改为隐藏这些图标.
+"Let comments, repost notes and your bio run past the length TikTok's app stops at. TikTok's servers can still turn down a long one.",让评论、转发笔记和您的简历运行超过 TikTok 应用程序停止的长度。 TikTok 的服务器仍然可以拒绝长的.
+"Let screenshots, screen recording and Circle to Search work on TikTok again. Restart TikTok to apply this.",让屏幕截图、屏幕录制和圈搜索再次在 TikTok 上运行。重新启动 TikTok 以应用此操作.
+Let the Offline videos menu use your own limit instead of TikTok's fixed one. Restart TikTok to apply this.,让离线视频菜单使用您自己的限制，而不是 TikTok 的固定限制。重新启动 TikTok 以应用此操作.
+Let the last video finish,让最后一个视频结束吧
+Let the video reach the bottom of the screen on the main feed and show the tabs over it with no bar behind them.,让视频到达主信息流的屏幕底部，并在其上方显示选项卡，且后面没有任何栏.
+"Let the video reach the top of the screen on the main feed, with the clock and status icons over it. The tabs at the top stay where they are.",让视频到达主信息流的屏幕顶部，并在其上方显示时钟和状态图标。顶部的选项卡保持在原来的位置.
+Licenses,许可证
+Lift text length limits,解除文本长度限制
+Like,喜欢
+Like the video,喜欢视频
+Liked videos,喜欢的视频
+Likes aren't available for this video,此视频无法点赞
+Likes range,喜欢范围
+Limit background traffic,限制后台流量
+Limits,限制
+Link copied,链接已复制
+Links,友情链接
+Links in comments open,评论里的链接打开
+Live photo clip,现场照片剪辑
+Live photo clip saved to %1$s,实时照片剪辑保存至 %1$s
+Live photo clips: %1$s,实时照片剪辑：%1$s
+Load more,加载更多
+Loaded current values. Loading all known gates…,加载当前值。正在加载所有已知的门…
+Loaded values are still being read. Try again in a moment.,仍在读取加载的值。稍后再试一次.
+Loaded-value file export failed,加载值文件导出失败
+Loading cancelled. The list is incomplete.,加载已取消。该列表不完整.
+Loading gates…,装载门…
+Loading page %1$s...,正在加载页面%1$s.
+Loading the gate list and TikTok's current values…,正在加载门列表和 TikTok 的当前值…
+Local profile counts,本地档案计数
+Local verified badge,本地验证徽章
+Location-tagged videos,带位置标签的视频
+Lock TikTok,锁定TikTok
+Lock again after,之后再次锁定
+Lock the feed,锁定信息流
+Lock the hold speed with a pull down,通过下拉锁定保持速度
+Lock today's budget,锁定今天的预算
+Log diagnostics,日志诊断
+Log diagnostics for 15 minutes,记录诊断 15 分钟
+Logging diagnostics until %1$s,记录诊断直到 %1$s
+Logging until %1$s. Tap to stop now.,记录直到 %1$s。点击立即停止.
+"Logging, hook status and reports",日志记录、挂钩状态和报告
+"Logs for 15 minutes, then stops on its own. Restarting TikTok doesn't move the end, and the switch above stays as you set it.",记录 15 分钟，然后自行停止。重新启动 TikTok 不会移动结尾，并且上面的开关保持您设置的状态.
+Long press,长按
+Long-press Home for Metra settings,长按 Home 进行 Metra 设置
+"Long-press a bio to copy it. A profile's share sheet gets buttons that copy its username and user ID, and a video's share sheet one that copies the video ID.",长按个人简介即可复制它。配置文件的共享表有复制其用户名和用户 ID 的按钮，视频的共享表有复制视频 ID 的按钮.
+Long-press menu on every post,在每个帖子上长按菜单
+Looking for apps,寻找应用程序
+Loop a story,循环播放一个故事
+Lowest,最低
+Make it yours.,随心设置.
+"Makes TikTok see the country and carrier you pick as your SIM. Your IP address, account history and language don't change, and any one of them can make TikTok keep your current region. Restart TikTok to see the change.",使 TikTok 查看您选择作为 SIM 卡的国家/地区和运营商。您的 IP 地址、帐户历史记录和语言不会改变，其中任何一项都可以使 TikTok 保留您当前的区域。重新启动 TikTok 以查看更改.
+"Makes TikTok see the country you pick as your SIM. Your IP address, account history and language don't change, and any one of them can make TikTok keep your current region. Restart TikTok to see the change.",使 TikTok 看到您选择作为 SIM 卡的国家/地区。您的 IP 地址、帐户历史记录和语言不会改变，其中任何一项都可以使 TikTok 保留您当前的区域。重新启动 TikTok 以查看更改.
+"Makes the heart easier to tap by using the empty space around it. The icon and spacing look the same, and Reply and other buttons keep their own space.",利用心脏周围的空白空间，使心脏更容易被敲击。图标和间距看起来相同，“回复”和其他按钮保留自己的空间.
+Making a video of the photos,将照片制作成视频
+Manage topics,管理主题
+Manager,经理
+Mark saved videos,标记已保存的视频
+Marked as not interested,标记为不感兴趣
+Match locale and timezone to country,将区域设置和时区与国家/地区相匹配
+Match region fields in requests,匹配请求中的区域字段
+Match text stickers too,也匹配文字贴纸
+Matches the rule: %1$s,匹配规则：%1$s
+Maximum,最大
+Maximum post age,最高任职年龄
+Maximum video length,最大视频长度
+Maximum views per comment,每条评论的最大浏览次数
+Maximum views per like,每次点赞的最大观看次数
+Media,媒体
+Media config (VE),媒体配置 (VE)
+Media save,媒体保存
+Message,留言
+"Message bubble colors, Inbox archive and sharing to more chats",消息气泡颜色、收件箱存档和分享到更多聊天
+"Messages, profiles and search still work.",消息、个人资料和搜索仍然有效.
+Microphone in use,麦克风正在使用中
+Mini dramas,迷你剧
+Minimum,最低
+Minimum video length,最小视频长度
+More hashtags per post,每个帖子有更多主题标签
+More items are available.,还有更多商品可供选择.
+More opens the comments,更多打开评论
+More options,更多选择
+"More than %1$d comments were loaded, so the rest aren't in the file.",已加载超过 %1$d 注释，因此其余注释不在文件中.
+Move down,下移
+Move left,向左移动
+Move right,向右移动
+"Move to the next video when the current one ends. Pauses, open dialogs and screen-time holds stop it. Restart TikTok to apply this.",当前视频结束后移至下一个视频。暂停、打开对话框和屏幕时间保持都会阻止它。重新启动 TikTok 以应用此操作.
+Move up,向上移动
+Music disc,音乐唱片
+Mute feed videos,将信息流视频静音
+Muted,静音
+Nearby,附近
+Network proxy,网络代理
+Never from these countries,从来没有来自这些国家
+New comment emoji,新评论表情符号
+New value,新价值
+Next message: today at %1$s.,下一条消息：今天在 %1$s.
+Next message: tomorrow at %1$s.,下一条消息：明天，地址：%1$s.
+No,否
+No app on this phone opens that file,此手机上没有应用程序可以打开该文件
+No app on this phone opens web links,此手机上的应用程序无法打开网络链接
+No apps match this search,没有与此搜索匹配的应用
+"No chat with @%1$s turned up on this account. Open your chat with them once, then try again.",此帐户未显示与@%1$s 的聊天记录。打开与他们的聊天一次，然后重试.
+No cleared videos fit the current history limits.,没有已清除的视频符合当前历史记录限制.
+No comments are loaded to export yet.,尚未加载要导出的评论.
+No creator to block on this video,没有创作者可以屏蔽该视频
+No creator to hide on this video,此视频没有可隐藏的创作者
+"No creators are hidden yet. Hide one from a video, or add a handle above.",尚未隐藏任何创作者。从视频中隐藏一个手柄，或在上面添加一个手柄.
+No current value,无当前值
+No current value and no active override,无当前值且无有效覆盖
+No delay,无延迟
+No font is imported,没有导入字体
+No gate data is available. Refresh values from the menu to try again.,没有可用的门数据。从菜单中刷新值以重试.
+No gate reads were recorded. Use a TikTok feature while recording.,没有记录门读数。录音时使用 TikTok 功能.
+No gates match this filter.,没有门与此过滤器匹配.
+No gates match this search and filter.,没有门与此搜索和过滤器匹配.
+No hidden creators match this search. Clear the search to see them all.,没有隐藏的创作者与此搜索匹配。清除搜索即可查看全部内容.
+No limit,无限制
+"No matching comments. Try a different word, or clear the search with the X in the box.",没有匹配的评论。尝试使用不同的单词，或使用框中的 X 清除搜索.
+No matching countries. Try a country name or a two-letter code.,没有匹配的国家/地区。尝试使用国家/地区名称或两个字母的代码.
+No matching diagnostics found,未找到匹配的诊断
+No matching settings,没有匹配的设置
+No other app takes shared text,没有其他应用程序接受共享文本
+No popups have been seen yet,尚未看到弹出窗口
+No preset selected. Choose a preset above.,未选择预设。选择上面的预设.
+No presets have been reviewed for TikTok %1$s yet,尚未审核 TikTok %1$s 的预设
+No profile shortcuts have been seen yet,尚未看到个人资料快捷方式
+"No recording yet. Start one, use a feature, then return here.",还没有录音。启动一个，使用一项功能，然后返回此处.
+No rule matches this text.,没有规则与此文本匹配.
+"No rules yet, so nothing would match.",还没有规则，所以没有任何内容可以匹配.
+No seen videos recorded yet.,尚未录制任何看过的视频.
+No share actions have been seen yet,尚未看到任何分享行动
+No share actions match this search,没有与此搜索匹配的分享操作
+No sound to block on this video,该视频没有可屏蔽的声音
+No suggested accounts to clear,没有要清除的建议帐户
+No video selected. Open a video first.,未选择视频。先打开一个视频.
+"Nobody was signed in to TikTok. Sign in, and it tries again at %1$s.",没有人登录 TikTok。登录后，它会在 %1$s 处再次尝试.
+None of the photos could be saved. Try again.,所有照片都无法保存。再试一次.
+None of the picked videos could be saved. Try again.,所选视频均无法保存。再试一次.
+None of these gates had an override to reset.,这些门都没有可以重置的超控权.
+None of these gates takes a true or false value.,这些门都不采用 true 或 false 值.
+None recorded,没有记录
+Normal,正常
+Normal-weight captions,正常粗细的字幕
+"Not a handle or id, so ignored: %1$s",不是句柄或 ID，因此被忽略：%1$s
+"Not a part Metra fills in, so it's kept as typed: %1$s",Metra 部分未填写，因此保持键入的状态：%1$s
+Not blocked,没有被阻止
+Not interested in this video,对这个视频不感兴趣
+Not read yet,尚未阅读
+Not requested in this process yet,在此过程中尚未请求
+Not saved yet,尚未保存
+Not seen,没见过
+Not seen yet,还没见过
+Not sent,未发送
+"Nothing has been checked yet, so there's nothing to report.",尚未检查任何内容，因此没有任何可报告的内容.
+"Nothing has been looked up yet. Use the app for a moment, then come back.",还没有查到什么。使用该应用程序一会儿，然后再回来.
+Nothing hidden.,没有什么隐藏的.
+Nothing is playing to seek,没有什么是在玩寻求的
+Nothing is playing to speed up,没有播放任何内容来加快速度
+"Nothing new was imported. %1$d already matched, %2$d unavailable, %3$d rejected.",没有进口任何新东西。 %1$d 已匹配，%2$d 不可用，%3$d 被拒绝.
+"Nothing new was imported. %1$d already matched, %2$d unavailable, %3$d rejected. First rejection: %4$s",没有进口任何新东西。 %1$d 已匹配，%2$d 不可用，%3$d 被拒绝。第一次拒绝：%4$s
+Nothing on this page changes what TikTok does until they are on.,在它们打开之前，此页面上的任何内容都不会改变 TikTok 的功能.
+Nothing to undo yet.,还没有什么可以撤消的.
+Nothing was recorded,没有记录任何内容
+"Nothing was recorded because Metra settings were still open. Start again, then leave settings.",由于 Metra 设置仍处于打开状态，因此未记录任何内容。重新开始，然后保留设置.
+Nothing was sent. Check the streak settings and try again.,没有发送任何内容。检查条纹设置并重试.
+Notices from this project and the ones it's built on,来自该项目及其构建基础的通知
+OK,好的
+Off,关闭
+"Off forces the value to false, on forces it to true. Reset lets TikTok decide again.",Off 强制将值设置为 false，on 强制将值设置为 true。重置让 TikTok 再次决定.
+Off. TikTok can report views and typing.,关闭。 TikTok 可以报告视图和输入.
+Offer LIVE quality in more rooms,在更多房间提供 LIVE 品质
+Offer clear screen in every LIVE room,每个 LIVE 房间均提供清晰的屏幕
+Offline videos,离线视频
+Offline videos limit,离线视频限制
+On,开
+"On a one-photo post, Download video makes an MP4 with the post's sound and no TikTok logo or end card. On a post with several photos, Download asks if you want the originals or one video.",在一张照片帖子中，下载视频会生成带有帖子声音的 MP4，但没有 TikTok 徽标或结束卡。在包含多张照片的帖子中，“下载”会询问您是否想要原件或一个视频.
+On mobile data,关于移动数据
+On or off,打开或关闭
+"On the Friends tab, hide posts, reposts and LIVEs from accounts that aren't a mutual follow, suggested accounts included. Your own posts stay.",在“好友”选项卡上，隐藏非相互关注帐户（包括建议帐户）的帖子、转发和直播。您自己的帖子会保留.
+On. Metra hasn't seen TikTok send any reports since it started.,上。自启动以来，Metra 尚未看到 TikTok 发送任何报告.
+On. Restore puts back the feed setup you had before.,上。恢复会恢复您之前的信息流设置.
+"Once today's budget runs out, the hold stays and can't be dismissed. The budget settings are locked until the day starts over. Turn this off any time before the budget runs out.",一旦今天的预算用完，保留将继续存在且无法撤销。预算设置将被锁定，直到新的一天开始。在预算用完之前随时关闭此功能.
+One area was checked and everything it needs is here.,检查了一个区域，所需的一切都在这里.
+"One language code, like en or es. Comments and captions TikTok translates come out in this language instead of the app's. Leave it empty to keep TikTok's choice.",一种语言代码，例如 en 或 es。评论和标题 TikTok 翻译为这种语言而不是应用程序的语言。将其留空以保留 TikTok 的选择.
+One minute left,还剩一分钟
+One more save waiting,又一保存等待
+"One of the quote marks in that list has nothing to close it, so the rest of the line reads as one phrase. Add the missing quote or take the stray one out.",该列表中的引号之一没有任何内容可以结束它，因此该行的其余部分读作一个短语。添加缺少的报价或删除杂散的报价.
+One picked,一选一
+One value per line,每行一个值
+One video was recorded before each account kept its own list. It hides nothing until you add it here.,在每个帐户保留自己的列表之前先录制一段视频。在您将其添加到此处之前，它不会隐藏任何内容.
+One was already saved,已经有一个被救了
+Only bottom tabs TikTok has loaded on this device are shown here. This doesn't force unavailable tabs to appear.,此处仅显示已加载到该设备上的底部选项卡 TikTok。这不会强制显示不可用的选项卡.
+Only fields the Lab can check and copy safely are shown.,仅显示实验室可以安全检查和复制的字段.
+Only from these countries,仅来自这些国家
+Only tabs TikTok has loaded on this device are shown here. This doesn't force unavailable tabs to appear.,此处仅显示已加载到该设备上的选项卡 TikTok。这不会强制显示不可用的选项卡.
+Only the first %1$s characters of the sample were checked.,仅检查样本的前 %1$s 字符.
+Only these caption languages,仅这些字幕语言
+Open,打开
+Open Metra settings,打开 Metra 设置
+Open TikTok on,打开 TikTok 于
+"Open a share sheet once, then return here to choose its actions.",打开共享表一次，然后返回此处选择其操作.
+Open and close TikTok's screens without their slide. Swipes inside a screen still follow your finger.,打开和关闭 TikTok 的屏幕，无需滑动。在屏幕内滑动仍会跟随您的手指.
+Open comments,打开评论
+Open external links directly,直接打开外部链接
+Open messages,打开消息
+Open profile and story website links in your system browser instead of TikTok's in-app browser.,在系统浏览器而不是 TikTok 的应用内浏览器中打开个人资料和故事网站链接.
+Open shared videos alone,单独打开共享视频
+Open the feed anyway,无论如何打开信息流
+"Open the feed anyway, %1$d left today",无论如何打开信息流，%1$d 今天离开
+"Open the feed anyway, the last time today",无论如何，今天最后一次打开信息流
+Open the feed once so Metra can see which bottom tabs TikTok loaded.,打开一次信息流，以便 Metra 可以看到 TikTok 加载了哪些底部选项卡.
+Open the feed once so Metra can see which tabs TikTok loaded.,打开一次信息流，以便 Metra 可以看到 TikTok 加载了哪些选项卡.
+Open the profile again and try once more,再次打开配置文件并再试一次
+Open the story again and try once more,再次打开故事并再试一次
+"Open your profile once, then return here to choose its shortcuts.",打开您的个人资料一次，然后返回此处选择其快捷方式.
+"Opens TikTok's own profile background editor in Edit profile, and shows the backgrounds other profiles have set. TikTok's servers may still refuse to save one for an account TikTok hasn't offered it to yet.",在编辑个人资料中打开 TikTok 自己的个人资料背景编辑器，并显示其他个人资料已设置的背景。 TikTok 的服务器可能仍然拒绝为 TikTok 尚未提供的帐户保存一个.
+Opens a GitHub report with your versions and settings filled in. Add what happened.,打开 GitHub 报告，其中填写了您的版本和设置。添加发生的情况.
+Opens github.com in your browser,在浏览器中打开 github.com
+Operator code,操作员代码
+Operator name,操作员名称
+"Optional, used with the user name. It isn't shown, logged or put in a backup.",可选，与用户名一起使用。它不会被显示、记录或放入备份中.
+"Optional. Only connections made by Android itself can sign in to a proxy, not TikTok's own. Leave empty for a proxy without a password.",可选。只有 Android 本身建立的连接才能登录到代理，而 TikTok 自己的连接则不能。对于没有密码的代理，留空.
+"Opus (.ogg), a smaller file",Opus (.ogg)，较小的文件
+Opus didn't work on this phone. Saving the sound as TikTok sent it instead.,Opus 无法在这款手机上运行。将声音保存为 TikTok 来发送.
+"Opus needs Android 10 or later, so sounds save as TikTok sent them.",Opus 需要 Android 10 或更高版本，因此声音保存为 TikTok 发送.
+Original language,原语言
+Original message,原始消息
+Original photos,原始照片
+Original sound,原声
+Other,其他
+Other feed filters,其他信息流过滤器
+Overridden,被覆盖
+Override,覆盖
+Override SIM details,覆盖 SIM 卡详细信息
+"Override set, not read yet",覆盖设置，尚未读取
+Override store region (experimental),覆盖存储区域（实验性）
+Override this configuration,覆盖此配置
+Override this gate,覆盖此门
+Overrides are disabled in the Feature Gate Lab.,覆盖在功能门实验室中被禁用.
+Overrides disabled. Restart TikTok to apply this.,覆盖禁用。重新启动 TikTok 以应用此操作.
+Overrides enabled. Restart TikTok to apply this.,覆盖已启用。重新启动 TikTok 以应用此操作.
+Own profile counts,自己的个人资料很重要
+Paid partnerships,付费合作伙伴
+Pass TikTok's install checks,通过 TikTok 的安装检查
+Pause,暂停
+Pause Metra,暂停Hushfeed
+"Pause Metra's switches after TikTok restarts. Your settings stay saved. Changes made when you patched, like the app's name or icon, stay.",TikTok 重新启动后暂停 Metra 的开关。您的设置将保持保存。修补时所做的更改（例如应用程序的名称或图标）将保留.
+Pause the video while comments are open,评论开放时暂停视频
+Paused,已暂停
+Pauses the video behind the comment sheet while you read. It plays on from the same spot when the sheet closes.,当您阅读时，将视频暂停在评论表后面。当纸张关闭时，它会从同一位置播放.
+"People, shortcuts and sending controls",人员、快捷方式和发送控件
+Performance,性能
+Photo,照片
+Photo and image posts,照片和图片帖子
+Photo destination,拍照目的地
+Photo filename,照片文件名
+Photos and stickers,照片和贴纸
+"Photos can't be saved to the folder in that file, so your photo folder was kept",照片无法保存到该文件中的文件夹中，因此您的照片文件夹被保留
+Pick a .ttf or .otf file of up to %1$s MB.,选择最大为 %1$s MB 的 .ttf 或 .otf 文件.
+Pick all,选择全部
+"Pick apps to add to the Share via row, before More. Each gets the same link the other apps get.",在“更多”之前选择要添加到“通过行共享”的应用程序。每个应用程序都获得与其他应用程序获得的相同链接.
+Pick for saving,选择保存
+Pick the actions to remove from the share sheet. Names you typed by hand that TikTok hasn't shown yet stay in the list above.,选择要从共享表中删除的操作。您手动输入但 TikTok 尚未显示的姓名仍保留在上面的列表中.
+Pick the buttons to take off the column. The rest stay where they are.,选择按钮以取下该列。其余的人留在原地.
+"Pick the popups to stop. The list holds the ones TikTok has tried to show on this phone, so a popup appears here after its first showing. CAPTCHA, verification, sign-in, age, ban and legal consent screens are never listed or blocked.",选择弹出窗口以停止。该列表包含 TikTok 尝试在此手机上显示的内容，因此在首次显示后，此处会出现一个弹出窗口。验证码、验证、登录、年龄、禁令和法律同意屏幕永远不会列出或阻止.
+"Pick the shortcuts to remove from the row under a profile's bio, such as TikTok Studio or Your orders. Restart TikTok to apply this.",选择要从个人资料简介下的行中删除的快捷方式，例如 TikTok Studio 或您的订单。重新启动 TikTok 以应用此操作.
+Pick videos to save from profile grids,从个人资料网格中选择要保存的视频
+"Picked the first %1$s. Save them, then tap Pick all again for the rest.",选择了第一个 %1$s。保存它们，然后再次点击“全选”以完成其余的操作.
+Picked videos,精选视频
+Picks the older H.264 video format when TikTok also offers a newer one (HEVC or ByteVC2). It helps phones that stutter or run hot. Videos without an H.264 version still play.,当 TikTok 还提供较新的视频格式（HEVC 或 ByteVC2）时，选择较旧的 H.264 视频格式。它可以帮助那些卡顿或发热的手机。没有 H.264 版本的视频仍然可以播放.
+Play,玩
+Play SDR instead of HDR,播放 SDR 而不是 HDR
+Play Store,Play 商店
+"Play feed videos without sound and leave the phone's volume alone. Music from another app keeps playing while it's on. DMs, stories and LIVE keep their sound.",播放没有声音的信息流视频，不要管手机的音量。另一个应用程序中的音乐在打开时会继续播放。私信、故事和 LIVE 保持其声音.
+Play sounds TikTok pulled,播放声音 TikTok 拉动
+Play the audio on videos TikTok silenced because their sound was pulled for copyright or in your region. TikTok may still say the sound isn't available.,播放视频 TikTok 上的音频，该视频被静音，因为它们的声音因版权原因或在您所在的地区而被拉取。 TikTok 可能仍然会说声音不可用.
+Playback,回放
+Player,玩家
+Playing at %1$sx,在 %1$sx 进行比赛
+Playlist posts,播放列表帖子
+Plays videos that TikTok covers with a content warning without asking you to tap through first.,播放 TikTok 包含内容警告的视频，而不要求您先点按.
+Popular,热门
+Popups,弹出窗口
+Post age,后期年龄
+Post dates in the feed,在信息流中发布日期
+Post every video as if you'd turned on TikTok's own HD upload on the post page. A clip TikTok doesn't count as high quality posts as before.,发布每个视频就好像您在帖子页面上打开了 TikTok 自己的高清上传一样。剪辑 TikTok 不像以前那样算作高质量帖子.
+Posting,发帖
+Prefer H.264 video,更喜欢 H.264 视频
+Preset,预设
+Preset applied. Restart TikTok to use it.,应用预设。重新启动 TikTok 即可使用它.
+Preset saved. Turn on overrides in the Lab to use it.,预设已保存。在实验室中打开覆盖即可使用它.
+Press and hold a comment to find Block this commenter in its menu. Their comments leave the list right away and an undo banner follows.,按住评论可在其菜单中找到“阻止此评论者”。他们的评论立即离开列表，随后出现撤消横幅.
+Press and hold a profile picture to save the full size original to your photo destination.,按住个人资料图片可将全尺寸原件保存到您的照片目的地.
+"Press and hold a story to save it. Stories have no save button of their own, and holding one is how TikTok pauses it, so this takes that gesture over.",按住一个故事即可保存它。故事没有自己的保存按钮，按住一个按钮就是 TikTok 暂停它的方式，所以这会接管该手势.
+Press and hold the Home tab to open these settings. A tap on Home works as before.,按住“主页”选项卡可打开这些设置。点击“主页”即可像以前一样工作.
+Press and hold the left or right third of the screen to jump back or forward. The middle third keeps the Long press action.,按住屏幕的左侧或右侧三分之一可向后或向前跳。中间三分之一保持长按动作.
+Preview a translation from a received text message's menu. The original message stays unchanged.,从收到的短信菜单中预览翻译。原始消息保持不变.
+Preview a translation of your draft before sending it.,在发送之前预览草稿的翻译.
+Preview shortened. Save report keeps the full report.,预览缩短。保存报告保留完整报告.
+Preview translation,预览翻译
+Preview with a made-up post:,用一个虚构的帖子预览:
+Privacy,隐私
+Privacy and app,隐私和应用
+Private account,私人账户
+Problem detected.,检测到问题.
+Problem detected. Story views may still be reported. Check Ghost mode diagnostics. The warning stays until TikTok restarts.,检测到问题。故事观看次数仍可能会被报告。检查幽灵模式诊断。该警告将一直持续到 TikTok 重新启动为止.
+Profile,公司简介
+Profile background,简介背景
+Profile banner,简介横幅
+Profile banner and new profile layout,个人资料横幅和新的个人资料布局
+Profile picture,个人资料图片
+Profile picture saved to %1$s,个人资料图片已保存至 %1$s
+Profile share actions,个人资料分享操作
+Profile tab name,配置文件选项卡名称
+Promotional music,宣传音乐
+Proof,证明
+Protect external pages in TikTok's browser,保护 TikTok 浏览器中的外部页面
+Proxy host,代理主机
+Proxy password,代理密码
+Proxy port,代理端口
+Proxy type,代理类型
+Proxy user name,代理用户名
+Public,公共
+Pulling down at the top of For You no longer reloads it.,在“为你”顶部向下拉不再重新加载它.
+Put %1$s in %2$s first.,首先将 %1$s 放入 %2$s 中.
+Put back the settings saved before the last restore or reset.,恢复上次恢复或重置之前保存的设置.
+Put every setting back to its default straight away. Your current settings are kept for Undo.,立即将所有设置恢复为默认值。您当前的设置将保留以供撤消.
+"Puts a circle on each video in a profile, Liked or Favorites grid. Pick up to %1$s, then tap Save to save them one after another, with a count and Cancel.",在个人资料、喜欢的或收藏夹网格中的每个视频上放置一个圆圈。选择 %1$s，然后点击“保存”将它们依次保存，并计数并取消.
+"Puts a save button in the sheet a story's Share button opens. It saves the story you're watching, and holding a story still pauses it.",在故事的共享按钮打开的工作表中放置一个保存按钮。它会保存您正在观看的故事，并且保留故事仍然会暂停它.
+"Puts a ✓ by videos and photo posts you saved with Metra, on profile grids and next to the time in the feed. Works only while Check for already-saved videos is on.",在您使用 Metra 保存的视频和照片帖子旁边、个人资料网格上以及信息流中的时间旁边打上 ✓。仅当检查已保存的视频处于打开状态时才有效.
+"Puts your time zone after the time to the second, like EDT.",将您的时区置于时间之后，如 EDT.
+Putting seen videos back,放回看过的视频
+Putting the saved videos back,将保存的视频放回去
+Putting the settings back to their defaults,将设置恢复为默认值
+Quality,品质
+"Quality, files, subtitles and hand-off",质量、文件、字幕和交接
+"Quality, speed and auto-advance",质量、速度和自动推进
+Quick setup,快速设置
+Quick setups,快速设置
+Quick setups couldn't start. Try again in a moment.,快速设置无法启动。稍后再试一次.
+Quick setups hidden. Bring it back from %1$s.,隐藏快速设置。从 %1$s 带回来.
+Quick setups on the home page,主页上的快速设置
+Quiet,安静
+"Quiet hides ads, Shop and LIVE. Privacy hides your views and typing and stops tracking. Back to defaults resets every switch. Press and hold to hide this row.",安静隐藏广告、商店和LIVE。隐私隐藏您的视图和打字并停止跟踪。返回默认值会重置每个开关。按住可隐藏该行.
+Read-only list. Accounts won't be opened or unblocked.,只读列表。帐户不会被开设或解锁.
+Reading,阅读
+Reading the font file,读取字体文件
+Reading the seen-history file,读取查看的历史文件
+Reading watch history,读取腕表历史
+Received message translation,收到消息翻译
+Record,记录
+Record LIVEs you watch,录制您观看的 LIVE
+Record a screen's layout,记录屏幕布局
+Record this LIVE from now,从现在开始记录这个LIVE
+Recorded gate reads (%1$d),记录的门读数 (%1$d)
+"Recording gate reads. Use a feature, then return here to stop.",记录门读取。使用一项功能，然后返回此处停止.
+Recording stopped early. What was recorded is saved to %1$s,录音提前停止。录制的内容保存到 %1$s
+Recording this LIVE from now,从现在开始记录这个LIVE
+Recording what the feed filters keep and hide. Tap to stop and save it in %1$s.,记录信息流过滤器保留和隐藏的内容。点击停止并将其保存在 %1$s 中.
+Recovered an interrupted settings change. Restart TikTok to apply this.,恢复了中断的设置更改。重新启动 TikTok 以应用此操作.
+Refresh values,刷新值
+Refreshing TikTok's current values…,正在刷新 TikTok 的当前值…
+Region,地区
+Remember the last speed,记住最后的速度
+"Remembers up to %1$s videos you saved here. If the file is still there, you get Open or Save again instead of a second copy.",最多记住您在此处保存的 %1$s 个视频。如果文件仍然存在，您将再次打开或保存，而不是第二个副本.
+Remind me every,每一次提醒我
+Remove,删除
+Remove %1$s,删除 %1$s
+Remove all overrides,删除所有覆盖
+Remove feed ads,删除信息流广告
+"Remove feed ads, creator commission posts, paid partnerships, and branded content.",删除信息流广告、创作者佣金帖子、付费合作伙伴关系和品牌内容.
+Remove story rings,删除故事环
+Remove the LIVE ring,取下 LIVE 环
+Remove the imported font,删除导入的字体
+Remove watermark,去除水印
+Removed %1$s,已删除 %1$s
+"Reopen Metra settings, then choose the file",重新打开 Metra 设置，然后选择文件
+Replace values when TikTok asks for them,当 TikTok 要求时替换值
+Replay a story from the start when it ends instead of moving to the next one. Tap or swipe to move on.,故事结束时从头开始重播，而不是转到下一个故事。点击或滑动以继续.
+Replay in the background,在后台重播
+Report a problem,报告问题
+Report saved to %1$s,报告保存至 %1$s
+Repost with a comment,重新发布并发表评论
+Required,必填
+Researched,研究过
+Researched values,研究值
+Reset,重置
+Reset %1$d gates of %2$d. Restart TikTok to apply this.,重置 %2$d 的 %1$d 门。重新启动 TikTok 以应用此操作.
+Reset %1$d gates. Restart TikTok to apply this.,重置 %1$d 门。重新启动 TikTok 以应用此操作.
+Reset 1 gate of %2$d. Restart TikTok to apply this.,重置 %2$d 的 1 个门。重新启动 TikTok 以应用此操作.
+Reset 1 gate. Restart TikTok to apply this.,重置 1 个门。重新启动 TikTok 以应用此操作.
+Reset didn't finish. Some settings may still be changed.,重置未完成。某些设置可能仍会更改.
+Reset didn't finish. Some settings may still be changed. Use Undo to put them back.,重置未完成。某些设置可能仍会更改。使用撤消将它们放回去.
+Reset override,重置覆盖
+Reset position,复位位置
+Reset settings,重置设置
+Restart TikTok to apply %1$d changes,重新启动 TikTok 以应用 %1$d 更改
+Restart TikTok to apply this,重新启动 TikTok 以应用此命令
+Restart TikTok to apply this change,重新启动 TikTok 以应用此更改
+Restart TikTok to apply this.,重新启动 TikTok 以应用此操作.
+Restart now,立即重新启动
+Restart pending,重启待定
+Restore failed. Some settings may still be changed.,恢复失败。某些设置可能仍会更改.
+Restore failed. Some settings may still be changed. Use Undo to put them back.,恢复失败。某些设置可能仍会更改。使用撤消将它们放回去.
+Restore seen history from a file,从文件中恢复查看的历史记录
+Restore settings,恢复设置
+Restore setup,恢复设置
+Restoring seen history,恢复看到的历史
+Restoring setup,恢复设置
+Restoring your settings,恢复您的设置
+Resume videos after scrolling,滚动后恢复视频
+Retry,重试
+Return a copy with the fields below changed,返回以下字段已更改的副本
+Return after using a TikTok feature to see every gate read during the recording.,使用 TikTok 功能后返回以查看记录期间读取的每个门.
+Returns %1$s,返回 %1$s
+Reviewed for TikTok %1$s,已审核 TikTok %1$s
+Reviewed presets,已审核预设
+Reviewed presets for TikTok %1$s,已审核 TikTok %1$s 的预设
+Right away,马上
+Right column,右栏
+Right edge strip,右边缘条
+Rows,行数
+SIM country preset,SIM 卡国家/地区预设
+SOCKS5,袜子5
+STEM,科学、技术、工程和数学
+Sample caption to test,要测试的示例标题
+Sample category to test,要测试的样本类别
+Save,保存
+Save a profile picture on a long press,长按保存个人资料图片
+Save a story from its share sheet,从分享表中保存故事
+Save a story on a long press,长按保存故事
+Save again,再次保存
+Save as video,另存为视频
+Save build details,保存构建详细信息
+Save cancelled. Nothing was saved.,保存已取消。什么都没有保存.
+Save comments to Favorites,将评论保存到收藏夹
+Save cover,保存封面
+Save cover button in the share sheet,在共享表中保存封面按钮
+Save details as JSON,将详细信息保存为 JSON
+Save details beside the video,在视频旁边保存详细信息
+"Save every photo in the post at full size as a JPEG, not as the screen shows it.",将帖子中的每张照片以全尺寸保存为 JPEG，而不是屏幕显示的那样.
+Save field values,保存字段值
+Save full report,保存完整报告
+Save in which quality?,以哪种质量保存?
+Save media,保存媒体
+Save photo posts as a video,将照片帖子保存为视频
+Save photos,保存照片
+Save photos or a video?,保存照片或视频?
+Save report,保存报告
+Save seen history to a file,将查看的历史记录保存到文件中
+Save subtitles beside videos,保存视频旁边的字幕
+Save the cover as well,封面也保存下来
+Save the feed capture,保存信息流捕获
+Save the frame on screen as a photo,将屏幕上的帧保存为照片
+Save the original sound,保存原始声音
+Save the sound as well,也保存声音
+Save the video's cover,保存视频的封面
+"Save the video's cover picture at the largest size TikTok has, each time you tap Download. It goes to your photo folder, named after the video.",每次点击“下载”时，以 TikTok 具有的最大尺寸保存视频的封面图片。它会转到您的照片文件夹，以视频命名.
+"Save the videos @%1$s has seen, and when, to a JSON file. Anyone who opens the file can see that viewing history.",将 @%1$s 看过的视频以及时间保存到 JSON 文件中。任何打开该文件的人都可以看到该查看历史记录.
+"Save this account's seen videos, and when they were watched, to a JSON file. Anyone who opens the file can see that viewing history.",将此帐户观看的视频以及观看时间保存到 JSON 文件中。任何打开该文件的人都可以看到该查看历史记录.
+Save videos without sound,保存没有声音的视频
+"Save, restore, reset and undo your settings",保存、恢复、重置和撤消您的设置
+Saved,已保存
+Saved %1$s,已保存%1$s
+Saved %1$s of %2$s photos before the story failed,在故事失败之前已保存 %1$s 张 %2$s 张照片
+"Saved %1$s of %2$s, %3$s skipped",已保存 %2$s 的 %1$s，已跳过 %3$s
+"Saved %1$s of %2$s, %3$s skipped and the rest cancelled",已保存 %2$s 的 %1$s，跳过 %3$s，其余取消
+"Saved %1$s of %2$s, the rest cancelled",已保存 %2$s 的 %1$s，其余已取消
+"Saved %1$s of %2$s, the rest need more free space",已保存 %2$s 的 %1$s，其余部分需要更多可用空间
+"Saved %1$s of %2$s, the rest ran out of time",已保存 %2$s 的 %1$s，其余时间已用完
+Saved %1$s of %2$s. The server asked us to wait. Try again later.,已保存 %2$s 的 %1$s。服务员要求我们稍等。稍后再试.
+Saved %1$s original photos,已保存%1$s原始照片
+Saved %1$s seen videos to the file,已将 %1$s 看过的视频保存到文件中
+Saved %1$s videos,已保存 %1$s 视频
+Saved 1 seen video to the file,已将 1 个看过的视频保存到文件中
+Saved one original photo,保存了一张原始照片
+Saved one video,已保存一个视频
+Saved post,已保存的帖子
+Saved posts,已保存的帖子
+Saved the photos as a video in %1$s,将照片另存为 %1$s 中的视频
+"Saved the photos as a video in %1$s. The sound couldn't be added, so it's silent.",将照片另存为 %1$s 中的视频。声音无法添加，所以一片寂静.
+Saved videos forgotten. The files are still there.,已保存的视频被遗忘。文件还在那里.
+Saved videos put back,保存的视频放回
+"Saved videos show the @username and the first line of the caption in the bottom left corner. The phone encodes the whole video again to do it, so saving takes longer. Applies to saves made by Metra.",保存的视频在左下角显示@用户名和标题的第一行。手机会再次对整个视频进行编码来完成此操作，因此保存时间会更长。适用于 Metra 进行的保存.
+"Saved, override off",已保存，覆盖关闭
+Saved. Restart TikTok to apply this.,已保存。重新启动 TikTok 以应用此操作.
+Saves TikTok's latest crash report on this phone so it can go in the diagnostic report.,在此手机上保存 TikTok 的最新崩溃报告，以便将其纳入诊断报告中.
+"Saves subtitle (SRT) files with the video. They go to Movies on Android 11 and newer, Download on Android 10, and your video folder on older versions. On Android 11 and newer with Save details on, the video moves to Download or Documents and the subtitles stay in Movies.",与视频一起保存字幕 (SRT) 文件。他们会在 Android 11 及更高版本上转到“电影”，在 Android 10 上转到“下载”，在旧版本上会转到您的视频文件夹。在 Android 11 及更高版本上，如果打开“保存详细信息”，视频将移至“下载”或“文档”，而字幕仍保留在“电影”中.
+"Saves the caption, creator, link and post date in a text file next to the video. On Android 10 and later, the pair goes in Download or Documents under the same folder name. Applies to saves made by Metra.",将标题、创建者、链接和发布日期保存在视频旁边的文本文件中。在 Android 10 及更高版本上，该对将进入同一文件夹名称下的“下载”或“文档”。适用于 Metra 进行的保存.
+Saves the details file in JSON format instead of plain text. Useful if another tool will read it.,以 JSON 格式而不是纯文本格式保存详细信息文件。如果其他工具可以读取它，则很有用.
+Saves your Metra settings and Feature Gate Lab rules to a file.,将 Metra 设置和功能门实验室规则保存到文件中.
+Saving,节省
+Saving %1$s of %2$s,节省 %2$s 的 %1$s
+Saving %1$s of %2$s: %3$s,保存 %2$s 的 %1$s： %3$s
+Saving %1$s original photos,保存%1$s原始照片
+Saving a frame from this video needs Android 7 or newer,保存该视频的帧需要 Android 7 或更高版本
+Saving and sharing,保存和分享
+Saving one original photo,保存一张原始照片
+Saving seen history,保存查看的历史记录
+Saving settings backup,保存设置备份
+Saving the cover,保存封面
+Saving the frame,保存框架
+Saving the live photo's clip,保存实时照片的剪辑
+Saving the profile picture,保存个人资料图片
+Saving the recording,保存录音
+Saving the sound,保存声音
+Saving the sticker,保存贴纸
+Saving the story,保存故事
+Saving video,保存视频
+Saving video to %1$s,将视频保存到 %1$s
+Saving video: %1$s,保存视频：%1$s
+Screen layout recorded. Export the diagnostic report to send it.,记录屏幕布局。导出诊断报告以发送.
+Screen time,屏幕时间
+Scrolling comments on videos,滚动视频评论
+Search,搜索
+Search Activity notifications already loaded on this screen. Loading more pauses while you search.,搜索活动通知已加载到此屏幕上。搜索时加载更多暂停.
+Search apps,搜索应用程序
+Search by name or gate key,按名称或门钥匙搜索
+"Search by name, description or category.",按名称、描述或类别搜索.
+Search countries or operators,搜索国家或运营商
+Search hidden creators,搜索隐藏的创作者
+Search is unavailable on this screen,此屏幕上无法进行搜索
+Search loaded activity,搜索加载的活动
+Search settings,搜索设置
+Search share actions,搜索分享操作
+Search these comments,搜索这些评论
+"Search translated titles and descriptions, then open the original setting.",搜索翻译的标题和描述，然后打开原始设置.
+Search within comments,在评论中搜索
+Seconds per photo,每张照片秒数
+"Seconds. Zero keeps every length. If everything the feed just sent would be filtered out, the video closest to your limit is kept so the feed isn't empty.",秒。零保留每个长度。如果刚刚发送的所有内容都将被过滤掉，则最接近限制的视频将被保留，因此信息流不会为空.
+"Seconds. Zero keeps every length. Photo posts and videos without a known length stay. If everything the feed just sent would be filtered out, the video closest to your limit is kept.",秒。零保留每个长度。没有已知停留时间的照片帖子和视频。如果刚刚发送的所有内容都会被过滤掉，则最接近您的限制的视频将被保留.
+See-through bottom bar,透明底栏
+See-through status bar,透视状态栏
+Seek bar on video stories,在视频故事中搜索栏
+Seek by,寻找依据
+Seek from the edges,从边缘拖动
+Seen,见过
+Seen this session,看过这个会话
+Seen videos,看过的视频
+Seen videos cleared. You can undo until TikTok closes.,看过的视频都清除了。您可以撤消直到 TikTok 关闭.
+Seen videos put back,看过的视频已放回
+Seen videos put back: %1$s of %2$s,放回的已观看视频：%1$s（共 %2$s）
+Select,选择
+Select at least one field.,至少选择一个字段.
+Select every tab,选择每个选项卡
+Selected,已选择
+Send TikTok through a proxy,通过代理发送 TikTok
+Send it now,立即发送
+Send links to another app,发送链接到另一个应用程序
+Sending feedback,发送反馈
+Sending the message,发送消息
+"Sends TikTok's feed, search, comments and other app traffic through the proxy below. Videos and LIVE streams still connect directly. Saves and short-link lookups from Metra also connect directly, after their own address checks. Other apps aren't affected.",通过下面的代理发送 TikTok 的信息流、搜索、评论和其他应用程序流量。视频和 LIVE 流仍然直接连接。在检查自己的地址后，来自 Metra 的保存和短链接查找也会直接连接。其他应用程序不受影响.
+"Sends one message a day to each person below at the time below, so your streaks keep going on days you don't open TikTok.",每天在下面的时间向下面的每个人发送一条消息，这样您的连胜在您不打开 TikTok 的日子里会继续下去.
+Sends today's message right away. The daily one then waits for tomorrow.,立即发送今天的消息。日常的就等明天吧.
+Sent to %1$d/%2$d chats. The rest still need a message.,发送到 %1$d/%2$d 聊天。剩下的还需要留言.
+Sent to %1$d/%2$d chats. They won't get another message today.,发送到 %1$d/%2$d 聊天。今天他们不会再收到任何消息了.
+"Separate account handles or user IDs with commas. Videos from these accounts are always hidden. An entry between slashes, like /^news_/, is a search pattern checked against the handle and display name.",用逗号分隔帐户句柄或用户 ID。来自这些帐户的视频始终处于隐藏状态。斜杠之间的条目（如 /^news_/）是根据句柄和显示名称检查的搜索模式.
+"Separate country codes with commas, like GB, IE. Videos posted from anywhere else are hidden. Leave empty for all countries.",用逗号分隔国家/地区代码，例如 GB、IE。从其他地方发布的视频被隐藏。对于所有国家/地区留空.
+"Separate country codes with commas. Videos posted from these are hidden, whatever the list above says.",用逗号分隔国家/地区代码。无论上面的列表如何说明，从这些网站发布的视频都是隐藏的.
+"Separate handles or user IDs with commas. Their videos stay when a filter on post type, labels, age, length or counts would hide them. Ads, blocked creators, words, sounds, countries, caption languages and seen videos still apply.",用逗号分隔句柄或用户 ID。当帖子类型、标签、年龄、长度或计数的过滤器将隐藏它们时，他们的视频会保留。广告、被屏蔽的创作者、文字、声音、国家/地区、字幕语言和观看的视频仍然适用.
+"Separate language codes with commas, like en, es. A video whose original caption is in another language is hidden. Videos with no caption, or only translated ones, always stay.",用逗号分隔语言代码，例如 en、es。原始字幕为另一种语言的视频被隐藏。没有字幕或仅翻译的视频将始终保留.
+"Separate language codes with commas, like es, de. When TikTok translates for you, captions and comments in these languages stay as they were written. See translation still works when you tap it. TikTok's own Don't translate list stays the way it is.",用逗号分隔语言代码，例如 es、de。当 TikTok 为您翻译时，这些语言的标题和注释将保持原样。当您点击它时，查看翻译仍然有效。 TikTok 自己的不翻译列表保持原样.
+"Separate names with commas, exactly as the share sheet shows them. These can be friends in the Send to row, apps such as Facebook, or actions such as Create group or Repost. The words copy, save and dislike also work before the sheet has opened.",用逗号分隔名称，与共享表中显示的名称完全相同。这些可以是“发送至”行中的朋友、Facebook 等应用程序或“创建群组”或“重新发布”等操作。复制、保存和不喜欢这些词在工作表打开之前也起作用.
+"Separate the titles of any other Inbox rows you want to hide with commas, spelled exactly. Use this for anything not listed above.",使用逗号分隔您想要隐藏的任何其他收件箱行的标题，并准确拼写。将此用于上面未列出的任何内容.
+Separate usernames or display names with commas. Their comments are hidden.,用逗号分隔用户名或显示名称。他们的评论是隐藏的.
+"Separate words or phrases with commas. Videos whose caption matches are hidden. Capital letters don't matter. Write ""a"" & ""b"" to need both phrases, or ""a"" !& ""b"" to need the first without the second.",用逗号分隔单词或短语。隐藏标题匹配的视频。大写字母并不重要。写“a”和“b”表示需要两个短语，或者写“a”!&“b”表示需要第一个短语而不需要第二个短语.
+"Separate words with commas, like music, chat. A LIVE is hidden when its category, topic tags or game name contains one. Capital letters don't matter.",用逗号分隔单词，例如音乐、聊天。当类别、主题标签或游戏名称包含 LIVE 时，该 LIVE 将被隐藏。大写字母并不重要.
+"Separate words with commas, like saxophone, to match against sound names. Capital letters don't matter.",用逗号分隔单词（如萨克斯管），以与声音名称匹配。大写字母并不重要.
+"Separate words with commas. A comment is hidden if it contains any of them. Capital letters don't matter. Write ""a"" & ""b"" to need both phrases, or ""a"" !& ""b"" to need the first without the second.",用逗号分隔单词。如果评论包含其中任何一个，则该评论将被隐藏。大写字母并不重要。写“a”和“b”表示需要两个短语，或者写“a”!&“b”表示需要第一个短语而不需要第二个短语.
+Series posts,系列帖子
+Set a sleep timer that closes TikTok,设置关闭 TikTok 的睡眠定时器
+Settings,设置
+Settings are back to their defaults. Restart TikTok to apply all changes.,设置恢复为默认值。重新启动 TikTok 以应用所有更改.
+Settings backup saved,设置备份已保存
+Settings couldn't open,设置打不开
+Settings couldn't refresh completely. Reopen settings and try again.,设置无法完全刷新。重新打开设置并重试.
+Settings restored. Restart TikTok to apply all changes.,设置已恢复。重新启动 TikTok 以应用所有更改.
+Settings restored. The Feature Gate Lab rules were for another TikTok version and were left out. Restart TikTok to apply all changes.,设置已恢复。功能门实验室规则适用于另一个 TikTok 版本，因此被排除在外。重新启动 TikTok 以应用所有更改.
+Several photos in one comment,一条评论里有几张照片
+Share,分享
+Share sheet,分享表
+Shares range,股票范围
+Shop,商店
+Shop order updates and coupon messages no longer take up rows in the Inbox. Your orders are unchanged.,商店订单更新和优惠券消息不再占用收件箱中的行。您的订单没有变化.
+Shop posts,商店帖子
+Shop tab name,商店选项卡名称
+Short date,短日期
+Show,显示
+Show @username beside a video instead of the display name the creator chose.,在视频旁边显示@用户名，而不是创建者选择的显示名称.
+Show See translation,显示 查看翻译
+"Show TikTok's button for recording a spoken comment, on accounts that don't have it yet. It hasn't been tried on a real account, so it may not work.",在尚无记录口头评论的帐户上显示 TikTok 的按钮。尚未在真实账户上尝试过，因此可能不起作用.
+Show TikTok's feed buttons,显示 TikTok 的信息流按钮
+Show TikTok's own progress bar on videos where it's normally hidden.,在通常隐藏的视频上显示 TikTok 自己的进度条.
+Show a LIVE under the status bar,在状态栏下显示 LIVE
+Show a progress bar while a video saves.,保存视频时显示进度条.
+Show a verified badge on your own profile on this phone. Other people see your real status.,在此手机上您自己的个人资料中显示经过验证的徽章。别人看到你的真实状态.
+Show a video preview thumbnail while dragging the progress bar.,拖动进度条时显示视频预览缩略图.
+Show chosen counts on your own profile on this phone. Other people see the real counts.,在这部手机上显示您自己的个人资料中选择的计数。其他人看到了真正的数字.
+Show commenters' handles,显示评论者的句柄
+"Show counts as full numbers, like 1,234,567 instead of 1.2M.","将计数显示为完整数字，例如 1,234,567 而不是 1.2M."
+Show dates on profile grids,在个人资料网格上显示日期
+Show download progress,显示下载进度
+Show each commenter's @username instead of the display name they chose. A reply to a reply names the person it answers the same way once their own comment has loaded.,显示每个评论者的@用户名，而不是他们选择的显示名称。一旦加载了自己的评论，对回复的回复就会以相同的方式命名回复者.
+Show engagement rate,显示参与率
+Show exact LIVE viewer counts,显示准确的 LIVE 观看人数
+Show exact counts,显示准确计数
+Show failures on screen,在屏幕上显示失败
+Show follow status,显示关注状态
+Show gates,显示大门
+Show how many were filtered,显示过滤了多少个
+Show last report,显示上次报告
+"Show likes, comments, shares and saves as a percentage of views, next to the creator's name and after the view count on profile grids.",在创建者姓名旁边以及个人资料网格上的观看次数之后，以观看次数的百分比形式显示点赞、评论、分享和保存.
+Show only LIVEs from creators with this many followers.,仅显示拥有这么多关注者的创作者的直播.
+Show only LIVEs with this many people watching.,仅显示有这么多人观看的直播.
+Show only mutual friends on the Friends tab,在“好友”选项卡上仅显示共同好友
+Show only videos with this many comments.,仅显示具有这么多评论的视频.
+Show only videos with this many favorites.,仅显示具有这么多收藏夹的视频.
+Show only videos with this many likes.,仅显示有这么多点赞的视频.
+Show only videos with this many shares.,仅显示具有这么多分享的视频.
+Show only videos with this many views.,仅显示具有这么多观看次数的视频.
+Show original,显示原件
+Show poll results before voting,投票前显示投票结果
+Show search in LIVE,在 LIVE 中显示搜索
+Show the Not interested button,显示不感兴趣按钮
+Show the block button on videos,在视频上显示阻止按钮
+Show the block sound button,显示阻止声音按钮
+Show the country a commenter's account is set to after the comment's time. Comments from accounts TikTok sends no country for stay as they are.,显示评论者的帐户在评论时间后设置的国家/地区。来自帐户 TikTok 的评论不会按原样发送居住国家/地区.
+Show the country a video was posted from next to the creator's name.,在创作者姓名旁边显示视频发布的国家/地区.
+Show the country as a flag,将国家显示为国旗
+Show the current spoken caption while the other controls are hidden.,显示当前语音字幕，同时隐藏其他控件.
+Show the day each video was posted under its view count on profile grids.,在个人资料网格上的观看次数下显示每个视频的发布日期.
+Show video length on profile grids,在个人资料网格上显示视频时长
+Show how long each video runs under its view count on profile grids. Photo posts and videos TikTok sent no length for show none.,在个人资料网格上的观看次数下显示每个视频的时长。图片作品和 TikTok 未提供时长的视频不显示.
+Show the handle instead of the name,显示句柄而不是名称
+Show the hide button on videos,在视频上显示隐藏按钮
+"Show the main feed's tabs on a rounded, see-through dark pill that floats over the video. Needs See-through bottom bar.",在漂浮在视频上方的圆形透明黑色药丸上显示主信息流的选项卡。需要透明底栏.
+Show the mute button on videos,在视频上显示静音按钮
+Show the progress bar,显示进度条
+Show the progress bar thumbnail,显示进度条缩略图
+"Show the search entry inside TikTok's LIVE drawer, where available. This doesn't add a search box to video comments.",显示 TikTok 的 LIVE 抽屉内的搜索条目（如果有）。这不会向视频评论添加搜索框.
+Show the switch,显示开关
+Show the time beside the progress bar,在进度条旁边显示时间
+Show the time played and the video's length at the end of the progress bar while it's on screen.,当屏幕上显示时，在进度条末尾显示播放时间和视频长度.
+Show the time to the second,将时间显示到秒
+Show the time zone,显示时区
+Show the whole Activity and New followers lists instead of stopping at a View all button.,显示整个活动和新关注者列表，而不是停在“查看全部”按钮上.
+"Show the whole video instead of cropping it to the window. Nothing changes on a tall phone, where it already fits. On a folding phone opened up, a squarer screen or a split view the sides or the ends stop being cut off.",显示整个视频而不是将其裁剪到窗口。对于已经适合的高手机来说，没有任何变化。在打开的折叠手机上，方形屏幕或分屏视图的侧面或末端不再被切断.
+Show translation,显示翻译
+Bring back TikTok's translation,恢复 TikTok 的翻译
+Show what is left of the budget,显示预算的剩余金额
+"Show when a video was posted down to the second, with your time zone, in place of TikTok's short date by the creator's name.",显示视频发布时间，精确到秒，并用您的时区代替 TikTok 的短日期，并用创建者的姓名表示.
+Show when the camera or microphone is in use,显示何时使用摄像头或麦克风
+Show where a video was posted,显示视频的发布位置
+Show where commenters are from,显示评论者来自哪里
+Showing %1$s again,再次显示 %1$s
+Shown. Tap to hide it.,显示。点击将其隐藏.
+"Shows TikTok's full sort menu on every post, with hot, newest, media and creator options, instead of the shorter one your account got. Restart TikTok to see the change.",在每篇文章上显示 TikTok 的完整排序菜单，包括热门、最新、媒体和创作者选项，而不是您帐户中较短的选项。重新启动 TikTok 以查看更改.
+"Shows TikTok's play, pause, previous and next buttons on the feed. TikTok normally shows them only to people who use a screen reader. TikTok can see when you use them.",在信息流上显示 TikTok 的播放、暂停、上一个和下一个按钮。 TikTok 通常仅向使用屏幕阅读器的人显示它们。 TikTok 可以在您使用它们时看到.
+"Shows TikTok's text in the font file you import below. While both are on, this one wins over Use system font. If the file is removed or can't be read, the text goes back to what Use system font shows.",显示您在下面导入的字体文件中的 TikTok 文本。当两者都打开时，这个胜过使用系统字体。如果文件被删除或无法读取，文本将返回到使用系统字体显示的内容.
+Shows TikTok's text in your phone's font instead of TikTok Sans. Icons and gift animations keep their own fonts. Restart TikTok to see the change.,以手机字体显示 TikTok 的文本，而不是 TikTok Sans。图标和礼物动画保留自己的字体。重新启动 TikTok 以查看更改.
+"Shows a small count under TikTok's top tabs of what the feed filter has removed since TikTok started. It shows only on the feed, and taps on it go through to the video under it.",在 TikTok 的顶部选项卡下显示自 TikTok 启动以来信息流过滤器已删除的内容的少量计数。它仅显示在信息流上，点击它即可查看其下方的视频.
+Shows every emoji in your phone's own emoji font. The newest emoji your phone doesn't have yet may show as a box or in pieces.,以手机自带的表情符号字体显示每个表情符号。您的手机尚未安装的最新表情符号可能会显示为盒子或碎片.
+Shows the Duet and Stitch options even when the creator turned them off. TikTok may still refuse to accept the result.,即使创建者关闭了 Duet 和 Stitch 选项，也会显示它们。 TikTok 仍可能拒绝接受结果.
+"Shows the country's flag in place of its two letters, by the creator's name and by a commenter's time.",在两个字母的位置显示该国的国旗，并按创建者的姓名和评论者的时间.
+Sign in to TikTok before importing watch history.,导入观看历史记录之前，请登录 TikTok.
+Sign in to TikTok before saving or restoring seen history.,在保存或恢复查看的历史记录之前，请登录 TikTok.
+Sign in to edit your own profile counts,登录以编辑您自己的个人资料计数
+Sign in to view this list,登录查看此列表
+Sign in without a passkey,无需密码即可登录
+Skip TikTok's setup screens,跳过 TikTok 的设置屏幕
+Skip content warnings,跳过内容警告
+"Skip the puzzle TikTok shows while you're just browsing. A puzzle right after you like, follow, comment or repost still shows, and so do sign-in, SMS and two-step checks. If something stops working, turn this off.",在浏览时跳过 TikTok 显示的谜题。在您点赞、关注、评论或转发后，谜题仍然会显示，登录、SMS 和两步检查也是如此。如果某些东西停止工作，请将其关闭.
+Skip the splash ad,跳过醒目广告
+Skip update checks,跳过更新检查
+"Skipped entries are invalid, expired, already recorded, or older than the newest %1$s videos.",跳过的条目无效、已过期、已录制或早于最新的 %1$s 视频.
+Skipping videos with %1$s,使用 %1$s 跳过视频
+Sleep timer off,睡眠定时器关闭
+Some Calm feed settings changed. Restore still puts back your earlier setup.,一些 平静信息流设置发生了变化。恢复仍会恢复您之前的设置.
+Some of these notes are in English.,其中一些注释是英文的.
+Something is missing from %1$s. Tap for the whole report.,%1$s 缺少某些内容。点击查看整个报告.
+Sound,声音
+"Sound IDs saved by the player's sound button, separated by commas. Remove one to unblock it.",播放器声音按钮保存的声音 ID，以逗号分隔。删除一个即可解锁.
+Sound format,声音格式
+Sound link copied,声音链接已复制
+Sound on,声音打开
+Sound saved to %1$s,声音保存至 %1$s
+Sound: %1$s,声音：%1$s
+Source,来源
+Speed,速度
+Speed menu choices,速度菜单选项
+"Speed up this video, double tap again to undo",加快该视频的速度，再次双击即可撤消
+Speed while you hold the video,按住视频时速度
+Spin the music disc,旋转音乐光盘
+Split comment minimum width,分割评论最小宽度
+Start each new video at your default. A manual choice lasts until the video changes.,以默认值开始每个新视频。手动选择将持续到视频发生变化为止.
+Start feature gate recording,开始功能门记录
+Start recording,开始录音
+Start the day at,新的一天开始于
+Start today over,从今天开始
+Start typing,开始打字
+Starts after %1$s other saves,在 %1$s 其他保存后开始
+Starts after one other save,在另一次保存后开始
+Stay on the video in full screen,保持全屏观看视频
+Staying on a video,停留在视频上
+Sticker,贴纸
+Sticker destination,贴纸目的地
+Sticker saved to %1$s,贴纸已保存至 %1$s
+"Stickers can't be saved to the folder in that file, so your sticker folder was kept",贴纸无法保存到该文件中的文件夹中，因此您的贴纸文件夹被保留
+Stickers: %1$s,贴纸：%1$s
+Still here. Nothing is waiting.,还在这里。没有什么在等待.
+Still reading the record. Tap again in a moment.,还在看记录。稍后再次点击.
+Still saving the last one,还保存着最后一张
+Still waiting for the file app.,仍在等待文件应用程序.
+Still waiting for the file app. Tap to stop waiting.,仍在等待文件应用程序。点击即可停止等待.
+Stop,停止
+Stop LIVE previews opening by themselves,停止LIVE预览自行打开
+"Stop TikTok loading upcoming videos ahead of time and setting up notifications. You won't get notifications, messages included, while this is on. Videos may take a moment longer to start.",停止 TikTok 提前加载即将播放的视频并设置通知。开启此功能后，您将不会收到通知（包括消息）。视频可能需要更长的时间才能开始.
+"Stop TikTok loading upcoming videos ahead of time. It uses less data, but videos may take a moment longer to start.",停止 TikTok 提前加载即将播放的视频。它使用的数据较少，但视频可能需要更长的时间才能启动.
+Stop TikTok reading what you copied. Copying a link from TikTok still works.,停止 TikTok 阅读您复制的内容。从 TikTok 复制链接仍然有效.
+"Stop TikTok's built-in AI engine from starting, so it doesn't get a copy of everything TikTok logs about your use. TikTok works as if the engine weren't there.",停止 TikTok 的内置 AI 引擎启动，这样它就不会获得 TikTok 记录的有关您的使用的所有内容的副本。 TikTok 的工作方式就好像引擎不存在一样.
+Stop TikTok's speed tests,停止 TikTok 的速度测试
+Stop a long press on Like from opening TikTok's repost action.,停止长按“赞”以打开 TikTok 的转发操作.
+Stop a long press on Share from opening TikTok's quick share action.,停止长按“分享”以打开 TikTok 的快速分享操作.
+Stop analytics and tracking,停止分析和跟踪
+Stop and save the feed capture,停止并保存信息流捕获
+Stop feature gate recording,停止功能门记录
+Stop on-device AI profiling,停止设备上的 AI 分析
+Stop recording this LIVE,停止录制此LIVE
+Stop search results playing on their own,停止搜索结果自行播放
+Stop the brand animation that plays over the comments when what someone typed matches an advertiser's trigger.,当某人输入的内容与广告商的触发器匹配时，停止在评论上播放的品牌动画.
+Stop the bubble TikTok floats at the top of the feed to point you to a LIVE.,停止气泡 TikTok 漂浮在信息流顶部，将您指向 LIVE.
+Stop the bubble that asks you to share a video with friends after you like it.,停止要求您在喜欢视频后与朋友分享的气泡.
+Stop the full-screen ad TikTok can show while it starts up.,停止启动时显示的全屏广告 TikTok.
+"Stop the notifications TikTok sends about popular videos it picked for you. Messages, comments, likes, follows and videos from accounts you follow still come through.",停止 TikTok 发送有关它为您挑选的热门视频的通知。您关注的帐户中的消息、评论、点赞、关注和视频仍然会出现.
+Stop the short vibrations TikTok plays on its own taps and gestures. Your keyboard and your phone's own haptics stay as they are.,停止 TikTok 通过其自己的点击和手势播放的短暂振动。您的键盘和手机本身的触觉保持原样.
+"Stop the two background tasks TikTok uses to check for updates, one of them when your phone starts. Some in-app update prompts may stop. Play Store updates still work.",停止 TikTok 用于检查更新的两个后台任务，其中之一是在手机启动时停止。某些应用内更新提示可能会停止。 Play 商店更新仍然有效.
+Stop video looping,停止视频循环
+Stop videos at the end instead of replaying them.,最后停止视频而不是重播它们.
+Stop waiting,停止等待
+Stopped after dismissing %1$s suggested accounts,驳回 %1$s 建议帐户后停止
+Stopped after dismissing one suggested account,驳回一个建议帐户后停止
+Stopped waiting for the file app. It hasn't said yet whether the backup was saved.,停止等待文件应用程序。目前还没有说明备份是否已保存.
+Stopped waiting for the file app. It hasn't said yet whether the export was saved.,停止等待文件应用程序。目前尚未透露导出是否已保存.
+Stopped waiting for the file app. Nothing was changed.,停止等待文件应用程序。一切都没有改变.
+Stopped waiting for the file app. Nothing was exported.,停止等待文件应用程序。没有任何东西被出口.
+Stopped waiting for the file app. Nothing was imported.,停止等待文件应用程序。没有进口任何东西.
+Stopping after this file,在此文件后停止
+Stops TikTok from reading your phone's motion and compass sensors. Apps can use them to recognize your phone.,阻止 TikTok 读取手机的运动和指南针传感器。应用程序可以使用它们来识别您的手机.
+"Stops TikTok from reporting the videos you watch, so they don't get added to Watch history in Activity center. Your views won't count and For You learns less. Likes, follows and searches are still seen.",阻止 TikTok 报告您观看的视频，这样它们就不会添加到活动中心的观看历史记录中。你的观点不会起作用，而 For You 学到的东西会更少。点赞、关注和搜索仍然可见.
+"Stops TikTok from sending usage reports, ad tracking and crash reports. TikTok's own diagnostic tools go quiet too.",阻止 TikTok 发送使用报告、广告跟踪和崩溃报告。 TikTok 自己的诊断工具也变得安静.
+"Stops TikTok from slowing your screen to match each video's frame rate. On a 90 or 120 Hz phone, that request makes the whole app, scrolling too, run slower.",阻止 TikTok 减慢屏幕速度以匹配每个视频的帧速率。在 90 或 120 Hz 手机上，该请求会使整个应用程序（包括滚动）运行速度变慢.
+"Stops the bedtime wind-down, the breathing exercise and the daily limit screen TikTok puts over the feed. Works only on accounts TikTok knows belong to adults. Teen accounts, and ones a parent links with Family Pairing, keep them. With Leave when TikTok says time is up on, the daily limit screen still shows so that switch can work.",停止就寝时间放松、呼吸练习和每日限制屏幕 TikTok 关闭信息流。仅适用于 TikTok 知道属于成人的帐户。青少年帐户以及家长与 Family Pairing 关联的帐户请保留。当 TikTok 说时间到时离开时，每日限制屏幕仍然显示，以便开关可以工作.
+"Stops websites you open from inside TikTok from reaching back into the app. TikTok's own pages, such as Activity center, Watch history, shop checkout and CAPTCHA, keep working.",阻止您从 TikTok 内部打开的网站返回应用程序。 TikTok自己的页面，如活动中心、观看历史、商店结账和验证码继续运行.
+Store TikTok thinks it came from,商店 TikTok 认为它来自
+"Stores the caption, creator, post date and link inside the video file, where media players can read them. Applies to saves made by Metra.",将标题、创建者、发布日期和链接存储在视频文件中，供媒体播放器读取。适用于 Metra 进行的保存.
+Stories,故事
+Story,故事
+Story position,故事位置
+Story saved to %1$s,故事保存至 %1$s
+Streak,连胜
+Structured value observed,观察到的结构化价值
+Subtitle language,字幕语言
+Subtitles,字幕
+Subtitles: %1$s,字幕：%1$s
+Support Metra,支持Hushfeed
+Swap the website in shared links,交换共享链接中的网站
+Swipe for brightness and volume,滑动即可调节亮度和音量
+Swipe left,向左滑动
+Swiping a message sideways no longer starts a reply to it. Taps and long presses work as before.,向侧面滑动消息不再开始回复。点击和长按的工作方式与以前一样.
+System,系统
+Tag saved videos with their details,为保存的视频添加详细信息标签
+"Take the Add comment bar off videos you open from a profile, a hashtag, a sound or search, so the video fills the screen down to the bottom. The comment button on the right still opens comments.",将添加评论栏从您从个人资料、主题标签、声音或搜索中打开的视频中删除，以便视频填满屏幕直至底部。右侧的评论按钮仍然可以打开评论.
+Take the pulsing LIVE ring off profile pictures on the feed and in comments. Tapping the picture of a creator who's live opens their profile instead of the LIVE.,把脉动的LIVE铃声放在信息流和评论中的个人资料图片上。点击实时创作者的图片会打开他们的个人资料，而不是 LIVE.
+"Take the story ring off profile pictures on the feed, in comments and on profiles. Tapping a picture opens the profile instead of the story.",将故事圈从信息流、评论和个人资料中的个人资料照片中删除。点击图片会打开个人资料而不是故事.
+Takes TikTok's own Auto scroll action out of the video panel. Auto-advance keeps working.,从视频面板中取出 TikTok 自己的自动滚动操作。自动前进继续工作.
+Tap Repost on the bar under a video twice within %1$d seconds. A repost with a note is left alone.,在 %1$d 秒内点击视频下方栏上的重新发布两次。带注释的转发将被保留.
+Tap a comment's heart twice within %1$d seconds. A double tap on the comment needs a second one too. Removing a like stays immediate.,在 %1$d 秒内点击评论的心两次。双击评论还需要第二次。立即删除点赞.
+Tap a story's heart twice within %1$d seconds. Removing a like stays immediate.,在 %1$d 秒内点击故事的核心两次。立即删除点赞.
+Tap again to follow,再次点击即可关注
+Tap again to like,再次点按即可喜欢
+Tap again to repost,再次点击即可重新发布
+Tap the feed Follow button twice within %1$d seconds.,在 %1$d 秒内点击信息流 Follow 按钮两次.
+Tap the like heart twice within %1$d seconds. Removing a like stays immediate.,在 %1$d 秒内点击相似的心两次。立即删除点赞.
+Tap to start the feed,点击以开始信息流
+"Tap to start, then scroll until the feed problem shows up and come back here to save it. The file has no captions or names, and videos and creators appear only as short codes. Read it before you share it.",点击开始，然后滚动直到出现信息流问题，然后返回此处保存。该文件没有标题或名称，视频和创建者仅显示为短代码。在分享之前先阅读它.
+"Tap, then go to the screen with what you want hidden. After %1$d seconds Metra records how that screen is built, without any of its text, for the diagnostic report.",点击，然后转到包含您想要隐藏的内容的屏幕。 %1$d 秒后，Metra 记录该屏幕的构建方式（不包含任何文本）以用于诊断报告.
+Tapping more under a video opens its comments with the whole caption at the top instead of spreading the caption over the video. A tap on the caption itself does the same. Photo posts keep TikTok's own page for this.,点击视频下方的“更多”会打开评论，整个标题位于顶部，而不是将标题散布在视频上。点击标题本身也能起到同样的作用。为此，照片帖子保留 TikTok 自己的页面.
+Technical details,技术细节
+"Technical details, %1$s",技术细节，%1$s
+Text sticker words,文字贴纸字
+That JSON file doesn't contain the supported TikTok watch history.,该 JSON 文件不包含受支持的 TikTok 观看历史记录.
+That backup was written by a newer Metra than this one. Nothing was altered.,该备份是由比这个更新的 Metra 编写的。一切都没有改变.
+That creator is already in the list,该创建者已在列表中
+"That creator pattern could stall the feed, so it was skipped: %1$s",该创建者模式可能会阻止信息流，因此它被跳过：%1$s
+"That creator pattern could stall the feed, so it wasn't added: %1$s",该创建者模式可能会导致信息流停止，因此未添加它：%1$s
+"That creator pattern is too long to use, so it was skipped: %1$s",该创建者模式太长而无法使用，因此被跳过：%1$s
+"That creator pattern is too long, so it wasn't added: %1$s",该创建者模式太长，因此未添加：%1$s
+That file has more than %1$s watch-history entries.,该文件具有超过 %1$s 观看历史记录条目.
+That file is larger than %1$s MB. Choose a seen-history file saved by Metra.,该文件大于 %1$s MB。选择 Metra 保存的查看历史记录文件.
+That file is larger than %1$s MB. Choose a smaller font file.,该文件大于 %1$s MB。选择较小的字体文件.
+That file is larger than %1$s MB. Choose a smaller watch-history export.,该文件大于 %1$s MB。选择较小的观看历史记录导出.
+That file is too large to be a settings backup. Nothing was altered.,该文件太大，无法作为设置备份。一切都没有改变.
+That file isn't a font Android can use. Choose a .ttf or .otf file.,该文件不是 Android 可以使用的字体。选择 .ttf 或 .otf 文件.
+"That file isn't a loaded-values export, or it's larger than the Lab accepts",该文件不是加载值导出，或者它大于实验室接受的大小
+"That file isn't readable text, so it may have been damaged in transit. Nothing was altered.",该文件不是可读文本，因此可能在传输过程中已损坏。一切都没有改变.
+That file lists more than %1$s videos. Nothing was restored.,该文件列出了超过 %1$s 个视频。什么都没有恢复.
+"That file was saved by a newer Metra. Update Metra, then try again.",该文件由较新的 Metra 保存。更新 Metra，然后重试.
+"That folder name has a character Android doesn't allow. Use letters, numbers, spaces or dashes.",该文件夹名称包含 Android 不允许的字符。使用字母、数字、空格或破折号.
+That is %1$d minutes today,今天是 %1$d 分钟
+That is %1$d videos today,这是今天的 %1$d 视频
+That is one minute today,这是今天的一分钟
+That is one video today,这是今天的一个视频
+That isn't a Metra settings backup. Nothing was altered.,这不是 Metra 设置备份。一切都没有改变.
+"That isn't a seen-history file saved by Metra. For TikTok's own data export, use Import watch history.",这不是 Metra 保存的可见历史文件。对于 TikTok 自己的数据导出，请使用导入观察历史记录.
+"That isn't an app name. Try something like com.example.downloader, or leave the box empty to keep saving in TikTok.",这不是应用程序名称。尝试类似 com.example.downloader 的内容，或者将框留空以继续保存在 TikTok 中.
+That isn't valid JSON. Check the brackets and quotes.,这不是有效的 JSON。检查括号和引号.
+That list has too many entries. Keep it to %1$s or fewer.,该列表的条目太多。将其保持在 %1$s 或更少.
+That list is too large. Keep it to %1$s KB or less.,该列表太大了。将其保持在 %1$s KB 或更小.
+That loosens the budget. It waits until %1$s.,这会放松预算。它会等到 %1$s.
+That loosens the lock. It waits until %1$s.,这样锁就松开了。它会等到 %1$s.
+That preset isn't recognized. Choose another.,该预设无法识别。选择另一个.
+That seen-history file is damaged or was edited. Nothing was restored.,该查看历史文件已损坏或已被编辑。什么都没有恢复.
+That settings backup contains a feed rule list larger than Metra accepts. Nothing was altered.,该设置备份包含的信息流规则列表大于 Metra 接受的大小。一切都没有改变.
+That settings backup holds a value Metra can't read. Nothing was altered.,该设置备份保存的值 Metra 无法读取。一切都没有改变.
+That settings backup holds more Feature Gate Lab rules than the Lab takes. Nothing was altered.,该设置备份保存的功能门实验室规则多于实验室所占用的规则。一切都没有改变.
+That settings backup is damaged or only partly downloaded. Nothing was altered.,该设置备份已损坏或仅下载了部分。一切都没有改变.
+"That settings backup is incomplete, so it may have been cut short. Nothing was altered.",该设置备份不完整，因此可能已被缩短。一切都没有改变.
+That settings change didn't go through. Nothing was altered.,该设置更改没有完成。一切都没有改变.
+That setup couldn't be applied. Nothing was changed.,无法应用该设置。一切都没有改变.
+That sticker is in a format Metra can't read,该贴纸的格式为 Metra 无法读取
+That watch-history file is damaged. Nothing was imported.,该观看历史文件已损坏。没有进口任何东西.
+The Activity row of likes and comments on your posts leaves the Inbox. Notifications about them still arrive.,对您帖子的点赞和评论的活动行会离开收件箱。关于他们的通知仍然会到达.
+The Archive row leaves the Inbox. Archived chats are kept.,存档行离开收件箱。存档的聊天记录将被保留.
+The Bulletin board rows TikTok adds to the Inbox leave the list. Chats and the other rows stay where they are.,公告板行 TikTok 添加到收件箱离开列表。聊天和其他行保留在原处.
+The Following and For You names above the feed go away. Swiping between the feeds and the search button stay as they are.,信息流上方的“关注”和“为您推荐”名称将消失。在信息流和搜索按钮之间滑动保持原样.
+The LIVE ended or the connection dropped. What was recorded is saved to %1$s,LIVE 结束或连接断开。录制的内容保存到 %1$s
+The LIVE recording TikTok closed on couldn't be saved. Its unfinished file was cleared.,无法保存关闭的 LIVE 录音 TikTok。其未完成的文件已被清除.
+The Lab can't check this. TikTok gets it exactly as typed.,实验室无法检查这一点。 TikTok 完全按照键入的方式获取它.
+The Lab couldn't open. Go back and open it again.,实验室无法打开。返回并再次打开它.
+"The Lab keeps at most %1$s rules. This change would make %2$s, so nothing was changed.",实验室最多保留 %1$s 条规则。此更改将生成 %2$s，因此没有任何更改.
+The Message requests row leaves the Inbox. Requests keep arriving and wait there until you turn this off.,消息请求行离开收件箱。请求不断到达并在那里等待，直到您将其关闭.
+The New followers row leaves the top of the Inbox. The accounts still follow you.,新关注者行离开收件箱顶部。账户仍然跟着你.
+The Tako assistant's conversation leaves the Inbox list. The Tako bubble on the feed has its own switch under Feed tabs.,Tako 助理的对话离开收件箱列表。 信息流上的 Tako 气泡在信息流选项卡下有自己的开关.
+The accounts TikTok suggests you follow no longer take up rows in the Inbox.,TikTok 建议您关注的帐户不再占用收件箱中的行.
+The activity status control leaves the Inbox header. Whether others see you as active is unchanged.,活动状态控件保留收件箱标题。其他人是否认为你活跃并没有改变.
+"The add people icon leaves the Inbox header. Only the shortcut goes, so friend suggestions elsewhere are unchanged.",添加人员图标会离开收件箱标题。只有捷径走，所以其他地方的好友推荐没有变化.
+The already-saved check failed. Try again.,已保存的检查失败。再试一次.
+The backup didn't start and its partial file couldn't be removed. Delete it from the folder you chose.,备份未启动，且无法删除其部分文件。从您选择的文件夹中将其删除.
+The backup wasn't saved. Back up again when the file app is ready.,备份未保存。当文件应用程序准备就绪时再次备份.
+The banner at the top of the Inbox that invites you to start a group chat stops showing. Groups you're already in are unchanged.,收件箱顶部邀请您开始群聊的横幅停止显示。您已加入的组保持不变.
+The catalog says this key is %1$s and this override is %2$s. Reset the override and make a new one.,目录显示此密钥为 %1$s，此覆盖为 %2$s。重置覆盖并创建一个新覆盖.
+The comment button also opens a video's comments with its caption at the top. The caption over the video goes away while this is on.,评论按钮还可以打开视频评论，其标题位于顶部。当此功能开启时，视频上的字幕就会消失.
+The cover couldn't be saved. Try again.,封面无法保存。再试一次.
+The diagnostic report couldn't be saved yet. Try again in a moment.,诊断报告尚无法保存。稍后再试一次.
+The diagnostic report couldn't be saved. Try again.,无法保存诊断报告。再试一次.
+The downloader app you chose isn't installed. Check Send links to another app under Downloads.,您选择的下载器应用程序未安装。选中“下载”下的“发送链接到另一个应用程序”.
+The export wasn't saved. Export again when the file app is ready.,导出未保存。当文件应用程序准备就绪时再次导出.
+The feed capture couldn't be saved. Tap the row to try again.,无法保存信息流捕获。点击该行重试.
+The feed capture is still being saved,信息流捕获仍在保存中
+The feed doesn't end. This is a fine time to leave it.,信息流还没有结束。这是离开它的好时机.
+The feed is locked,信息流已锁定
+The feed is open again,信息流再次开放
+"The feed slowly dims during the last 45 seconds before the hold, so it doesn't come as a sudden stop. Needs a time budget and a hold.",在暂停前的最后 45 秒内，信号会慢慢变暗，因此不会突然停止。需要时间预算和保留.
+The feed stops when this video ends.,当该视频结束时，信息流将停止.
+"The feed waits for one tap before it starts playing again when you come back to the app. Messages, profiles and search are still one tap away.",当您返回应用程序时，信息流会等待一次点击，然后才会再次开始播放。消息、个人资料和搜索仍然只需轻轻一按即可完成.
+"The file app still has the last file. Try again once it lets go, or restart TikTok.",文件应用程序仍然保留着最后一个文件。松开后重试，或重新启动 TikTok.
+The file hushfeed-safe-mode couldn't be removed. Delete it from TikTok's folder under Android/data to turn Metra back on.,无法删除文件 hushfeed-safe-mode。将其从 Android/data 下的 TikTok 文件夹中删除，以重新打开 Metra.
+The frame couldn't be read. Try again.,无法读取该框架。再试一次.
+The frame couldn't be saved. Try again.,无法保存该帧。再试一次.
+"The hour both budgets reset, on a 24 hour clock. The default is 4 in the morning, so a late night still counts as the same day.",两个预算重置的时间，采用 24 小时制。默认时间为凌晨 4 点，因此深夜仍算作同一天.
+The last feed capture wasn't saved. Tap to try again.,上次的信息流捕获未保存。点击重试.
+The last one is still waiting to start,最后一期还在等待开始
+The last report is still being saved,最新报告仍在保存中
+The list changed while loading. Results are incomplete.,加载时列表发生变化。结果不完整.
+The list reached its limit. More items may remain.,该列表已达到极限。可能会留下更多物品.
+The list stopped making progress. Results are incomplete.,该清单停止取得进展。结果不完整.
+The live photo's clip couldn't be saved. Try again.,无法保存实时照片的剪辑。再试一次.
+The loaded-values file you chose couldn't be read. Try again.,无法读取您选择的加载值文件。再试一次.
+The message didn't go through. It tries again at %1$s.,消息没有传出去。它在 %1$s 再次尝试.
+The network proxy from that file is off. Check its address before you turn it on,该文件的网络代理已关闭。打开之前检查其地址
+"The original photos aren't available, so TikTok's own save runs instead",原始照片不可用，因此 TikTok 自己的保存运行
+The original photos aren't available. No video was saved.,原始照片不可用。没有保存视频.
+"The override changes no fields. Edit the field values, or reset the override.",覆盖不会更改任何字段。编辑字段值，或重置覆盖.
+"The override couldn't be applied: %1$s. Edit the field values, or reset the override.",无法应用覆盖：%1$s。编辑字段值，或重置覆盖.
+"The override doesn't say what list to return. Edit the field values, or reset the override.",覆盖没有说明要返回什么列表。编辑字段值，或重置覆盖.
+The partial file couldn't be removed. Delete it from the folder you chose.,无法删除部分文件。从您选择的文件夹中将其删除.
+The phone is running out of room. What was recorded is saved to %1$s,电话空间不足。录制的内容保存到 %1$s
+"The port the proxy listens on, like 8080 or 1080.",代理侦听的端口，例如 8080 或 1080.
+The presets couldn't load. Open the Lab again.,无法加载预设。再次打开实验室.
+The profile picture couldn't be saved. Try again.,无法保存个人资料图片。再试一次.
+"The proxy at %1$s asks for a password, and TikTok can't send one. Use a proxy that doesn't need one.",%1$s 处的代理要求输入密码，而 TikTok 无法发送密码。使用不需要的代理.
+"The proxy's address, like 192.168.1.20 or proxy.example.com.",代理的地址，例如 192.168.1.20 或 proxy.example.com.
+The quality choice is still open,品质选择依然开放
+"The record of an interrupted settings change couldn't be read, so it was set aside. Check your settings.",中断的设置更改记录无法读取，因此被搁置。检查您的设置.
+The recording couldn't be saved. Try again.,录音无法保存。再试一次.
+The recording reached its size limit and was saved to %1$s,录音达到其大小限制并保存到 %1$s
+The report couldn't be saved. Try again.,无法保存报告。再试一次.
+The request timed out. The list may be incomplete.,请求超时。该列表可能不完整.
+The row of story avatars across the top of the Inbox goes. Stories still play from the feed and from profiles.,收件箱顶部的一排故事头像出现了。故事仍然通过信息流和个人资料播放.
+The saved-video choice couldn't open. Try again.,无法打开已保存的视频选项。再试一次.
+The saved-video choice is still open,保存视频的选择仍然开放
+The server asked us to wait. Try again later.,服务员要求我们稍等。稍后再试.
+The setting couldn't finish updating. Its saved value is shown.,该设置无法完成更新。显示其保存值.
+The settings backup was rejected. Nothing was altered.,设置备份被拒绝。一切都没有改变.
+The smallest value is above the largest,最小值高于最大值
+The sound couldn't be saved. Try again.,声音无法保存。再试一次.
+The sticker couldn't be saved. Try again.,无法保存贴纸。再试一次.
+The sticker suggestion banner stops showing in a chat. Your own stickers are still in the sticker picker.,贴纸建议横幅停止在聊天中显示。您自己的贴纸仍在贴纸选择器中.
+The story couldn't be saved. Try again.,故事无法保存。再试一次.
+"The thumbs down on each comment blocks the commenter instead of disliking. The comment dims, an undo banner follows, and a second tap unblocks.",对每条评论的“大拇指朝下”会阻止评论者，而不是不喜欢。评论变暗，随后出现撤消横幅，然后再点按即可解锁.
+The time of day the message goes out.,消息发出的时间.
+The video couldn't be made from these photos. Try again.,无法根据这些照片制作视频。再试一次.
+"The video couldn't be saved. Try again, or choose Automatic.",视频无法保存。再试一次，或选择“自动”.
+"The video was saved, but its record couldn't be updated. A later save may make another copy.",视频已保存，但无法更新其记录。稍后保存可能会制作另一个副本.
+"The video without the watermark couldn't be fetched, so TikTok's watermarked copy was saved to %1$s. Try again later for the clean copy.",无法获取没有水印的视频，因此TikTok的带水印副本保存到%1$s。稍后重试以获得干净的副本.
+"The video you're watching keeps playing to its end after you leave TikTok or turn the screen off, with TikTok's own media notification to pause it. TikTok's background play switch stays on while this is on. Restart TikTok to apply this.",在您离开 TikTok 或关闭屏幕后，您正在观看的视频将继续播放到最后，并通过 TikTok 自己的媒体通知来暂停。当此功能打开时，TikTok 的后台播放开关保持打开状态。重新启动 TikTok 以应用此操作.
+"The voice and video call buttons leave the top of a chat. Calls still ring, and the chat details button stays.",语音和视频通话按钮离开了聊天的顶部。来电仍然响起，并且聊天详细信息按钮仍然保留.
+"The words under the bottom tab icons go away. The icons stay, and each tab opens what it always did.",底部选项卡图标下方的文字消失。图标保留下来，每个选项卡都会像往常一样打开.
+"Their usernames, separated by commas or new lines. Each person must already have a chat with you.",他们的用户名，以逗号或换行符分隔。每个人都必须已经与您聊天过.
+There is no Lab change to undo.,没有可撤消的实验室更改.
+There is no diagnostic data to clear,没有要清除的诊断数据
+There is no diagnostic data to put back,没有可放回的诊断数据
+There isn't enough room on the phone to record,手机空间不足，无法录音
+There was nothing to put back,没有什么可以放回去的
+There were no saved videos to forget,没有可忘记的已保存视频
+There's no video on screen to save a frame from,屏幕上没有视频可保存帧
+These are posts saved by your signed-in account. Other Favorites categories aren't included.,这些是您登录帐户保存的帖子。不包括其他收藏夹类别.
+These loaded values are for a different TikTok version.,这些加载的值适用于不同的 TikTok 版本.
+These notes are in English.,这些注释是英文的.
+This LIVE's stream can't be saved,无法保存此 LIVE 的流
+This catalog entry is no longer available. Refresh the Lab and try again.,该目录条目不再可用。刷新实验室并重试.
+This change couldn't be saved. Try again.,无法保存此更改。再试一次.
+This configuration has no fields that can be copied and changed safely on this build.,此配置没有可以在此版本上安全复制和更改的字段.
+This file has no loaded values in it.,该文件中没有加载的值.
+This file isn't a loaded-values export from the Feature Gate Lab.,此文件不是从功能门实验室导出的加载值.
+This gate type isn't supported.,不支持此门类型.
+"This is the video's own sound, so YouTube Music won't have it",这是视频自己的声音，因此 YouTube Music 不会有它
+"This key isn't in Metra's list, so its type can't be checked. Reset the override.",该键不在 Metra 的列表中，因此无法检查其类型。重置覆盖.
+"This key touches account safety. Forcing it can change login, region, payment or security checks.",这个关键涉及到账户安全。强制它可以更改登录、区域、付款或安全检查.
+"This line opens a rule and doesn't finish it: %1$s. Write two phrases as ""a"" & ""b"" for both, or ""a"" !& ""b"" for the first without the second.",此行打开一条规则但未完成它：%1$s。将两个短语写为“a”和“b”，或者将第一个短语写为“a”！&“b”，而没有第二个.
+This list is too long to preview here. Saving still follows the usual limit.,此列表太长，无法在此处预览。储蓄仍遵循通常的限额.
+This list isn't available on this TikTok build.,此列表在此 TikTok 版本上不可用.
+"This phone has no file picker, so there's no way to choose a file here",这款手机没有文件选择器，因此无法在此处选择文件
+This phone has no folder picker. Type the folder into the row instead.,此手机没有文件夹选择器。请在该行中键入文件夹.
+This preset doesn't match the installed gates. Nothing changed.,此预设与已安装的门不匹配。一切都没有改变.
+This preset isn't available for your installed TikTok version.,此预设不适用于您安装的 TikTok 版本.
+This profile picture isn't available to save,该个人资料照片无法保存
+"This quality isn't available as a complete file, so TikTok's own save runs instead",此质量无法作为完整文件使用，因此 TikTok 自己的保存会运行
+"This setting's value can't be copied on this build, so it can't be overridden. Reset the override.",无法在此版本上复制此设置的值，因此无法覆盖它。重置覆盖.
+This story isn't available to save,该故事无法保存
+This value is required.,该值是必需的.
+This video has no cover to save,该视频没有可保存的封面
+This video has no link to copy,该视频没有可复制的链接
+"This video has no link to send, so TikTok's own save runs instead",该视频没有要发送的链接，因此 TikTok 自己的保存会运行
+This video has no original sound to save,该视频没有可保存的原声
+This video has no sound of its own,该视频没有自己的声音
+This video is already saved,该视频已保存
+This video is already saved. Open TikTok to save another copy.,该视频已保存。打开 TikTok 以保存另一个副本.
+This video isn't available as a complete file. Try again later.,该视频不提供完整文件。稍后再试.
+This video's sound has no title to look for,该视频的声音没有可查找的标题
+Those photos can't be tried again now. Save the post again to get the rest.,现在无法再次尝试这些照片。再次保存帖子以获取其余内容.
+Thumbs down blocks the commenter,大拇指朝下屏蔽评论者
+TikTok account facts,TikTok 账户事实
+"TikTok checks how it was signed and installed. This answers those checks the way the Play Store version would. Try it if follows or likes undo themselves after a refresh. It may not help, since TikTok has other checks.",TikTok 检查它是如何签名和安装的。这将按照 Play 商店版本的方式回答这些检查。如果关注或喜欢在刷新后自行撤消，请尝试一下。它可能没有帮助，因为 TikTok 还有其他检查.
+TikTok closed during these saves,TikTok 在这些保存期间关闭
+"TikTok closed three times within a minute of starting, so Metra paused itself. Your settings stay as they are.",TikTok 在启动后一分钟内关闭了 3 次，因此 Metra 自行暂停。您的设置保持原样.
+TikTok closed. What was recorded is saved to %1$s,TikTok 已关闭。录制的内容保存到 %1$s
+TikTok closes at %1$s,TikTok 收盘于 %1$s
+TikTok default,TikTok 默认值
+"TikTok default (hold to speed up, quick share)",TikTok 默认（按住加速，快速分享）
+TikTok default (open the creator's profile),TikTok 默认（打开创建者的个人资料）
+TikTok didn't accept the feedback. Try again later.,TikTok 未接受反馈。稍后再试.
+TikTok didn't block %1$s. Try again in a moment.,TikTok 没有阻止 %1$s。稍后再试一次.
+TikTok didn't unblock %1$s. Try again in a moment.,TikTok 未解锁 %1$s。稍后再试一次.
+TikTok forgets the LIVE quality you picked when it closes. This starts rooms at that quality again after a restart. A room whose stream doesn't have it opens at TikTok's choice.,TikTok 会忘记您在关闭时选择的 LIVE 质量。这会在重新启动后再次以该质量启动房间。没有该流的房间由 TikTok 选择打开.
+"TikTok gets a blank advertising ID, like the one Android gives after you delete yours. Apps can't use it to recognize your phone.",TikTok 获得一个空白广告 ID，就像 Android 在删除广告 ID 后给出的那样。应用程序无法使用它来识别您的手机.
+TikTok gets no location from your phone. The Region settings change your country and time zone. This switch stops the exact position.,TikTok 无法从您的手机获取位置信息。区域设置更改您的国家/地区和时区。该开关停止在准确的位置.
+"TikTok hasn't loaded this setting yet. Open the part of the app that uses it, then come back.",TikTok 尚未加载此设置。打开使用它的应用程序部分，然后返回.
+TikTok is locked,TikTok 已锁定
+TikTok isn't locked because this phone has no screen lock,TikTok 未锁定，因为此手机没有屏幕锁定
+"TikTok lets you pick a LIVE's quality only in some rooms. This adds Video quality to the menu in most of the others, and the next room opens at the quality you picked last.",TikTok 允许您仅在某些房间中选择 LIVE 的品质。这会将视频质量添加到大多数其他房间的菜单中，并且下一个房间会以您上次选择的质量打开.
+"TikTok may have taken this message. Delivery isn't confirmed, so it won't be retried today.",TikTok 可能已收到此消息。交货尚未确认，因此今天不会重试.
+"TikTok only had its watermarked copy of this story, so that copy was saved to %1$s",TikTok 只有该故事的带水印副本，因此该副本被保存到 %1$s
+TikTok read it,TikTok 阅读它
+"TikTok read it, but the override couldn't be applied. Reset it and save it again.",TikTok 读取它，但无法应用覆盖。重置并再次保存.
+TikTok refused the follow with code %1$s,TikTok 拒绝了以下代码 %1$s
+TikTok refused the follow with code %1$s. A hidden CAPTCHA may be the cause.,TikTok 拒绝了以下代码，代码为 %1$s。隐藏的验证码可能是原因.
+TikTok refused the follow: %1$s,TikTok 拒绝以下内容：%1$s
+TikTok refused the follow: %1$s A hidden CAPTCHA may be the cause.,TikTok 拒绝了以下内容： %1$s 隐藏的验证码可能是原因.
+TikTok refused this request (%1$s).,TikTok 拒绝了此请求 (%1$s).
+"TikTok removes videos saved for offline viewing after a set time, sometimes only two days, watched or not. With this on they stay until you delete them in TikTok's Offline videos settings. TikTok can still clear watched ones when your phone is low on space.",TikTok 在设定的时间（有时仅两天）后删除保存用于离线观看的视频，无论观看与否。启用此功能后，它们会一直保留，直到您在 TikTok 的离线视频设置中删除它们为止。当您的手机空间不足时，TikTok 仍然可以清除观看的内容.
+TikTok reports additional filtered accounts. This list is incomplete.,TikTok 报告其他已过滤的帐户。此列表不完整.
+TikTok reports no more items in this list.,TikTok 报告此列表中不再有任何项目.
+TikTok sees an empty contact list instead of yours. Find Friends and People you may know can no longer use your contacts.,TikTok 看到的是一个空的联系人列表，而不是您的。查找您可能认识的朋友和人无法再使用您的联系人.
+"TikTok sees an empty list of apps instead of the apps on your phone. Checks for one specific app, such as when TikTok opens an app you tap, still work.",TikTok 看到的是一个空的应用程序列表，而不是手机上的应用程序。检查一个特定的应用程序，例如当 TikTok 打开您点击的应用程序时，仍然有效.
+TikTok slips the videos it saved for offline viewing back into For You when it can't load enough new ones. This takes them all out. Your offline list stays as it is.,当 TikTok 无法加载足够的新视频时，会将其保存的供离线观看的视频滑回到“For You”中。这会将他们全部带走。您的离线列表保持原样.
+TikTok sometimes tests a change that empties the Favorites tab on your profile. This keeps the tab and your saved videos.,TikTok 有时会测试一项更改，以清空您的个人资料上的“收藏夹”选项卡。这会保留该选项卡和您保存的视频.
+TikTok sometimes tests your phone's speed in a background process that can use a lot of memory. This stops that test from starting. One already running ends when TikTok restarts.,TikTok 有时会在可能使用大量内存的后台进程中测试手机的速度。这会阻止该测试开始。当 TikTok 重新启动时，已经运行的一个会结束.
+"TikTok treats your phone as one without passkeys, so signing in asks for your password or a code by email or text instead. Password managers won't hand a passkey to a patched app.",TikTok 将您的手机视为没有密钥的手机，因此登录时会要求您通过电子邮件或短信输入密码或代码。密码管理器不会将密钥交给已修补的应用程序.
+TikTok's background play and Auto scroll,TikTok的后台播放和自动滚动
+TikTok's downloader: %1$s,TikTok 的下载器：%1$s
+TikTok's hold to speed up,TikTok 按住可加速
+TikTok's messages didn't start in time. It tries again at %1$s.,TikTok 的消息没有及时开始。它在 %1$s 再次尝试.
+"TikTok's own daily screen-time reminder sends the app to the background instead of waiting to be dismissed. Coming straight back leaves the reminder on screen, so the limit stays reachable. Needs a daily limit set under TikTok's Settings and privacy, under Time and well-being.",TikTok 自己的每日屏幕时间提醒会将应用程序发送到后台，而不是等待被关闭。直接回来会在屏幕上留下提醒，因此仍然可以达到限制。需要在 TikTok 的“设置”和“隐私”下的“时间和健康”下设置每日限额.
+TikTok's own name,TikTok 自己的名字
+TikTok's own value,TikTok 自身的值
+TikTok's size,TikTok 的大小
+TikTok's suggested reply cells and their intro banner stop showing in a chat. Messages you type or receive are untouched.,TikTok 的建议回复单元格及其介绍横幅停止在聊天中显示。您输入或接收的消息不会受到影响.
+TikTok's total: %1$s. Filtered accounts: %2$s.,TikTok 总计：%1$s。过滤的帐户：%2$s.
+Timed logging stopped,定时记录已停止
+Times you can open the feed anyway,您无论如何都可以打开信息流的次数
+Today can't start over while Wait a day to loosen the budget is on. The day starts over at %1$s.,当“等待一天放松预算”开始时，今天无法重新开始。这一天从 %1$s 开始.
+"Today has moved on, so there's nothing to put back",今天已经过去了，所以没有什么可以挽回的
+Today is back where it was,今天又回到原来的位置了
+Today started over. Tap again to put the counts back.,今天又重新开始了。再次点击可恢复计数.
+Today starts again,今天又开始了
+Today's budget is locked. The day starts over at %1$s.,今天的预算已锁定。这一天从 %1$s 开始.
+"Today's budget is locked. The feed opens again at %1$s. Messages, profiles and search still work.",今天的预算已锁定。该信息流在 %1$s 再次打开。消息、个人资料和搜索仍然有效.
+Today's budget is locked. This can be changed again at %1$s.,今天的预算已锁定。可以在 %1$s 再次更改此设置.
+Today: %1$d minute,今天：%1$d 分钟
+Today: %1$d minutes,今天：%1$d 分钟
+Today: %1$d video,今天：%1$d 视频
+Today: %1$d videos,今天：%1$d 视频
+Too late to put the saved videos back,为时已晚，无法恢复已保存的视频
+Too many media saves are already running. Try again in a moment.,正在运行的媒体保存过多。稍后再试一次.
+Tracking,追踪
+"Tracking, device access and links",跟踪、设备访问和链接
+Translate button in comments,评论中的翻译按钮
+"Translate comments as they load, using TikTok's own translator.",使用 TikTok 自己的翻译器在加载时翻译注释.
+Translate draft,翻译草稿
+Translate into,翻译成
+Translated message,翻译后的消息
+Translating…,翻译…
+Translation preview,翻译预览
+Transparent,透明
+Try a different word or clear the search.,尝试使用不同的单词或清除搜索.
+Try a different word or clear the search. Switches from patches you didn't tick in Morphe Manager aren't listed.,尝试使用不同的单词或清除搜索。未列出您未在 Morphe Manager 中勾选的补丁的切换.
+"Try again, or go back to TikTok.",再试一次，或返回 TikTok.
+Turn Metra back on,重新打开 Metra
+Turn off double tap to react,关闭双击即可做出反应
+Turn off haptics,关闭触觉
+Turn off push notifications,关闭推送通知
+Turn off screen transitions,关闭屏幕过渡
+Turn off swipe to reply,关闭滑动回复功能
+Turn off the timer (TikTok closes at %1$s),关闭计时器（TikTok 在 %1$s 关闭）
+Turn on %1$s first.,首先打开 %1$s.
+Turn on Keep a streak going first,首先打开“保持连胜”
+Turn on overrides,打开覆盖
+"Turn the music disc at the bottom of the right column while a video plays, the way TikTok used to.",播放视频时，转动右栏底部的音乐光盘，就像 TikTok 以前那样.
+Turned off %1$d gates of %2$d. The rest don't take a true or false value. Restart TikTok to apply this.,关闭了 %2$d 的 %1$d 门。其余的不采用 true 或 false 值。重新启动 TikTok 以应用此操作.
+Turned off %1$d gates. Restart TikTok to apply this.,关闭 %1$d 门。重新启动 TikTok 以应用此操作.
+Turned off 1 gate of %2$d. The rest don't take a true or false value. Restart TikTok to apply this.,关闭了 %2$d 的 1 个门。其余的不采用 true 或 false 值。重新启动 TikTok 以应用此操作.
+Turned off 1 gate. Restart TikTok to apply this.,关闭 1 个门。重新启动 TikTok 以应用此操作.
+"Turns off TikTok's notification service, so nothing it sends reaches your notification shade and it can't wake your phone. You won't hear about new messages until you open TikTok. Notifications hidden while this is on don't come back. Ongoing ones like media controls stay.",关闭 TikTok 的通知服务，因此它发送的任何内容都不会到达您的通知栏，并且无法唤醒您的手机。在打开 TikTok 之前，您不会听到新消息。开启此功能时隐藏的通知不会再出现。诸如媒体控制之类的持续性措施将保留.
+Turns off at %1$s,于 %1$s 关闭
+"Two letters, like us, gb or jp.",两个字母，例如 us，gb 或 jp.
+Type,类型
+"Type a website name to use instead of tiktok.com in links you share or copy, like vxtiktok.com. Leave empty to share TikTok's own links. Only TikTok links change, and only the website name.",在您共享或复制的链接中键入要使用的网站名称，而不是 tiktok.com，例如 vxtiktok.com。留空以共享 TikTok 自己的链接。仅 TikTok 链接发生变化，并且仅网站名称发生变化.
+"Type one language code here, like en.",在此输入一种语言代码，例如 en.
+Type some sample text to see whether these rules match it.,输入一些示例文本以查看这些规则是否匹配.
+"Type the other app's ID, like com.dv.adm. The save button sends the video's link there instead of saving. Leave empty to save here.",输入其他应用程序的 ID，例如 com.dv.adm。保存按钮将视频的链接发送到那里而不是保存。留空以保存此处.
+Unavailable,不可用
+Unblock,解锁
+Unblock this commenter,解除对该评论者的屏蔽
+Unblocked %1$s,已解锁%1$s
+"Under the @username on a profile, say whether it follows you or doesn't follow you back. Follower and following lists mark the accounts you follow that don't follow you back.",在个人资料的@用户名下，说明它是关注您还是不关注您。关注者和关注者列表标记了您关注但未关注您的帐户.
+Undo,撤消
+Undo clearing seen videos,撤消清除已看过的视频
+Undo didn't finish. Some settings may still be changed.,撤消未完成。某些设置可能仍会更改.
+Undo didn't finish. Some settings may still be changed. Try Undo again.,撤消未完成。某些设置可能仍会更改。再次尝试撤消.
+Undo forgetting saved videos,撤消忘记保存的视频
+Undo last Lab change,撤消上次实验室更改
+Undo last restore or reset,撤消上次恢复或重置
+Undoing the last change,撤消最后一次更改
+Unknown resolution,未知分辨率
+Unlock,解锁
+Unlock TikTok,解锁TikTok
+Unpersonalized For You videos,为您量身定制的视频
+"Until you choose here, this sheet follows your choices under Hide share actions.",在您选择此处之前，此表将遵循您在“隐藏共享操作”下的选择.
+"Up to %1$d speeds from %2$s to %3$s, separated by commas. Example: 0.5, 1, 1.5, 2, 2.5, 3. Leave empty for TikTok's list. Restart TikTok to apply this.",从 %2$s 到 %3$s 最多 %1$d 速度，以逗号分隔。示例：0.5、1、1.5、2、2.5、3。TikTok 的列表留空。重新启动 TikTok 以应用此操作.
+"Use 0 for TikTok's size, or %1$d to %2$d. Applies to the next caption.",使用 0 作为 TikTok 的大小，或使用 %1$d 到 %2$d。适用于下一个标题.
+"Use 0 for TikTok's size, or %1$d to %2$d. Sizes the author's name and the post date next to it, and keeps Android's font scaling.",使用 0 作为 TikTok 的大小，或使用 %1$d 到 %2$d。调整作者姓名及其旁边的发布日期的大小，并保持 Android 的字体缩放.
+"Use 0 for TikTok's size, or %1$d to %2$d. Sizes the description below the author's name and keeps Android's font scaling.",使用 0 作为 TikTok 的大小，或使用 %1$d 到 %2$d。调整作者姓名下方描述的大小并保持 Android 的字体缩放.
+Use Calm feed,使用平静信息流
+Use Save report for this large report,使用保存此大型报告的报告
+Use TikTok for a while. A popup shows up here after TikTok first tries to show it.,使用 TikTok 一段时间。在 TikTok 首次尝试显示后，此处会出现一个弹出窗口.
+"Use TikTok's own hold, pull down and release gesture to keep playing at the hold speed, 2x unless Playback sets another.",使用 TikTok 自己的按住、下拉和释放手势继续以按住速度 2 倍播放，除非播放设置另一个速度.
+Use a default playback speed,使用默认播放速度
+"Use a whole number from 0 to %1$s, or leave the field empty.",使用 0 到 %1$s 之间的整数，或将该字段留空.
+Use an imported font,使用导入的字体
+Use non-personalized search,使用非个性化搜索
+Use screen lock,使用屏幕锁定
+Use system emoji,使用系统表情符号
+Use system font,使用系统字体
+Use the preset for the region TikTok reports for your account and its shop too. May affect search.,也为您的帐户及其商店使用区域 TikTok 报告的预设。可能会影响搜索.
+"Use the split layout on wider screens. Restart TikTok to apply this. If the old layout is still there, unfold again.",在更宽的屏幕上使用分割布局。重新启动 TikTok 以应用此操作。如果旧布局仍然存在，请再次展开.
+"Use this account's TikTok JSON export, up to %1$s MB and %2$s entries. Dates without a time zone use this phone's time zone.",使用此帐户的 TikTok JSON 导出，最多 %1$s MB 和 %2$s 条目。没有时区的日期使用此手机的时区.
+Use translation,使用翻译
+Use value,使用价值
+Use your own offline videos limit,使用您自己的离线视频限制
+"Use {creator}, {date} and {video_id} to build the name. Start with {creator}/ to put each creator in a folder. The file ending is added for you.",使用 {creator}、{date} 和 {video_id} 构建名称。以 {creator}/ 开头，将每个创建者放入一个文件夹中。文件结尾已为您添加.
+"Use {creator}, {date}, {video_id} and {index} to build the name. {index} numbers the photos of a slideshow saved with Download original photos. TikTok's own save button numbers files by folder instead. The file ending is added for you.",使用 {creator}、{date}、{video_id} 和 {index} 来构建名称。 {index} 对使用“下载原始照片”保存的幻灯片的照片进行编号。 TikTok 自己的保存按钮按文件夹对文件进行编号。文件结尾已为您添加.
+Use {date} and {media_id} to build the name. Works for image and video stickers.,使用 {date} 和 {media_id} 构建名称。适用于图像和视频贴纸.
+User ID copied,已复制用户 ID
+Username copied,用户名已复制
+Username last changed,最后更改的用户名
+Using TikTok's value,使用 TikTok 的值
+Value,价值
+Value to return,返回值
+Value: %1$s to %2$s,值：%1$s 至 %2$s
+Verified accounts,已验证帐户
+Version %1$s,版本%1$s
+Version %1$s for TikTok %2$s,TikTok %2$s 的版本 %1$s
+"Version, changes and licenses",版本、变更和许可
+Video,视频
+Video (MP4),视频 (MP4)
+Video ID copied,视频 ID 已复制
+Video and details saved to %1$s,视频和详细信息保存到 %1$s
+Video destination,视频目的地
+Video download quality,视频下载质量
+Video filename,视频文件名
+Video frame,视频帧
+Video info,视频信息
+Video of photos,照片视频
+Video playback quality,视频播放质量
+Video player settings,视频播放器设置
+Video saved,视频已保存
+"Video saved in %1$s, but only %2$s of %3$s subtitles came with it",视频保存在 %1$s 中，但仅附带 %2$s（共 %3$s 字幕）
+Video saved with %1$s subtitles in %2$s,视频以 %1$s 字幕保存在 %2$s 中
+"Videos can't be saved to the folder in that file, so your video folder was kept",视频无法保存到该文件中的文件夹中，因此您的视频文件夹被保留
+Videos in search results show their cover and play when you open them. The feed and the videos you open play as usual.,搜索结果中的视频会显示其封面并在您打开时播放。您打开的信息流和视频照常播放.
+Views range,观看范围
+Visual search,视觉搜索
+Volume,体积
+Wait a day to loosen the budget,等一天放松预算
+"Wait a day to loosen the budget is on, so Metra stays on",等待一天放松预算，所以 Metra 保持不变
+Wait before hiding the controls.,隐藏控件之前请等待.
+Wait for loading to finish,等待加载完成
+Waiting for the file app to let go of the last file. Restart TikTok if it doesn't.,等待文件应用程序释放最后一个文件。如果没有，请重新启动 TikTok.
+Waiting to record. Go to the screen you want recorded.,等待录制。转到您要录制的屏幕.
+Waiting to save %1$s files,等待保存 %1$s 文件
+Waiting to save one file,等待保存一个文件
+Waiting to save video,等待保存视频
+Watch history was imported for the account that chose the file. Switch back to see it.,已为选择该文件的帐户导入观看历史记录。切换回来看看.
+"WebP, exactly as TikTok sent it",WebP，与 TikTok 发送的完全相同
+What TikTok gets,TikTok 得到什么
+What gets sent each day.,每天发送什么.
+What's new,有什么新消息
+"When Copy link gives a short vt.tiktok.com or vm.tiktok.com link, Metra opens it once in the background to find the full video link and copies that instead. TikTok sees that visit, and it connects directly even when a proxy is on. Links you send to another app go out as they were.",当“复制链接”提供简短的 vt.tiktok.com 或 vm.tiktok.com 链接时，Metra 在后台打开一次以找到完整的视频链接并复制该链接。 TikTok 看到该访问，即使代理打开，它也会直接连接。您发送到另一个应用程序的链接将按原样消失.
+"When TikTok is in dark mode, the list of collections you get by holding the Favorites button is dark too instead of white.",当 TikTok 处于深色模式时，您通过按住“收藏夹”按钮获得的收藏列表也是深色的，而不是白色的.
+"When TikTok requests this key, return the selected value below",当TikTok请求该键时，返回下面选择的值
+"When TikTok starts and decides the phone's language changed, it forgets the language you picked in its settings and follows the phone. With this on, your pick stays. Counts from TikTok's next start.",当 TikTok 启动并确定手机的语言已更改时，它会忘记您在设置中选择的语言并跟随手机。启用此功能后，您的选择就会保留。从 TikTok 的下一次开始算起.
+"When a video ends in full screen, stay on it instead of moving to the next one. Swiping still moves on.",当视频以全屏方式结束时，请继续观看该视频，而不是转到下一个视频。滑动仍然继续.
+"When a video ends while TikTok plays in the background, it starts over instead of waiting for you to press Play in the notification. A call or another app's sound still pauses it.",当视频结束而 TikTok 在后台播放时，视频会重新开始，而不是等待您按通知中的“播放”。通话或其他应用程序的声音仍然会暂停它.
+"When the budget runs out, the video on screen plays to its end before the hold starts, and you can't swipe to another video meanwhile. If the fade already dimmed the feed, the hold starts right away. Needs a hold. It waits %1$d minutes at most.",当预算用完时，屏幕上的视频会在暂停开始之前播放到最后，并且您无法同时滑动到另一个视频。如果淡入淡出已经使信息流变暗，则立即开始保持。需要抓住。它最多等待 %1$d 分钟.
+"When the video without the watermark can't be fetched, save TikTok's own watermarked copy instead and say so. It's the size TikTok's own save uses, so it may be smaller than the quality you picked.",当无法获取没有水印的视频时，请保存TikTok自己的带水印的副本并说出来。这是TikTok自己保存使用的尺寸，因此它可能比您选择的质量小.
+When to send,何时发送
+"When you leave TikTok while a video plays, it keeps playing in a small window over your other apps, with a button to pause it. Works in the feed and on videos you open from a profile, search or a sound. Needs Android 8 or later.",当您在视频播放时离开 TikTok 时，视频会在其他应用程序上方的小窗口中继续播放，并有一个按钮可以暂停。适用于信息流以及通过个人资料、搜索或声音打开的视频。需要 Android 8 或更高版本.
+"When you open TikTok from its icon, the first video in the feed waits for one tap before it plays. A link, a notification or a shortcut opens as usual.",当您从图标打开 TikTok 时，信息流中的第一个视频会等待点击一下才能播放。链接、通知或快捷方式照常打开.
+"While Clear display is on, also hide the progress bar, the close button and the pause and speed buttons at the bottom. You can still drag along the bottom edge to move through the video. To leave Clear display, press and hold the video and tap Restore display, or pinch the screen.",启用“清晰显示”时，还隐藏底部的进度条、关闭按钮以及暂停和速度按钮。您仍然可以沿着底部边缘拖动以在视频中移动。要离开清晰显示，请按住视频并点击恢复显示，或捏合屏幕.
+"While diagnostic logging is on, a message names the part of Metra that failed. Off keeps failures in the report only.",当诊断日志记录打开时，一条消息会指出 Metra 失败的部分。关闭仅在报告中保留失败.
+Who to message,给谁发消息
+Window width needed to enable the layout. Restart TikTok to apply this.,启用布局所需的窗口宽度。重新启动 TikTok 以应用此操作.
+"With the fade below 100, the buttons and caption stay on screen at that level in Clear display, and taps go through them to the video. Off, Clear display hides them the way it does at 100.",当淡入度低于 100 时，按钮和标题会以清晰显示的方式保留在屏幕上，点击即可浏览它们并观看视频。关闭时，清除显示会像 100 时那样隐藏它们.
+"Word rules only, not every feed filter:",仅单词规则，并非每个信息流过滤器:
+"Words, countries and languages",单词、国家和语言
+Working,工作
+Works only with YTDLnis (com.deniscerri.ytdl). Picks audio or video when the save button sends it a link.,仅适用于 YTDLnis (com.deniscerri.ytdl)。当保存按钮向其发送链接时选择音频或视频.
+Works only with YTDLnis (com.deniscerri.ytdl). Starts the download in the background without showing its download card.,仅适用于 YTDLnis (com.deniscerri.ytdl)。在后台开始下载，而不显示其下载卡.
+Write the username and caption on the video,在视频上写下用户名和标题
+"Write the video's sound beside it, in the format picked under Sound format. Android 10 and later file audio separately, so it lands in Music under the same folder name as your videos.",按照在声音格式下选择的格式在其旁边写下视频的声音。 Android 10 及更高版本单独归档音频，因此它位于与视频相同的文件夹名称下的音乐中.
+"Writes the date before the time to the second the short way your language does, like 10/7/25.",按照您的语言的缩写方式将时间之前的日期写成秒，例如 10/7/25.
+Writing,写作
+Writing the caption on the video,在视频上写标题
+Writing the caption on the video: %1$s,在视频上写下标题：%1$s
+YTDLnis background mode,YTDLnis后台模式
+YTDLnis download type,YTDLnis 下载类型
+Yes,是的
+You can pick up to %1$s at a time,您一次最多可以领取 %1$s
+YouTube Music couldn't be opened. Open it yourself and search for the sound.,无法打开 YouTube Music。自己打开，搜索声音.
+YouTube Music isn't installed,未安装 YouTube 音乐
+Your TikTok account changed. Choose the file again for this account.,您的 TikTok 帐户已更改。再次为此帐户选择文件.
+Your account changed. Close this list and open it again.,您的帐户已更改。关闭此列表并再次打开它.
+Your account changed. Open the count editor again.,您的帐户已更改。再次打开计数编辑器.
+Your current settings already match Calm feed.,您当前的设置已与平静信息流匹配.
+Your earlier settings are back,您之前的设置已恢复
+Your feed,你的信息流
+Your feed. Your rules.,你的信息流。你的规则.
+Your filters hid everything TikTok just sent. Most were %1$s.,您的过滤器隐藏了刚刚发送的所有内容 TikTok。大多数是%1$s.
+"Your filters hid everything TikTok sent, %1$d times in a row. Most were %2$s.",您的过滤器连续 %1$d 次隐藏了 TikTok 发送的所有内容。大多数是%2$s.
+"Your network proxy was kept, since a backup can't change it",您的网络代理已保留，因为备份无法更改它
+"Your operator's name, like T-Mobile.",您的运营商名称，例如 T-Mobile.
+"Your operator's numeric code, like 310260.",您的运营商的数字代码，例如 310260.
+Your previous feed setup couldn't be restored. Nothing was changed.,无法恢复您之前的信息流设置。一切都没有改变.
+Your previous feed setup is back.,您之前的信息流设置又回来了.
+Your previous feed setup is back. Restart TikTok to apply all changes.,您之前的信息流设置又回来了。重新启动 TikTok 以应用所有更改.
+Your seen history changed before the import finished. Choose the file again.,在导入完成之前，您看到的历史记录发生了变化。再次选择该文件.
+Your settings,您的设置
+Your settings already match,您的设置已经匹配
+"Zero means no limit. Counts the videos Metra advanced past for you, not the ones you swiped yourself, and starts again when the feed is rebuilt or you change this number.",零意味着没有限制。计算 Metra 为您提前过去的视频，而不是您自己刷过的视频，并在重建信息流或您更改此数字时重新开始.
+"Zero means the way out of the hold is always there. Any other number is how many times a day it works. Once they're used up, the hold stays until the day starts over. Ignored while the budget is locked, which removes the way out.",零意味着脱离困境的出路始终存在。任何其他数字都是每天工作的次数。一旦用完，保留就会一直保留到新的一天开始。在预算被锁定时被忽略，从而消除了出路.
+"Zero shows the notice and leaves the feed alone. Anything else covers the feed for that many minutes once a budget is reached. Messages, profiles and search keep working, and nothing in the feed is thrown away.",零显示通知并保留信息流。一旦达到预算，其他任何内容都会覆盖那么多分钟的信息流。消息、个人资料和搜索继续运行，信息流中的任何内容都不会丢失.
+"Zero switches this off. A short reminder after that many minutes of watching, and again after the same again. Time on messages, a profile or search doesn't count, and nothing is shown while the feed is on hold.",零将其关闭。在观看了几分钟之后的简短提醒，以及在同样的情况之后再次提醒。消息、个人资料或搜索的时间不计算在内，并且在信息流暂停时不会显示任何内容.
+"Zero switches this off. Count the minutes the player spends running in the feed. Time on messages, a profile or search doesn't count.",零将其关闭。计算玩家在信息流中运行的分钟数。消息、个人资料或搜索的时间不计算在内.
+"Zero switches this off. Counts every video that comes up in the feed and tells you when you reach the limit. Separate from the auto-advance session limit under Playback, which counts only videos Metra moved past for you.",零将其关闭。计算信息流中出现的每个视频，并在达到限制时告诉您。与“播放”下的自动前进会话限制分开，后者仅计算为您移动过去的视频 Metra.
+collapsed,崩溃了
+debug debugging logs logging,调试调试日志记录
+expanded,扩大
+this creator,这位创造者
+Only on the sides of the video,仅在视频两侧
+Your Long press choice runs only on the left and right thirds of the video. A press in the middle still opens TikTok's own menu. It needs a Long press choice other than TikTok default.,长按所选的操作只在视频的左侧和右侧三分之一生效。在中间长按仍会打开 TikTok 自带的菜单。需要把长按设为 TikTok 默认以外的选项.
+Full-width progress bar,全宽进度条
+"Run the progress bar from one screen edge to the other, without the gap TikTok leaves at each end.",进度条从屏幕一侧延伸到另一侧，去掉 TikTok 在两端留下的空隙.
+New device identity,新设备身份
+"Wipe TikTok's data and give it a new Android ID and advertising ID on the next start, so it sees a phone it hasn't met. You'll be signed out and lose your drafts. Metra's settings stay.",下次启动时清除 TikTok 的数据，并给它新的 Android ID 和广告 ID，让它看到一部没见过的手机。您将被退出登录，草稿也会丢失。Metra 的设置会保留.
+TikTok starts as a new phone after the restart. Tap again to cancel.,重启后 TikTok 会以新手机的身份启动。再次点按可取消.
+Couldn't set up a new device identity. Try again.,无法设置新的设备身份。请重试.
+Feed controls,信息流过滤器
+Feed navigation,信息流标签页
+Interface,信息流界面
+App behavior,应用行为
+Comments and translation,评论与翻译
+Region spoof,地区
+Hide sharing apps by ID,Hide sharing apps by ID
+Hide video actions by ID,Hide video actions by ID
+Balanced,Balanced
+Show TikTok's Auto scroll action,Show TikTok's Auto scroll action
+Comma-separated share option IDs. Other sharing apps remain available.,Comma-separated share option IDs. Other sharing apps remain available.
+Comma-separated action IDs. Other video actions remain available.,Comma-separated action IDs. Other video actions remain available.
+Make the native action available. It starts only when you choose it.,Make the native action available. It starts only when you choose it.
+MENUS,MENUS
+Support,Support
+Support Metra patches,Support Metra patches
+Choose which posts appear in your feeds,Choose which posts appear in your feeds
+"Feed tabs, bottom tabs, and Tako AI","Feed tabs, bottom tabs, and Tako AI"
+"Promotions, overlays, profile and inbox controls","Promotions, overlays, profile and inbox controls"
+"Filters, translation, copy options and split view","Filters, translation, copy options and split view"
+Change the region TikTok reads,Change the region TikTok reads
+"Playback, gestures, privacy, screen time and system","Playback, gestures, privacy, screen time and system"

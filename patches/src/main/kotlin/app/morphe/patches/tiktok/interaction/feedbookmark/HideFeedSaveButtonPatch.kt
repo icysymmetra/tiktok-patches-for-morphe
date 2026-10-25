@@ -1,18 +1,23 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Hushfeed contributors
+ * https://github.com/SysAdminDoc/hushfeed
+ *
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.patches.tiktok.interaction.feedbookmark
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.string
+import app.morphe.util.addInstruction
+import app.morphe.util.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
-import app.morphe.util.getReference
+import app.morphe.patches.tiktok.misc.settings.settingsPatch
+import app.morphe.patcher.util.getReference
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -28,7 +33,7 @@ private fun MethodReference.isFavoriteRootVisibilityCall() =
 private object FeedFavoriteStateFingerprint : Fingerprint(
     definingClass = VIDEO_FAVORITE_ASSEM_DESCRIPTOR,
     returnType = "V",
-    strings = listOf("VideoFavoriteAssem showFavoriteState "),
+    strings = listOf("VideoFavoriteAssem showFavoriteState ").map { string(it, StringComparisonType.CONTAINS) },
     custom = { method, _ ->
         method.parameterTypes.size == 1 &&
             method.implementation?.instructions?.count { instruction ->
@@ -41,11 +46,13 @@ private object FeedFavoriteStateFingerprint : Fingerprint(
 @Suppress("unused")
 val hideFeedSaveButtonPatch = bytecodePatch(
     name = "Hide feed save button",
-    description = "Adds an option to hide the save/favourites button from video feeds.",
+    description = "Removes the save button from the right side of the feed, for a cleaner " +
+        "screen. Starts off. Turn it on in Metra settings > Interface.",
     default = true,
 ) {
-    dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    category("Feed")
+    dependsOn(settingsPatch, sharedExtensionPatch)
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(

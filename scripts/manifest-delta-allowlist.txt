@@ -1,0 +1,25 @@
+# Reviewed Android manifest changes the Hushfeed patches make to a stock TikTok APK.
+#
+# One line per change, as "<kind> <value>":
+#   permission-added     <permission name>      the patched app asks for something stock did not
+#   permission-removed   <permission name>      the patched app no longer asks for it
+#   exported-added       <kind>:<class>         something other apps can now reach
+#   exported-removed     <kind>:<class>         something other apps can no longer reach
+#
+# scripts/build-release-receipt.ps1 writes the delta it measures into the release receipt, and
+# scripts/validate-release-facts.ps1 refuses a receipt carrying a change that is not listed here.
+# A line nothing produces any more fails the run as well, so this cannot quietly outlive the
+# change it approved.
+#
+# Every entry needs its reason next to it, and anything new stops the release until somebody
+# writes one: if patching starts asking for a permission or exporting a component, that is a
+# change worth stopping for.
+#
+# Keep a streak going (off by default in Manager) adds these through its manifest half, and only
+# when it is selected. Its daily alarm has to come on time and has to survive a reboot: start at
+# boot re-arms it, SCHEDULE_EXACT_ALARM (capped at Android 12L, maxSdkVersion 32) and
+# USE_EXACT_ALARM (Android 13 on) let it fire at the minute picked. Its receiver is declared
+# disabled and not exported, so nothing outside the app can reach it. Reviewed 2026-10-01.
+permission-added android.permission.RECEIVE_BOOT_COMPLETED
+permission-added android.permission.SCHEDULE_EXACT_ALARM
+permission-added android.permission.USE_EXACT_ALARM

@@ -1,3 +1,11 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared;
 
 import static app.morphe.extension.shared.settings.BaseSettings.DEBUG;
@@ -9,10 +17,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
+import app.morphe.extension.shared.diagnostics.DiagnosticRedactor;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
@@ -49,6 +55,19 @@ public class Logger {
     private static final String MORPHE_LOG_TAG_PREFIX = "morphe: ";
 
     private static final String LOGGER_CLASS_NAME = Logger.class.getName();
+
+    /**
+     * Error toasts already shown in this process, so one broken hook cannot repeat itself.
+     *
+     * <p>An error on a path the feed runs fires once per video. The queue then holds a minute of
+     * identical toasts, each covering the video underneath it, long after the reader has read the
+     * first one. Bounded so a stream of genuinely different failures cannot grow it without end;
+     * every occurrence still reaches the log and the diagnostic report either way.
+     */
+    private static final java.util.Set<String> TOASTED_ERRORS =
+            java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<>());
+
+    private static final int MAX_TOASTED_ERRORS = 24;
 
     /**
      * @return For outer classes, this returns {@link Class#getSimpleName()}.
@@ -99,29 +118,71 @@ public class Logger {
         // It's very important that no Settings are used in this method,
         // as this code is used when a context is not set and thus referencing
         // a setting will crash the app.
-        String messageString = message.buildMessageString();
-        String className = explicitSource == null ? getOuterClassSimpleName(message) : explicitSource;
+        //
+        // The message is built by the caller's lambda, and that lambda reads whatever the caller
+        // was in the middle of: a host object's fields, a list's size, a nullable name. Every
+        // hook in the extension logs on its way through, so a message that cannot be built must
+        // not be the thing that throws out of the hook into the host app.
+        //
+        // So is everything after the message: the stack trim, the buffer and the toast all run
+        // inside a hook too. An Error counts as much as an exception here, since a toString that
+        // recurses or a class that fails to load is exactly what a host object hands over.
+        String messageString;
+        try {
+            messageString = message.buildMessageString();
+        } catch (Throwable failure) {
+            try {
+                messageString = "Could not build the log message: " + failure;
+            } catch (Throwable ignored) {
+                // Throwable.toString() calls getMessage(), and host throwables can override both.
+                messageString = "Could not build the log message.";
+            }
+        }
+        try {
+            logBuilt(logLevel, category, explicitSource, message, messageString, ex, includeStackTrace, showToast);
+        } catch (Throwable failure) {
+            try {
+                Log.e(MORPHE_LOG_TAG_PREFIX + "Logger", DiagnosticRedactor.redact(
+                        "Could not log a message: " + DiagnosticRedactor.redact(messageString)
+                                + "\n" + DiagnosticRedactor.redactThrowable(failure)));
+            } catch (Throwable ignored) {
+                // Nothing is left to report through.
+            }
+        }
+    }
+
+    private static void logBuilt(
+            LogLevel logLevel,
+            @Nullable DiagnosticCategory category,
+            @Nullable String explicitSource,
+            LogMessage message,
+            String messageString,
+            @Nullable Throwable ex,
+            boolean includeStackTrace,
+            boolean showToast
+    ) {
+        String className = DiagnosticRedactor.redact(
+                explicitSource == null ? getOuterClassSimpleName(message) : explicitSource);
         if (category == null) category = legacyCategory(className, logLevel);
 
-        String logText = messageString;
+        String logText = DiagnosticRedactor.redact(messageString);
 
-        // Append exception message if present.
+        // Android's Throwable overload prints raw messages, causes and suppressed exceptions.
+        // Render a bounded sanitized copy, while leaving the original host exception untouched.
         if (ex != null) {
-            var exceptionMessage = ex.getMessage();
-            if (exceptionMessage != null) {
-                logText += "\nException: " + exceptionMessage;
-            }
+            logText += "\n" + DiagnosticRedactor.redactThrowable(ex);
         }
 
         if (includeStackTrace) {
-            var sw = new StringWriter();
-            new Throwable().printStackTrace(new PrintWriter(sw));
-            String stackTrace = sw.toString();
+            String stackTrace = DiagnosticRedactor.redactThrowable(new Throwable());
             // Remove the stacktrace elements of this class.
             final int loggerIndex = stackTrace.lastIndexOf(LOGGER_CLASS_NAME);
             final int loggerBegins = stackTrace.indexOf('\n', loggerIndex);
-            logText += stackTrace.substring(loggerBegins);
+            // With no line after the logger's last frame there is nothing of the caller's to
+            // keep past it, and substring(-1) would throw.
+            logText += loggerBegins >= 0 ? stackTrace.substring(loggerBegins) : "\n" + stackTrace;
         }
+        logText = DiagnosticRedactor.redact(logText);
 
         // Do not include "morphe:" prefix in clipboard logs.
         String managerToastString = className + ": " + logText;
@@ -130,20 +191,18 @@ public class Logger {
         String logTag = MORPHE_LOG_TAG_PREFIX + className;
         switch (logLevel) {
             case DEBUG:
-                if (ex == null) Log.d(logTag, logText);
-                else Log.d(logTag, logText, ex);
+                Log.d(logTag, logText);
                 break;
             case INFO:
-                if (ex == null) Log.i(logTag, logText);
-                else Log.i(logTag, logText, ex);
+                Log.i(logTag, logText);
                 break;
             case ERROR:
-                if (ex == null) Log.e(logTag, logText);
-                else Log.e(logTag, logText, ex);
+                Log.e(logTag, logText);
                 break;
         }
 
-        if (showToast) {
+        if (showToast && TOASTED_ERRORS.size() < MAX_TOASTED_ERRORS
+                && TOASTED_ERRORS.add(managerToastString)) {
             Utils.showToastLong(managerToastString);
         }
     }
@@ -154,8 +213,21 @@ public class Logger {
         return Utils.context == null || DEBUG.get();
     }
 
+    /**
+     * Whether a failure inside the bundle is put in front of the reader as a toast.
+     *
+     * <p>Only while diagnostic logging is on. These messages are written for whoever is fixing
+     * the code: they carry the class that failed and the exception's own text, in English, past
+     * every translation this bundle ships. A reader who has not turned diagnostic logging on
+     * cannot act on "PlaybackQuality: Could not read the playback quality model", and on a path
+     * the feed runs they were getting it once per video.
+     *
+     * <p>Nothing is lost by keeping it out of their way. Every one of these still reaches
+     * logcat, the diagnostic buffer and the exported report, which is what the bug report form
+     * asks for, and a hook that stopped binding still says so in Hook status.
+     */
     private static boolean shouldShowErrorToast() {
-        return Utils.context != null && DEBUG_TOAST_ON_ERROR.get();
+        return Utils.context != null && DEBUG.get() && DEBUG_TOAST_ON_ERROR.get();
     }
 
     private static boolean includeStackTrace() {

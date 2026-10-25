@@ -1,10 +1,16 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared.settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -59,11 +65,6 @@ public class BooleanSetting extends Setting<Boolean> {
     }
 
     @Override
-    protected Boolean readFromJSON(JSONObject json, String importExportKey) throws JSONException {
-        return json.getBoolean(importExportKey);
-    }
-
-    @Override
     protected void setValueFromString(@NonNull String newValue) {
         value = Boolean.valueOf(Objects.requireNonNull(newValue));
     }
@@ -73,9 +74,10 @@ public class BooleanSetting extends Setting<Boolean> {
         preferences.saveBoolean(key, value);
     }
 
+    /** A switch answers off while Hushfeed is paused: every one of them changes TikTok when on. */
     @NonNull
     @Override
-    public Boolean get() {
-        return value;
+    protected Boolean pausedValue() {
+        return Boolean.FALSE;
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="app.hushfeed.verification.api23" android:versionCode="1" android:versionName="0.1.0">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="23" />
+    <application android:hasCode="true" android:debuggable="true" android:label="Hushfeed API23 ART member probe" />
+    <instrumentation android:name="app.hushfeed.verification.api23.Api23ArtProbe"
+        android:targetPackage="app.hushfeed.verification.api23"
+        android:label="Hushfeed API23 ART member probe" />
+</manifest>

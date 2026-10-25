@@ -1,0 +1,4 @@
+# Feature Gate Lab rows researched by hand, which GateCatalogGenerator can't read off an APK and
+# merges in unchanged. One row per line: the catalog's class name, a tab, then the row exactly as
+# that catalog stores it (FeatureGateCatalog reads the fields).
+GeneratedFeatureGateCatalog	ac_profile_history	pia_activity_center	INT	1	0	[]	[0,1,2]	[]		historical_43.8.3_poseidon_route_pending_46.2.3_runtime_proof

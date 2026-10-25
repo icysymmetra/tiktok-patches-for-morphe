@@ -4,24 +4,25 @@
  */
 package app.morphe.extension.tiktok.featuregatelab;
 
+import app.morphe.extension.tiktok.settings.L10n;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.os.Build;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.lang.reflect.Constructor;
@@ -54,47 +55,22 @@ final class FeatureGateLabUi {
     }
 
     static FrameLayout header(Context context, String title, Runnable onBack, Runnable onMenu) {
-        FrameLayout toolbar = new FrameLayout(context);
-        toolbar.setMinimumHeight(dp(context, 52));
-        toolbar.setBackgroundColor(SettingsUi.background());
-
-        View back = iconButton(
-                context,
-                "icon_arrow_left_ltr",
-                android.R.drawable.ic_media_previous,
-                "Back",
-                onBack
-        );
-        FrameLayout.LayoutParams backParams = new FrameLayout.LayoutParams(dp(context, 48), dp(context, 48));
-        backParams.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
-        toolbar.addView(back, backParams);
-
-        TextView heading = text(context, title, 17, SettingsUi.textPrimary(), Typeface.BOLD);
-        heading.setGravity(Gravity.CENTER);
-        heading.setSingleLine(true);
-        heading.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        FrameLayout.LayoutParams headingParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        );
-        headingParams.leftMargin = dp(context, 56);
-        headingParams.rightMargin = dp(context, 56);
-        toolbar.addView(heading, headingParams);
-
+        FrameLayout frame = new FrameLayout(context);
+        frame.setPadding(dp(context, 16), 0, dp(context, 16), dp(context, 24));
+        LinearLayout header = app.morphe.extension.tiktok.settings.preference.SettingsHeaderPreference.createHeader(context, title, onBack);
         if (onMenu != null) {
-            View menu = iconButton(
-                    context,
-                    "icon_ellipsis_horizontal",
-                    android.R.drawable.ic_menu_more,
-                    "More options",
-                    onMenu
-            );
-            FrameLayout.LayoutParams menuParams = new FrameLayout.LayoutParams(dp(context, 48), dp(context, 48));
-            menuParams.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
-            toolbar.addView(menu, menuParams);
+            // Metra already places the title in the toolbar. Add the Lab action to its free
+            // slot; moving children by index aliases the title with the old brand label.
+            LinearLayout toolbar = header.findViewWithTag("hushfeed_toolbar");
+            frame.setPadding(dp(context, 16), 0, dp(context, 16), dp(context, 8));
+            View menu = iconButton(context, "icon_ellipsis_horizontal", android.R.drawable.ic_menu_more,
+                    L10n.t(context, "More options"), onMenu);
             menu.setTag("feature_gate_menu");
+            toolbar.addView(menu,
+                    new LinearLayout.LayoutParams(dp(context, 48), dp(context, 48)));
         }
-        return toolbar;
+        frame.addView(header, new FrameLayout.LayoutParams(-1, -2));
+        return frame;
     }
 
     static View clearSearchButton(Context context, Runnable onClear) {
@@ -102,7 +78,7 @@ final class FeatureGateLabUi {
                 context,
                 "icon_x_mark_small",
                 android.R.drawable.ic_menu_close_clear_cancel,
-                "Clear search",
+                L10n.t(context, "Clear search"),
                 onClear
         );
     }
@@ -117,19 +93,37 @@ final class FeatureGateLabUi {
         View icon = createTuxIcon(context, rawIconName);
         if (icon == null) {
             ImageButton fallback = new ImageButton(context);
-            fallback.setImageResource(fallbackDrawable);
+            if ("icon_ellipsis_horizontal".equals(rawIconName)) {
+                fallback.setImageDrawable(new android.graphics.drawable.Drawable() {
+                    private final android.graphics.Paint paint = new android.graphics.Paint(3);
+                    @Override public void draw(android.graphics.Canvas canvas) {
+                        paint.setColor(SettingsUi.textPrimary());
+                        float cx = getBounds().exactCenterX();
+                        float cy = getBounds().exactCenterY();
+                        for (int i = -1; i <= 1; i++) canvas.drawCircle(cx, cy + dp(context, 6) * i, dp(context, 2), paint);
+                    }
+                    @Override public int getIntrinsicWidth() { return dp(context, 24); }
+                    @Override public int getIntrinsicHeight() { return dp(context, 24); }
+                    @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); }
+                    @Override public void setColorFilter(android.graphics.ColorFilter filter) { paint.setColorFilter(filter); }
+                    @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
+                });
+            } else {
+                fallback.setImageResource(fallbackDrawable);
+            }
             fallback.setColorFilter(SettingsUi.textPrimary());
             fallback.setScaleType(ImageButton.ScaleType.CENTER);
             icon = fallback;
         }
         icon.setPadding(dp(context, 12), dp(context, 12), dp(context, 12), dp(context, 12));
-        TypedValue ripple = new TypedValue();
-        if (context.getTheme().resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, ripple, true)) {
-            icon.setBackgroundResource(ripple.resourceId);
-        } else {
-            icon.setBackgroundColor(0x00000000);
-        }
+        // The settings pages' press and focus, on the control radius. The platform's borderless
+        // ripple drew a circle and had no focus state, so a d-pad or keyboard could land on an
+        // icon button and leave nothing on screen to say so.
+        icon.setBackground(SettingsUi.pressAndFocusOver(context, SettingsUi.RADIUS_PILL,
+                new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)));
         icon.setContentDescription(description);
+        icon.setFocusable(true);
+        SettingsUi.markAsButton(icon);
         icon.setOnClickListener(view -> action.run());
         return icon;
     }
@@ -162,16 +156,99 @@ final class FeatureGateLabUi {
         view.clearFocus();
     }
 
+    /**
+     * A row that is the switch: one screen-reader stop with the Switch role, the whole row a
+     * touch target, and the control itself invisible to accessibility so nothing is read twice.
+     *
+     * <p>The Lab's master row and the detail page's three switch rows only toggled on the 44dp
+     * switch, and TalkBack read the title, then the summary, then the switch's copy of the
+     * title. Every switch row in the main settings is one stop that toggles on a tap anywhere;
+     * these four now match it, through this one builder.
+     */
+    static LinearLayout switchRow(Context context, String title, String summary, Switch control) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setMinimumHeight(dp(context, 56));
+        row.setPadding(dp(context, 16), dp(context, 14), dp(context, 16), dp(context, 14));
+        // The row answers the tap and takes focus, so it wears the settings press and focus over
+        // its card. A plain card showed nothing for either.
+        row.setBackground(SettingsUi.pressAndFocusOver(context, SettingsUi.RADIUS_SETTINGS_CARD,
+                SettingsUi.borderedSurface(context, SettingsUi.RADIUS_SETTINGS_CARD, false)));
+        LinearLayout labels = new LinearLayout(context);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.addView(body(context, title), matchWrap());
+        if (summary != null && !summary.isEmpty()) {
+            TextView detail = label(context, summary);
+            detail.setPadding(0, dp(context, 4), 0, 0);
+            labels.addView(detail, matchWrap());
+        }
+        row.addView(labels, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        // The control draws the state and nothing else: the row answers the tap and the reader.
+        control.setClickable(false);
+        control.setFocusable(false);
+        control.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        row.addView(control, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, dp(context, 48)));
+        row.setClickable(true);
+        row.setFocusable(true);
+        row.setContentDescription(summary == null || summary.isEmpty()
+                ? title : L10n.f(context, "%1$s. %2$s", title, summary));
+        row.setOnClickListener(view -> {
+            if (control.isEnabled()) control.toggle();
+        });
+        row.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                info.setClassName(Switch.class.getName());
+                info.setCheckable(true);
+                info.setChecked(control.isChecked());
+                info.setEnabled(control.isEnabled());
+                info.addAction(AccessibilityNodeInfo.ACTION_CLICK);
+            }
+        });
+        return row;
+    }
+
     static TextView label(Context context, String text) {
-        return FeatureGateLabUi.text(context, text, 13, SettingsUi.textSecondary(), Typeface.NORMAL);
+        return FeatureGateLabUi.text(context, text, SettingsUi.TEXT_LABEL,
+                SettingsUi.textSecondary(), Typeface.NORMAL);
     }
 
     static TextView body(Context context, String text) {
-        return FeatureGateLabUi.text(context, text, 15, SettingsUi.textPrimary(), Typeface.NORMAL);
+        return FeatureGateLabUi.text(context, text, SettingsUi.TEXT_TITLE,
+                SettingsUi.textPrimary(), Typeface.NORMAL);
+    }
+
+    static void styleTab(View tab, boolean selected) {
+        Context context = tab.getContext();
+        android.graphics.drawable.GradientDrawable surface = SettingsUi.roundedSurface(
+                context, SettingsUi.RADIUS_PILL, selected);
+        surface.setStroke(Math.max(1, dp(context, 1)),
+                selected ? SettingsUi.accent() : SettingsUi.border());
+        tab.setBackground(SettingsUi.pressAndFocusOver(context, SettingsUi.RADIUS_PILL, surface));
+    }
+
+    static View notice(Context context, String text, int toneColor) {
+        LinearLayout notice = SettingsUi.inlineNotice(context, text, toneColor);
+        notice.setBaselineAligned(false);
+        android.graphics.drawable.GradientDrawable surface = SettingsUi.borderedSurface(
+                context, SettingsUi.RADIUS_SETTINGS_CARD, false);
+        surface.setStroke(Math.max(1, dp(context, 1)), toneColor);
+        notice.setBackground(surface);
+        ((TextView) notice.getChildAt(0)).setTextSize(SettingsUi.TEXT_HEADLINE);
+        ((TextView) notice.getChildAt(1)).setTextSize(SettingsUi.TEXT_LABEL);
+        return notice;
     }
 
     static LinearLayout.LayoutParams matchWrap() {
         return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    /** For a child that should be no wider than its own text, such as an empty state's action. */
+    static LinearLayout.LayoutParams wrapWrap() {
+        return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     static LinearLayout.LayoutParams weight() {
@@ -182,10 +259,13 @@ final class FeatureGateLabUi {
         return SettingsUi.dp(context, value);
     }
 
+    /**
+     * Read from the same place as every other colour on the screen. Reading the configuration
+     * here instead meant the warning could be painted for one theme while its surface was
+     * painted for the other.
+     */
     static int warningColor(Context context) {
-        int nightMode = context.getResources().getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK;
-        return nightMode == Configuration.UI_MODE_NIGHT_YES ? 0xffffa45b : 0xffb45309;
+        return SettingsUi.attentionColor();
     }
 
     static void styleDialog(AlertDialog dialog) {
@@ -199,11 +279,19 @@ final class FeatureGateLabUi {
         if (view instanceof RadioButton) {
             RadioButton radio = (RadioButton) view;
             radio.setTextColor(SettingsUi.textPrimary());
-            if (Build.VERSION.SDK_INT >= 21) {
-                radio.setButtonTintList(ColorStateList.valueOf(SettingsUi.ACCENT));
-            }
+            radio.setButtonTintList(ColorStateList.valueOf(SettingsUi.accent()));
         } else if (view instanceof Button) {
-            ((Button) view).setTextColor(SettingsUi.ACCENT);
+            // Everything except the dialog's own three actions. styleFramedDialog has already
+            // given the positive one the accent and the other two the secondary colour, and
+            // this walk runs after it: repainting them all one shade put Use value and Cancel
+            // on the same footing, which is the opposite of what a destructive-looking pair of
+            // actions needs. It also replaced their state lists with a flat colour, so a
+            // disabled action stopped looking disabled.
+            int id = view.getId();
+            if (id != android.R.id.button1 && id != android.R.id.button2
+                    && id != android.R.id.button3) {
+                ((Button) view).setTextColor(SettingsUi.accent());
+            }
         } else if (view instanceof TextView) {
             ((TextView) view).setTextColor(SettingsUi.textPrimary());
         }
@@ -239,56 +327,6 @@ final class FeatureGateLabUi {
             if (event.getKeyCode() != KeyEvent.KEYCODE_BACK) return false;
             if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) onBack.run();
             return true;
-        }
-    }
-
-    static final class SystemBackHandler {
-        private Object dispatcher;
-        private Object callback;
-
-        void register(Activity activity, Runnable action) {
-            if (Build.VERSION.SDK_INT < 33 || activity == null || callback != null) return;
-            try {
-                Class<?> callbackClass = Class.forName("android.window.OnBackInvokedCallback");
-                Class<?> dispatcherClass = Class.forName("android.window.OnBackInvokedDispatcher");
-                Method getDispatcher = Activity.class.getMethod("getOnBackInvokedDispatcher");
-                dispatcher = getDispatcher.invoke(activity);
-                callback = Proxy.newProxyInstance(
-                        callbackClass.getClassLoader(),
-                        new Class<?>[]{callbackClass},
-                        (proxy, method, args) -> {
-                            String name = method.getName();
-                            if ("onBackInvoked".equals(name)) {
-                                action.run();
-                                return null;
-                            }
-                            if ("hashCode".equals(name)) return System.identityHashCode(proxy);
-                            if ("equals".equals(name)) return proxy == args[0];
-                            if ("toString".equals(name)) return "FeatureGateLabBackCallback";
-                            return null;
-                        }
-                );
-                dispatcherClass.getMethod("registerOnBackInvokedCallback", int.class, callbackClass)
-                        .invoke(dispatcher, 1_000_000, callback);
-            } catch (Throwable ignored) {
-                dispatcher = null;
-                callback = null;
-            }
-        }
-
-        void unregister() {
-            if (dispatcher == null || callback == null) return;
-            try {
-                Class<?> callbackClass = Class.forName("android.window.OnBackInvokedCallback");
-                Class<?> dispatcherClass = Class.forName("android.window.OnBackInvokedDispatcher");
-                dispatcherClass.getMethod("unregisterOnBackInvokedCallback", callbackClass)
-                        .invoke(dispatcher, callback);
-            } catch (Throwable ignored) {
-                // Activity teardown also removes callbacks.
-            } finally {
-                dispatcher = null;
-                callback = null;
-            }
         }
     }
 }

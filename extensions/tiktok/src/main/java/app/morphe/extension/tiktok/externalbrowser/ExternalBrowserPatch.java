@@ -14,9 +14,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import app.morphe.extension.tiktok.blockauthor.Reflect;
 import app.morphe.extension.tiktok.settings.Settings;
 
 public final class ExternalBrowserPatch {
+    private static final String HOOK_FAMILY = "external browser";
+    private static final String MAIN_SERVICE_CLASS =
+            "com.ss.android.ugc.aweme.services.IMainService";
+    private static final String SERVICE_MANAGER_CLASS =
+            "com.ss.android.ugc.aweme.framework.services.ServiceManager";
+
     private ExternalBrowserPatch() {
     }
 
@@ -74,47 +81,94 @@ public final class ExternalBrowserPatch {
             return false;
         }
 
-        try {
-            Class<?> serviceClass = Class.forName("com.ss.android.ugc.aweme.services.IMainService");
-            Object manager = Class.forName("com.ss.android.ugc.aweme.framework.services.ServiceManager")
-                    .getMethod("get")
-                    .invoke(null);
-            Object service = manager.getClass()
-                    .getMethod("getService", Class.class)
-                    .invoke(manager, serviceClass);
-            return Boolean.TRUE.equals(serviceClass
-                    .getMethod("openSystemBrowser", Context.class, String.class)
-                    .invoke(service, context, uri.toString()));
-        } catch (ReflectiveOperationException | RuntimeException ignored) {
-            return false;
-        }
+        Class<?> serviceClass = Reflect.requiredClass(MAIN_SERVICE_CLASS, HOOK_FAMILY);
+        Class<?> managerClass = Reflect.requiredClass(SERVICE_MANAGER_CLASS, HOOK_FAMILY);
+        Method getManager = Reflect.requiredMethod(managerClass, "get", HOOK_FAMILY);
+        Object manager = Reflect.invokeRequired(getManager, null, HOOK_FAMILY);
+        if (serviceClass == null || manager == null) return false;
+
+        Method getService = Reflect.requiredMethod(
+                manager.getClass(), "getService", HOOK_FAMILY, Class.class);
+        Object service = Reflect.invokeRequired(
+                getService, manager, HOOK_FAMILY, serviceClass);
+        if (service == null) return false;
+
+        Method openBrowser = Reflect.requiredMethod(
+                serviceClass,
+                "openSystemBrowser",
+                HOOK_FAMILY,
+                Context.class,
+                String.class);
+        return Boolean.TRUE.equals(Reflect.invokeRequired(
+                openBrowser, service, HOOK_FAMILY, context, uri.toString()));
     }
 
-    private static Uri resolveTarget(String source) {
+    static Uri resolveTarget(String source) {
         String value = source == null ? null : source.trim();
         for (int i = 0; value != null && i < 4; i++) {
-            Uri uri = Uri.parse(value);
+            Uri uri;
+            try {
+                uri = Uri.parse(value);
+            } catch (RuntimeException ignored) {
+                return null;
+            }
             if (uri.getScheme() == null) {
                 value = "https://" + value;
                 continue;
             }
-            if ("aweme".equalsIgnoreCase(uri.getScheme())) {
-                value = uri.getQueryParameter("url");
+            if (asciiEqualsIgnoreCase("aweme", uri.getScheme())) {
+                try {
+                    value = uri.getQueryParameter("url");
+                } catch (RuntimeException ignored) {
+                    return null;
+                }
                 continue;
             }
-            String target = uri.getQueryParameter("target");
-            if (target != null) {
-                value = target;
-                continue;
+            String scheme = uri.getScheme();
+            String host = uri.getHost();
+            if (!(asciiEqualsIgnoreCase("http", scheme) || asciiEqualsIgnoreCase("https", scheme))
+                    || host == null || host.trim().isEmpty()) {
+                return null;
             }
 
-            String scheme = uri.getScheme();
-            return ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))
-                    && uri.getHost() != null
-                    ? uri
-                    : null;
+            if (isLinkSafetyRedirect(uri)) {
+                String target;
+                try {
+                    target = uri.getQueryParameter("target");
+                } catch (RuntimeException ignored) {
+                    return null;
+                }
+                if (target != null) {
+                    value = target;
+                    continue;
+                }
+            }
+
+            return uri;
         }
         return null;
+    }
+
+    private static boolean isLinkSafetyRedirect(Uri uri) {
+        if (!asciiEqualsIgnoreCase("https", uri.getScheme()) || uri.getUserInfo() != null
+                || (uri.getPort() != -1 && uri.getPort() != 443)) return false;
+        String path = uri.getPath();
+        if (path == null || !path.startsWith("/link/")) return false;
+        String host = uri.getHost();
+        return asciiEqualsIgnoreCase("www.tiktok.com", host)
+                || asciiEqualsIgnoreCase("www.tiktoklinksafety.us", host)
+                || asciiEqualsIgnoreCase("www.tiktoklinksafety.eu", host)
+                || asciiEqualsIgnoreCase("www.tiktoklinksafety.com", host);
+    }
+
+    private static boolean asciiEqualsIgnoreCase(String expected, String actual) {
+        if (actual == null || actual.length() != expected.length()) return false;
+        for (int i = 0; i < actual.length(); i++) {
+            char value = actual.charAt(i);
+            if (value >= 'A' && value <= 'Z') value += 'a' - 'A';
+            if (value != expected.charAt(i)) return false;
+        }
+        return true;
     }
 
     private static String stringField(Object target, String name) {

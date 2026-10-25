@@ -1,2 +1,11 @@
-<manifest/>
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      The payload is injected into TikTok, whose own manifest carries
+      android:supportsRtl="true" (aapt2 dump xmltree of the 46.2.3 fixture, application tag:
+      android:supportsRtl(0x010103af)=true). Without the same declaration here the app under
+      test has no RTL support, so View.getLayoutDirection() answers left to right whatever the
+      configuration and the view itself say, and the mirrored screenshots were captured the
+      wrong way round. Nothing consumes this manifest at patch time; the dex is what ships.
+    -->
+    <application android:supportsRtl="true" />
+</manifest>
