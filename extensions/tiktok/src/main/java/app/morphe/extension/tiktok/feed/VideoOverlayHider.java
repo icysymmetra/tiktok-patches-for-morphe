@@ -745,6 +745,15 @@ public final class VideoOverlayHider {
                     // After every target, so the like count is already gone when its row is weighed.
                     collapseRailWrappers(activity, found, TRAVERSAL.selected, hidden);
                     settleStripColumns(strips);
+                    // Settling an attached column can resize its cells in this same pass. Keep
+                    // their widgets in place before this frame, rather than on the next pass.
+                    liftWidgetLayers(strips, seeThroughBar, seeThroughBar
+                            ? identifier(activity, activity.getPackageName(), WIDGET_LAYER_ID) : 0, cellId);
+                    // Fill against the final player size after the pager has gained the strip's
+                    // room, so the next pass does not visibly grow the picture a second time.
+                    for (View player : selectedViews(found, TRAVERSAL.selected, PLAYER_VIEW_TARGET)) {
+                        SeeThroughStatusBar.fill(player, seeThroughStatusBar);
+                    }
                     if (detailPager && detailCommentBar) noteColumnChildren(strips);
                     alignBarRows(found, TRAVERSAL.selected, hidden, cellId);
                     fadeFullscreenEntries();
@@ -1893,7 +1902,8 @@ public final class VideoOverlayHider {
                     // controls. A native alpha write or comments rebind can bring the row back,
                     // so the pre-draw pass keeps the transparent row out of sight too.
                     if (target == PLAYER_VIEW_TARGET) {
-                        SeeThroughStatusBar.fill(view, wanted);
+                        // Player sizing runs after the column's synchronous relayout.
+                        continue;
                     } else if (target == CLEAR_SEEK_BAR_TARGET) {
                         if (wanted) {
                             setFaded(view, 100);

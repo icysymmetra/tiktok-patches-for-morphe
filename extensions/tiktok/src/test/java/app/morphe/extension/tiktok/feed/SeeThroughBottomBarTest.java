@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -275,6 +276,7 @@ public class SeeThroughBottomBarTest {
     private static final int STRIP_ID = 0x7f0a0c24;
     private static final int COLUMN_ID = 0x7f0a0c25;
     private static final int LAYER_ID = 0x7f0a0c26;
+    private static final int PLAYER_ID = 0x7f0a0c27;
 
     /**
      * The main feed as the S22 lays it out (2026-10-13): the cell's own spacer is already gone,
@@ -289,7 +291,7 @@ public class SeeThroughBottomBarTest {
         VideoOverlayHider.resolveForTests("viewpager_container", COLUMN_ID);
         VideoOverlayHider.resolveForTests("widget_container", LAYER_ID);
         Settings.SEE_THROUGH_BOTTOM_BAR.save(true);
-        try (var controller = Robolectric.buildActivity(Activity.class).setup().visible()) {
+        try (var controller = Robolectric.buildActivity(Activity.class).setup()) {
             Activity activity = controller.get();
             Utils.setContext(activity);
             FrameLayout root = new FrameLayout(activity);
@@ -316,12 +318,14 @@ public class SeeThroughBottomBarTest {
             root.addView(bar, new FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT, 138, android.view.Gravity.BOTTOM));
             activity.setContentView(root);
+            controller.visible();
             layOut(root);
             assertEquals(1882, anchor.getTop() + cell.getTop());
 
             VideoOverlayHider.applyTo(activity);
             assertEquals(View.GONE, strip.getVisibility());
-            assertEquals("nothing moves before the pager has the room", 0f, layer.getTranslationY(), 0f);
+            assertEquals("the attached pager settles in the same frame", 2181, cell.getHeight());
+            assertEquals("the widgets must follow that resize before drawing", -138f, layer.getTranslationY(), 0f);
 
             layOut(root);
             assertEquals(2181, cell.getHeight());
@@ -348,6 +352,102 @@ public class SeeThroughBottomBarTest {
         root.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(2181, View.MeasureSpec.EXACTLY));
         root.layout(0, 0, 1080, 2181);
+    }
+
+    /** #195: a pre-draw pager resize must not leave its widgets or video a frame behind. */
+    @Test
+    public void synchronousPagerRelayoutKeepsCaptionInPlaceInTheFirstFrame() {
+        firstFrameAfterPagerRelayout(false, false);
+    }
+
+    @Test
+    public void floatingBarKeepsCaptionInPlaceInTheFirstFrame() {
+        firstFrameAfterPagerRelayout(true, false);
+    }
+
+    @Test
+    public void seeThroughStatusBarFillsTheSettledPlayerInTheFirstFrame() {
+        firstFrameAfterPagerRelayout(false, true);
+    }
+
+    @Test
+    public void floatingAndStatusBarsSettleInTheSameFrame() {
+        firstFrameAfterPagerRelayout(true, true);
+    }
+
+    private void firstFrameAfterPagerRelayout(boolean floating, boolean seeThroughStatus) {
+        VideoOverlayHider.resolveForTests("47.4.3:cnc", STRIP_ID);
+        VideoOverlayHider.resolveForTests("viewpager_container", COLUMN_ID);
+        VideoOverlayHider.resolveForTests("widget_container", LAYER_ID);
+        VideoOverlayHider.resolveForTests("player_view", PLAYER_ID);
+        Settings.SEE_THROUGH_BOTTOM_BAR.save(true);
+        Settings.FLOATING_BOTTOM_BAR.save(floating);
+        Settings.SEE_THROUGH_STATUS_BAR.save(seeThroughStatus);
+        try (var controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            Utils.setContext(activity);
+            FrameLayout root = new FrameLayout(activity);
+            LinearLayout column = new LinearLayout(activity);
+            column.setId(COLUMN_ID);
+            column.setOrientation(LinearLayout.VERTICAL);
+            FrameLayout cell = new FrameLayout(activity);
+            cell.setId(CELL_ID);
+            column.addView(cell, new LinearLayout.LayoutParams(-1, 0, 1f));
+            View strip = new View(activity);
+            strip.setId(STRIP_ID);
+            column.addView(strip, new LinearLayout.LayoutParams(-1, 138));
+            FrameLayout player = new FrameLayout(activity);
+            player.setId(PLAYER_ID);
+            SurfaceView surface = new SurfaceView(activity);
+            player.addView(surface, new FrameLayout.LayoutParams(1080, 1920, android.view.Gravity.CENTER));
+            cell.addView(player, new FrameLayout.LayoutParams(-1, -1));
+            FrameLayout layer = new FrameLayout(activity);
+            layer.setId(LAYER_ID);
+            cell.addView(layer, new FrameLayout.LayoutParams(-1, -1));
+            View caption = new View(activity);
+            caption.setId(ANCHOR_ID);
+            layer.addView(caption, new FrameLayout.LayoutParams(-1, 161, android.view.Gravity.BOTTOM));
+            root.addView(column, new FrameLayout.LayoutParams(-1, -1));
+            View bar = new View(activity);
+            bar.setId(BAR_ID);
+            bar.setBackgroundColor(Color.BLACK);
+            root.addView(bar, new FrameLayout.LayoutParams(-1, 138, android.view.Gravity.BOTTOM));
+            activity.setContentView(root);
+            controller.visible();
+            layOut(root);
+            assertTrue("exercise the attached column's synchronous relayout", column.isAttachedToWindow());
+            float captionBottom = caption.getBottom() + layer.getTranslationY();
+            assertEquals(2043f, captionBottom, 0f);
+            int barTop = bar.getTop();
+            try {
+                VideoOverlayHider.applyTo(activity);
+                assertEquals(View.GONE, strip.getVisibility());
+                assertEquals("the column should settle before drawing", 2181, cell.getHeight());
+                if (seeThroughStatus) {
+                    assertTrue("the first frame must fill the resized player, not its previous size",
+                            surface.getHeight() * surface.getScaleY() >= player.getHeight());
+                }
+                assertEquals("the first frame must not draw the caption down behind the tabs",
+                        captionBottom, caption.getBottom() + layer.getTranslationY(), 0f);
+                float scale = surface.getScaleY();
+                for (int pass = 0; pass < 4; pass++) {
+                    VideoOverlayHider.applyTo(activity);
+                    assertEquals("another pass must not move the caption", captionBottom,
+                        caption.getBottom() + layer.getTranslationY(), 0f);
+                    assertEquals("another pass must not resize the video", scale, surface.getScaleY(), 0f);
+                    assertEquals("styling must not move the tabs", barTop, bar.getTop());
+                }
+            } finally {
+                Settings.SEE_THROUGH_BOTTOM_BAR.save(false);
+                Settings.SEE_THROUGH_STATUS_BAR.save(false);
+                VideoOverlayHider.applyTo(activity);
+            }
+        } finally {
+            VideoOverlayHider.resolveForTests("47.4.3:cnc", 0);
+            VideoOverlayHider.resolveForTests("viewpager_container", 0);
+            VideoOverlayHider.resolveForTests("widget_container", 0);
+            VideoOverlayHider.resolveForTests("player_view", 0);
+        }
     }
 
     @Test
