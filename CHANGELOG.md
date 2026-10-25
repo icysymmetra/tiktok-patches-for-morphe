@@ -1,3 +1,16 @@
+# [0.9.0-dev.4](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.3...v0.9.0-dev.4) (2026-10-25)
+
+
+### Bug Fixes
+
+* **tiktok:** settle see-through bar layout before drawing ([595e309](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/595e3097ebf712f835151cba9f2281ebb2609f89)), closes [#195](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/195)
+
+
+
+
+
+## 0.9.0-dev.4
+
 # [0.9.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.2...v0.9.0-dev.3) (2026-10-24)
 
 
