@@ -1095,6 +1095,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting COMMENT_KEYWORD_FILTER = new BooleanSetting("comment_keyword_filter", FALSE);
     public static final StringSetting COMMENT_BLOCKED_KEYWORDS = new StringSetting("comment_blocked_keywords", "");
     public static final StringSetting COMMENT_BLOCKED_USERS = new StringSetting("comment_blocked_users", "");
+    public static final StringSetting COMMENT_BLOCKED_NAME_KEYWORDS = new StringSetting("comment_blocked_name_keywords", "");
     public static final BooleanSetting BLOCK_FROM_COMMENT = new BooleanSetting("block_from_comment", FALSE);
     /** Adds Block this commenter to the menu a long press on a comment opens (#169). */
     public static final BooleanSetting BLOCK_FROM_COMMENT_MENU = new BooleanSetting("block_from_comment_menu", FALSE);
@@ -1147,7 +1148,13 @@ public class Settings extends BaseSettings {
             new StringSetting("share_hidden_items_profile", SHARE_HIDDEN_ITEMS_FOLLOW_VIDEO);
     public static final StringSetting SHARE_HIDDEN_ITEMS_LIVE =
             new StringSetting("share_hidden_items_live", SHARE_HIDDEN_ITEMS_FOLLOW_VIDEO);
-    public static final StringSetting SHARE_ACTION_CATALOG = new StringSetting("share_action_catalog", "");
+    public static final StringSetting SHARE_ACTION_CATALOG = new StringSetting("share_action_catalog", "") {
+        @Override public void saveToPreferences() {
+            // Observed labels are rediscoverable metadata. Keep the checklist current in memory
+            // without waiting for a disk commit while TikTok is building its share sheet.
+            preferences.preferences.edit().putString(key, value).apply();
+        }
+    };
     // Profile shortcuts (#49): the pills under a profile's bio. Names typed to hide, comma separated;
     // the keys picked in the checklist, kept apart so neither rewrites the other; and the ones
     // TikTok has sent to this phone, which the checklist offers.

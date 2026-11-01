@@ -255,9 +255,15 @@ public class CommentsPreferenceCategory extends ConditionalPreferenceCategory {
             addPreference(new InputTextPreference(
                     context,
                     "Hidden commenters",
-                    "Separate usernames or display names with commas. Their comments are hidden.",
+                    "Enter full usernames or display names, separated by commas. Capital letters don't matter.",
                     Settings.COMMENT_BLOCKED_USERS
             ).withNameKeyboard());
+            addPreference(new InputTextPreference(
+                    context,
+                    "Blocked words in commenter names",
+                    "Hide comments when a username or display name contains one of these entries. Separate entries with commas. Uses the same rules as blocked comment words.",
+                    Settings.COMMENT_BLOCKED_NAME_KEYWORDS
+            ).withCheck(app.morphe.extension.tiktok.feedfilter.KeywordRules::problem));
             addPreference(new TogglePreference(
                     context,
                     "Hide picture comments",

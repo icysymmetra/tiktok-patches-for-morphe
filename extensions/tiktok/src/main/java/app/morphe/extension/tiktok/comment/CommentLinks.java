@@ -58,6 +58,21 @@ public final class CommentLinks {
     private CommentLinks() {
     }
 
+    /** The native comment text view and model, after the native renderer has bound them. */
+    public static void onTextBound(TextView view, Object comment) {
+        if (view == null || comment == null || !Settings.COMMENT_LINKS.get()) return;
+        try {
+            String modelText = Reflect.string(comment, "getText", "text");
+            if (modelText == null || !LOOKS_LIKE_A_LINK.matcher(modelText).find()) return;
+            CharSequence rendered = view.getText();
+            if (rendered == null || !LOOKS_LIKE_A_LINK.matcher(rendered).find()) return;
+            linkify(view);
+        } catch (Throwable ex) {
+            HookStatus.threw(FAMILY, "native text bind", ex);
+            Logger.printException(() -> "Could not make a native comment link tappable", ex);
+        }
+    }
+
     /** Called from the posted cell bind, with the comment that row is showing. */
     public static void apply(View cell, Object comment) {
         if (cell == null || comment == null) return;
@@ -75,20 +90,22 @@ public final class CommentLinks {
                 return;
             }
 
-            // Read before Linkify runs. It installs a plain LinkMovementMethod of its own on
-            // the way out, so afterwards there is no telling TikTok's from the one it just put
-            // there, and the restore below would have nothing to restore to.
-            MovementMethod before = view.getMovementMethod();
-            boolean wasClickable = view.isClickable();
-            boolean wasLongClickable = view.isLongClickable();
-
-            if (!Linkify.addLinks(view, Linkify.WEB_URLS)) return;
-            HookStatus.bound(FAMILY, "comment text");
-            ensureLinksCanBeTapped(view, before, wasClickable, wasLongClickable);
+            linkify(view);
         } catch (Throwable ex) {
             HookStatus.threw(FAMILY, "linkify", ex);
             Logger.printException(() -> "Could not make a link in a comment tappable", ex);
         }
+    }
+
+    private static void linkify(TextView view) {
+        // Read before Linkify can install its movement method. Native mentions and hashtags
+        // keep their existing spans and handler; plain text retains its ordinary tap flags.
+        MovementMethod before = view.getMovementMethod();
+        boolean wasClickable = view.isClickable();
+        boolean wasLongClickable = view.isLongClickable();
+        if (!Linkify.addLinks(view, Linkify.WEB_URLS)) return;
+        HookStatus.bound(FAMILY, "comment text");
+        ensureLinksCanBeTapped(view, before, wasClickable, wasLongClickable);
     }
 
     /**

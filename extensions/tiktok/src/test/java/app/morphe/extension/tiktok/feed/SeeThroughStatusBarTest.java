@@ -41,6 +41,7 @@ public class SeeThroughStatusBarTest {
     private static final int SPACER_ID = 0x7f0a0d31;
     private static final int BAND_ID = 0x7f0a0d32;
     private static final int PLAYER_ID = 0x7f0a5f5e;
+    private static final int COVER_ID = 0x7f0a1d7b;
     private static final int OWN_BAR_COLOR = 0xFF121212;
 
     @Before
@@ -50,6 +51,7 @@ public class SeeThroughStatusBarTest {
         VideoOverlayHider.resolveForTests("47.4.3:dus", SPACER_ID);
         VideoOverlayHider.resolveForTests("47.4.3:wiz", BAND_ID);
         VideoOverlayHider.resolveForTests("player_view", PLAYER_ID);
+        VideoOverlayHider.resolveForTests("cover", COVER_ID);
     }
 
     @After
@@ -63,6 +65,7 @@ public class SeeThroughStatusBarTest {
         VideoOverlayHider.resolveForTests("47.4.3:dus", 0);
         VideoOverlayHider.resolveForTests("47.4.3:wiz", 0);
         VideoOverlayHider.resolveForTests("player_view", 0);
+        VideoOverlayHider.resolveForTests("cover", 0);
         Utils.setContext(RuntimeEnvironment.getApplication());
     }
 
@@ -375,6 +378,68 @@ public class SeeThroughStatusBarTest {
             VideoOverlayHider.applyTo(activity);
             assertEquals(View.GONE, spacer.getVisibility());
             assertEquals(Color.TRANSPARENT, activity.getWindow().getStatusBarColor());
+        }
+    }
+
+    @Test public void theWrappedCoverFillsWithTheLaunchSurfaceAndRestoresWithIt() {
+        coverFollowsPicture(true, true);
+    }
+
+    @Test public void aSiblingCoverFillsWithTheSurfaceControlPlayerAndRestoresWithIt() {
+        coverFollowsPicture(false, false);
+    }
+
+    private void coverFollowsPicture(boolean surfacePlayer, boolean wrappedCover) {
+        try (var controller = Robolectric.buildActivity(Activity.class).setup().visible()) {
+            Activity activity = controller.get();
+            Utils.setContext(activity);
+            feedCell(activity, View.INVISIBLE);
+            FrameLayout cell = activity.findViewById(CELL_ID);
+            FrameLayout space = new FrameLayout(activity);
+            cell.addView(space, new FrameLayout.LayoutParams(1080, 2181));
+            FrameLayout player = new FrameLayout(activity);
+            player.setId(PLAYER_ID);
+            space.addView(player, new FrameLayout.LayoutParams(
+                    surfacePlayer ? 1080 : 1107, surfacePlayer ? 2181 : 1968, Gravity.CENTER));
+            View picture = player;
+            if (surfacePlayer) {
+                picture = new SurfaceView(activity);
+                player.addView(picture, new FrameLayout.LayoutParams(1107, 1968, Gravity.CENTER));
+            }
+            View cover = new android.widget.ImageView(activity);
+            cover.setId(COVER_ID);
+            FrameLayout coverParent = wrappedCover ? new FrameLayout(activity) : space;
+            if (wrappedCover) space.addView(coverParent, new FrameLayout.LayoutParams(-1, -1));
+            coverParent.addView(cover, new FrameLayout.LayoutParams(-1, -1));
+            layOut(space, 1080, 2181);
+            Settings.SEE_THROUGH_STATUS_BAR.save(true);
+
+            VideoOverlayHider.applyTo(activity);
+
+            assertTrue("the video fixture did not fill its space", picture.getScaleY() > 1f);
+            assertEquals("the native cover would reintroduce the bands during a swipe",
+                    picture.getScaleY(), cover.getScaleY(), 0f);
+            assertEquals(cover.getScaleY(), cover.getScaleX(), 0f);
+            SettingsStatus.videoFitEnabled = true;
+            Settings.FIT_VIDEO_TO_SCREEN.save(true);
+            VideoOverlayHider.applyTo(activity);
+            assertEquals("Fit must also restore the cover", 1f, cover.getScaleY(), 0f);
+            assertEquals(1f, picture.getScaleY(), 0f);
+            Settings.FIT_VIDEO_TO_SCREEN.save(false);
+            VideoOverlayHider.applyTo(activity);
+            assertEquals(picture.getScaleY(), cover.getScaleY(), 0f);
+            PausedProcess.set(true);
+            VideoOverlayHider.applyTo(activity);
+            assertEquals("Pause must restore the cover", 1f, cover.getScaleY(), 0f);
+            PausedProcess.set(false);
+            VideoOverlayHider.applyTo(activity);
+            cover.setScaleX(1.3f);
+            cover.setScaleY(1.3f);
+            VideoOverlayHider.applyTo(activity);
+            Settings.SEE_THROUGH_STATUS_BAR.save(false);
+            VideoOverlayHider.applyTo(activity);
+            assertEquals("TikTok's own cover zoom must be preserved", 1.3f, cover.getScaleY(), 0f);
+            assertEquals(1f, picture.getScaleY(), 0f);
         }
     }
 

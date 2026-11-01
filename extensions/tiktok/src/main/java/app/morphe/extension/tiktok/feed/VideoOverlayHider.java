@@ -156,6 +156,8 @@ public final class VideoOverlayHider {
      * column, so the fade reaches them through these two (S22, 2026-10-08).
      */
     private static final String[] MUSIC_COVER_IDS = {"videomusiccoverblock"};
+    /** The native cover image beside player_view, also shown between decoded video frames. */
+    private static final String COVER_STILL_ID = "cover";
     /**
      * The full-width search bar under the caption ("Search · ..."). On 47.1.4 it sits in its own
      * container beside the cell's interaction area, outside both the column and the anchor's
@@ -751,8 +753,10 @@ public final class VideoOverlayHider {
                             ? identifier(activity, activity.getPackageName(), WIDGET_LAYER_ID) : 0, cellId);
                     // Fill against the final player size after the pager has gained the strip's
                     // room, so the next pass does not visibly grow the picture a second time.
+                    int coverId = seeThroughStatusBar || SeeThroughStatusBar.anyFilled()
+                            ? identifier(activity, activity.getPackageName(), COVER_STILL_ID) : 0;
                     for (View player : selectedViews(found, TRAVERSAL.selected, PLAYER_VIEW_TARGET)) {
-                        SeeThroughStatusBar.fill(player, seeThroughStatusBar);
+                        SeeThroughStatusBar.fill(player, seeThroughStatusBar, coverId);
                     }
                     if (detailPager && detailCommentBar) noteColumnChildren(strips);
                     alignBarRows(found, TRAVERSAL.selected, hidden, cellId);

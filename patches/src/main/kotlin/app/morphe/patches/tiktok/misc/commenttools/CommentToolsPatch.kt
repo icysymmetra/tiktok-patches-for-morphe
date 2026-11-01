@@ -34,6 +34,7 @@ import app.morphe.patches.tiktok.shared.guardAtEntry
 import app.morphe.patches.tiktok.shared.requireLocals
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.patcher.util.findMutableMethodOf
+import app.morphe.patcher.util.numberOfParameterRegisters
 import app.morphe.util.getFreeRegisterProvider
 import app.morphe.patcher.util.getReference
 import app.morphe.util.writeRegister
@@ -55,8 +56,48 @@ private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/com
 private const val TRANSLATED_COMMENT_FILTER_DESCRIPTOR = "Lapp/morphe/extension/tiktok/comment/TranslatedCommentFilter;"
 private const val COMMENT_DESCRIPTOR = "Lcom/ss/android/ugc/aweme/comment/model/Comment;"
 private const val COMMENT_LIST_DESCRIPTOR = "Lcom/ss/android/ugc/aweme/comment/model/CommentItemList;"
+private const val COMMENT_LINKS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/comment/CommentLinks;"
 private const val TOUCH_LISTENER_DESCRIPTOR = "Landroid/view/View\$OnTouchListener;"
 private const val RELATIVE_LAYOUT = "Landroid/widget/RelativeLayout;"
+
+/** The native comment renderer, before its formatted text can differ from Comment.getText(). */
+internal object NativeCommentTextBindFingerprint : Fingerprint(
+    returnType = "V",
+    custom = { method, owner ->
+        !AccessFlags.STATIC.isSet(method.accessFlags) &&
+            method.parameterTypes.size == 6 &&
+            method.parameterTypes.take(5).map(CharSequence::toString) == listOf(
+                "Ljava/lang/CharSequence;", "Ljava/util/List;", "Ljava/lang/String;", COMMENT_DESCRIPTOR, "Z",
+            ) && method.parameterTypes.last().startsWith("L") && owner.methods.any {
+                it.name == "getCommentText" && it.parameterTypes.isEmpty() &&
+                    it.returnType == "Ljava/lang/CharSequence;"
+            } && method.implementation?.instructions?.any {
+                it.getReference<MethodReference>()?.let { call ->
+                    call.name == "setText" && call.parameterTypes.map(CharSequence::toString) ==
+                        listOf("Ljava/lang/CharSequence;")
+                } == true
+            } == true
+    },
+)
+
+/** Each native exit runs the bridge with the renderer and its real bound Comment argument. */
+internal fun MutableMethod.resolveNativeCommentLinks(): CommentToolsWrite {
+    val body = implementation
+        ?: throw PatchException("Comment tools: the native comment text binder has no code")
+    val locals = body.registerCount - numberOfParameterRegisters
+    if (body.instructions.any { it.writeRegister == locals || it.writeRegister == locals + 4 }) {
+        throw PatchException("Comment tools: the renderer no longer retains its view and Comment parameters")
+    }
+    val returns = body.instructions.withIndex()
+        .filter { it.value.opcode == Opcode.RETURN_VOID }.map { it.index }.reversed()
+    if (returns.isEmpty()) throw PatchException("Comment tools: the native comment text binder has no exit")
+    val bridge = callThroughLocals(
+        "Comment tools", "invoke-static",
+        "$COMMENT_LINKS_DESCRIPTOR->onTextBound(Landroid/widget/TextView;Ljava/lang/Object;)V",
+        objectIn("p0"), objectIn("p4"),
+    )
+    return { returns.forEach { addInstructionsAtControlFlowLabel(it, bridge) } }
+}
 
 /** The optional banner factory already returns null when TikTok has no related search. */
 internal fun isCommentSearchHeaderFactory(method: Method): Boolean {
@@ -203,6 +244,17 @@ val commentToolsPatch = bytecodePatch(
         // The patcher keeps writes made by a patch that later fails. Each resolver below returns
         // a deferred write, so even the last reply/list/register refusal leaves the APK untouched.
         applyAfterCommentToolsPreflight(
+            {
+                val owner = NativeCommentTextBindFingerprint.originalClassDef
+                var parent: String? = owner.type
+                var isTextView = false
+                repeat(12) {
+                    if (parent == "Landroid/widget/TextView;") isTextView = true
+                    parent = parent?.let { classDefByOrNull(it)?.superclass }
+                }
+                if (!isTextView) throw PatchException("Comment tools: the comment renderer is not a TextView")
+                NativeCommentTextBindFingerprint.method.resolveNativeCommentLinks()
+            },
             {
                 // The keyword filter judges a translation as TikTok's text completion finishes,
                 // before the text lands in the comment. It is hooked here, not only by Translate

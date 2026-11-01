@@ -158,6 +158,50 @@ public class CommentLinksTest {
                 body(cell).getMovementMethod());
     }
 
+    @Test public void aNativeBoundViewCanRenderTheMentionDifferentlyFromTheModel() {
+        TextView view = new TextView(context);
+        android.text.SpannableString rendered = new android.text.SpannableString(
+                "@Alice see https://example.com/buns");
+        android.text.style.ClickableSpan mention = new android.text.style.ClickableSpan() {
+            @Override public void onClick(View widget) { }
+        };
+        rendered.setSpan(mention, 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        view.setText(rendered, TextView.BufferType.SPANNABLE);
+        Comment model = new Comment("@12345 see https://example.com/buns");
+
+        CommentLinks.onTextBound(view, model);
+
+        assertEquals("the native bind must not rediscover its own view by full-text equality",
+                1, linksIn(view).length);
+        Spanned result = (Spanned) view.getText();
+        assertSame("the native mention span was lost", mention,
+                result.getSpans(0, 6, android.text.style.ClickableSpan.class)[0]);
+        assertEquals(0, result.getSpanStart(mention));
+        assertEquals(6, result.getSpanEnd(mention));
+        CommentLinks.onTextBound(view, model);
+        assertEquals("rebinding duplicated the URL", 1, linksIn(view).length);
+        assertFalse(view.isClickable());
+        assertFalse(view.isLongClickable());
+    }
+
+    @Test public void aNativeBoundViewKeepsLinksAfterNativeLineBreakFormatting() {
+        TextView view = new TextView(context);
+        view.setText("@Alice\n\u200b\nsee https://example.com/buns");
+        CommentLinks.onTextBound(view, new Comment("@Alice\nsee https://example.com/buns"));
+        assertEquals(1, linksIn(view).length);
+    }
+
+    @Test public void theNativeBindRespectsTheSwitchAndNullOrLinkFreeModels() {
+        TextView view = new TextView(context);
+        view.setText("see https://example.com/buns");
+        CommentLinks.onTextBound(view, null);
+        CommentLinks.onTextBound(view, new Comment("ordinary comment"));
+        assertEquals(0, linksIn(view).length);
+        Settings.COMMENT_LINKS.save(false);
+        CommentLinks.onTextBound(view, new Comment("see https://example.com/buns"));
+        assertEquals(0, linksIn(view).length);
+    }
+
     private static boolean dispatch(View view, int action) {
         MotionEvent event = MotionEvent.obtain(0, 0, action, 5, 5, 0);
         try {

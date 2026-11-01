@@ -300,6 +300,7 @@ Blocked creators,Blocked creators
 Blocked sound ids,Blocked sound ids
 Blocked sound names,Blocked sound names
 Blocked sounds,Blocked sounds
+Blocked words in commenter names,Blocked words in commenter names
 Blocking,Blocking
 Bottom tabs to keep,Bottom tabs to keep
 Brightness,Brightness
@@ -546,6 +547,7 @@ Enter a valid two-letter country code,Enter a valid two-letter country code
 "Enter a whole number, or one like 20K, 1.5M or 2B","Enter a whole number, or one like 20K, 1.5M or 2B"
 Enter a whole number.,Enter a whole number.
 "Enter an hour, like 6 or 06:00.","Enter an hour, like 6 or 06:00."
+"Enter full usernames or display names, separated by commas. Capital letters don't matter.","Enter full usernames or display names, separated by commas. Capital letters don't matter."
 Enter true or false.,Enter true or false.
 Enter up to %1$d comma-separated speeds from %2$s to %3$s,Enter up to %1$d comma-separated speeds from %2$s to %3$s
 Enter who to message below to start.,Enter who to message below to start.
@@ -701,6 +703,7 @@ Hide comment surveys,Hide comment surveys
 Hide comment typing suggestions,Hide comment typing suggestions
 Hide comments made of an image or a sticker instead of words.,Hide comments made of an image or a sticker instead of words.
 "Hide comments that contain any of the words below, or that come from the accounts below.","Hide comments that contain any of the words below, or that come from the accounts below."
+Hide comments when a username or display name contains one of these entries. Separate entries with commas. Uses the same rules as blocked comment words.,Hide comments when a username or display name contains one of these entries. Separate entries with commas. Uses the same rules as blocked comment words.
 Hide controls after each video starts. Tap to restore them.,Hide controls after each video starts. Tap to restore them.
 Hide conversations,Hide conversations
 Hide effect and template tags,Hide effect and template tags
@@ -778,7 +781,6 @@ Hide the caption,Hide the caption
 Hide the comment bar on opened videos,Hide the comment bar on opened videos
 Hide the description under the creator's name on the feed.,Hide the description under the creator's name on the feed.
 Hide the event badge,Hide the event badge
-"Hide the fill-in videos TikTok sends to For You without picking them for you. When a whole batch is fill-in, it stays so the feed doesn't run dry.","Hide the fill-in videos TikTok sends to For You without picking them for you. When a whole batch is fill-in, it stays so the feed doesn't run dry."
 Hide the flag button TikTok puts above the creator's picture in some regions. You can still report a video from the share menu.,Hide the flag button TikTok puts above the creator's picture in some regions. You can still report a video from the share menu.
 Hide the floating promotional badge over the feed.,Hide the floating promotional badge over the feed.
 Hide the follow button on the feed,Hide the follow button on the feed
@@ -1529,7 +1531,6 @@ Sent to %1$d/%2$d chats. They won't get another message today.,Sent to %1$d/%2$d
 "Separate language codes with commas, like es, de. When TikTok translates for you, captions and comments in these languages stay as they were written. See translation still works when you tap it. TikTok's own Don't translate list stays the way it is.","Separate language codes with commas, like es, de. When TikTok translates for you, captions and comments in these languages stay as they were written. See translation still works when you tap it. TikTok's own Don't translate list stays the way it is."
 "Separate names with commas, exactly as the share sheet shows them. These can be friends in the Send to row, apps such as Facebook, or actions such as Create group or Repost. The words copy, save and dislike also work before the sheet has opened.","Separate names with commas, exactly as the share sheet shows them. These can be friends in the Send to row, apps such as Facebook, or actions such as Create group or Repost. The words copy, save and dislike also work before the sheet has opened."
 "Separate the titles of any other Inbox rows you want to hide with commas, spelled exactly. Use this for anything not listed above.","Separate the titles of any other Inbox rows you want to hide with commas, spelled exactly. Use this for anything not listed above."
-Separate usernames or display names with commas. Their comments are hidden.,Separate usernames or display names with commas. Their comments are hidden.
 "Separate words or phrases with commas. Videos whose caption matches are hidden. Capital letters don't matter. Write ""a"" & ""b"" to need both phrases, or ""a"" !& ""b"" to need the first without the second.","Separate words or phrases with commas. Videos whose caption matches are hidden. Capital letters don't matter. Write ""a"" & ""b"" to need both phrases, or ""a"" !& ""b"" to need the first without the second."
 "Separate words with commas, like music, chat. A LIVE is hidden when its category, topic tags or game name contains one. Capital letters don't matter.","Separate words with commas, like music, chat. A LIVE is hidden when its category, topic tags or game name contains one. Capital letters don't matter."
 "Separate words with commas, like saxophone, to match against sound names. Capital letters don't matter.","Separate words with commas, like saxophone, to match against sound names. Capital letters don't matter."
@@ -2075,6 +2076,7 @@ Use {date} and {media_id} to build the name. Works for image and video stickers.
 User ID copied,User ID copied
 Username copied,Username copied
 Username last changed,Username last changed
+Uses TikTok's unpersonalized fill-in marker. Covers full batches and cached copies.,Uses TikTok's unpersonalized fill-in marker. Covers full batches and cached copies.
 Using TikTok's value,Using TikTok's value
 Value,Value
 Value to return,Value to return

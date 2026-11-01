@@ -88,6 +88,7 @@ public class CommentMediaFilterTest {
         Settings.COMMENT_KEYWORD_FILTER.save(false);
         Settings.COMMENT_BLOCKED_KEYWORDS.save("");
         Settings.COMMENT_BLOCKED_USERS.save("");
+        Settings.COMMENT_BLOCKED_NAME_KEYWORDS.save("");
         CommentTools.signedInUserIdForTests = null;
         HookStatus.clear();
     }

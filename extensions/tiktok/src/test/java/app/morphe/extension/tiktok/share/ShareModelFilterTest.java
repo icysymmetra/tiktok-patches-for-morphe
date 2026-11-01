@@ -136,6 +136,65 @@ public class ShareModelFilterTest {
         assertEquals("Save video", catalog.get(1).label);
     }
 
+    @Test public void openingAShareSheetDoesNotWaitForTheCatalogDiskCommit() throws Exception {
+        assertSame(android.os.Looper.getMainLooper(), android.os.Looper.myLooper());
+        Settings.SHARE_ACTION_CATALOG.save("");
+        var preferences = app.morphe.extension.shared.settings.Setting.preferences;
+        var previous = preferences.preferences;
+        var field = preferences.getClass().getDeclaredField("preferences");
+        field.setAccessible(true);
+        Thread openingThread = Thread.currentThread();
+        var synchronousCommits = new java.util.concurrent.atomic.AtomicInteger();
+        var asynchronousWrites = new java.util.concurrent.atomic.AtomicInteger();
+        var wrapped = (android.content.SharedPreferences) java.lang.reflect.Proxy.newProxyInstance(
+                previous.getClass().getClassLoader(), new Class[]{android.content.SharedPreferences.class},
+                (proxy, method, arguments) -> {
+                    if (!method.getName().equals("edit")) return method.invoke(previous, arguments);
+                    var editor = previous.edit();
+                    return java.lang.reflect.Proxy.newProxyInstance(editor.getClass().getClassLoader(),
+                            new Class[]{android.content.SharedPreferences.Editor.class}, (editorProxy, call, values) -> {
+                                if (call.getName().equals("commit") && Thread.currentThread() == openingThread) {
+                                    synchronousCommits.incrementAndGet();
+                                }
+                                if (call.getName().equals("apply")) asynchronousWrites.incrementAndGet();
+                                Object result = call.invoke(editor, values);
+                                return result instanceof android.content.SharedPreferences.Editor ? editorProxy : result;
+                            });
+                });
+        field.set(preferences, wrapped);
+        try {
+            List<?> items = List.of(new Item("save_video", "Save video"));
+            assertSame(items, ShareModelFilter.actions(items));
+            assertEquals("opening the sheet synchronously waited for the observed catalog's disk write",
+                    0, synchronousCommits.get());
+            assertEquals(1, asynchronousWrites.get());
+            assertEquals("the action must be visible to the checklist immediately", "save",
+                    ShareActionCatalog.entries().get(0).key);
+            assertEquals("the preference's live value must be updated immediately",
+                    Settings.SHARE_ACTION_CATALOG.get(), previous.getString(Settings.SHARE_ACTION_CATALOG.key, ""));
+
+            ShareModelFilter.actions(items);
+            assertEquals("unchanged actions must not schedule another write", 1, asynchronousWrites.get());
+            ShareModelFilter.surface(new Package("user"));
+            ShareModelFilter.actions(items);
+            assertEquals(2, asynchronousWrites.get());
+            assertEquals(1, ShareActionCatalog.entries(ShareSurface.PROFILE).size());
+            assertEquals(1, ShareActionCatalog.entries(ShareSurface.VIDEO).size());
+
+            String restored = "copy\tCopy link\t" + ShareSurface.VIDEO.flag;
+            app.morphe.extension.shared.settings.Setting.saveAll(
+                    java.util.Map.of(Settings.SHARE_ACTION_CATALOG, restored));
+            assertEquals("explicit batch restores still commit", 1, synchronousCommits.get());
+            assertEquals(restored, previous.getString(Settings.SHARE_ACTION_CATALOG.key, ""));
+            assertEquals("copy", ShareActionCatalog.entries().get(0).key);
+            Settings.SHARE_ACTION_CATALOG.save("");
+            assertEquals("explicit resets still commit", 2, synchronousCommits.get());
+            assertFalse(previous.contains(Settings.SHARE_ACTION_CATALOG.key));
+        } finally {
+            field.set(preferences, previous);
+        }
+    }
+
     @Test public void profileAndLiveFollowTheVideoListUntilTheirOwnIsSaved() {
         Object copy = new Item("copy"), save = new Item("save");
         List<?> input = Arrays.asList(copy, save);

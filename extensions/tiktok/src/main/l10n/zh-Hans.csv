@@ -763,7 +763,6 @@ Hide the caption,隐藏文案
 Hide the comment bar on opened videos,隐藏打开视频的评论栏
 Hide the description under the creator's name on the feed.,隐藏信息流中创建者姓名下的描述.
 Hide the event badge,隐藏活动徽章
-"Hide the fill-in videos TikTok sends to For You without picking them for you. When a whole batch is fill-in, it stays so the feed doesn't run dry.",隐藏 TikTok 发送给 For You 的填充视频，而不为您挑选。当整批信息流填满后，它会留下来，这样信息流就不会干涸.
 Hide the flag button TikTok puts above the creator's picture in some regions. You can still report a video from the share menu.,在某些地区隐藏创作者图片上方的标志按钮 TikTok。您仍然可以从共享菜单举报视频.
 Hide the floating promotional badge over the feed.,将浮动促销徽章隐藏在信息流上方.
 Hide the follow button on the feed,隐藏信息流上的关注按钮
@@ -1505,7 +1504,10 @@ Sent to %1$d/%2$d chats. They won't get another message today.,发送到 %1$d/%2
 "Separate language codes with commas, like es, de. When TikTok translates for you, captions and comments in these languages stay as they were written. See translation still works when you tap it. TikTok's own Don't translate list stays the way it is.",用逗号分隔语言代码，例如 es、de。当 TikTok 为您翻译时，这些语言的标题和注释将保持原样。当您点击它时，查看翻译仍然有效。 TikTok 自己的不翻译列表保持原样.
 "Separate names with commas, exactly as the share sheet shows them. These can be friends in the Send to row, apps such as Facebook, or actions such as Create group or Repost. The words copy, save and dislike also work before the sheet has opened.",用逗号分隔名称，与共享表中显示的名称完全相同。这些可以是“发送至”行中的朋友、Facebook 等应用程序或“创建群组”或“重新发布”等操作。复制、保存和不喜欢这些词在工作表打开之前也起作用.
 "Separate the titles of any other Inbox rows you want to hide with commas, spelled exactly. Use this for anything not listed above.",使用逗号分隔您想要隐藏的任何其他收件箱行的标题，并准确拼写。将此用于上面未列出的任何内容.
-Separate usernames or display names with commas. Their comments are hidden.,用逗号分隔用户名或显示名称。他们的评论是隐藏的.
+"Enter full usernames or display names, separated by commas. Capital letters don't matter.",输入完整的用户名或显示名称，用逗号分隔。不区分大小写.
+Blocked words in commenter names,评论者名称中的屏蔽词
+Uses TikTok's unpersonalized fill-in marker. Covers full batches and cached copies.,使用 TikTok 的非个性化补充内容标记。涵盖整批内容和缓存副本.
+Hide comments when a username or display name contains one of these entries. Separate entries with commas. Uses the same rules as blocked comment words.,当用户名或显示名称包含任一条目时隐藏其评论。用逗号分隔条目。规则与评论屏蔽词相同.
 "Separate words or phrases with commas. Videos whose caption matches are hidden. Capital letters don't matter. Write ""a"" & ""b"" to need both phrases, or ""a"" !& ""b"" to need the first without the second.",用逗号分隔单词或短语。隐藏标题匹配的视频。大写字母并不重要。写“a”和“b”表示需要两个短语，或者写“a”!&“b”表示需要第一个短语而不需要第二个短语.
 "Separate words with commas, like music, chat. A LIVE is hidden when its category, topic tags or game name contains one. Capital letters don't matter.",用逗号分隔单词，例如音乐、聊天。当类别、主题标签或游戏名称包含 LIVE 时，该 LIVE 将被隐藏。大写字母并不重要.
 "Separate words with commas, like saxophone, to match against sound names. Capital letters don't matter.",用逗号分隔单词（如萨克斯管），以与声音名称匹配。大写字母并不重要.
