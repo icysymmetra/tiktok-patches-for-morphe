@@ -1,3 +1,16 @@
+# [0.9.0-dev.5](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.4...v0.9.0-dev.5) (2026-11-01)
+
+
+### Bug Fixes
+
+* **tiktok:** repair comment links, share persistence and cover transitions ([7ec2af1](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/7ec2af1fef7a910524f3ea0c9807caf64bf6967b)), closes [#3](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/3) [#158](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/158) [#195](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/195) [#204](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/204)
+
+
+
+
+
+## 0.9.0-dev.5
+
 # [0.9.0-dev.4](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.3...v0.9.0-dev.4) (2026-10-25)
 
 
