@@ -1429,9 +1429,11 @@ public final class VideoOverlayHider {
             return 0f;
         }
         android.widget.LinearLayout column = (android.widget.LinearLayout) strip.getParent();
-        ViewGroup.LayoutParams params = strip.getLayoutParams();
-        if (column.getHeight() <= 0 || leavesRoom(column) || params == null) return 0f;
-        return Math.max(0, params.height);
+        if (column.getHeight() <= 0 || leavesRoom(column)) return 0f;
+        // ScreenAdaptionComponent can write a requested height of zero once this strip is
+        // GONE. That is its next layout request, not the space the pager already gained.
+        // GONE children keep their last laid-out bounds, which record the space removed.
+        return Math.max(0, strip.getHeight());
     }
 
     /** Each cell's widget layer under {@code view}: column, wrapper, pager, cell at the most. */

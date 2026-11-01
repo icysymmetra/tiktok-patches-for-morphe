@@ -375,7 +375,21 @@ public class SeeThroughBottomBarTest {
         firstFrameAfterPagerRelayout(true, true);
     }
 
+    @Test
+    public void nativeZeroHeightOnHiddenStripDoesNotDropTheCaption() {
+        firstFrameAfterPagerRelayout(false, false, true);
+    }
+
+    @Test
+    public void nativeZeroHeightOnHiddenStripKeepsFloatingAndStatusBarStable() {
+        firstFrameAfterPagerRelayout(true, true, true);
+    }
+
     private void firstFrameAfterPagerRelayout(boolean floating, boolean seeThroughStatus) {
+        firstFrameAfterPagerRelayout(floating, seeThroughStatus, false);
+    }
+
+    private void firstFrameAfterPagerRelayout(boolean floating, boolean seeThroughStatus, boolean nativeZeroHeight) {
         VideoOverlayHider.resolveForTests("47.4.3:cnc", STRIP_ID);
         VideoOverlayHider.resolveForTests("viewpager_container", COLUMN_ID);
         VideoOverlayHider.resolveForTests("widget_container", LAYER_ID);
@@ -430,8 +444,16 @@ public class SeeThroughBottomBarTest {
                 assertEquals("the first frame must not draw the caption down behind the tabs",
                         captionBottom, caption.getBottom() + layer.getTranslationY(), 0f);
                 float scale = surface.getScaleY();
+                if (nativeZeroHeight) {
+                    // 47.4.3 ScreenAdaptionComponent.uq writes zero to a GONE bottom
+                    // strip's requested height. The pager has already gained its old space.
+                    strip.getLayoutParams().height = 0;
+                    strip.requestLayout();
+                    layOut(root);
+                }
                 for (int pass = 0; pass < 4; pass++) {
                     VideoOverlayHider.applyTo(activity);
+                    if (nativeZeroHeight) assertEquals("keep TikTok's height request", 0, strip.getLayoutParams().height);
                     assertEquals("another pass must not move the caption", captionBottom,
                         caption.getBottom() + layer.getTranslationY(), 0f);
                     assertEquals("another pass must not resize the video", scale, surface.getScaleY(), 0f);
