@@ -1,3 +1,16 @@
+# [0.9.0-dev.6](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.5...v0.9.0-dev.6) (2026-11-01)
+
+
+### Bug Fixes
+
+* **tiktok:** preserve widget lift after native strip height reset ([dec6211](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/dec62111bc2ca5dc9ea1f29e3fc29dc7a0291102)), closes [#195](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/195)
+
+
+
+
+
+## 0.9.0-dev.6
+
 # [0.9.0-dev.5](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.4...v0.9.0-dev.5) (2026-11-01)
 
 
