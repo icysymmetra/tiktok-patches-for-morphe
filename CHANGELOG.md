@@ -1,3 +1,16 @@
+# [0.9.0-dev.7](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.6...v0.9.0-dev.7) (2026-11-02)
+
+
+### Bug Fixes
+
+* **tiktok:** prevent download quality recursion and capture menu stalls ([c4f398b](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/c4f398b6990470d80859ac89b57c5d5f07a44666))
+
+
+
+
+
+## 0.9.0-dev.7
+
 # [0.9.0-dev.6](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.5...v0.9.0-dev.6) (2026-11-01)
 
 
