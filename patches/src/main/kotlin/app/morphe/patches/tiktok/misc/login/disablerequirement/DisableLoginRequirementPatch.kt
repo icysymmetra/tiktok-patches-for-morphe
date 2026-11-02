@@ -5,30 +5,31 @@
 package app.morphe.patches.tiktok.misc.login.disablerequirement
 
 import app.morphe.patches.shared.compat.AppCompatibilities
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
+import app.morphe.patches.tiktok.misc.settings.registerForBuildDetails
+import app.morphe.util.returnEarly
 
 @Suppress("unused")
 val disableLoginRequirementPatch = bytecodePatch(
     name = "Disable login requirement",
-    description = "Removes TikTok's mandatory login gate from supported flows.",
+    description = "Stops TikTok from forcing you to sign in before you can keep browsing. " +
+        "Works as soon as you patch it in, with no switch.",
     default = true,
 ) {
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    category("Settings")
+    // Only so Build details can list it: the patch itself runs no extension code.
+    dependsOn(sharedExtensionPatch)
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         listOf(
             MandatoryLoginServiceFingerprint,
             MandatoryLoginService2Fingerprint,
         ).forEach { fp ->
-            fp.method.addInstructions(
-                0,
-                """
-                    const/4 v0, 0x0
-                    return v0
-                """,
-            )
+            fp.method.returnEarly(false)
         }
+        registerForBuildDetails("enableNoLoginRequirement")
     }
 }
 

@@ -1,10 +1,14 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Hushfeed contributors
+ * https://github.com/SysAdminDoc/hushfeed
+ *
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.patches.tiktok.interaction.feedtoolbar
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
+import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.methodCall
+import app.morphe.util.addInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
@@ -12,30 +16,33 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
-import app.morphe.util.getReference
+import app.morphe.patches.tiktok.misc.settings.settingsPatch
+import app.morphe.patcher.util.getReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val HOME_PAGE_UI_FRAME_SERVICE_DESCRIPTOR =
     "Lcom/ss/android/ugc/aweme/homepage/api/ui/HomePageUIFrameService;"
 
+private object SearchIconInflaterFingerprint : Fingerprint(
+    returnType = "Landroid/view/View;",
+    parameters = listOf("Landroid/content/Context;"),
+    filters = listOf(
+        methodCall(
+            definingClass = HOME_PAGE_UI_FRAME_SERVICE_DESCRIPTOR,
+            name = "getInflatedSearchIcon",
+            returnType = "Landroid/view/View;",
+        ),
+    ),
+)
+
 private fun BytecodePatchContext.resolveSearchEnabledBoundary(): MutableMethod {
     val controllerSuperclasses = mutableSetOf<String>()
-    classDefForEach { classDef ->
-        val inflatesSearchIcon = classDef.methods.any { method ->
-            method.parameterTypes == listOf("Landroid/content/Context;") &&
-                method.returnType == "Landroid/view/View;" &&
-                method.implementation?.instructions?.any { instruction ->
-                    instruction.getReference<MethodReference>()?.let { reference ->
-                        reference.definingClass == HOME_PAGE_UI_FRAME_SERVICE_DESCRIPTOR &&
-                            reference.name == "getInflatedSearchIcon" &&
-                            reference.returnType == "Landroid/view/View;"
-                    } == true
-                } == true
-        }
+    SearchIconInflaterFingerprint.matchAllOrNull().orEmpty().forEach { match ->
+        val classDef = match.originalClassDef
         val hasVisibilityProtocol = classDef.methods.any { method ->
             method.parameterTypes == listOf("I") && method.returnType == "V"
         }
-        if (inflatesSearchIcon && hasVisibilityProtocol) {
+        if (hasVisibilityProtocol) {
             classDef.superclass?.let(controllerSuperclasses::add)
         }
     }
@@ -62,11 +69,13 @@ private fun BytecodePatchContext.resolveSearchEnabledBoundary(): MutableMethod {
 @Suppress("unused")
 val hideFeedSearchButtonPatch = bytecodePatch(
     name = "Hide feed search button",
-    description = "Adds an option to hide the search button at the top right of video feeds.",
+    description = "Removes the search button from the top right of the feed, for a cleaner " +
+        "screen. Starts off. Turn it on in Metra settings > Interface.",
     default = true,
 ) {
-    dependsOn(sharedExtensionPatch)
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    category("Feed")
+    dependsOn(settingsPatch, sharedExtensionPatch)
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(

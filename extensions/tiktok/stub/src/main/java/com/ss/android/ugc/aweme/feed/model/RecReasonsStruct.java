@@ -1,4 +1,5 @@
 package com.ss.android.ugc.aweme.feed.model;
 
-public final class RecReasonsStruct {
+@SuppressWarnings("unused")
+public class RecReasonsStruct {
 }

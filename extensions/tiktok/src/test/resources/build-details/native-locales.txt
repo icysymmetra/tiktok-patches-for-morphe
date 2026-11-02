@@ -1,0 +1,1 @@
+af,ar,az,bg,bn,ca,ceb,cs,da,de,el,en,es,et,fa,fi,fil,fr,ga,gu,he,hi,hr,hu,id,in,is,it,iw,ja,jv,kk,km,kn,ko,lt,lv,ml,mr,ms,my,nb,nl,or,pa,pl,pt,ro,ru,sk,sl,sq,sv,sw,ta,te,th,tr,uk,ur,uz,vi,zh,zu

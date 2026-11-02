@@ -1,8 +1,15 @@
+/*
+ * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
+ * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ */
 package app.morphe.patches.tiktok.misc.comment
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.string
+import app.morphe.patcher.methodCall
+import app.morphe.util.addInstruction
+import app.morphe.util.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
@@ -10,21 +17,22 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
+import app.morphe.patches.tiktok.misc.settings.settingsPatch
+import app.morphe.util.argumentRegister
 import app.morphe.util.getFreeRegisterProvider
-import app.morphe.util.getReference
+import app.morphe.patcher.util.getReference
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
-import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
-import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val COMMENT_CLASS_DESCRIPTOR = "Lcom/ss/android/ugc/aweme/comment/model/Comment;"
 private const val CLIP_DATA_CLASS_DESCRIPTOR = "Landroid/content/ClipData;"
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/morphe/extension/tiktok/comment/CommentCopySanitizer;"
 
-private val clipboardTextHelperFingerprint = Fingerprint(
+internal val clipboardTextHelperFingerprint = Fingerprint(
     returnType = "V",
     parameters = listOf(
         "Ljava/lang/String;",
@@ -32,6 +40,9 @@ private val clipboardTextHelperFingerprint = Fingerprint(
         "Landroid/content/Context;",
         "Lcom/bytedance/bpea/basics/Cert;",
     ),
+    // The filter repeats a reference the custom block requires, so the patcher reads only the
+    // classes that make it (#54).
+    filters = listOf(methodCall(definingClass = CLIP_DATA_CLASS_DESCRIPTOR, name = "newPlainText")),
     custom = { method, _ ->
         method.implementation?.instructions?.any { instruction ->
             instruction.getReference<MethodReference>()?.isClipDataNewPlainText() == true
@@ -39,15 +50,40 @@ private val clipboardTextHelperFingerprint = Fingerprint(
     },
 )
 
+/**
+ * The static helper the comment menu's Copy goes through since 46.9.3: the name prefix, the
+ * comment text and the text's emoji spans in, a ClipData out, either the plain text under
+ * "copy_label" or, with emoji encoding on, one built from the spans. The menu never calls the
+ * helper above any more, so on 47.0.3 that route only reached Favorites > Comments (issue #28).
+ */
+internal val commentClipDataBuilderFingerprint = Fingerprint(
+    returnType = CLIP_DATA_CLASS_DESCRIPTOR,
+    parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;", "Ljava/util/List;"),
+    strings = listOf("copy_label").map { string(it, StringComparisonType.CONTAINS) },
+    // The filter repeats a reference the custom block requires, so the patcher reads only the
+    // classes that make it (#54).
+    filters = listOf(methodCall(definingClass = CLIP_DATA_CLASS_DESCRIPTOR, name = "newPlainText")),
+    // Static is checked here rather than through accessFlags, which the patcher compares as one
+    // exact value: the builder is public static final on 47.0.3, and the rest may move.
+    custom = { method, _ ->
+        AccessFlags.STATIC.isSet(method.accessFlags) &&
+            method.implementation?.instructions?.any { instruction ->
+                instruction.getReference<MethodReference>()?.isClipDataNewPlainText() == true
+            } == true
+    },
+)
+
 @Suppress("unused")
 val copyCommentsWithoutUsernamePatch = bytecodePatch(
     name = "Copy comments without username",
-    description = "Copies only the comment text without including the creator's username.",
+    description = "When you copy a comment, you get just its text, without the username in " +
+        "front. On by default. Turn it off in Metra settings > Comments and translation.",
     default = true,
 ) {
-    dependsOn(sharedExtensionPatch)
+    category("Comments")
+    dependsOn(settingsPatch, sharedExtensionPatch)
 
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
     execute {
         SettingsStatusLoadFingerprint.method.addInstruction(
@@ -65,6 +101,13 @@ val copyCommentsWithoutUsernamePatch = bytecodePatch(
         )
 
         val commentCopyFingerprint = Fingerprint(
+            // The semantic predicate below already requires this exact helper call.
+            filters = listOf(methodCall(
+                definingClass = clipboardHelper.definingClass,
+                name = clipboardHelper.name,
+                parameters = clipboardHelper.parameters,
+                returnType = clipboardHelper.returnType,
+            )),
             custom = { method, _ ->
                 method.isCommentCopyBuilder(clipboardHelper)
             },
@@ -96,7 +139,24 @@ val copyCommentsWithoutUsernamePatch = bytecodePatch(
             }
         }
 
-        if (patchedCalls == 0) {
+        // The prefix is the first parameter, blanked before the helper joins it to the text. A
+        // range invoke, so the parameter register's number never has to fit a 4-bit operand.
+        // Absent on 46.2.3, whose menu still takes the helper route above (matchAll would throw).
+        val builders = commentClipDataBuilderFingerprint.matchAllOrNull().orEmpty()
+        if (builders.size > 1) {
+            throw PatchException(
+                "Copy comments without username: ${builders.size} comment ClipData builders: ${builders.map { it.originalClassDef.type }}",
+            )
+        }
+        builders.singleOrNull()?.method?.addInstructions(
+            0,
+            """
+                invoke-static/range { p0 .. p0 }, $EXTENSION_CLASS_DESCRIPTOR->copiedPrefix(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object p0
+            """,
+        )
+
+        if (patchedCalls == 0 && builders.isEmpty()) {
             throw PatchException("Copy comments without username: no comment copy clipboard calls were patched.")
         }
     }
@@ -192,19 +252,6 @@ private fun MutableMethod.addCommentCopySanitizerInstructions(
     )
 }
 
-private fun Instruction.argumentRegister(argumentIndex: Int): Int? =
-    when (this) {
-        is FiveRegisterInstruction -> when (argumentIndex) {
-            0 -> registerC
-            1 -> registerD
-            2 -> registerE
-            3 -> registerF
-            4 -> registerG
-            else -> null
-        }
-        is RegisterRangeInstruction -> startRegister + argumentIndex
-        else -> null
-    }
 
 private fun MethodReference.isClipDataNewPlainText(): Boolean =
     definingClass == CLIP_DATA_CLASS_DESCRIPTOR &&

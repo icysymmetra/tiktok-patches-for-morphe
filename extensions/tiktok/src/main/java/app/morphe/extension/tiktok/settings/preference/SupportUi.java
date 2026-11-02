@@ -34,15 +34,20 @@ final class SupportUi {
         LinearLayout pill = new LinearLayout(context);
         pill.setGravity(Gravity.CENTER);
         pill.setOrientation(LinearLayout.HORIZONTAL);
-        pill.setMinimumHeight(SettingsUi.dp(context, 34));
+        pill.setMinimumHeight(SettingsUi.dp(context, 48));
         pill.setPadding(
                 SettingsUi.dp(context, 11),
                 0,
                 SettingsUi.dp(context, 13),
                 0
         );
-        pill.setBackground(new SupportBackgroundDrawable(context, 0, 0, 17));
-        pill.setContentDescription("Support Metra patches");
+        pill.setBackground(SettingsUi.pressAndFocusOver(context, SettingsUi.RADIUS_PILL,
+                new android.graphics.drawable.LayerDrawable(new Drawable[]{
+                        new SupportBackgroundDrawable(context, 0, 7, 17),
+                        SettingsUi.focusRing(context, SettingsUi.RADIUS_PILL)})));
+        SettingsUi.markAsButton(pill);
+        pill.setFocusable(true);
+        pill.setContentDescription(app.morphe.extension.tiktok.settings.L10n.t(context, "Support Metra patches"));
         pill.setOnClickListener(view -> openSupport());
 
         ImageView heart = new ImageView(context);
@@ -50,12 +55,12 @@ final class SupportUi {
         int iconSize = SettingsUi.dp(context, 16);
         pill.addView(heart, new LinearLayout.LayoutParams(iconSize, iconSize));
 
-        TextView label = SettingsUi.text(context, "Support", 13.5f, SettingsUi.ACCENT, 1);
+        TextView label = SettingsUi.text(context, app.morphe.extension.tiktok.settings.L10n.t(context, "Support"), 13.5f, SettingsUi.ACCENT, 1);
         LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        labelParams.leftMargin = SettingsUi.dp(context, 6);
+        labelParams.setMarginStart(SettingsUi.dp(context, 6));
         pill.addView(label, labelParams);
         return pill;
     }

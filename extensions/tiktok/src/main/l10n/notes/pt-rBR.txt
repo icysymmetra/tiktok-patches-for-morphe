@@ -1,0 +1,840 @@
+## 0.76.0 (2026-10-18)
+
+* **TikTok:** O Hushfeed agora é compatível com o TikTok 47.4.3, e só com essa versão. Aplique o patch no APK 47.4.3 do APKMirror. O PineDrama continua no 47.1.4.
+
+* **TikTok:** Mostrar só amigos mútuos na aba Amigos volta a olhar quem repostou um vídeo, e os filtros do feed também chegam à lista de reposts da aba Amigos.
+
+* **TikTok:** A nova chave Mostrar a duração na grade do perfil coloca a duração de cada vídeo embaixo das visualizações (#181).
+
+* **TikTok:** Comentários ao lado do vídeo agora abre mesmo os comentários ao lado do vídeo numa janela larga, no PineDrama também (#26).
+
+* **TikTok:** Com Fundo das legendas em Escuro ou Preto, os cantos da faixa voltam a ser os cantinhos arredondados do TikTok (#158).
+
+* **TikTok:** Com a opção Seguir o papel de parede do Accent color, o mais de seguir embaixo do avatar de um criador também pega a cor do papel de parede (#163).
+
+* **TikTok:** Esconder a barra de comentários nos vídeos abertos também esconde a barra de Mensagem no vídeo de um amigo mútuo (#153).
+
+* **TikTok:** Quando o disco de música é o último botão da direita, ele não cobre mais a barra de progresso depois que a barra de comentários some (#153).
+
+* **TikTok:** Esconder sugestões de pesquisa também para a pesquisa em alta que fica trocando dentro da caixa de pesquisa, no PineDrama também.
+
+* **TikTok:** Esconder a bolha do Tako também tira o bloco "People also ask Tako" dos resultados da pesquisa.
+
+* **TikTok:** Remover os anúncios do feed também esconde o bloco de ofertas de hotel nos resultados da pesquisa.
+
+* **TikTok:** Com Mostrar o horário com segundos ligado, o topo de um story mostra quando ele foi postado, até o minuto.
+
+* **TikTok:** Esconder as janelas de CAPTCHA agora funciona nos primeiros segundos depois que o TikTok abre (#111, #87).
+
+* **TikTok:** Nova identidade do dispositivo, na página Privacidade, apaga os dados do TikTok no próximo reinício para os servidores darem um novo ID de dispositivo. Você vai sair da conta, e o PineDrama também tem essa opção.
+
+* **TikTok:** Parar um backup ou uma exportação enquanto o app de arquivos estava com ele não conta mais como erro do Hushfeed, no PineDrama também.
+
+* **TikTok:** Importar os valores carregados do Laboratório de gates volta a aceitar uma exportação de verdade, e também um arquivo .gz já descompactado.
+
+* **TikTok:** Quando o Laboratório de gates recusa algo e explica por quê, isso não é mais registrado como erro do Hushfeed.
+
+* **TikTok:** Remover pacotes de idioma não usados pula um idioma que o TikTok não tem em vez de parar o patch inteiro (#196).
+
+* **TikTok:** Relatar um problema deixa vazia a caixa do que deu errado e mostra as perguntas como dica (#197, #201).
+
+* **TikTok:** Publicações de fotos que o Hushfeed salva agora contam para Verificar vídeos já salvos e ganham a marca de Marcar vídeos salvos (#197).
+
+* **TikTok:** Publicações de fotos escolhidas na grade de um perfil são salvas como um vídeo só quando Salvar publicações de fotos como vídeo está ligado (#197).
+
+* **TikTok:** Esconder a Curtida com Ocultar botões da coluna da direita fecha a coluna em vez de deixar um buraco (#190).
+
+* **TikTok:** A nova chave Esconder prévias de respostas, na página Comentários, esconde a resposta que o TikTok abre embaixo de alguns comentários (#193).
+
+* **TikTok:** País predefinido do SIM agora inclui Sérvia, Croácia, Bósnia e Herzegovina, Eslovênia, Montenegro, Macedônia do Norte, Albânia e Bulgária (#198).
+
+* **TikTok:** A verificação de alinhamento nativo agora detecta sobreposições RELRO inseguras em páginas de 16 KB e aceita segmentos isolados.
+
+* **TikTok:** A auditoria de patches agora separa as evidências atuais verificadas dos testes antigos e rejeita avaliações de capturas desatualizadas.
+
+* **TikTok:** Compilações com acesso ao dispositivo e auditorias agora exigem uma reserva exclusiva do dispositivo. Compilações locais continuam funcionando sem ela.
+
+* **TikTok:** Com Registrar diagnósticos ligado, os cards dos resultados da pesquisa também registram seus códigos de tipo. A pesquisa e o texto do card ficam fora do log.
+
+* **TikTok:** scripts/phone.sh verifica a reserva do dispositivo antes de cada chamada do adb e se recusa sem ela.
+
+* **TikTok:** A verificação dos registradores injetados agora compara com o APK 47.4.3.
+
+## 0.75.0 (2026-10-16)
+
+* **TikTok:** Com Esconder a barra de comentários nos vídeos abertos ligado, o número de curtidas não fica mais sobre a barra de progresso quando Curtir é o botão mais baixo que sobrou à direita (#145).
+
+* **TikTok:** A chave de tradução em Comentários agora se chama Trazer de volta a tradução do TikTok. Ela também traz de volta «Ver tradução» nos vídeos e nas legendas e pede para reiniciar (#143).
+
+* **TikTok:** Com Registrar diagnósticos ligado, um relatório exportado agora mostra se um comentário da LIVE chegou à sala em que você estava (#110).
+
+* **TikTok:** Vídeos longos numa conexão lenta agora são salvos em vez de parar depois de dois minutos. Um download que para de receber dados ainda para (#179).
+
+* **TikTok:** Ocultar o atalho de recompensas agora oferece reiniciar quando você o muda.
+
+* **TikTok:** Copiar bio e IDs também coloca Copiar nome de usuário e Copiar ID de usuário na folha Compartilhar perfil de Configurações e privacidade.
+
+* **TikTok:** Desativar as transições de tela voltou a funcionar, então as páginas abrem sem animação.
+
+* **TikTok:** Esconder as contas sugeridas agora oferece reiniciar quando você o muda, porque a aba Amigos e os perfis mantêm os cartões que já mostraram.
+
+* **TikTok:** Copiar o link completo nos links curtos agora funciona também com Limpar os links compartilhados desligado, e aceita links tiktok.com/t/.
+
+* **TikTok:** Desligar Velocidade de reprodução padrão agora vale já a partir do próximo vídeo.
+
+* **TikTok:** Remover recursos de credenciais de conteúdo e leitor de cartões e Remover ferramentas de criação não deixam mais partes do TikTok em inglês num celular em outro idioma. Aplique o patch de novo para recuperar o seu (#125).
+
+* **TikTok:** A lista de Qualidade do vídeo da LIVE não mostra mais as linhas em branco sobre branco no modo escuro (#57).
+
+* **TikTok:** Com Limpar a tela automaticamente ligado e sem atraso, um vídeo aberto pela pesquisa já começa limpo em vez de mostrar os botões por um segundo (#84).
+
+* **TikTok:** Com Esconder a bolha do Tako ligado, uma legenda que cabe inteira não mostra mais um «mais» em vídeos com conteúdo do Tako (#162).
+
+* **TikTok:** Accent color tem uma nova opção, Seguir o papel de parede, que pega a cor do seu papel de parede no Android 12 ou mais novo (#163).
+
+* **TikTok:** Uma nova chave, Barra de progresso em largura total, leva a barra de progresso de uma borda da tela à outra (#173).
+
+* **TikTok:** Com Esconder a bolha do Tako ligado, tocar numa legenda a expande no lugar em vez de abrir a folha Ask Tako (#162).
+
+* **TikTok:** Uma nova chave limita sua escolha de Toque longo às laterais do vídeo, então um toque no meio continua abrindo o menu do TikTok (#136).
+
+* **TikTok:** Com Esconder a barra de comentários nos vídeos abertos ligado, Compartilhar e o rótulo dele não cobrem mais o fim da barra de progresso (#153).
+
+* **TikTok:** A predefinição de tradução automática do chat da LIVE no Laboratório de gates agora avisa que também precisa de Substituir os dados do SIM com o Japão (#98).
+
+* **TikTok:** Um layout de tela gravado agora lista as views de um pop-up mesmo quando a tela atrás está muito cheia (#162).
+
+* **TikTok:** As configurações do Hushfeed agora podem seguir o TikTok em chinês simplificado.
+
+* **TikTok:** Permitir capturas de tela e Círculo para pesquisar agora também vale para os pop-ups que o TikTok abre fora da janela principal.
+
+* **TikTok:** A partir da próxima versão, o Morphe Manager mostra a lista completa de mudanças da versão mais recente.
+
+* **TikTok:** O TikTok 47.1.4 com Hushfeed passou nas verificações rígidas de páginas de 16 KB do Android 17.
+
+* **TikTok:** A aba Perfil volta a abrir nos celulares em que ela fechava ou ficava em branco desde a 0.72.0 (#165, #140).
+
+* **TikTok:** Um Fundo das legendas Escuro ou Preto mantém os cantos arredondados do TikTok (#158).
+
+* **TikTok:** Salvar uma foto de perfil com um toque longo voltou a funcionar no TikTok 47.1.4 (#160).
+
+* **TikTok:** Com Ocultar sugestões de pesquisa acima dos comentários ligado, os comentários não abrem mais com uma faixa branca vazia acima da contagem (#161).
+
+* **TikTok:** Uma nova chave adiciona Bloquear quem comentou ao menu que abre ao tocar e segurar um comentário (#169).
+
+* **TikTok:** Com Barra de status transparente ligada, todo vídeo do feed agora chega até embaixo do relógio, não só o primeiro (#164).
+
+* **TikTok:** Esconder os selos de não lidos nas abas inferiores agora também afasta a bolha que o TikTok mostra sobre a Caixa de entrada (#170).
+
+* **TikTok:** Salvar uma seleção grande de uma grade de perfil não para mais depois de poucos vídeos. Cada vídeo agora tem seus próprios dois minutos (#27).
+
+* **TikTok:** Ocultar sugestões na página de pesquisa agora também oculta a lista de pesquisas recomendadas que algumas contas ainda viam.
+
+## 0.74.0 (2026-10-14)
+
+* **TikTok:** Uma nova chave mantém a qualidade da LIVE que você escolheu depois que o TikTok reinicia (#57).
+
+
+* **TikTok:** Hide the comment bar on opened videos agora também esconde a barra de Mensagem nos vídeos de amigos em comum, que cobria a legenda e a barra de progresso (#153).
+
+* **TikTok:** Accent color agora também pinta com a sua cor o mais de seguir embaixo do avatar do criador no feed (#84).
+
+* **TikTok:** Com Esconder a barra de comentários nos vídeos abertos ligado, o disco de música não cobre mais o fim da barra de progresso nem o tempo ao lado (#153).
+
+* **TikTok:** O tema escuro AMOLED agora também deixa pretos os cartões da própria lista de Configurações e privacidade (#152).
+
+* **TikTok:** Novo botão Mostrar opções de tradução nas configurações de idioma em Comentários: a própria página Idioma do TikTok volta a mostrar as linhas de tradução nas contas que ali só viam Idioma do app (#143).
+
+* **TikTok:** O Hushfeed agora também aplica patches no PineDrama 47.1.4, o app de séries do TikTok. 90 patches funcionam nele, e o Morphe Manager só oferece esses (#156).
+
+* **TikTok:** O botão Gravar da LIVE desce para sair do caminho quando o painel Descobrir do TikTok abre sobre a sala, e volta quando ele fecha (#37).
+
+* **TikTok:** Novo botão Barra inferior flutuante em Barra inferior transparente: as abas ficam sobre uma pílula escura, arredondada e transparente por cima do vídeo (#124).
+
+* **TikTok:** Novo botão Barra de status transparente na Tela do feed: o vídeo do feed principal chega até a borda de cima com o relógio por cima, e as abas do topo não saem do lugar (#145).
+
+* **TikTok:** Com Mostrar a LIVE sob a barra de status ligado, a faixa preta sob o relógio não aparece mais por um instante quando uma sala abre ou quando você desliza para a próxima (#137).
+
+* **TikTok:** Novos botões Esconder as visualizações do perfil e Esconder Adicionar amigos em Perfil: esses dois botões saem do topo do seu perfil, o menu continua (#158).
+
+* **TikTok:** Se o TikTok fechar no meio de uma gravação de LIVE (arrastado para fora ou parado pelo celular), a próxima abertura salva o que foi gravado e avisa você, em vez de deixar no cache (#37).
+
+* **TikTok:** Novo botão Também nos vídeos abertos em Esconder o botão de busca do feed: a barra de pesquisa no topo de um vídeo aberto também sai, Voltar continua (#158).
+
+* **TikTok:** Novo botão Legendas com espessura normal em Legendas: legendas faladas com espessura normal em vez do negrito do TikTok (#158).
+
+* **TikTok:** Novo botão Menu completo de toque longo nos resultados da pesquisa: um toque longo em um vídeo aberto pela pesquisa abre o menu de Para você (#120).
+
+* **TikTok:** Novo botão Mostrar o país como bandeira: o país ao lado do nome do criador e depois do horário de um comentário aparece como bandeira (#157).
+
+* **TikTok:** Não iniciar o primeiro vídeo agora para o vídeo no primeiro quadro, não um ou dois segundos depois (#83).
+
+* **TikTok:** O novo patch Accent color troca o vermelho dos botões e textos do TikTok por azul, verde, roxo, laranja, verde-azulado ou uma cor sua (#84).
+
+## 0.73.0 (2026-10-14)
+
+* **TikTok:** Um fundo de perfil salvo com Fundo do perfil ligado não some mais quando o TikTok reinicia. A chave agora oferece reiniciar (#80).
+
+* **TikTok:** Filtro do feed tem uma Duração mínima do vídeo ao lado da máxima (#154).
+
+* **TikTok:** Salvar uma história com qualidade Automático agora pega a versão reproduzível mais alta em vez da transmissão menor (#155).
+
+* **TikTok:** Uma chave em Comentários que muda os nomes ou países de quem comenta agora também muda os comentários de um vídeo que você já tinha aberto, sem reiniciar.
+
+* **TikTok:** Nova chave Colorir os nomes de quem comenta em Comentários: o nome de cada pessoa que comenta ganha uma cor própria, sempre a mesma.
+
+* **TikTok:** Esconder os vídeos que você já viu agora também funciona em Seguindo, sem mover o vídeo que está tocando.
+
+* **TikTok:** Um vídeo tocando em Para você ou Seguindo não some mais quando passa da Idade máxima da publicação ou quando Esconder os vídeos que você já viu o conta.
+
+* **TikTok:** Mostrar o horário com segundos ganhou duas opções próprias: Mostrar o fuso horário, ligada como antes, e Data curta (#147).
+
+* **TikTok:** Escolher vídeos para salvar nas grades de perfil agora também funciona dentro de uma coleção dos Favoritos, com Escolher todos incluído (#27).
+
+* **TikTok:** Quando só parte das fotos originais é salva, agora aparece Tentar novamente ao lado de Abrir. Ele tenta de novo só as fotos que falharam.
+
+* **TikTok:** As Configurações rápidas podem ser escondidas da página inicial das configurações com um toque longo no cartão. A linha Configurações rápidas na página inicial, em Backup e restauração, traz de volta.
+
+* **TikTok:** As salas de LIVE podem mostrar um botão Gravar (desativado por padrão, nas configurações de Reprodução). Ele salva o que você assiste desde o toque até você tocar em Parar ou sair da sala (#37).
+
+* **TikTok:** Com Esconder a barra de comentários nos vídeos abertos ligado, a barra de progresso não passa mais por cima da legenda nos vídeos que você abre de um perfil ou da busca. A legenda e o disco de música sobem só o suficiente para ficarem livres (#153).
+
+* **TikTok:** O relatório de diagnóstico não marca mais a barra de comentários como ausente enquanto você está no feed principal (#153).
+
+* **TikTok:** A seção de armazenamento do relatório de diagnóstico não mostra mais parte do ID da sua conta como nome de pasta (#70).
+
+* **TikTok:** Com Esconder a barra de comentários nos vídeos abertos ligado, as publicações de fotos numa grade aberta não terminam mais acima de uma faixa preta embaixo (#153).
+
+* **TikTok:** Com Mostrar a LIVE sob a barra de status ligado, os painéis acima da primeira sala do feed de LIVE agora começam abaixo do relógio, e não mais atrás da barra de status (#137).
+
+* **TikTok:** Uma LIVE no feed Para você não mostra mais a linha Service+ de uma LIVE pela qual você já passou (#94).
+
+* **TikTok:** Uma nova chave adiciona a tela limpa, que deixa só a transmissão, ao menu de todas as salas de LIVE (#57).
+
+* **TikTok:** O nome de exibição de um criador que volta depois do país ou do @usuário não fica mais cortado (#127).
+
+* **TikTok:** O tema escuro AMOLED agora também deixa pretos os cartões das páginas de configurações do próprio TikTok (#152).
+
+* **TikTok:** O Feature Gate Lab tem duas novas predefinições: Comentários passando sobre os vídeos e Várias fotos em um comentário (#98).
+
+* **TikTok:** Um novo botão na página Feed screen, Barra inferior transparente, deixa o vídeo chegar até a parte de baixo da tela e tira o fundo da barra de abas. Começa desligado (#145).
+
+* **TikTok:** O Feature Gate Lab tem uma nova predefinição, Tradução automática do chat da LIVE. Ela liga a opção Traduzir comentários que fica em Compartilhar numa sala de LIVE (#98).
+
+* **TikTok:** Ligue Escolher vídeos para salvar nas grades de perfil em Configurações do Hushfeed > Downloads e cada vídeo de uma grade de perfil, Curtidos ou Favoritos ganha um círculo. Escolha até 50, toque em Salvar e eles são salvos um após o outro, com uma contagem e Cancelar (#27).
+
+* **TikTok:** Escolher vídeos para salvar nas grades de perfil ganhou um botão Escolher todos. Ele escolhe até 50 das publicações que uma lista carregou e, com Verificar vídeos já salvos ligado, pula os que você já salvou. Assim uma lista inteira é salva em rodadas, cada uma continuando de onde a anterior parou (#27).
+
+* **TikTok:** Com Esconder os vídeos que você já viu ligado e o registro cheio, cada vídeo que você assiste não percorre mais as 10.000 linhas para tirar a mais antiga. Agora isso acontece uma vez a cada 256 vídeos (#84).
+
+## 0.72.0 (2026-10-13)
+
+* **TikTok:** O relatório de diagnóstico tem uma nova seção com as configurações alteradas. Ela lista cada configuração que não está mais no valor padrão, para que um relatório mostre quais chaves estão ligadas. O texto que você digitou em uma configuração nunca é incluído (#149).
+
+* **TikTok:** Adicionada uma nota de configuração do emulador do Android 17 para ferramentas do SDK que leem errado as versões menores da API.
+
+* **TikTok:** Todas as páginas de configurações agora ficam na página principal de configurações, sob um título curto, a um toque. Pausar o Hushfeed e o status completo ficam perto do fim, sob Hushfeed.
+
+* **TikTok:** Um novo botão em Pop-ups, Ocultar avisos de Verifique suas fontes, tira o banner Verifique suas fontes do topo de alguns vídeos e o aviso que o TikTok mostra quando você compartilha um.
+
+* **TikTok:** A busca nas configurações deixa você ligar ou desligar uma chave direto nos resultados. Chaves que fazem mais do que ligar e desligar ainda abrem a página delas.
+
+* **TikTok:** As Configurações rápidas ficam abaixo do campo de busca. Tranquilo, Privacidade e Restaurar padrões levam um toque, dizem quantas configurações mudaram e oferecem Desfazer.
+
+* **TikTok:** A página principal das configurações termina com Relatar um problema, que abre um relatório no GitHub com suas versões e chaves já preenchidas, e Apoie o Hushfeed, que abre o Ko-fi.
+
+* **TikTok:** Reiniciar o TikTok pela linha de reinício ou pelo aviso traz você de volta à página de configurações do Hushfeed em que estava.
+
+* **TikTok:** As configurações do Hushfeed estão de cara nova, com os atalhos da página inicial no mesmo grupo e ícones rosa. Os painéis arredondados e os botões de ativação em formato de pílula também chegam ao Feature Gate Lab e ao editor de criadores ocultos. O texto grande e o modo claro continuam legíveis.
+
+* **TikTok:** Voltaram a funcionar a verificação de cobertura do menu do perfil, o caso de teste com registradores altos e o projeto de teste de assinatura. O teste de assinatura também aceita as opções do D8 em qualquer ordem.
+
+* **TikTok:** Toque e segure Para você no topo do feed para abrir as configurações do Hushfeed. Um toque rápido continua funcionando como antes, e o atalho funciona mesmo com o Hushfeed pausado.
+
+* **TikTok:** Downloads tem um novo botão abaixo de Qualidade de download do vídeo: Perguntar a qualidade a cada download. Com ele ligado, Baixar lista as qualidades em que o vídeo está disponível, com o tamanho que o TikTok informa para cada uma, e salva a que você escolher. Automático, o arquivo do próprio TikTok, vem sempre primeiro. A qualidade que você definiu continua igual para o próximo download.
+
+* **TikTok:** Uma nova chave ao lado de Toque longo, Menu completo de toque longo nos vídeos de um criador, faz um toque longo em um vídeo que você abriu pelo perfil de alguém abrir o mesmo menu completo de Para você em vez da folha de compartilhamento pequena (#120).
+
+* **TikTok:** Uma nova chave na página Folha de compartilhamento, Copiar o link com um toque em Compartilhar, faz um toque em Compartilhar embaixo de um vídeo copiar o link dele, limpo como um link compartilhado. Um segundo toque logo depois abre a folha de compartilhamento como sempre.
+
+* **TikTok:** Silenciar o feed enquanto os comentários estão abertos agora se chama Pausar o vídeo enquanto os comentários estão abertos, que é o que ele faz.
+
+* **TikTok:** Com Limpar a tela automaticamente sem atraso, um vídeo que você abre pela busca, por um perfil, por uma hashtag ou por um som agora começa com os controles já escondidos, mesmo depois de você trazê-los de volta no feed para chegar à busca. Antes, os botões dele e a barra de busca no topo apareciam por cerca de meio segundo (#84).
+
+* **TikTok:** Bloquear este criador e Salvar capa agora ficam no mesmo círculo cinza dos botões do próprio TikTok no menu de compartilhar, com um ícone do tamanho e da cor deles nos modos claro e escuro. Eles também ganharam o ícone no painel que abre quando você segura um vídeo do feed, onde ele faltava.
+
+* **TikTok:** Toque duplo tem uma opção nova, Acelerar este vídeo, toque duplo de novo para desfazer. O vídeo na tela toca na sua Velocidade enquanto você segura o vídeo (2x, a menos que você escolha outra), um segundo toque duplo volta à velocidade que ele tinha e o próximo vídeo toca na velocidade de sempre (#136).
+
+* **TikTok:** Downloads tem um novo botão de ativação, Botão Salvar capa na folha de compartilhamento. Com ele ligado, a folha de compartilhamento de um vídeo mostra Salvar capa logo depois de Baixar, para você salvar a capa só quando quiser, e Baixar salva só o vídeo. Enquanto ele está desligado, Salvar a capa também funciona como antes (#146).
+
+* **TikTok:** Pesquisar atividade carregada também sai do caminho quando encontra um problema enquanto o TikTok carrega mais da lista: a pesquisa fecha e a solicitação do TikTok continua, em vez de o app fechar.
+
+* **TikTok:** AMOLED dark theme agora também deixa preto o painel que abre quando você mantém um vídeo do feed pressionado, e as páginas Atividade e Novos seguidores da Caixa de entrada. Eles continuavam no cinza-escuro do TikTok. Os cartões dentro do painel continuam cinza para se destacarem.
+
+* **TikTok:** Network proxy agora informa quais conexões não passam por ele. Os downloads do Hushfeed e a consulta de links curtos do Copiar link se conectam direto, depois das próprias verificações de endereço, e o relatório de diagnóstico exportado lista cada rota em Network routes.
+
+* **TikTok:** No Android 6 ao 8.1, os leitores de tela agora anunciam como títulos os nomes das páginas, das seções e da tela de recuperação nas configurações do Hushfeed, como já acontecia no Android mais novo.
+
+* **TikTok:** A publicação de versões funciona no Windows PowerShell 5.1 além do PowerShell 7. A verificação de tags duplicadas agora lê cada versão de uma página no 5.1, onde antes tratava a página inteira como uma versão só, e as verificações de publicação e de scripts passam nos dois shells.
+
+* **TikTok:** Pausar o vídeo enquanto os comentários estão abertos agora pausa o vídeo assim que os comentários abrem, inclusive na primeira vez depois que o TikTok inicia e em um vídeo sem comentários. Antes, essa primeira abertura continuava tocando até os comentários carregarem. Agora também funciona quando Block author button fica fora da seleção de patches.
+
+* **TikTok:** Deslizar para brilho e volume não mexe mais nos comentários: arrastar perto da borda com os comentários abertos rola os comentários e não muda o brilho nem o volume.
+
+* **TikTok:** Show commenter handle and region usa o país que o feed mostrou para a conta de quem comentou quando o comentário não traz um, o que o TikTok costuma omitir. É preciso que um dos vídeos dessa pessoa já tenha passado pelo seu feed.
+
+* **TikTok:** Se Pesquisar atividade carregada tiver um problema durante uma atualização da lista do TikTok, a pesquisa fecha e a lista do próprio TikTok continua na tela em vez de o app fechar.
+
+* **TikTok:** A publicação de versões agora envia e baixa os arquivos pela mesma versão que verificou, em vez de procurá-la de novo pela tag, e para quando duas versões têm a mesma tag. Recompilar uma tag já publicada é recusado, e a etapa do índice compara o recibo com o checksum da cópia publicada antes de copiá-lo.
+
+* **TikTok:** Novo patch Show commenter handle and region: os comentários podem mostrar o @usuário de quem comenta no lugar do nome de exibição, e o país definido na conta depois do horário do comentário. Cada um tem sua própria chave em Configurações do Hushfeed > Comentários, e os dois começam desligados. Trazido dos patches onlynazril de na-x-ril.
+
+* **TikTok:** Usar a fonte do sistema agora também pode mostrar o texto do TikTok com um arquivo .ttf ou .otf que você importar. Ative Usar uma fonte importada em Aplicativo, escolha o arquivo e reinicie o TikTok. Se o arquivo for removido ou não puder ser lido, o texto volta ao que Usar a fonte do sistema mostra. Trazido dos patches onlynazril de na-x-ril.
+
+* **TikTok:** Novo patch Profile background: uma chave em Aplicativo, na seção Perfil, abre o editor de fundo do perfil do próprio TikTok em Editar perfil e mostra os fundos que outros perfis definiram. Os servidores do TikTok ainda podem se recusar a salvar um fundo para uma conta à qual o TikTok não ofereceu o recurso. Começa desativado. Trazido dos patches onlynazril de na-x-ril.
+
+* **TikTok:** Esconder as janelas de CAPTCHA voltou a ser um botão, em Configurações do Hushfeed > Tela do feed, e começa desligado. Ele pula o quebra-cabeça que o TikTok mostra enquanto você só está navegando. Um quebra-cabeça logo depois de curtir, seguir, comentar ou republicar continua aparecendo, assim como as verificações de login, SMS e em duas etapas. Com o patch Hide the risk control CAPTCHA, os quebra-cabeças dessa verificação durante a navegação também são pulados. A regra vem dos patches onlynazril de na-x-ril.
+
+* **TikTok:** Com Bloquear o acesso à lista de contatos ligado, uma leitura de contatos que pede todas as colunas agora recebe uma lista vazia que ainda tem as colunas de contatos, então uma tela do TikTok que procura o nome de um cartão de contato não tropeça numa coluna que falta.
+
+* **TikTok:** Preferir vídeo H.264 e Reproduzir em SDR em vez de HDR agora mantêm as outras versões de um vídeo quando nenhuma das preferidas tem um endereço para tocar, então a Qualidade de reprodução continua escolhendo entre versões que tocam.
+
+* **TikTok:** Na Tela limpa, as abas de baixo continuam escondidas depois de deslizar até o perfil de um criador e voltar (#84).
+
+* **TikTok:** Os números digitados em Contagens do seu perfil continuam nos campos quando a tela gira ou o tema muda com o editor aberto.
+
+* **TikTok:** Se a pesquisa na atividade carregada falhar em uma versão do TikTok, a barra some e a lista do próprio TikTok continua na tela, em vez de o app fechar. A pesquisa fica desligada até o TikTok reiniciar.
+
+* **TikTok:** Abaixo de Esmaecer os controles do vídeo há uma chave nova, Manter os controles esmaecidos na tela limpa, ligada por padrão. Desligada, a tela limpa volta a esconder os botões e a legenda, e o esmaecimento continua valendo em todo o resto (#84).
+
+* **TikTok:** Com Barra de reprodução nos stories em vídeo ativada, um visualizador de stories que você fechou não fica mais na memória enquanto você continua usando o TikTok.
+
+* **TikTok:** O nome na linha do autor não fica mais cortado depois de rolar rápido ou quando o selo de uma publicação de fotos encolhe para um ícone (#127).
+
+* **TikTok:** Seu perfil pode mostrar um selo de verificação ou ocultar o aviso da conta neste celular. Outras pessoas veem seu status real.
+
+* **TikTok:** As verificações de mídia agora testam o muxer instalado com clipes gerados e confirmam que os arquivos são reproduzíveis. Os arquivos de teste são removidos depois.
+
+* **TikTok:** Trocar a categoria de Atividade após uma busca não fecha mais o app. A busca pode usar a lista que já está na tela.
+
+* **TikTok:** As verificações do dispositivo agora reconhecem menus pop-up pelo app ao qual pertencem. Outros apps e janelas sem correspondência continuam recusando entrada.
+
+* **TikTok:** Seu perfil pode mostrar os números que você escolher neste celular. Campos vazios mantêm os números do TikTok. Outras pessoas veem os valores reais.
+
+* **TikTok:** Adicionada uma busca opcional nas notificações de Atividade já carregadas. A busca pausa o carregamento de mais notificações. Limpar a consulta restaura a lista atual e a posição.
+
+* **TikTok:** O X das publicações de fotos continua funcionando com os controles esmaecidos em Tela limpa. Os outros controles esmaecidos continuam deixando os toques chegarem ao vídeo (#84).
+
+* **TikTok:** Verificados o estilo das legendas e o tratamento do feed vazio no Android 6 com a pequena ferramenta ART.
+
+* **TikTok:** Verificados os gestos de brilho e volume sobre a barra de comentários esmaecida. Os testes restauram o brilho, o áudio e as configurações temporárias após cada gesto.
+
+* **TikTok:** Os testes de gestos recusam entradas quando o áudio silenciado oculta o volume e rejeitam gestos concluídos após o prazo.
+
+* **TikTok:** Os testes no dispositivo agora usam gestos reais com dois dedos. As duas posições do dedo na barra lateral foram verificadas para sair da tela limpa (#84).
+
+* **TikTok:** A barra de progresso oculta na tela limpa continua transparente quando o TikTok muda a opacidade ou substitui a linha. Desativar a opção restaura a última opacidade do TikTok (#84).
+
+* **TikTok:** A tela limpa automática tenta de novo quando você reabre o mesmo vídeo em um novo visualizador. A saída manual continua valendo ao voltar dos comentários ou após uma breve perda de foco (#84).
+
+* **TikTok:** Verificado que liberar ou encerrar uma pausa de sessão mantém o vídeo pausado até outro app devolver o foco de áudio.
+
+* **TikTok:** As prévias locais do índice de desenvolvimento verificam a versão real do pacote e a ordem main/dev do Manager. Elas não alteram o índice estável nem publicam nada.
+
+* **TikTok:** Ocultar root impede que as verificações de dispositivo do TikTok recebam o status de root e os detalhes das ferramentas de root. Começa desativado. Reinicie o TikTok após alterar.
+
+* **TikTok:** Bloquear este criador, no painel de compartilhamento, adiciona Bloquear ao lado de Denunciar. A opção começa desativada e oferece Desfazer após a confirmação do TikTok. Um Desfazer anterior aguarda um bloqueio pendente do mesmo criador.
+
+* **TikTok:** Stickers recebidos por mensagem direta abrem uma prévia com Salvar mídia. O salvamento usa o formato escolhido e verifica arquivos criptografados antes de gravá-los. Abrir a prévia não envia mensagens.
+
+* **TikTok:** Os uploads de uma versão ficam em rascunho até baixar e verificar o pacote, o recibo e as somas de verificação. Ao retomar, os arquivos existentes são conferidos. A verificação opcional de versões imutáveis exige a configuração do repositório no GitHub e valida a atestação publicada.
+
+* **TikTok:** Verificado que o TalkBack anuncia a ação de um aviso nas configurações como Toque duas vezes para fechar.
+
+* **TikTok:** Limpar tudo fica visível ao lado das contas sugeridas na Caixa de entrada, com espaço para toda a área de toque do botão.
+
+* **TikTok:** Novidades resume todas as mudanças no idioma das configurações, com Histórico completo para ver tudo. Mais tarde e Entendi mantêm o comportamento, e as ações se dividem em linhas em telas estreitas ou com texto maior.
+
+* **TikTok:** Novo emoji de comentário é uma predefinição do Lab para o experimento nativo de emoji do TikTok. Reinicie após aplicar. Verificações do catálogo, alternativa, recursos e elegibilidade do servidor ainda decidem o que aparece.
+
+* **TikTok:** Mais hashtags por publicação desativa o limite do cliente TikTok sem mudar o máximo nem outras verificações da legenda. Reinicie após aplicar. Um limite do servidor ainda pode valer.
+
+* **TikTok:** Um inspetor de APK verifica o alinhamento de carregamento nativo e as posições no ZIP de arquivos sem compressão para páginas de 16 KB, sem extrair arquivos. Falhas são informadas por biblioteca, enquanto a compatibilidade com o Android em execução exige uma verificação separada no aparelho.
+
+* **TikTok:** As tabelas de tradução das configurações podem ser exportadas e importadas por XML, preservando plurais e marcadores. Importações rejeitam chaves alteradas ou traduções ausentes antes de substituir a tabela.
+
+* **TikTok:** A coleta de resultados dos APKs de teste não informa mais erros duplicados de limpeza de tarefas quando os patches terminam. Falhas na aplicação ainda impedem o envio.
+
+* **TikTok:** Prévias de figurinhas recuperam Salvar quando as ações nativas chegam tarde, sua linha muda ou o botão Salvar desaparece. Prévias reutilizadas salvam a figurinha exibida no momento.
+
+* **TikTok:** Desativar Ocultar contas sugeridas restaura o espaçamento original das células, incluindo margens negativas.
+
+* **TikTok:** A pessoa que abriu o relato confirmou que as datas das publicações seguem Tamanho do texto do autor (#66).
+
+* **TikTok:** Um backup restaurado com um padrão de nome de arquivo ou uma pasta de downloads muito longos não trava mais a página de configurações.
+
+* **TikTok:** A seta Voltar em uma página de configurações aberta por "Mostrar a opção" agora sai das configurações em vez de não fazer nada.
+
+* **TikTok:** "Ocultar uma conexão VPN" agora diz que o TikTok ainda vê o endereço IP da VPN, e "Bloquear o ID de publicidade" fala em excluir em vez de redefinir.
+
+* **TikTok:** "Esquecer os vídeos salvos" e "Adicionar apps ao Compartilhar via" não travam mais quando o TikTok está ocupado. Eles avisam, e você pode tentar de novo.
+
+* **TikTok:** O verificador de patches agora confere a pasta de retenção antes de esvaziá-la e recusa uma pasta que ele não criou.
+
+* **TikTok:** Com o TalkBack ativado, Para você oferece a ação Abrir as configurações do Hushfeed, então o atalho de tocar e segurar também funciona com um leitor de tela.
+
+* **TikTok:** Se salvar uma nova fonte importada falhar ou o TikTok fechar no meio, a fonte que você tinha continua lá em vez de sumir.
+
+* **TikTok:** Trocar de conta no meio de um vídeo não esconde mais esse vídeo na conta para a qual você trocou. Ele conta como visto só para a conta que assistiu.
+
+* **TikTok:** Girar o celular ou trocar o modo escuro com um editor de lista aberto mantém o que você marcou ou digitou, em vez de começar do zero. Cancelar continua sem mudar nada.
+
+* **TikTok:** Imagem do ícone agora também verifica os dados de pixels do PNG, então um arquivo danificado por dentro interrompe a aplicação dos patches com segurança em vez de entrar no app.
+
+* **TikTok:** Mostrar a LIVE sob a barra de status agora preenche o topo de todas as salas, sem faixas pretas ou claras (#137).
+
+* **TikTok:** Com Mostrar LIVE sob a barra de status ligado, a tela limpa não deixa uma faixa sob o relógio, e os painéis laterais ficam abaixo dele (#137).
+
+* **TikTok:** Esconder a bolha do Tako agora também cobre a versão no canto inferior do feed (#115).
+
+* **TikTok:** A predefinição Banner de perfil do Lab adiciona Add background ao Edit profile sem mudar o restante do layout (#80).
+
+* **TikTok:** A janela de coleções dos Favoritos segue o tema escuro do TikTok, com a chave Janela de Favoritos escura em Aplicativo (#142).
+
+## 0.71.2 (2026-10-11)
+
+* **TikTok:** As duas chaves da barra de status em LIVE agora funcionam ao entrar numa sala pela prévia de um criador na busca (#137).
+
+## 0.71.1 (2026-10-11)
+
+* **TikTok:** Manter as legendas com a tela limpa preserva a última posição usada pelo TikTok, recorrendo à posição antiga só antes de aparecer a primeira legenda (#141).
+
+* **TikTok:** Mostrar a LIVE sob a barra de status agora ajusta a sombra da faixa do relógio à sala (#137).
+
+## 0.71.0 (2026-10-11)
+
+* **TikTok:** Segurar o segundo toque não abre mais o menu de toque longo do TikTok sobre os comentários com gestos personalizados ligados (#63).
+
+* **TikTok:** Oferecer qualidade de LIVE em mais salas adiciona um seletor onde houver suporte, exceto em salas só de áudio, e guarda a escolha até fechar o TikTok. Vem desligado (#57).
+
+* **TikTok:** Datas e taxas de engajamento nas grades de perfil agora funcionam no TikTok 47.1.4, inclusive em Favoritos e vídeos curtidos.
+
+* **TikTok:** Seguindo agora aplica criadores e palavras bloqueados, faixas de contagem e os demais filtros do feed, incluindo regras de LIVE e stories.
+
+* **TikTok:** Não traduzir automaticamente estes idiomas agora mostra um aviso claro de código de idioma inválido, em vez do aviso de nenhuma correspondência do filtro de legendas (#121).
+
+* **TikTok:** Detalhes da compilação agora lista patches só de recursos sem revelar o nome de aplicativo ou a imagem de ícone escolhidos.
+
+* **TikTok:** Com Registrar diagnóstico ligado, a quantidade de imagens de prévia de cada vídeo é registrada uma vez para que a exportação ajude a explicar prévias ausentes na barra de progresso (#140).
+
+* **TikTok:** Detalhes da compilação e o registro completo de diagnóstico agora listam todos os patches de código, inclusive os que não têm chave.
+
+* **TikTok:** A tela limpa memorizada e automática agora funciona em resultados de busca que começam a tocar ao abrir (#84).
+
+* **TikTok:** Ocultar elementos e Tamanhos de texto do feed agora funcionam ao abrir um vídeo ou busca diretamente, sem Para você por trás (#84).
+
+* **TikTok:** Privacidade do navegador agora permite a comunicação das páginas confiáveis de CAPTCHA de quebra-cabeça, mantendo LIVE e Shop funcionando (#87).
+
+* **TikTok:** Toques rápidos não abrem mais janelas duplicadas de Detalhes da compilação, Status dos hooks, Licenças ou Novidades.
+
+* **TikTok:** As ações dos gestos agora curtem o vídeo na tela ou avisam que falta o botão Curtir, sem tocar num vídeo vizinho.
+
+* **TikTok:** A ação personalizada de toque duplo agora roda uma vez, mesmo quando os dois reconhecedores de gestos do TikTok recebem o toque.
+
+* **TikTok:** Extras da barra de progresso e integrações de tradução de comentários sem suporte agora são ignorados separadamente, sem quebrar ou aplicar um patch pela metade.
+
+* **TikTok:** As configurações de tela limpa agora usam a mesma grafia do TikTok em todos os lugares.
+
+* **TikTok:** Ocultar a barra de comentários de um vídeo aberto agora mantém a barra de progresso de vídeos longos abaixo da legenda, longe do nome do criador (#50).
+
+* **TikTok:** Esmaecer os controles do vídeo agora cobre barras de progresso pausadas, stories de Seguindo e controles de vídeos abertos pela busca (#84).
+
+* **TikTok:** Salvar story pela janela de compartilhamento adiciona uma chave em Downloads e um botão, usando uma cópia limpa quando disponível e avisando quando não houver (#93).
+
+* **TikTok:** Barra de progresso em stories de vídeo permite arrastar e mostra o tempo. Vem desligada, e tocar ainda avança o story (#72).
+
+* **TikTok:** Repetir em segundo plano pode reiniciar um vídeo terminado, enquanto chamadas e áudio de outros aplicativos ainda pausam a reprodução (#99).
+
+* **TikTok:** Girar o disco de música e Manter o disco parado adicionam opções do feed que exigem reinício, inclusive para o disco parado do 47.1.4 (#68).
+
+* **TikTok:** Mostrar tempo ao lado da barra de progresso adiciona o tempo decorrido e total. Aumentar o controle da barra de progresso adiciona um controle maior e uma linha mais grossa. Ambos vêm desligados (#90).
+
+* **TikTok:** Ocultar os controles da tela limpa agora também remove a linha de carregamento (#84).
+
+* **TikTok:** Botão Traduzir nos comentários traduz os comentários e respostas carregados, e outro toque restaura o texto. Vem desligado (#85).
+
+* **TikTok:** A tela limpa não deixa mais uma linha fina entre o vídeo e as abas inferiores (#84).
+
+* **TikTok:** Ocultar a barra de status em LIVE continua ativo ao abrir painéis, e uma nova chave desligada por padrão deixa a LIVE ocupar a área sob o relógio (#137).
+
+* **TikTok:** O toque duplo agora oferece todas as ações de toque longo, incluindo Curtir vídeo, que nunca remove uma curtida existente (#136).
+
+* **TikTok:** Vídeos abertos de coleções e grades agora preservam todas as publicações, exceto anúncios, para que o filtro não selecione o vídeo errado (#135).
+
+* **TikTok:** Ocultar a linha Enviar para agora preserva as linhas de ações da janela compacta de compartilhamento (#120).
+
+* **TikTok:** Mostrar a barra de progresso agora funciona em Para você no 47.1.4, inclusive em vídeos curtos (#134).
+
+* **TikTok:** O diagnóstico agora lista as maiores pastas de armazenamento sem nomes de arquivos ou números de contas (#70).
+
+* **TikTok:** Voltar e compartilhar não desligam mais a tela limpa memorizada ao abrir um vídeo (#84).
+
+* **TikTok:** Remover extras de LIVE agora avisa que entrar como convidado por voz ou vídeo pode falhar. Deixe esse patch de fora se você entra nas salas (#132).
+
+* **TikTok:** A tela limpa memorizada e automática imediata agora esconde controles e abas do primeiro vídeo, inclusive ao abrir Favoritos ou perfis (#84).
+
+* **TikTok:** A linha do autor agora usa toda a largura disponível antes de abreviar um nome e mantém o país completo quando cabe (#127).
+
+* **TikTok:** Ocultar vídeos já vistos agora preserva as coleções, mantendo os filtros em Para você, Seguindo e Amigos (#135).
+
+* **TikTok:** Manter o idioma escolhido do TikTok impede que mudar o idioma do celular altere o do TikTok. Fica em Aplicativo > Sistema e vem desligado (#61).
+
+* **TikTok:** Escrever usuário e legenda no vídeo salvo adiciona uma chave desligada por padrão em Downloads. Recodifica o vídeo, demora mais e oferece progresso e Cancelar.
+
+* **TikTok:** Remover ferramentas de criação agora avisa que criar vídeos e buscar efeitos pode causar falhas. Deixe esse patch de fora se você cria publicações (#133).
+
+* **TikTok:** Não decodificar quadros animados antecipadamente substitui Descartar o cache de imagens animadas. Impede só a decodificação antecipada e preserva o cache de quadros do TikTok para evitar figurinhas congeladas (#130).
+
+* **TikTok:** Sair da tela limpa agora restaura o botão de stories de Seguindo só quando ele estava visível e tinha stories.
+
+* **TikTok:** Traduzir para escolhe um idioma para comentários e legendas traduzidos independentemente do idioma do TikTok. Deixe vazio para seguir o TikTok.
+
+* **TikTok:** A proteção contra burn-in reduz o brilho dos botões sobrepostos, legendas e abas a um quarto após cinco segundos sem uso. Escurecer quando ocioso e deslocar também move o feed a cada dois minutos. Tocar restaura o brilho.
+
+* **TikTok:** Ocultar a barra de comentários em vídeos abertos agora também cobre publicações de fotos abertas pela busca.
+
+* **TikTok:** Salvar som original e Salvar também o som agora oferecem Opus (.ogg) no Android 10 ou mais recente. A conversão demora mais, e o formato original continua sendo o padrão.
+
+* **TikTok:** A tela limpa mantém os controles esmaecidos nos níveis de 1 a 99, deixando os toques chegarem ao vídeo. Segure ou faça uma pinça para sair, e controles visíveis fora dela continuam utilizáveis (#84).
+
+* **TikTok:** Silenciar vídeos do feed agora continua ativo quando o TikTok alterna entre os temas claro e escuro.
+
+* **TikTok:** A contagem de publicações filtradas e a ocultação da Caixa de entrada agora sobrevivem às mudanças de tema do TikTok.
+
+* **TikTok:** O atalho de configurações ao segurar Início agora sobrevive às mudanças de tema do TikTok.
+
+* **TikTok:** Restaurar um backup preserva um proxy existente. Num celular novo, o endereço é restaurado desligado e com um aviso.
+
+* **TikTok:** Não traduzir automaticamente estes idiomas agora reconhece códigos regionais de chinês tradicional sem confundir um código explícito de chinês simplificado (#121).
+
+* **TikTok:** Ocultar o botão LIVE não exige mais uma referência ausente da barra lateral, e a configuração da barra lateral aparece só onde há suporte (#128).
+
+* **TikTok:** A busca das configurações agora encontra Detalhes da compilação e Novidades, mostra o contexto do Lab e de Licenças e ignora consultas só com pontuação.
+
+* **TikTok:** Tocar num aviso das configurações o fecha sem ativar a linha por trás. O TalkBack também oferece a ação Fechar.
+
+* **TikTok:** O texto de Pausar agora explica escolhas salvas e mudanças feitas ao aplicar patches, e as configurações usam Rolagem automática de forma consistente.
+
+* **TikTok:** As listas de idiomas do feed e dos comentários agora aceitam vírgulas extras entre códigos.
+
+* **TikTok:** Se Copiar detalhes da compilação falhar, agora oferece Salvar.
+
+* **TikTok:** Novidades não exibe mais os acentos graves do Markdown.
+
+* **TikTok:** O seletor de horário de Manter uma sequência agora segue o tema claro ou escuro do TikTok.
+
+* **TikTok:** Seis mudanças antes permanentes agora têm chaves e respeitam Pausar. Vêm desligadas, então usuários atuais devem reativar ignorar tela inicial/atualizações, limites em segundo plano, limites de quadros animados, proteção contra criação de perfis por IA e comentários de voz.
+
+* **TikTok:** Ignorar login com chave de acesso entra no modo Simples, vem desligado e adiciona Entrar sem chave de acesso em Aplicativo, com alternativas por senha, e-mail ou SMS (#102).
+
+## 0.70.0 (2026-10-09)
+
+* **TikTok:** Tamanho do texto do autor agora inclui a data de publicação ao lado do nome (#66).
+
+* **TikTok:** Não traduzir automaticamente estes idiomas adiciona uma lista vazia por padrão em Comentários para exceções de tradução de legendas e comentários. A tradução manual continua funcionando (#121).
+
+* **TikTok:** Manter vídeos offline impede que Ajustar automaticamente reduza o limite ou corte a lista na inicialização, e preserva os vídeos quando o experimento offline do TikTok termina. Reinicie o TikTok após mudar a opção (#123).
+
+* **TikTok:** Backups de versões antigas do TikTok agora restauram substituições compatíveis do Lab e deixam as incompatíveis desligadas.
+
+* **TikTok:** Ocultar o botão do menu lateral adiciona uma chave desligada por padrão em Tela do feed para o botão ao lado de LIVE. Exige reinício (#128).
+
+* **TikTok:** As descrições de patches no Manager agora explicam resultados, padrões e onde ficam as configurações, e Ignorar configuração de push passa a se chamar Ignorar configuração de notificações.
+
+* **TikTok:** Os títulos e as descrições das configurações usam inglês mais simples.
+
+* **TikTok:** As mensagens do Modo fantasma, Status dos hooks, senha do proxy e prévia de arquivos agora explicam melhor os resultados.
+
+* **TikTok:** A opção de fundo escuro do Manager agora explica o código de cor e o preto OLED.
+
+* **TikTok:** A página inicial das configurações agora tem um cartão de status compacto, busca e sete grupos, com backups, diagnóstico e Lab em Aplicativo, preservando suas escolhas.
+
+* **TikTok:** TikTok 47.1.4 agora é a única versão compatível. Atualizar com a mesma chave de assinatura preserva login e configurações, desligando substituições incompatíveis do Lab.
+
+* **TikTok:** Manter vídeos offline até você apagar adiciona uma chave desligada por padrão em Downloads e exige reinício. Exclusão manual, limpeza por pouco espaço e limites menores continuam funcionando (#123).
+
+* **TikTok:** Ocultar Pensamentos nos perfis remove a bolha e seu próprio convite. Fica em Aplicativo, vem desligado e exige reinício (#122).
+
+* **TikTok:** Permitir capturas de tela agora cobre Circule para pesquisar, janelas flutuantes e telas Compose.
+
+* **TikTok:** Capturar o feed registra decisões dos filtros e regras de ocultação em um arquivo de texto local em Download/Hushfeed, começando e parando ao tocar. Cada captura usa novos códigos para vídeos e criadores, sem legendas, nomes, usuários ou URLs. Leia antes de compartilhar.
+
+* **TikTok:** Ocultar os controles da tela limpa agora explica como sair com uma pinça (#84).
+
+* **TikTok:** As chaves de privacidade, comentários e aparência agora vêm desligadas no modo Simples. Usuários atuais devem religar as chaves que escolherem.
+
+* **TikTok:** O modo Simples do Manager agora inclui 107 dos 130 patches, com as novas chaves desligadas. O modo Especialista contém os 23 restantes.
+
+* **TikTok:** A nova categoria Interface agrupa AMOLED, fontes, transições, nome do aplicativo, ícone, atalhos do inicializador e tamanhos de texto do feed.
+
+## 0.69.0 (2026-10-08)
+
+* **TikTok:** Um link compartilhado de vídeo ou foto agora ignora os filtros do feed para essa publicação por um minuto, incluindo links antigos do site móvel e Bloquear o feed (#117).
+
+* **TikTok:** Sair de uma sala LIVE não causa mais falhas com Remover extras de LIVE, e presentes animados continuam desligados (#119).
+
+* **TikTok:** Remover recursos de credenciais de conteúdo e leitor de cartões agora também remove o ambiente Python não usado do Pitaya, economizando mais 6,7 MB, cerca de 19 MB no total.
+
+* **TikTok:** Ocultar avisos de conteúdo não verificado adiciona uma chave desligada por padrão para faixas Confira as fontes e avisos ao compartilhar, separada dos avisos que exigem tocar para continuar.
+
+* **TikTok:** Ignorar configuração no primeiro uso é um patch opcional cuja chave vem ligada. Pula as perguntas de configuração do TikTok, preservando consentimento, idade, login e pedidos de notificação do Android.
+
+* **TikTok:** Ocultar as telas de descanso do TikTok vem desligado e se aplica só a contas adultas fora da Sincronização Familiar. Os limites diários permanecem quando Sair quando o TikTok disser que o tempo acabou precisa deles.
+
+* **TikTok:** Novas chaves desligadas por padrão ocultam Notas em vídeos, linhas de Mural e o convite para chat em grupo na Caixa de entrada.
+
+* **TikTok:** Gestos nas bordas controlam brilho, volume ou velocidade por vídeo em passos de um quarto, de 0,5x a 3x. A velocidade exige seu patch, e o próximo vídeo usa seu padrão salvo. A esquerda continua com brilho e a direita com volume até mudar, enquanto outros arrastos continuam rolando.
+
+* **TikTok:** Abas do feed agora permite ocultar os rótulos das abas inferiores ou trocar cada um por seu próprio texto. Nomes vazios restauram os rótulos do TikTok imediatamente.
+
+* **TikTok:** Novas chaves de chat desligadas por padrão desativam reações por toque duplo e deslizar para responder, mantendo toques simples e longos.
+
+* **TikTok:** Executar ao lado do aplicativo da loja agora direciona configurações compartilhadas, dados de papel de parede e verificações do próprio pacote para a cópia renomeada.
+
+* **TikTok:** A correspondência de região nas solicitações mantém sua região e fuso reais para login, cadastro, verificações da conta, renovação de tokens e logout. Outras solicitações mantêm a predefinição.
+
+* **TikTok:** As verificações do proxy agora são retomadas no máximo a cada cinco minutos. Host ou porta vazios o desligam, e Redefinir apaga credenciais que backups e Desfazer nunca restauram.
+
+* **TikTok:** Confiar em certificados do usuário é um patch opcional de teste. Também permite que autoridades certificadoras instaladas leiam o tráfego do TikTok, então use só num celular de teste.
+
+* **TikTok:** Copiar o link completo de links curtos vem desligado e expande os links copiados em segundo plano. O TikTok vê a solicitação, e compartilhamentos diretos não mudam.
+
+* **TikTok:** Dados da conta nos perfis adiciona um botão desligado por padrão na janela de compartilhamento para datas, região e privacidade já enviadas pelo TikTok, sem solicitações extras.
+
+* **TikTok:** Mostrar quantos foram filtrados adiciona um contador desligado por padrão em Início para publicações removidas desde que o TikTok iniciou, exibido após a primeira remoção. Repetições em cache e elementos ocultos não contam, e os toques passam pelo contador.
+
+* **TikTok:** Considerar também figurinhas de texto permite que palavras bloqueadas da legenda correspondam a texto adicionado pelo editor, sem incluir palavras gravadas na imagem. Vem desligado.
+
+* **TikTok:** Usar a cópia com marca-d'água se necessário vem desligado e pode salvar a cópia menor do TikTok quando não houver vídeo limpo. Cancelar e os limites de salvamento continuam valendo.
+
+* **TikTok:** Marcar vídeos salvos adiciona uma marca desligada por padrão nas grades de vídeos e linhas de criadores. Exige a verificação de vídeos salvos e mantém as marcas até você esquecer esse histórico. Fotos nunca recebem marca, e Pausar a desativa.
+
+* **TikTok:** Salvar também a capa vem desligado e salva a maior capa junto com um vídeo, exceto ao enviar para outro aplicativo ou abrir um vídeo já salvo. O toque longo permite salvar capas separadamente. As imagens usam o nome do vídeo na pasta de fotos, em JPEG quando a conversão funciona.
+
+* **TikTok:** Imagem do ícone aceita PNG quadrado de 432 a 1024 pixels no Android 8 ou mais recente. Não tem camada temática, e arquivos inválidos interrompem a aplicação dos patches com segurança.
+
+* **TikTok:** Novas chaves de Downloads desligadas por padrão adicionam detalhes da publicação aos MP4s e salvam detalhes em JSON. MP4s incompatíveis ainda são salvos sem os dados extras.
+
+* **TikTok:** Chaves de data desligadas por padrão adicionam horários com segundos e seu fuso no formato do relógio do celular ao lado dos criadores, além de datas nas grades. Datas ausentes vêm do ID do vídeo, com ano para publicações antigas e uma linha separada ao lado das taxas de engajamento.
+
+* **TikTok:** Ocultar botões da caixa de comentários remove foto, @ e presentes, mantendo emoji, digitação e envio. Vem desligado.
+
+* **TikTok:** Ocultar pesquisas nos comentários remove cartões de perguntas das listas de comentários. A nova chave vem desligada.
+
+* **TikTok:** Desativar notificações push vem desligado e exige reinício. As mensagens esperam você abrir o TikTok, notificações descartadas não voltam e notificações em andamento permanecem. Bloqueios de suspensão são impedidos, exceto em LIVEs que você transmite e tarefas com notificação própria. Desativar ou pausar restaura o push no próximo reinício.
+
+* **TikTok:** Abrir vídeos compartilhados sozinhos vem desligado e mantém um vídeo vinculado até outro tocar ou você voltar após dez minutos. Avanço e rolagem automáticos não podem passar dele. Exige Botão de bloquear autor e Navegação das abas do feed. Outras abas ainda aceitam deslizar, e Pausar o desativa.
+
+* **TikTok:** Avançar automaticamente na busca vem desligado e exige reinício. A rolagem da busca respeita seus limites de avanço e tempo de tela.
+
+* **TikTok:** A lista de popups agora inclui campanhas do servidor, e Ocultar a bolha LIVE adiciona uma chave desligada por padrão para o convite flutuante de LIVE no feed.
+
+* **TikTok:** Usar emoji do sistema vem desligado e exige reinício. Emoji ausentes no celular podem aparecer como quadrados ou partes separadas.
+
+* **TikTok:** Os patches opcionais Desativar vibrações e Desativar transições de tela vêm com suas chaves ligadas quando selecionados. Vibrações do teclado e gestos dentro das telas permanecem.
+
+* **TikTok:** O toque longo salva o quadro atual do vídeo em JPEG sem elementos sobrepostos no destino de Fotos, com o nome do vídeo e o instante do quadro. Pause antes para escolher um quadro exato.
+
+* **TikTok:** O limite de vídeos offline agora chega a 10.000 e estima o armazenamento usado. O TikTok ainda decide quantos vídeos envia.
+
+* **TikTok:** Manter vídeos offline fora do feed vem desligado, remove publicações offline de reserva e preserva sua lista de vídeos offline salvos.
+
+* **TikTok:** O toque longo oferece um temporizador de 15, 30, 45, 60 ou 90 minutos que para a reprodução e fecha o TikTok, inclusive em segundo plano. Pressione de novo para cancelar. Se o celular dormir além do prazo sem reproduzir, o TikTok permanece aberto.
+
+* **TikTok:** Parar de registrar o histórico de vídeos vem desligado e bloqueia novos relatos de visualização. O histórico existente e outros relatos de atividade do TikTok permanecem.
+
+* **TikTok:** Salve e restaure o histórico de vídeos vistos em JSON local da conta escolhida, sem nomes de contas ou configurações. Importações validam antes de mesclar, mantêm datas mais recentes e aplicam limites de idade, datas futuras e 10.000 vídeos. Trocar de conta ou parar uma importação travada deixa o histórico intacto. Exportações do TikTok ainda usam Importar histórico de exibição.
+
+* **TikTok:** Palavras bloqueadas da legenda e Categorias de LIVE ocultas agora têm uma caixa de exemplo para testar regras sem salvar, contar ou enviar o exemplo.
+
+* **TikTok:** Não iniciar o primeiro vídeo vem desligado e espera um toque após abrir pelo ícone. Links, notificações, atalhos e Recentes continuam reproduzindo normalmente (#83).
+
+* **TikTok:** Os editores de nomes de downloads agora mostram pastas e arquivos acompanhantes enquanto você digita, identificam códigos desconhecidos e explicam {original} e {media_id}.
+
+* **TikTok:** Executar ao lado do aplicativo da loja é um complemento opcional de Clonar aplicativo do Morphe. Permite que a cópia renomeada se registre no TikTok, mantendo os dados e logins de cada aplicativo separados. Use login por e-mail ou telefone, pois Google e Facebook não funcionam nela. Pacotes com nomes normais ficam intactos, e Pausar restaura o nome da cópia.
+
+* **TikTok:** Registrar diagnósticos por 15 minutos mostra quando termina e para antes com um segundo toque. Reiniciar o TikTok ou atrasar o relógio não muda o prazo, mas reiniciar o telefone encerra a sessão. As sessões ficam fora dos backups e não alteram o registro permanente. Registrar diagnósticos agora informa que continua ligado até você desligar.
+
+* **TikTok:** Bloquear o ID de publicidade agora também cobre leituras diretas dos serviços de anúncios e informa que a personalização está desligada. Pausar restaura as respostas reais do TikTok.
+
+* **TikTok:** Proxy de rede vem desligado e direciona o tráfego de API e Java após reiniciar. Vídeo e LIVE continuam diretos, e as credenciais funcionam só nas conexões Java. Senhas ficam fora dos backups, e um aviso na inicialização informa quando o proxy está inacessível.
+
+* **TikTok:** Picture-in-picture adiciona uma janela pequena de vídeo desligada por padrão no Android 8 ou mais recente, com reproduzir e pausar no feed e em vídeos abertos.
+
+* **TikTok:** Sempre enviar em HD vem desligado e usa a opção HD do TikTok nos clipes compatíveis, mantendo HD ligado enquanto a chave estiver ativa.
+
+* **TikTok:** Reproduzir sons removidos pelo TikTok vem desligado e restaura áudio disponível em vídeos silenciados do feed e da busca, mesmo se o TikTok disser que o som está indisponível.
+
+* **TikTok:** Combinar campos de região nas solicitações vem desligado e aplica sua predefinição de região à região salva e ao país da rede enviados ao TikTok.
+
+* **TikTok:** Mostrar contagens exatas de espectadores em LIVE adiciona uma chave desligada por padrão para números completos em salas e LIVEs agendadas, inclusive na horizontal.
+
+* **TikTok:** Impedir que prévias de LIVE abram sozinhas vem desligado e mantém a prévia fora da sala até você tocar.
+
+* **TikTok:** Chaves de privacidade desligadas por padrão ocultam o estado da VPN e bloqueiam o ID de publicidade imediatamente. Pausar restaura ambas as respostas reais.
+
+* **TikTok:** Impedir reprodução automática na busca mantém os resultados nas capas até você abri-los, enquanto o feed principal reproduz normalmente.
+
+* **TikTok:** Ocultar status online vem desligado e exige Modo fantasma. Amigos podem deixar de ver sua atividade, e o status deles pode parar de atualizar para você.
+
+* **TikTok:** Parecer o aplicativo da loja pode informar Play Store (o padrão), Galaxy Store, AppGallery ou Amazon Appstore como instalador. Reinicie após escolher.
+
+* **TikTok:** Deslizar para brilho e volume vem desligado, com brilho na borda esquerda e volume na direita no feed e em vídeos abertos. A largura da borda vai de 5% a 30%, outros arrastos continuam rolando e o brilho volta ao normal ao sair do vídeo.
+
+* **TikTok:** Três chaves de chat desligadas por padrão ocultam botões de chamada, sugestões de figurinhas e respostas sugeridas sem mudar detalhes do chat ou conteúdo enviado.
+
+* **TikTok:** Esmaecer os controles do vídeo reduz a opacidade dos elementos em vez de escondê-los. Em 100 não mudam, em 0 ficam ocultos com as abas em 10, e controles esmaecidos ainda aceitam toques.
+
+* **TikTok:** Bloquear o feed vem desligado, abre na Caixa de entrada e bloqueia as abas do feed, preservando perfis, busca e links de vídeo único. O adiamento para afrouxar o orçamento de tempo também vale para desbloqueá-lo. Pausar desativa o bloqueio.
+
+* **TikTok:** Bloquear popups oculta só os itens escolhidos na lista. Telas de CAPTCHA, login, verificação, idade, banimento e consentimento legal são sempre preservadas.
+
+* **TikTok:** Controles de stories adiciona chaves desligadas por padrão para repetir stories de vídeo ou manter stories de fotos parados. Toques e gestos ainda avançam.
+
+* **TikTok:** Exportar comentários adiciona exportação CSV e JSON desligada por padrão para comentários e respostas carregados. Exige Buscar nos comentários, e você precisa abrir as respostas antes. Operações de arquivo travadas oferecem Parar de esperar.
+
+* **TikTok:** Remover anúncios do feed agora também remove o cartão de promoção de instalação do Lemon8 em Para você.
+
+* **TikTok:** Bloqueio do aplicativo exige seu bloqueio de tela ao abrir e voltar após um atraso imediato, de 1, 5 ou 15 minutos, oculta a reprodução até desbloquear e deixa Recentes sem prévia. Android 9 ou mais recente usa o aviso do sistema, com o bloqueio de tela como alternativa em celulares antigos. Pausar não o ignora, e celulares sem bloqueio de tela continuam utilizáveis.
+
+* **TikTok:** Salvar publicações de fotos como vídeo cria um MP4 limpo com som, usando 3 segundos por foto por padrão, ajustáveis de 1 a 10. Sem áudio, salva em silêncio e avisa.
+
+* **TikTok:** Preferir reprodução H.264 escolhe uma cópia H.264 disponível, aplicando SDR e qualidade dentro dela. Vídeos sem essa cópia continuam tocando.
+
+* **TikTok:** Mostrar taxa de engajamento soma curtidas, comentários, compartilhamentos e salvamentos como porcentagem das visualizações em vídeos do feed e de perfil, usando contagens já enviadas pelo TikTok. Vídeos sem contagem de visualizações não mostram nada.
+
+* **TikTok:** Mostrar contagens exatas exibe números completos de curtidas, comentários, compartilhamentos e outras contagens, agrupados no formato local em vez de arredondados.
+
+* **TikTok:** Ícone personalizado do aplicativo adiciona ícones temáticos com as cores do papel de parede no Android 13 ou mais recente e estilos alternativos no Android 8 ou mais recente.
+
+* **TikTok:** Remover limites de texto permite digitar comentários, notas de republicação e biografias mais longos. Os servidores do TikTok ainda decidem o que aceitam.
+
+* **TikTok:** Remover anéis de avatar oculta anéis de stories e LIVE. Tocar numa foto afetada abre o perfil em vez do story ou da LIVE.
+
+* **TikTok:** Reproduzir SDR em vez de HDR prefere uma cópia padrão disponível, aplicando a qualidade dentro dela. Vídeos só em HDR continuam tocando.
+
+* **TikTok:** Copiar bio e IDs adiciona cópia da biografia por toque longo e botões na janela de compartilhamento para usuários, IDs de usuário e IDs de vídeo.
+
+* **TikTok:** Mostrar status de seguidores marca seguidores e contas que não seguem você de volta em perfis e listas, usando dados já enviados pelo TikTok.
+
+* **TikTok:** Mostrar só amigos mútuos na aba Amigos mantém publicações e republicações de amigos e suas próprias publicações, removendo contas não mútuas e sugeridas.
+
+* **TikTok:** Ocultar vídeos gerados por IA agora verifica avisos ocultos, moderação, credenciais, efeitos e etiquetas de IA. As regras do feed também chegam ao novo feed de Amigos.
+
+* **TikTok:** As regiões dos autores agora aparecem sem data de publicação visível e em vídeos abertos, acompanham o vídeo atual e deixam espaço ao lado de nomes longos.
+
+* **TikTok:** Ativar substituições do Lab pela página de uma opção agora libera Resultado forçado imediatamente.
+
+* **TikTok:** Remover extras de LIVE agora avisa sobre placares de batalhas e nomes de convidados ausentes. Deixe esse patch opcional de fora se você assiste a batalhas.
+
+* **TikTok:** Descartar o cache de imagens animadas agora mantém o quadro atual e para de decodificar antecipadamente, em vez de descartar quadros e causar engasgos (#100).
+
+* **TikTok:** Ocultar os controles da tela limpa agora fica ao lado de Tela limpa automática em Tela do feed > Tela limpa.
+
+* **TikTok:** A tela limpa agora mantém as abas inferiores ocultas no primeiro vídeo do feed, enquanto outras páginas preservam suas abas.
+
+* **TikTok:** A Tela limpa automática imediata agora mantém o próximo vídeo limpo durante todo o gesto de deslizar. Restaurar exibição ainda traz os controles de volta (#84).
+
+* **TikTok:** Links ocultos de legendas e barras inferiores de busca não recebem mais toques acidentais na tela limpa (#84).
+
+* **TikTok:** A tela limpa agora oculta a barra de comentários em vídeos e fotos abertos, e Restaurar exibição a traz de volta (#84).
+
+* **TikTok:** Ocultar os controles da tela limpa mantém uma barra de progresso invisível e arrastável na borda inferior (#84).
+
+* **TikTok:** O Lab adiciona 13 predefinições para republicar com um comentário anexado, banners e layouts de perfil, fotos ao vivo, comentários com câmera ou áudio, Favoritos e estilos de ordenação ou descurtida dos comentários, cores, arquivo e compartilhamento em vários chats, Gerenciar tópicos, busca visual, AI Self, menus de toque longo em todas as publicações, segurar para acelerar, reprodução em segundo plano, rolagem automática e datas do feed. Mostrar Ver tradução agora cobre também 47.0.3, 47.1.3 e 47.1.4. Só aparecem predefinições da versão instalada, e a elegibilidade do servidor ainda vale.
+
+* **TikTok:** Remover anúncios agora pega publicações promovidas de criadores, e Ignorar anúncio inicial também impede o pré-carregamento de anúncios de abertura e suas solicitações em tempo real.
+
+* **TikTok:** Ocultar vídeos não personalizados de Para você remove publicações de preenchimento, mas preserva lotes compostos só por elas para evitar travamentos. Exceções de criadores continuam passando.
+
+* **TikTok:** A busca das configurações agora prioriza correspondências nos títulos e reconhece termos de registro de diagnóstico em cada idioma das configurações.
+
+* **TikTok:** Fotos disponíveis só em HEIF agora têm uma segunda opção de conversão para JPEG. Se nenhum decodificador funcionar, o Hushfeed preserva o arquivo original.
+
+* **TikTok:** Novidades agora traduz 0.68.0 e 0.67.1 nos oito idiomas das configurações, com um aviso em inglês nas versões mais antigas (#91).
+
+* **TikTok:** Os relatórios de depuração agora descrevem linhas e elementos ocultos da janela de compartilhamento sem identificar pessoas em Enviar para (#120).
+
+* **TikTok:** As perguntas frequentes agora explicam os fundos pretos próprios de Perfil e Caixa de entrada do TikTok 47.1.4, que também aparecem sem Tema escuro AMOLED (#69).
+
+* **TikTok:** A solução de problemas agora explica que o Lab não pode ocultar CAPTCHA e mostra como experimentar uma predefinição revisada (#111).
+
+## 0.68.0 (2026-10-06)
+
+* **TikTok:** Fotos originais agora preferem JPEG em tamanho completo no Android 9 ou mais recente, inclusive em stories. Conversões que falham e imagens transparentes mantêm o formato original (#105).
+
+* **TikTok:** Ocultar a barra de status agora remove a faixa vazia e preenche recortes da câmera no Android 14 e anteriores. Uma nova chave esconde os controles da tela limpa até você sair (#97).
+
+* **TikTok:** A tela limpa agora oculta e restaura o botão de stories de Seguindo, e tentativas automáticas esperam o TikTok realmente limpar a tela (#84).
+
+* **TikTok:** A tela limpa automática agora tenta novamente ao recuperar o foco, inclusive na inicialização, respeitando a saída manual e ignorando retornos de vídeos antigos (#84).
+
+* **TikTok:** Backups, restaurações e importações do histórico oferecem Parar de esperar para aplicativos de arquivos travados. Parar antes de ler ou gravar deixa os dados intactos, enquanto backups já encaminhados informam o resultado final quando o aplicativo responde. Um arquivo travado bloqueia só sua linha, e girar a tela mantém a restauração.
+
+* **TikTok:** Importar e exportar no Lab agora permite parar de esperar por aplicativos de arquivos travados, impede tarefas duplicadas e substitui exportações maiores com segurança.
+
+* **TikTok:** Um backup cancelado ou malsucedido agora preserva um arquivo existente até começar a gravação, mantendo a limpeza de arquivos vazios recém-criados.
+
+* **TikTok:** A busca das configurações agora prioriza palavras inteiras sobre trechos dentro de palavras maiores, em todos os idiomas.
+
+* **TikTok:** A busca das configurações agora encontra cada opção de lista e a abre no lugar certo. Girar a tela preserva as seleções não salvas.
+
+* **TikTok:** Linhas estreitas das configurações agora colocam a chave abaixo do texto grande, deixando a largura inteira para os títulos.
+
+* **TikTok:** Novidades agora identifica as notas em inglês e informa o idioma correto do texto aos leitores de tela.
+
+* **TikTok:** Desfazer restaura o histórico de vídeos vistos em segundo plano, informa só os registros ainda compatíveis e continua disponível se salvar falhar.
+
+* **TikTok:** Desfazer agora conta visualizações registradas durante a restauração e preserva horários recentes contra gravações antigas na fila.
+
+* **TikTok:** Salvar mídia agora respeita os intervalos completos de repetição do servidor e Cancelar. Intervalos além do limite da tarefa a interrompem com um aviso e preservam arquivos concluídos.
+
+* **TikTok:** Relatórios de diagnóstico e do Lab agora são salvos em tarefas próprias de segundo plano, e toques repetidos avisam que já há um salvamento em andamento.
+
+* **TikTok:** Hushfeed agora exige Morphe Manager 1.34.0 ou mais recente com patcher 1.15.1. As verificações de lançamento usam CLI 1.18.1.
+
+* **TikTok:** As compilações usam Guava 33.7.2, não afetado pelo alerta de segurança, de forma consistente e com somas de verificação conferidas. Guava não é incluído no aplicativo nem no pacote. A verificação de importações do código agora lê os arquivos de patches que verifica.
+
+* **TikTok:** Edições só em Java na extensão não repetem mais testes de identificação de APK sem relação com elas. Testes completos e verificações de lançamento ainda os executam.
+
+* **TikTok:** Edições na documentação não repetem mais testes de APK inalterados, enquanto APKs substituídos invalidam o cache mesmo com datas e tamanhos iguais.
+
+* **TikTok:** As verificações do analisador de armazenamento no Windows agora mostram o diagnóstico do Java sem confundir uma execução bem-sucedida com falha.
+
+* **TikTok:** A assinatura de APK agora aceita mensagens inofensivas de inicialização do Java, mas continua rejeitando certificados inválidos e verificações malsucedidas.
+
+## 0.67.1 (2026-10-03)
+
+* **TikTok:** As configurações agora agrupam botões de vídeo, colocam opções do player em Reprodução e opções do sistema em Aplicativo. As escolhas salvas são preservadas.
+
+* **TikTok:** Os cinco botões do feed agora vêm desligados. Se você usava o botão de silenciar, religue Mostrar o botão de silenciar nos vídeos.
+
+* **TikTok:** Remover pacotes de idiomas não usados agora preserva conjuntos de idiomas desmarcados quando Idiomas a manter é todos, em vez de interromper os patches (#96).
+
+* **TikTok:** O status da sequência agora diz Enviado quando o TikTok aceita todas as mensagens, reservando não confirmado para envios falhos ou incompletos (#92).
+
+* **TikTok:** Os botões de ocultar e bloquear som agora funcionam independentemente do botão de bloquear, exigem Filtro do feed e vêm desligados (#95).
+
+* **TikTok:** Pausar mantém o atalho de configurações ao segurar Início se estiver ligado, permitindo que convidados retomem o Hushfeed. Atalhos desligados continuam desligados, toques comuns funcionam como antes e a ação de toque longo do próprio TikTok permanece (#89).
+
+* **TikTok:** Android 6 agora usa as formas plurais dos idiomas incluídos, com alternativa correta em inglês para quantidades ausentes.
+
+* **TikTok:** Novidades agora mantém o histórico completo sem exceder o limite de strings do Java conforme as traduções crescem.
+
+* **TikTok:** Manager 1.33.0 agora categoriza todos os 106 patches. As verificações de compilação cobrem entradas com ABI única, rejeitam arquivos alterados e permitem verificar lançamentos.
+
+* **TikTok:** Limitar tráfego em segundo plano agora mantém a configuração de push por padrão. Restaurar a configuração removida exige reaplicar os patches ao APK original, e Pausar não desfaz isso (#86).
+
+* **TikTok:** Restaurar agora distingue chaves incompatíveis de configurações ausentes no backup, mantendo opções portáteis, estado local, compatibilidade do Lab e o comportamento de Desfazer.
+
+* **TikTok:** Importar histórico de vídeos vistos aceita JSON revisado do TikTok de até 2 MB e 10.000 entradas, preservando a conta escolhida, datas de exibição e limites de idade. Repetir uma importação não adiciona nada, e arquivos inválidos ou falhas de gravação deixam o histórico intacto. Links ficam no celular. Adicionar histórico encerra o Desfazer de uma limpeza anterior e explica o motivo.

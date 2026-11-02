@@ -1,10 +1,16 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared.settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -45,11 +51,6 @@ public class FloatSetting extends Setting<Float> {
     }
 
     @Override
-    protected Float readFromJSON(JSONObject json, String importExportKey) throws JSONException {
-        return (float) json.getDouble(importExportKey);
-    }
-
-    @Override
     protected void setValueFromString(@NonNull String newValue) {
         value = Float.valueOf(Objects.requireNonNull(newValue));
     }
@@ -57,11 +58,5 @@ public class FloatSetting extends Setting<Float> {
     @Override
     public void saveToPreferences() {
         preferences.saveFloatString(key, value);
-    }
-
-    @NonNull
-    @Override
-    public Float get() {
-        return value;
     }
 }

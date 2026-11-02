@@ -71,7 +71,7 @@ internal fun main(args: Array<String>) {
 }
 
 /**
- * Emits `version`, root-level `appNames` (package â†’ label), and `patches` with
+ * Emits `version`, root-level `appNames` (package to label), and `patches` with
  * `compatiblePackages`, **`compatibility`** (full `Compatibility` metadata for Manager UI),
  * and options. Requires morphe-patcher 1.3.x and `compatibleWith(Compatibility(...))` in patches.
  */
@@ -93,9 +93,22 @@ private fun generatePatchList(version: String, patches: Set<Patch<*>>) {
         JsonPatch(
             it.name!!,
             it.description,
-            it.use,
-            it.dependencies.map { dependency -> dependency.javaClass.simpleName },
-            it.compatiblePackages?.associate { (packageName, versions) -> packageName to versions },
+            it.category,
+            it.default,
+            // The patch's own name, not its Kotlin class. Every entry used to read
+            // "BytecodePatch", which made the only machine-readable dependency record say
+            // nothing at all. Internal patches with no name keep the class name.
+            //
+            // Deduplicated and sorted, because this is a set written down as a list. Two patches
+            // reached the same unnamed dependency twice and their rows said "BytecodePatch,
+            // BytecodePatch", which reads as two things and is one, and the order everywhere else
+            // was whatever the traversal happened to produce, so an unrelated edit could move
+            // rows about and make the catalog diff say more than the change did.
+            it.dependencies
+                .map { dependency -> dependency.name ?: dependency.javaClass.simpleName }
+                .distinct()
+                .sorted(),
+            it.compatibility?.mapNotNull { c -> c.toLegacyEntry() }?.toMap(),
             it.compatibility.orEmpty().map { c -> c.toJsonCompatibility() },
             it.options.values.map { option ->
                 JsonPatch.Option(
@@ -127,17 +140,31 @@ private fun generatePatchList(version: String, patches: Set<Patch<*>>) {
     )
 }
 
+/** Preserve the legacy catalog field while using Patcher 2's public compatibility API. */
+private fun Compatibility.toLegacyEntry(): Pair<PackageName, Set<VersionName>?>? {
+    val packageName = packageName ?: return null
+    val included = targets.filterNot { it.isExperimental }.ifEmpty { targets }
+    val versions = included.mapNotNull { it.version }.toSet()
+        .takeUnless { it.isEmpty() || included.any { target -> target.version == null } }
+    return packageName to versions
+}
+
 private fun Compatibility.toJsonCompatibility() = JsonCompatibility(
     name = name ?: "",
     packageName = packageName ?: "",
     description = description?.takeUnless { it.isBlank() },
     appIconColor = appIconColor,
+    // The certificates Morphe Manager holds a picked APK to. The patches template's generator
+    // writes these and the per-target version codes; this one used to drop both, so the catalog
+    // said nothing about what Manager actually checks.
+    signatures = signatures?.sorted(),
     targets = targets?.map { t -> t.toJsonAppTarget() },
 )
 
 private fun AppTarget.toJsonAppTarget() = JsonAppTarget(
     version = version ?: "",
     experimental = isExperimental,
+    versionCodes = versionCodes?.entries?.sortedBy { it.key.name }?.associate { it.key.name to it.value },
 )
 
 @Suppress("unused")
@@ -146,6 +173,7 @@ private class JsonCompatibility(
     val packageName: String,
     val description: String? = null,
     val appIconColor: Int?,
+    val signatures: List<String>?,
     val targets: List<JsonAppTarget>?,
 )
 
@@ -153,12 +181,14 @@ private class JsonCompatibility(
 private class JsonAppTarget(
     val version: String,
     val experimental: Boolean = false,
+    val versionCodes: Map<String, Int>? = null,
 )
 
 @Suppress("unused")
 private class JsonPatch(
     val name: String? = null,
     val description: String? = null,
+    val category: String? = null,
     val use: Boolean = true,
     val dependencies: List<String>,
     val compatiblePackages: Map<PackageName, Set<VersionName>?>? = null,

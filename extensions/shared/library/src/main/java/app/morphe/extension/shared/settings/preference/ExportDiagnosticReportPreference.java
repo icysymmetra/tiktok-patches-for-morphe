@@ -13,17 +13,20 @@ import android.util.AttributeSet;
 @SuppressWarnings({"deprecation", "unused"})
 public class ExportDiagnosticReportPreference extends Preference {
     {
+        // A key so the settings search can index this row. Nothing in the settings
+        // framework treats it as a setting: a key with no Setting behind it is skipped.
+        setKey("action_export_diagnostic_report");
         setOnPreferenceClickListener(pref -> {
             AlertDialog shownDialog = new AlertDialog.Builder(getContext())
-                    .setTitle("Export diagnostic report")
+                    .setTitle(dialogTitle())
                     .setItems(
-                            new String[]{"Copy quick report", "Save full report"},
+                            labels(),
                             (dialog, which) -> {
                                 if (which == 0) LogBufferManager.exportToClipboard();
                                 if (which == 1) LogBufferManager.exportToFile();
                             }
                     )
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(negativeText(), null)
                     .show();
             onDialogShown(shownDialog);
             return true;
@@ -31,6 +34,20 @@ public class ExportDiagnosticReportPreference extends Preference {
     }
 
     protected void onDialogShown(AlertDialog dialog) {
+    }
+
+    /** The dialog's title. A bundle with a translation table overrides these three. */
+    protected CharSequence dialogTitle() {
+        return "Export diagnostic report";
+    }
+
+    /** The two choices, quick copy first, full file second. */
+    protected CharSequence[] labels() {
+        return new CharSequence[]{"Copy quick report", "Save full report"};
+    }
+
+    protected CharSequence negativeText() {
+        return "Cancel";
     }
 
     public ExportDiagnosticReportPreference(

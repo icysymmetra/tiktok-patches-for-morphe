@@ -10,18 +10,15 @@ import android.os.Build;
 import android.os.Process;
 import android.util.Log;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.diagnostics.DebugCapture;
 import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
+import app.morphe.extension.shared.diagnostics.DiagnosticEvent;
+import app.morphe.extension.shared.diagnostics.DiagnosticRedactor;
 import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
 public final class JavaCrashCapture {
@@ -97,7 +94,8 @@ public final class JavaCrashCapture {
             );
         } catch (Throwable throwable) {
             npthCallback = null;
-            Log.w("morphe:NpthCrashCapture", "Could not register TikTok crash callback", throwable);
+            Log.w("morphe:NpthCrashCapture", "Could not register TikTok crash callback\n"
+                    + DiagnosticRedactor.redactThrowable(throwable));
         }
     }
 
@@ -146,19 +144,21 @@ public final class JavaCrashCapture {
 
         String recent = LogBufferManager.snapshotForCrash(RECENT_EVENTS_MAX_CHARS);
         if (!recent.isEmpty()) {
-            report.append("\n[RECENT MORPHE EVENTS]\n").append(recent);
+            report.append("\n[RECENT MORPHE EVENTS]\n").append(redact(recent));
         }
-        return report.toString();
+        return redact(report.toString());
     }
 
     private static String sanitizeNpthDetail(String detail) {
         if (detail == null || "null".equals(detail)) return "";
         boolean truncated = detail.length() > NPTH_DETAIL_MAX_CHARS;
         String boundedDetail = truncated ? detail.substring(0, NPTH_DETAIL_MAX_CHARS) : detail;
-        String sanitized = boundedDetail
-                .replaceAll("(?i)https?://\\S+", "[url omitted]")
-                .replaceAll("(?i)(access_token|sessionid|sid_tt|passport_csrf_token)=\\S+", "$1=[omitted]");
+        String sanitized = redact(boundedDetail);
         return truncated ? sanitized + "\n[summary truncated]" : sanitized;
+    }
+
+    static String redact(String text) {
+        return DiagnosticRedactor.redact(text);
     }
 
     private static final class MorpheCrashHandler implements Thread.UncaughtExceptionHandler {
@@ -208,8 +208,7 @@ public final class JavaCrashCapture {
             Throwable throwable,
             Thread.UncaughtExceptionHandler delegate
     ) {
-        StringWriter stack = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(stack));
+        String sanitizedStack = DiagnosticRedactor.redactThrowable(throwable);
 
         StringBuilder report = new StringBuilder();
         report.append("schema: 1\n")
@@ -218,7 +217,7 @@ public final class JavaCrashCapture {
                 .append("package: ").append(context.getPackageName()).append('\n')
                 .append("tiktok_version: ").append(Utils.getAppVersionName()).append('\n')
                 .append("morphe_version: ").append(Utils.getPatchesReleaseVersion()).append('\n')
-                .append("diagnostic_logging: ").append(isEnabled(context, DEBUG_KEY)).append('\n')
+                .append("diagnostic_logging: ").append(isEnabled(context, DEBUG_KEY) || DebugCapture.isRunning()).append('\n')
                 .append("java_crash_capture: ").append(isEnabled(context, CAPTURE_KEY)).append('\n')
                 .append("android_api: ").append(Build.VERSION.SDK_INT).append('\n')
                 .append("abis: ").append(String.join(",", Build.SUPPORTED_ABIS)).append('\n')
@@ -227,16 +226,25 @@ public final class JavaCrashCapture {
                 .append("thread: ").append(thread.getName()).append('\n')
                 .append("thread_id: ").append(thread.getId()).append('\n')
                 .append("exception: ").append(throwable.getClass().getName()).append('\n')
-                .append("message: ").append(safe(throwable.getMessage())).append('\n')
+                .append("message: ").append(throwableMessage(throwable)).append('\n')
                 .append("delegate: ").append(delegate == null ? "none" : delegate.getClass().getName())
                 .append("\n\n[STACK TRACE]\n")
-                .append(stack);
+                .append(sanitizedStack);
 
         String recent = LogBufferManager.snapshotForCrash(RECENT_EVENTS_MAX_CHARS);
         if (!recent.isEmpty()) {
-            report.append("\n[RECENT MORPHE EVENTS]\n").append(recent);
+            // Log lines carry addresses too: a download names the URL it could not reach.
+            report.append("\n[RECENT MORPHE EVENTS]\n").append(redact(recent));
         }
-        return report.toString();
+        return redact(report.toString());
+    }
+
+    private static String throwableMessage(Throwable throwable) {
+        try {
+            return safe(redact(throwable.getMessage()));
+        } catch (Throwable unavailable) {
+            return "[message unavailable]";
+        }
     }
 
     private static String processName(Context context) {
@@ -256,8 +264,6 @@ public final class JavaCrashCapture {
     }
 
     private static String utcNow() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return format.format(new Date());
+        return DiagnosticEvent.utc(System.currentTimeMillis());
     }
 }

@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,19 +25,55 @@ final class SettingsManagerObservationRecorder {
     private static final int MAX_FIELDS = 128;
     private static final int MAX_STRING_LENGTH = 8192;
     private static final Object NO_DEFAULT = new Object();
-    private static final Map<String, Observation> OBSERVATIONS = new ConcurrentHashMap<>();
+    private static final Object OBSERVATION_LOCK = new Object();
+    // Declared as the class, not Map: putIfAbsent below is the concrete API 1 method, while the
+    // one on the Map interface is an API 24 default D8 cannot backport.
+    private static final ConcurrentHashMap<String, Observation> OBSERVATIONS = new ConcurrentHashMap<>();
     private static final Map<String, Boolean> DEFAULT_WRAPPER_KEYS = new ConcurrentHashMap<>();
+    /**
+     * What the stack walk said about a key, so it is walked once rather than on every read.
+     *
+     * <p>A key TikTok only ever reads through the no-default getter never enters
+     * {@link #DEFAULT_WRAPPER_KEYS}, so without this every read of it captured a full stack
+     * trace, forever, on whatever thread the host reads settings from.
+     */
+    private static final ConcurrentHashMap<String, Boolean> WRAPPER_CHECKED = new ConcurrentHashMap<>();
 
     private SettingsManagerObservationRecorder() {
     }
 
     static void clear() {
-        OBSERVATIONS.clear();
-        DEFAULT_WRAPPER_KEYS.clear();
+        synchronized (OBSERVATION_LOCK) {
+            OBSERVATIONS.clear();
+            DEFAULT_WRAPPER_KEYS.clear();
+            WRAPPER_CHECKED.clear();
+        }
+    }
+
+    /** Observations are immutable serialized values and exist only for this process. */
+    static Runnable checkpoint() {
+        java.util.Map<String, Observation> observations;
+        java.util.Map<String, Boolean> wrappers;
+        synchronized (OBSERVATION_LOCK) {
+            observations = new java.util.HashMap<>(OBSERVATIONS);
+            wrappers = new java.util.HashMap<>(DEFAULT_WRAPPER_KEYS);
+        }
+        return () -> {
+            synchronized (OBSERVATION_LOCK) {
+                OBSERVATIONS.clear();
+                DEFAULT_WRAPPER_KEYS.clear();
+                WRAPPER_CHECKED.clear();
+                OBSERVATIONS.putAll(observations);
+                DEFAULT_WRAPPER_KEYS.putAll(wrappers);
+            }
+        };
     }
 
     static Object observeWithoutDefault(String key, Class<?> requestedClass, Object returnedValue) {
-        if (key != null && (DEFAULT_WRAPPER_KEYS.containsKey(key) || calledFromDefaultWrapper())) {
+        FeatureGateLearnMode.observe(FeatureGateLabStore.MANAGER_SETTINGS_MANAGER, key,
+                (requestedClass == null ? "unknown" : requestedClass.getName())
+                        + "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;", returnedValue);
+        if (key != null && (DEFAULT_WRAPPER_KEYS.containsKey(key) || cameFromDefaultWrapper(key))) {
             return returnedValue;
         }
         record(
@@ -94,8 +129,11 @@ final class SettingsManagerObservationRecorder {
     }
 
     static JSONArray exportJson() {
-        List<Observation> snapshot = new ArrayList<>(OBSERVATIONS.values());
-        Collections.sort(snapshot, Comparator.comparing(observation -> observation.key));
+        List<Observation> snapshot;
+        synchronized (OBSERVATION_LOCK) {
+            snapshot = new ArrayList<>(OBSERVATIONS.values());
+        }
+        Collections.sort(snapshot, (left, right) -> left.key.compareTo(right.key));
         JSONArray result = new JSONArray();
         for (Observation observation : snapshot) {
             result.put(observation.toJson());
@@ -104,7 +142,9 @@ final class SettingsManagerObservationRecorder {
     }
 
     static int size() {
-        return OBSERVATIONS.size();
+        synchronized (OBSERVATION_LOCK) {
+            return OBSERVATIONS.size();
+        }
     }
 
     static String serializeText(Object value) {
@@ -115,13 +155,36 @@ final class SettingsManagerObservationRecorder {
         return serialize(value);
     }
 
-    private static boolean calledFromDefaultWrapper() {
-        for (StackTraceElement frame : Thread.currentThread().getStackTrace()) {
-            if ("X.0BZ5".equals(frame.getClassName())) {
-                return true;
-            }
+    /** Counts stack walks, so a test can show a key is only walked once. */
+    static volatile int wrapperWalks;
+
+    /**
+     * Whether this read came through the getter with a default, remembered per key.
+     *
+     * <p>That getter reaches this one through TikTok's settings cache and a wrapper, and it is
+     * recorded on its own, so a read that came that way would be the same key twice. The
+     * wrapper's class used to be named here, first 46.2.3's and then whatever class hooked the
+     * getter with a default, which is SettingsManager itself: from then on every read of this
+     * getter matched, its own frame included, and nothing read without a default was recorded.
+     * What tells the two apart on every build is a second SettingsManager frame a few frames
+     * out, see {@link GateCallers#throughAnotherSettingsManagerGetter}.
+     *
+     * <p>The answer for a given key does not change over a process, and the walk it takes is the
+     * whole cost of this path, so it is taken once. Past the observation cap nothing new is
+     * recorded anyway, so nothing new is remembered either.
+     */
+    private static boolean cameFromDefaultWrapper(String key) {
+        Boolean known = WRAPPER_CHECKED.get(key);
+        if (known != null) {
+            return known;
         }
-        return false;
+        wrapperWalks++;
+        boolean fromWrapper = GateCallers.throughAnotherSettingsManagerGetter(
+                Thread.currentThread().getStackTrace());
+        if (WRAPPER_CHECKED.size() < MAX_OBSERVATIONS) {
+            WRAPPER_CHECKED.putIfAbsent(key, fromWrapper);
+        }
+        return fromWrapper;
     }
 
     private static void record(
@@ -136,11 +199,20 @@ final class SettingsManagerObservationRecorder {
         if (key == null || key.isEmpty() || requestedClass == null) {
             return;
         }
+        if (defaultValue != NO_DEFAULT) {
+            FeatureGateLearnMode.observe(manager, key, requestedClass.getName() + methodDescriptor, returnedValue);
+        }
         String identity = manager + "\n" + key + "\n"
                 + requestedClass.getName() + "\n" + methodDescriptor;
+        // Read first, so a repeat of a key already seen costs one hash lookup. This runs on the
+        // host's own settings threads.
         if (OBSERVATIONS.containsKey(identity) || OBSERVATIONS.size() >= MAX_OBSERVATIONS) {
             return;
         }
+        // Built outside the lock. The constructor serialises the value by reflection, up to 128
+        // fields deep, and doing that while holding the lock stopped every other thread that
+        // reached a new identity at the same moment. Two threads racing the same identity build
+        // one throwaway between them, which is far cheaper than the wait was.
         Observation observation = new Observation(
                 manager,
                 sourceType,
@@ -151,25 +223,16 @@ final class SettingsManagerObservationRecorder {
                 methodDescriptor,
                 captureCaller()
         );
-        OBSERVATIONS.putIfAbsent(identity, observation);
+        synchronized (OBSERVATION_LOCK) {
+            if (OBSERVATIONS.size() >= MAX_OBSERVATIONS) {
+                return;
+            }
+            OBSERVATIONS.putIfAbsent(identity, observation);
+        }
     }
 
     private static String captureCaller() {
-        for (StackTraceElement frame : Thread.currentThread().getStackTrace()) {
-            String className = frame.getClassName();
-            if (className.startsWith("app.morphe.extension.tiktok.featuregatelab")
-                    || className.equals("java.lang.Thread")
-                    || className.equals("dalvik.system.VMStack")
-                    || className.equals("com.bytedance.ies.abmock.SettingsManager")
-                    || className.equals("com.bytedance.android.live_settings.SettingsManager")
-                    || className.equals("X.0BZ5")
-                    || className.equals("X.0Bb9")) {
-                continue;
-            }
-            return className + "#" + frame.getMethodName()
-                    + "(" + frame.getFileName() + ":" + frame.getLineNumber() + ")";
-        }
-        return "unknown";
+        return GateCallers.hostCallerWithLine(Thread.currentThread().getStackTrace());
     }
 
     private static String serializeJsonText(Object value) {

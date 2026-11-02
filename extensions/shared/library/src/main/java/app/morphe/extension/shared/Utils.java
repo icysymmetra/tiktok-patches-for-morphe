@@ -1,3 +1,11 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared;
 
 import android.annotation.SuppressLint;
@@ -17,9 +25,11 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PersistableBundle;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Process;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
@@ -38,6 +48,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.io.FileInputStream;
 import java.text.Bidi;
 import java.text.Collator;
 import java.text.Normalizer;
@@ -50,7 +61,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -58,10 +71,9 @@ import java.util.regex.Pattern;
 import app.morphe.extension.shared.settings.AppLanguage;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
-import app.morphe.extension.shared.settings.preference.MorpheAboutPreference;
+import app.morphe.extension.shared.settings.HushfeedPause;
 import app.morphe.extension.shared.ui.Dim;
 
-@SuppressWarnings("NewApi")
 public class Utils {
     private static WeakReference<Activity> activityRef = new WeakReference<>(null);
 
@@ -70,6 +82,7 @@ public class Utils {
 
     private static String versionName;
     private static String applicationLabel;
+    private static volatile String processName;
 
     @ColorInt
     private static int darkColor = Color.BLACK;
@@ -101,6 +114,11 @@ public class Utils {
     @SuppressWarnings("SameReturnValue")
     public static String getPatchesReleaseVersion() {
         return ""; // Value is replaced during patching.
+    }
+
+    /** Fixed APK facts, independent of runtime settings and diagnostic events. */
+    public static String getBuildMetadata() {
+        return app.morphe.extension.shared.diagnostics.BuildDetails.readMetadata(getContext());
     }
 
     public static boolean isPreReleasePatches() {
@@ -231,23 +249,107 @@ public class Utils {
      * All tasks run at max thread priority.
      */
     private static final ThreadPoolExecutor backgroundThreadPool = new ThreadPoolExecutor(
-            3, // 3 threads always ready to go.
-            Integer.MAX_VALUE,
-            10, // For any threads over the minimum, keep them alive 10 seconds after they go idle.
+            3,
+            6,
+            10,
             TimeUnit.SECONDS,
-            new SynchronousQueue<>(),
+            new ArrayBlockingQueue<>(32),
             r -> { // ThreadFactory
                 Thread t = new Thread(r);
-                t.setPriority(Thread.MAX_PRIORITY); // Run at max priority.
+                t.setPriority(Thread.NORM_PRIORITY);
+                t.setDaemon(true);
                 return t;
-            });
+            },
+            new ThreadPoolExecutor.AbortPolicy());
 
-    public static void runOnBackgroundThread(Runnable task) {
-        backgroundThreadPool.execute(task);
+    private static final java.util.concurrent.atomic.AtomicInteger backgroundTasksInFlight =
+            new java.util.concurrent.atomic.AtomicInteger();
+
+    /**
+     * @return true when the task was accepted, or false when the bounded worker queue was full.
+     *         Stateful callers must unwind any busy state when this returns false.
+     */
+    public static boolean runOnBackgroundThread(Runnable task) {
+        backgroundTasksInFlight.incrementAndGet();
+        try {
+            backgroundThreadPool.execute(() -> {
+                try {
+                    runAndLogFailure(task);
+                } finally {
+                    backgroundTasksInFlight.decrementAndGet();
+                }
+            });
+            return true;
+        } catch (RejectedExecutionException error) {
+            backgroundTasksInFlight.decrementAndGet();
+            Logger.printException(() -> "Background task queue is full", error);
+            return false;
+        }
     }
 
     public static <T> Future<T> submitOnBackgroundThread(Callable<T> call) {
-        return backgroundThreadPool.submit(call);
+        backgroundTasksInFlight.incrementAndGet();
+        try {
+            return backgroundThreadPool.submit(() -> {
+                try {
+                    return call.call();
+                } finally {
+                    backgroundTasksInFlight.decrementAndGet();
+                }
+            });
+        } catch (RejectedExecutionException error) {
+            backgroundTasksInFlight.decrementAndGet();
+            throw error;
+        }
+    }
+
+    /**
+     * Runs work that can block inside another app's code for as long as that app likes, such as
+     * a file app opening a document, on a thread of its own so it never holds one of the shared
+     * pool's few threads. It counts as background work, so a test waiting for that waits for
+     * this too. False when no thread could be started.
+     */
+    public static boolean runOnOwnThread(String name, Runnable task) {
+        backgroundTasksInFlight.incrementAndGet();
+        Thread thread = new Thread(() -> {
+            try {
+                runAndLogFailure(task);
+            } finally {
+                backgroundTasksInFlight.decrementAndGet();
+            }
+        }, name);
+        thread.setDaemon(true);
+        try {
+            thread.start();
+            return true;
+        } catch (OutOfMemoryError noThread) {
+            // Android reports a thread it couldn't create as an OutOfMemoryError.
+            backgroundTasksInFlight.decrementAndGet();
+            Logger.printException(() -> "Could not start " + name, noThread);
+            return false;
+        }
+    }
+
+    /** Waits until background work submitted before this call has finished. */
+    public static void awaitBackgroundTasksForTests() throws Exception {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        while (true) {
+            long remaining = deadline - System.nanoTime();
+            if (remaining <= 0) throw new TimeoutException("Background tasks did not finish");
+            Future<?> marker;
+            try {
+                marker = backgroundThreadPool.submit(() -> { });
+            } catch (RejectedExecutionException full) {
+                // A full queue is work still in flight, so wait for it to drain. A burst bigger
+                // than the queue (twenty quick switch flips) used to fail the wait itself.
+                Thread.sleep(5);
+                continue;
+            }
+            marker.get(remaining, TimeUnit.NANOSECONDS);
+            if (backgroundTasksInFlight.get() == 0 && backgroundThreadPool.getQueue().isEmpty()) {
+                return;
+            }
+        }
     }
 
     /**
@@ -389,6 +491,47 @@ public class Utils {
     public static void setActivity(Activity mainActivity) {
         Logger.printInfo(() -> "Set activity: " + mainActivity);
         activityRef = new WeakReference<>(mainActivity);
+        followResumed(mainActivity);
+    }
+
+    private static volatile WeakReference<Activity> resumedRef = new WeakReference<>(null);
+    private static WeakReference<android.app.Application> followedApplication = new WeakReference<>(null);
+
+    /**
+     * The host activity in front: the last one resumed while it is still alive, else the main
+     * activity. A video opened from a profile or search plays in an activity of its own, and a
+     * dialog built on the main activity behind it opens on a stopped window nobody can see.
+     */
+    public static Activity getVisibleActivity() {
+        Activity resumed = resumedRef.get();
+        if (resumed != null && !resumed.isFinishing() && !resumed.isDestroyed()) return resumed;
+        return getActivity();
+    }
+
+    private static synchronized void followResumed(Activity activity) {
+        android.app.Application application = activity == null ? null : activity.getApplication();
+        if (application == null || followedApplication.get() == application) return;
+        followedApplication = new WeakReference<>(application);
+        application.registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
+            @Override public void onActivityResumed(Activity resumed) { resumedRef = new WeakReference<>(resumed); }
+            @Override public void onActivityDestroyed(Activity destroyed) {
+                if (resumedRef.get() == destroyed) resumedRef = new WeakReference<>(null);
+            }
+            @Override public void onActivityCreated(Activity created, Bundle state) { }
+            @Override public void onActivityStarted(Activity started) { }
+            @Override public void onActivityPaused(Activity paused) { }
+            @Override public void onActivityStopped(Activity stopped) { }
+            @Override public void onActivitySaveInstanceState(Activity saved, Bundle state) { }
+        });
+    }
+
+    /**
+     * The activity when there is one, else the application: for sizes that follow the window
+     * rather than the display, such as a side by side split view's half of the screen.
+     */
+    public static Context getWindowContext() {
+        Activity activity = getActivity();
+        return activity != null ? activity : getContext();
     }
 
     public static Context getContext() {
@@ -398,15 +541,61 @@ public class Utils {
         return context;
     }
 
+    /** Persistent preference writes are owned by the package's main process. */
+    public static boolean isMainProcess() {
+        Context appContext = context;
+        if (appContext == null) return true;
+        String packageName = appContext.getPackageName();
+        String declared = appContext.getApplicationInfo().processName;
+        if (declared != null && declared.startsWith(packageName + ":")) return false;
+        String actual = currentProcessName();
+        if (actual == null || actual.isEmpty() || packageName.equals(actual)) return true;
+        return !actual.startsWith(packageName + ":");
+    }
+
+    private static String currentProcessName() {
+        String cached = processName;
+        if (cached != null) return cached;
+        StringBuilder name = new StringBuilder();
+        try (FileInputStream input = new FileInputStream("/proc/" + Process.myPid() + "/cmdline")) {
+            int value;
+            while ((value = input.read()) > 0) name.append((char) value);
+        } catch (Exception ignored) {
+            return null;
+        }
+        cached = name.toString();
+        if (!cached.isEmpty()) processName = cached;
+        return cached;
+    }
+
     public static void setContext(Context appContext) {
         // Intentionally use logger before context is set,
         // to expose any bugs in the 'no context available' logger code.
         Logger.printInfo(() -> "Set context: " + appContext);
+        // An activity is kept weakly, in getActivity(), for the callers that need one; the field
+        // holds its application, so a finished MainActivity isn't reachable from here until the
+        // next one is created. Any other context (a test's wrapper) is kept as given.
+        Context stored = appContext;
+        if (appContext instanceof Activity activity) {
+            Context application = activity.getApplicationContext();
+            if (application != null) stored = application;
+        }
         // Must initially set context to check the app language.
-        context = appContext;
+        context = stored;
 
-        // Set activity if not already set.
-        if (appContext instanceof Activity activity && getActivity() == null) {
+        // Before any hook reads a setting: whether this process runs with Hushfeed paused, and
+        // the record that lets three crashed starts in a row turn safe mode on.
+        HushfeedPause.onProcessStart(appContext);
+        // A timed capture keeps the end it was given, or is cleared when that passed while
+        // TikTok was closed.
+        app.morphe.extension.shared.diagnostics.DebugCapture.load();
+
+        // Follow the activity rather than keeping the first one. The host recreates its main
+        // activity on a configuration change it does not swallow, and this hook runs again for
+        // the new one; holding the old instance left every overlay attaching to a window nobody
+        // is looking at, which isFinishing() does not report because a recreated activity is
+        // destroyed rather than finishing.
+        if (appContext instanceof Activity activity && getActivity() != activity) {
             setActivity(activity);
         }
 
@@ -414,9 +603,9 @@ public class Utils {
         if (language != AppLanguage.DEFAULT) {
             // Create a new context with the desired language.
             Logger.printDebug(() -> "Using app language: " + language);
-            Configuration config = new Configuration(appContext.getResources().getConfiguration());
+            Configuration config = new Configuration(stored.getResources().getConfiguration());
             config.setLocale(language.getLocale());
-            context = appContext.createConfigurationContext(config);
+            context = stored.createConfigurationContext(config);
         }
 
         setThemeLightColor(getThemeColor(getThemeLightColorResourceName(), Color.WHITE));
@@ -424,9 +613,21 @@ public class Utils {
     }
 
     public static void setClipboard(CharSequence text) {
-        ClipboardManager clipboard = (ClipboardManager) context
+        setClipboard(context, "Morphe", text);
+    }
+
+    /** Copies a labeled clip through a caller-owned Context with the shared sensitive-data policy. */
+    public static void setClipboard(Context clipboardContext, CharSequence label, CharSequence text) {
+        ClipboardManager clipboard = (ClipboardManager) clipboardContext
                 .getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("Morphe", text);
+        ClipData clip = ClipData.newPlainText(label, text);
+        if (Build.VERSION.SDK_INT >= 24) {
+            PersistableBundle extras = new PersistableBundle();
+            // Use the literal so API 24 through 32 can carry the flag before the constant
+            // was added to the SDK. Android 13 and newer recognize the same key.
+            extras.putBoolean("android.content.extra.IS_SENSITIVE", true);
+            clip.getDescription().setExtras(extras);
+        }
         clipboard.setPrimaryClip(clip);
     }
 
@@ -651,14 +852,7 @@ public class Utils {
      * Automatically logs any exceptions the runnable throws.
      */
     public static void runOnMainThreadDelayed(Runnable runnable, long delayMillis) {
-        Runnable loggingRunnable = () -> {
-            try {
-                runnable.run();
-            } catch (Exception ex) {
-                Logger.printException(() -> runnable.getClass().getSimpleName() + ": " + ex.getMessage(), ex);
-            }
-        };
-        new Handler(Looper.getMainLooper()).postDelayed(loggingRunnable, delayMillis);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> runAndLogFailure(runnable), delayMillis);
     }
 
     /**
@@ -667,9 +861,21 @@ public class Utils {
      */
     public static void runOnMainThreadNowOrLater(Runnable runnable) {
         if (isCurrentlyOnMainThread()) {
-            runnable.run();
+            runAndLogFailure(runnable);
         } else {
             runOnMainThread(runnable);
+        }
+    }
+
+    /** Keeps a fire-and-forget callback from escaping into TikTok's process. */
+    private static void runAndLogFailure(Runnable runnable) {
+        try {
+            runnable.run();
+        } catch (Throwable failure) {
+            Logger.printException(
+                    () -> runnable.getClass().getSimpleName() + ": " + failure.getMessage(),
+                    failure
+            );
         }
     }
 
@@ -1073,9 +1279,9 @@ public class Utils {
             int order = index++;
             Preference pref = pair.second;
 
-            // Move any screens, intents, and the one off About preference to the top.
-            if (pref instanceof PreferenceScreen || pref instanceof MorpheAboutPreference
-                    || pref.getIntent() != null) {
+            // Move any screens and intents to the top. The About preference this also named was
+            // never built here and its class is gone.
+            if (pref instanceof PreferenceScreen || pref.getIntent() != null) {
                 // Any arbitrary large number.
                 order -= 1000;
             }

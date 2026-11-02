@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="app.hushfeed.verification.gestures">
+    <uses-sdk android:minSdkVersion="34" android:targetSdkVersion="36" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <queries><package android:name="com.zhiliaoapp.musically" /></queries>
+    <application android:hasCode="true" android:debuggable="true" android:label="Hushfeed gesture probe" />
+    <instrumentation android:name="app.hushfeed.verification.gestures.GestureProbe"
+        android:targetPackage="app.hushfeed.verification.gestures"
+        android:label="Hushfeed native gesture probe" />
+</manifest>

@@ -13,11 +13,3 @@ internal object GoogleAuthAvailableFingerprint : Fingerprint(
     parameters = listOf(),
     definingClass = "Lcom/bytedance/lobby/google/GoogleAuth;",
 )
-
-internal object GoogleOneTapAuthAvailableFingerprint : Fingerprint(
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
-    returnType = "Z",
-    parameters = listOf(),
-    definingClass = "Lcom/bytedance/lobby/google/GoogleOneTapAuth;",
-)
-

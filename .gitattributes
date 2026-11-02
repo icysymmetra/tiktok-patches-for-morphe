@@ -1,9 +1,15 @@
 #
 # https://help.github.com/articles/dealing-with-line-endings/
 #
+
+# Normalise on checkin, check out with LF everywhere except the Windows scripts below.
+* text=auto eol=lf
 # Linux start script should use lf
 /gradlew        text eol=lf
 
 # These are Windows script files and should use crlf
 *.bat           text eol=crlf
+
+# The historical receipt fixture is verified by its published byte digest.
+/scripts/fixtures/legacy-receipt-0.61.0.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
