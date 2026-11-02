@@ -84,7 +84,10 @@ public final class QualitySelector {
      * clean (refutation review of f792e71e).
      */
     static int ownHeight(Object video) {
-        Object address = Reflect.property(video, "getDownloadNoWatermarkAddr", "downloadNoWatermarkAddr");
+        // Both download getters call download(this) at entry. Calling the clean getter here
+        // re-enters this selection until the stack is exhausted. Its native 47.4.3 body simply
+        // returns this field, so inspect the original address without going through the hook.
+        Object address = Reflect.readField(video, "downloadNoWatermarkAddr");
         return usable(address) ? dimension(address) : 0;
     }
 

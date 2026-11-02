@@ -100,6 +100,7 @@ public final class LogBufferManager {
         final String javaCrash;
         final String nativeCrash;
         final List<String> layout;
+        final app.morphe.extension.shared.diagnostics.MainThreadStallProbe.Snapshot stall;
 
         ClearSnapshot(
                 List<DiagnosticEvent> events,
@@ -107,7 +108,8 @@ public final class LogBufferManager {
                 app.morphe.extension.shared.diagnostics.FeedFilterCounters.Snapshot feedFilter,
                 String javaCrash,
                 String nativeCrash,
-                List<String> layout
+                List<String> layout,
+                app.morphe.extension.shared.diagnostics.MainThreadStallProbe.Snapshot stall
         ) {
             this.events = events;
             this.hooks = hooks;
@@ -115,11 +117,12 @@ public final class LogBufferManager {
             this.javaCrash = javaCrash;
             this.nativeCrash = nativeCrash;
             this.layout = layout;
+            this.stall = stall;
         }
 
         boolean isEmpty() {
             return events.isEmpty() && hooks.isEmpty() && feedFilter.isEmpty()
-                    && javaCrash.isEmpty() && nativeCrash.isEmpty() && layout.isEmpty();
+                    && javaCrash.isEmpty() && nativeCrash.isEmpty() && layout.isEmpty() && stall.isEmpty();
         }
     }
 
@@ -375,8 +378,9 @@ public final class LogBufferManager {
         // A recorded screen layout is something the reader asked for by name, so it makes a
         // report worth sending on its own and ignores "Included diagnostics".
         List<String> layout = app.morphe.extension.shared.diagnostics.ScreenLayout.lines();
+        List<String> stall = app.morphe.extension.shared.diagnostics.MainThreadStallProbe.lines();
         boolean worthReporting = paused || !crash.isEmpty() || !npthCrash.isEmpty() || events.length() > 0
-                || !layout.isEmpty()
+                || !layout.isEmpty() || !stall.isEmpty()
                 || (hooks.length() > 0
                         && app.morphe.extension.shared.diagnostics.HookStatus.anyMissing());
         if (!worthReporting) return "";
@@ -443,6 +447,12 @@ public final class LogBufferManager {
         }
         // Immutable facts ride along only after the existing no-matching decision.
         report.append("\n[BUILD DETAILS]\n").append(BuildDetails.section(Utils.getBuildMetadata()));
+        // Explicit timed evidence stays available even if OTHER events were excluded or the
+        // ordinary log sink was held up. The small dedicated store never performs disk I/O.
+        if (!stall.isEmpty()) {
+            report.append("\n[SHARE OPENING TRACE]\n");
+            for (String line : stall) report.append(DiagnosticRedactor.redact(line)).append('\n');
+        }
         // Last, because the quick copy keeps the end of a long report: the layout is bounded
         // below the clipboard limit, so a copied report always carries all of it.
         if (!layout.isEmpty()) {
@@ -675,7 +685,8 @@ public final class LogBufferManager {
                     app.morphe.extension.shared.diagnostics.FeedFilterCounters.snapshotAndClear(),
                     readCrashReport(context),
                     readNpthCrashReport(context),
-                    app.morphe.extension.shared.diagnostics.ScreenLayout.snapshotAndClear()
+                    app.morphe.extension.shared.diagnostics.ScreenLayout.snapshotAndClear(),
+                    app.morphe.extension.shared.diagnostics.MainThreadStallProbe.snapshotAndClear()
             );
             clearLogBufferData();
             clearCrashReports(context);
@@ -710,6 +721,7 @@ public final class LogBufferManager {
                     app.morphe.extension.shared.diagnostics.HookStatus.restore(saved.hooks);
                     app.morphe.extension.shared.diagnostics.FeedFilterCounters.restore(saved.feedFilter);
                     app.morphe.extension.shared.diagnostics.ScreenLayout.restore(saved.layout);
+                    app.morphe.extension.shared.diagnostics.MainThreadStallProbe.restore(saved.stall);
                     lastClear = null;
                     result = UndoResult.RESTORED;
                 } catch (Exception error) {

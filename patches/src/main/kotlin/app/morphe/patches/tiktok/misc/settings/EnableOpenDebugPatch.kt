@@ -12,6 +12,7 @@ import app.morphe.util.addInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
+import app.morphe.patches.tiktok.misc.diagnostics.resolveShareTimingWrites
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.patcher.util.numberOfParameterRegisters
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -61,5 +62,11 @@ val enableOpenDebugPatch = bytecodePatch(
                 "invoke-static {$contextRegister}, $CRASH_CAPTURE_INITIALIZER",
             )
         }
+    }
+
+    finalize {
+        // Other selected patches can prepend share interception and add normal returns.
+        // Time the completed native methods, including those optional extension paths.
+        resolveShareTimingWrites()()
     }
 }

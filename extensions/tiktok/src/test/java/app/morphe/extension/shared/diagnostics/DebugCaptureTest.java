@@ -5,12 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.os.Looper;
+import android.os.Handler;
+import android.os.Message;
 import android.text.format.DateFormat;
 
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.PausedProcess;
 import app.morphe.extension.shared.settings.Setting;
+import app.morphe.extension.shared.settings.preference.LogBufferManager;
 import app.morphe.extension.tiktok.SettingsContextRule;
 import app.morphe.extension.tiktok.settings.SettingsBackup;
 import app.morphe.extension.tiktok.settings.preference.TimedDiagnosticsPreference;
@@ -101,6 +104,155 @@ public class DebugCaptureTest {
         assertFalse(DebugCapture.isRunning());
         assertFalse(BaseSettings.DEBUG.get());
         assertEquals("", BaseSettings.DEBUG_CAPTURE.savedValue());
+    }
+
+    @Test public void aSavedDebugSwitchAloneDoesNotStartTheStallProbe() throws Exception {
+        BaseSettings.DEBUG.save(true);
+        DebugCapture.load();
+        assertFalse(DebugCapture.isRunning());
+        Field current = MainThreadStallProbe.class.getDeclaredField("current");
+        current.setAccessible(true);
+        assertEquals(null, current.get(null));
+    }
+
+    @Test public void stalledThreadFramesReachTheExistingDiagnosticExport() throws Exception {
+        LogBufferManager.clearLogBuffer();
+        DebugCapture.start();
+        Field current = MainThreadStallProbe.class.getDeclaredField("current");
+        current.setAccessible(true);
+        Object session = current.get(null);
+        java.lang.reflect.Method record = session.getClass().getDeclaredMethod("record", String.class);
+        record.setAccessible(true);
+        long[] tick = {0};
+        MainThreadStallProbe.Probe probe = new MainThreadStallProbe.Probe(() -> tick[0], () -> true,
+                callback -> {}, Thread.currentThread(), message -> {
+                    try { record.invoke(session, message); }
+                    catch (Exception error) { throw new RuntimeException(error); }
+                });
+        try {
+            probe.tick(); tick[0] = 500; probe.tick();
+            String report = LogBufferManager.buildExportText();
+            assertTrue(report, report.contains("[ShareFreeze-204] sample=1"));
+            assertTrue(report, report.contains("[SHARE OPENING TRACE]"));
+            assertTrue(report, report.contains("DebugCaptureTest.stalledThreadFramesReachTheExistingDiagnosticExport"));
+        } finally {
+            probe.stop();
+            LogBufferManager.clearLogBuffer();
+        }
+    }
+
+    @Test public void theHeartbeatBypassesSynchronizationBarriersAndKeepsItsCancellationToken() {
+        Object token = new Object();
+        Runnable callback = () -> {};
+        Message message = MainThreadStallProbe.heartbeatMessage(new Handler(Looper.getMainLooper()), callback, token);
+        assertTrue("a diagnostic ping must not queue behind a rendering synchronization barrier", message.isAsynchronous());
+        assertEquals(token, message.obj);
+        assertEquals(callback, message.getCallback());
+        message.recycle();
+    }
+
+    @Test public void shareTimingRemainsInTheReportWhenOtherEventsAreFilteredOut() {
+        LogBufferManager.clearLogBuffer();
+        BaseSettings.DEBUG_LOG_FILTERS.save("feed");
+        DebugCapture.start();
+        MainThreadStallProbe.shareClickStarted();
+        MainThreadStallProbe.shareModelStarted();
+        MainThreadStallProbe.shareModelFinished();
+        MainThreadStallProbe.shareClickFinished();
+        try {
+            String report = LogBufferManager.buildExportText();
+            assertTrue(report, report.contains("[SHARE OPENING TRACE]"));
+            assertTrue(report, report.contains("model:start"));
+            assertTrue(report, report.contains("model:end"));
+            LogBufferManager.clearLogBuffer();
+            assertFalse(LogBufferManager.buildExportText().contains("[SHARE OPENING TRACE]"));
+            LogBufferManager.undoClear();
+            assertTrue(LogBufferManager.buildExportText().contains("model:start"));
+        } finally {
+            DebugCapture.stop();
+            BaseSettings.DEBUG_LOG_FILTERS.resetToDefault();
+            LogBufferManager.clearLogBuffer();
+        }
+    }
+
+    @Test public void undoDoesNotReplaceANewerCaptureWithTheClearedShareTrace() {
+        DebugCapture.start();
+        MainThreadStallProbe.shareClickStarted();
+        MainThreadStallProbe.Snapshot old = MainThreadStallProbe.snapshotAndClear();
+        MainThreadStallProbe.shareModelStarted();
+        MainThreadStallProbe.restore(old);
+        String trace = MainThreadStallProbe.lines().toString();
+        assertTrue(trace, trace.contains("model:start"));
+        assertFalse(trace, trace.contains("click:start"));
+        MainThreadStallProbe.snapshotAndClear();
+    }
+
+    @Test public void theSamplerContinuesWhileTheOrdinaryLoggerLockIsHeld() throws Exception {
+        DebugCapture.start();
+        Field current = MainThreadStallProbe.class.getDeclaredField("current");
+        current.setAccessible(true);
+        Object session = current.get(null);
+        java.lang.reflect.Method record = session.getClass().getDeclaredMethod("record", String.class);
+        record.setAccessible(true);
+        Field lockField = LogBufferManager.class.getDeclaredField("CLEAR_UNDO_LOCK");
+        lockField.setAccessible(true);
+        java.util.concurrent.atomic.AtomicReference<Throwable> failure = new java.util.concurrent.atomic.AtomicReference<>();
+        java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
+        Thread worker = new Thread(() -> {
+            try {
+                long[] time = {0};
+                MainThreadStallProbe.Probe replay = new MainThreadStallProbe.Probe(() -> time[0], () -> true,
+                        callback -> {}, Thread.currentThread(), message -> {
+                            try { record.invoke(session, message); }
+                            catch (Exception error) { throw new RuntimeException(error); }
+                        });
+                replay.tick();
+                for (long at : new long[]{500, 1000, 1500}) { time[0] = at; replay.tick(); }
+                replay.stop(); replay.finish();
+            } catch (Throwable error) { failure.set(error); }
+            finally { done.countDown(); }
+        }, "sampler-lock-replay");
+        boolean completed;
+        try {
+            synchronized (lockField.get(null)) {
+                worker.start();
+                completed = done.await(2, java.util.concurrent.TimeUnit.SECONDS);
+            }
+            worker.join(2000);
+            assertTrue("sampling and finishing must not wait for crash/logger disk locks", completed);
+            assertEquals(null, failure.get());
+            String lines = MainThreadStallProbe.lines().toString();
+            assertTrue(lines, lines.contains("sample=3"));
+            assertTrue(lines, lines.contains("summary pings="));
+        } finally { worker.join(2000); }
+    }
+
+    @Test public void concurrentUndoAndMarkerKeepTheNewEvidenceReachable() throws Exception {
+        DebugCapture.start();
+        MainThreadStallProbe.shareClickStarted();
+        MainThreadStallProbe.Snapshot saved = MainThreadStallProbe.snapshotAndClear();
+        java.util.concurrent.CountDownLatch began = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
+        Thread writer = new Thread(() -> {
+            began.countDown();
+            MainThreadStallProbe.shareModelStarted();
+            done.countDown();
+        }, "trace-undo-writer");
+        boolean usedLifecycleLock;
+        synchronized (MainThreadStallProbe.class) {
+            writer.start();
+            assertTrue(began.await(2, java.util.concurrent.TimeUnit.SECONDS));
+            long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(2);
+            while (writer.getState() != Thread.State.BLOCKED && done.getCount() != 0
+                    && System.nanoTime() < deadline) Thread.yield();
+            usedLifecycleLock = writer.getState() == Thread.State.BLOCKED;
+            MainThreadStallProbe.restore(saved);
+        }
+        assertTrue(done.await(2, java.util.concurrent.TimeUnit.SECONDS));
+        writer.join(2000);
+        assertTrue("trace selection and writes must serialize with undo", usedLifecycleLock);
+        String trace = MainThreadStallProbe.lines().toString();
+        assertTrue(trace, trace.contains("model:start"));
     }
 
     @Test public void aRestartedTikTokKeepsTheSameEnd() throws Exception {

@@ -85,6 +85,7 @@ public final class DebugCapture {
         String saved = BaseSettings.DEBUG_CAPTURE.savedValue();
         if (saved.isEmpty()) {
             endsAt = 0;
+            MainThreadStallProbe.stop();
             return;
         }
         Clock now = clock;
@@ -92,11 +93,13 @@ public final class DebugCapture {
         long left = remaining(saved, now.wall(), elapsed, now.boot());
         if (left <= 0) {
             endsAt = 0;
+            MainThreadStallProbe.stop();
             BaseSettings.DEBUG_CAPTURE.resetToDefault();
             Logger.printInfo(() -> "Timed diagnostic capture ended while TikTok was closed");
             return;
         }
         endsAt = elapsed + left;
+        MainThreadStallProbe.start();
     }
 
     /**
@@ -110,6 +113,7 @@ public final class DebugCapture {
         long elapsed = now.elapsed();
         BaseSettings.DEBUG_CAPTURE.save(record(wall, elapsed, now.boot(), DURATION_MS));
         endsAt = elapsed + DURATION_MS;
+        MainThreadStallProbe.start();
         Logger.printInfo(() -> "Timed diagnostic capture started for " + DURATION_MS / 60_000L + " minutes");
         return wall + DURATION_MS;
     }
@@ -118,6 +122,7 @@ public final class DebugCapture {
     public static synchronized void stop() {
         boolean wasRunning = isRunning();
         endsAt = 0;
+        MainThreadStallProbe.stop();
         BaseSettings.DEBUG_CAPTURE.resetToDefault();
         if (wasRunning) Logger.printInfo(() -> "Timed diagnostic capture stopped");
     }
