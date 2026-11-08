@@ -20,6 +20,7 @@ import app.morphe.patches.tiktok.interaction.blockauthor.BlockServiceFingerprint
 import app.morphe.patches.tiktok.interaction.blockauthor.sessionPlaybackBridgePatch
 import app.morphe.patches.tiktok.interaction.gesture.doubleTapPatch
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
+import app.morphe.patches.tiktok.misc.comment.commentResponseOwnershipPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
 import app.morphe.patches.tiktok.misc.settings.settingsPatch
 import app.morphe.patches.tiktok.misc.translation.BaseCommentCellBindFingerprint
@@ -236,7 +237,7 @@ val commentToolsPatch = bytecodePatch(
     // The player bridge: "Pause the video while comments are open" pauses the video through
     // TikTok's own pause, which only that patch wires in. Without it the request for the audio
     // focus was all the switch did, and 47.x's player plays on through that.
-    dependsOn(settingsPatch, sharedExtensionPatch, doubleTapPatch, sessionPlaybackBridgePatch)
+    dependsOn(settingsPatch, sharedExtensionPatch, doubleTapPatch, sessionPlaybackBridgePatch, commentResponseOwnershipPatch)
 
     compatibleWith(*AppCompatibilities.tiktok())
 
