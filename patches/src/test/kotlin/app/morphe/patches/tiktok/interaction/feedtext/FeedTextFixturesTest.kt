@@ -31,7 +31,7 @@ class FeedTextFixturesTest {
     @Test
     fun `all declared hosts resolve native owners and safely size before line breaking`() {
         val expected = mapOf(
-            "47.4.3" to Triple("LX/09Bg;", "LX/07Yl;", 0x7f0a206a to 0x7f0a882c),
+            "47.6.15" to Triple("LX/09Bg;", "LX/07Yl;", 0x7f0a206a to 0x7f0a882c),
         )
         assertEquals(Fixtures.declaredVersions().toSet(), expected.keys)
         Fixtures.forEachDeclared { apk ->

@@ -6,7 +6,7 @@
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-GPLv3-blue.svg" /></a>
   <a href="https://github.com/MorpheApp/morphe-cli"><img alt="source" src="https://img.shields.io/badge/source-Morphe-00b894.svg" /></a>
   <a href="https://www.android.com/"><img alt="platform" src="https://img.shields.io/badge/platform-Android-3ddc84.svg" /></a>
-  <a href="https://www.apkmirror.com/apk/tiktok-pte-ltd/tik-tok-including-musical-ly/tiktok-47-4-3-release/"><img alt="TikTok 47.4.3 dev" src="https://img.shields.io/badge/TikTok-47.4.3_dev-ff0050.svg" /></a>
+  <a href="https://www.apkmirror.com/apk/tiktok-pte-ltd/tik-tok-including-musical-ly/tiktok-47-6-15-release/"><img alt="TikTok 47.6.15 dev" src="https://img.shields.io/badge/TikTok-47.6.15_dev-ff0050.svg" /></a>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 
 **This repository is a Morphe patch source for TikTok.**
 
-**This dev channel targets global TikTok 47.4.3, package `com.zhiliaoapp.musically`, with the expanded Metra feature set and Morphe Patcher 2.0.**
+**This dev channel targets global TikTok 47.6.15, package `com.zhiliaoapp.musically`, with the expanded Metra feature set and Morphe Patcher 2.0.**
 
 The goal is to keep the existing patch set usable while adding more TikTok-focused features over time. Some features are small fixes, some are quality-of-life changes, and some need deeper testing because TikTok changes its internals often.
 
@@ -33,7 +33,7 @@ The goal is to keep the existing patch set usable while adding more TikTok-focus
 
 ## Development target
 
-The expanded Metra feature set is adapted from Hushfeed v0.76.0, commit `b68741ca02898c2003751da75df34b44b8943daa`, to global TikTok 47.4.3 (version code 2024704030). It keeps Metra's style, navigation and support links, including the Anti-slop and Feature Gate Lab repairs. The table below describes this dev prerelease. The stable release still targets 46.2.3.
+The expanded Metra feature set is adapted from Hushfeed v0.76.0, commit `b68741ca02898c2003751da75df34b44b8943daa`, to global TikTok 47.6.15 (version code 2024706150). It keeps Metra's style, navigation and support links, including the Anti-slop and Feature Gate Lab repairs. The table below describes this dev prerelease. The stable release still targets 46.2.3.
 
 Use Morphe Manager 2.0.0 or newer and enable prerelease source updates to test this bundle. Older Managers cannot load its Patcher 2.0 API.
 
@@ -219,7 +219,7 @@ Open to feature requests.
 ## Supported Target
 
 - App: TikTok
-- Version: [`47.4.3`](https://www.apkmirror.com/apk/tiktok-pte-ltd/tik-tok-including-musical-ly/tiktok-47-4-3-release/) (dev prerelease)
+- Version: [`47.6.15`](https://www.apkmirror.com/apk/tiktok-pte-ltd/tik-tok-including-musical-ly/tiktok-47-6-15-release/) (dev prerelease)
 - Package: `com.zhiliaoapp.musically`
 
 Only the global package is declared in Morphe compatibility metadata. The JP package may share some internals, but it is not advertised as supported unless it gets its own proof pass again.

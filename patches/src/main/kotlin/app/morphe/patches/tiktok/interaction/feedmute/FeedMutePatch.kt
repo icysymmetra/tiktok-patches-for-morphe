@@ -36,14 +36,17 @@ private const val PATCH = "Mute feed videos"
 private const val FEED_MUTE = "Lapp/morphe/extension/tiktok/playback/FeedMute;"
 private const val CONTEXT = "Landroid/content/Context;"
 
+/** How many of its own fields' types the session's focus helper is looked through. */
+private const val FOCUS_HELPER_DEPTH = 2
+
 /**
  * TikTok's members the extension's bridges call, all renamed by each build and read here off
  * TikTok's own code:
  * - the feed engine's player field and the player type that declares `getSourceId()`, from the
  *   first thing the engine's play() reads off itself and casts;
  * - TTVideoEngine's public setIsMute forwarder, the `(Z)V` that calls the impl logging it;
- * - the player session's focus request, the `()V` beside its give-up that calls the manager's
- *   request.
+ * - the focus helper holding the player session's grant: the `()V` that asks the manager for it
+ *   and the give-up the session itself makes on it, both called with the helper as p0.
  */
 internal class FeedMuteMembers(
     val engine: String,
@@ -51,8 +54,8 @@ internal class FeedMuteMembers(
     val player: String,
     val setMute: MethodReference,
     val session: String,
-    val sessionAbandon: String,
-    val sessionRequest: String,
+    val sessionAbandon: MethodReference,
+    val sessionRequest: MethodReference,
 )
 
 private fun Method.invokes(target: Method): Boolean =
@@ -63,6 +66,65 @@ private fun Method.invokes(target: Method): Boolean =
     } == true
 
 private fun isInstance(method: Method) = !AccessFlags.STATIC.isSet(method.accessFlags)
+
+/** Every method a body calls, in order. */
+private fun Method.calls(): List<MethodReference> =
+    implementation?.instructions?.mapNotNull {
+        (it as? ReferenceInstruction)?.reference as? MethodReference
+    }.orEmpty()
+
+/** Whether [classDef] declares the no-arg method that asks the manager for the focus. */
+private fun asksForFocus(classDef: ClassDef, focusRequest: Method) = classDef.methods.any {
+    isInstance(it) && it.returnType == "V" && it.parameterTypes.isEmpty() && it.invokes(focusRequest)
+}
+
+/**
+ * The class that declares the session's focus request: the session itself on builds that keep
+ * the request beside its give-up, or a class it holds within [FOCUS_HELPER_DEPTH] field hops.
+ * 47.6.15 moved the request off the player into its per-session audio-focus helper
+ * (`LX/0ord;->LIZIZ:LX/0orc;` -> `LX/0orc;->LJIILIIL:LX/0orh;`), so the session's give-up and its
+ * request no longer sit in one class; a level holding more than one asker is a build nothing
+ * here can settle.
+ */
+private fun focusHelper(
+    session: ClassDef,
+    focusRequest: Method,
+    classOf: (String) -> ClassDef?,
+): ClassDef? {
+    val seen = mutableSetOf(session.type)
+    var level = listOf(session)
+    repeat(FOCUS_HELPER_DEPTH + 1) {
+        val asks = level.filter { asksForFocus(it, focusRequest) }
+        if (asks.size > 1) {
+            throw PatchException("$PATCH: ${asks.map { it.type }} all ask for the focus, so ${session.type}'s helper is ambiguous.")
+        }
+        asks.singleOrNull()?.let { return it }
+        level = level.flatMap { classDef -> classDef.fields.mapNotNull { classOf(it.type) } }
+            .filter { seen.add(it.type) }
+        if (level.isEmpty()) return null
+    }
+    return null
+}
+
+/** The bridge body that calls [member] on the session's helper; a boolean give-up drops it. */
+private fun sessionCall(members: FeedMuteMembers, member: MethodReference): String {
+    val call = when (val parameters = member.parameterTypes.map(CharSequence::toString)) {
+        emptyList<String>() -> "invoke-virtual { p0 }, ${members.session}->${member.name}()${member.returnType}"
+        // 47.6.15's helper only asks; the give-up TikTok's own release makes on it is (Z), false.
+        listOf("Z") -> """
+            const/4 v0, 0x0
+            invoke-virtual { p0, v0 }, ${members.session}->${member.name}(Z)${member.returnType}
+        """
+        else -> throw PatchException(
+            "$PATCH: ${members.session}->${member.name} takes ${parameters.joinToString(", ", "(", ")")}, a shape the bridge can't call.",
+        )
+    }
+    return """
+        check-cast p0, ${members.session}
+        $call
+        return-void
+    """
+}
 
 private fun requirePublic(what: String, flags: Int) {
     if (!AccessFlags.PUBLIC.isSet(flags)) {
@@ -102,17 +164,37 @@ internal fun resolveFeedMuteMembers(
     val engineBase = classOf(TT_VIDEO_ENGINE) ?: throw PatchException("$PATCH: $TT_VIDEO_ENGINE isn't in this build.")
     val forwarder = engineBase.methods.filter {
         isInstance(it) && it.returnType == "V" &&
-            it.parameterTypes.map(CharSequence::toString) == listOf("Z") && it.invokes(setIsMuteImpl)
+            it.parameterTypes.map(CharSequence::toString) == listOf("Z") &&
+            // 47.6.15 routes the public call through an interface the impl implements, so match
+            // the same member name and shape rather than the impl class the call lands on.
+            it.implementation?.instructions?.any { instruction ->
+                val called = (instruction as? ReferenceInstruction)?.reference as? MethodReference
+                called != null && called.name == setIsMuteImpl.name &&
+                    called.parameterTypes.map(CharSequence::toString) == listOf("Z") &&
+                    called.returnType == "V"
+            } == true
     }.singleOrPatchException("$PATCH: TTVideoEngine's forwarder to ${setIsMuteImpl.definingClass}->${setIsMuteImpl.name}")
     val isMute = engineBase.methods.singleOrNull {
         it.name == "isMute" && it.parameterTypes.isEmpty() && it.returnType == "Z" && isInstance(it)
     } ?: throw PatchException("$PATCH: TTVideoEngine has no isMute().")
 
-    val session = classOf(sessionAbandon.definingClass)
+    val sessionAbandonClass = classOf(sessionAbandon.definingClass)
         ?: throw PatchException("$PATCH: ${sessionAbandon.definingClass} isn't in this build.")
+    val session = focusHelper(sessionAbandonClass, focusRequest, classOf)
+        ?: throw PatchException("$PATCH: ${sessionAbandonClass.type} and what it holds ask for no focus.")
     val request = session.methods.filter {
         isInstance(it) && it.returnType == "V" && it.parameterTypes.isEmpty() && it.invokes(focusRequest)
     }.singleOrPatchException("$PATCH: the player session's focus request in ${session.type}")
+    // The give-up is the session's own on builds that hold both, and on 47.6.15 the call its
+    // release makes on the helper it asked through.
+    val abandon = if (session.type == sessionAbandonClass.type) sessionAbandon else {
+        val given = sessionAbandon.calls().filter { it.definingClass == session.type && it.name != request.name }
+            .singleOrPatchException("$PATCH: ${sessionAbandonClass.type}'s give-up on ${session.type}")
+        session.methods.filter {
+            isInstance(it) && it.name == given.name &&
+                it.parameterTypes.map(CharSequence::toString) == given.parameterTypes.map(CharSequence::toString)
+        }.singleOrPatchException("$PATCH: ${session.type}->${given.name}, the give-up the session makes")
+    }
 
     val engine = classOf(enginePlay.definingClass)!!
     requirePublic("the engine ${engine.type}", engine.accessFlags)
@@ -121,8 +203,8 @@ internal fun resolveFeedMuteMembers(
     requirePublic("TTVideoEngine", engineBase.accessFlags)
     requirePublic("TTVideoEngine->${forwarder.name}(Z)", forwarder.accessFlags)
     requirePublic("TTVideoEngine->isMute()", isMute.accessFlags)
-    requirePublic("the player session ${session.type}", session.accessFlags)
-    requirePublic("${session.type}->${sessionAbandon.name}()", sessionAbandon.accessFlags)
+    requirePublic("the player session's focus helper ${session.type}", session.accessFlags)
+    requirePublic("${session.type}->${abandon.name}", abandon.accessFlags)
     requirePublic("${session.type}->${request.name}()", request.accessFlags)
     val declared = generateSequence(engine) { classOf(it.superclass ?: return@generateSequence null) }
         .firstNotNullOfOrNull { owner -> owner.fields.singleOrNull { it.name == field.name && it.type == field.type } }
@@ -135,8 +217,8 @@ internal fun resolveFeedMuteMembers(
         player = player,
         setMute = forwarder,
         session = session.type,
-        sessionAbandon = sessionAbandon.name,
-        sessionRequest = request.name,
+        sessionAbandon = abandon,
+        sessionRequest = request,
     )
 }
 
@@ -192,7 +274,7 @@ val feedMutePatch = bytecodePatch(
         // The player session's lasting grant and the page helper's transient one, turned down
         // while muted with a feed video in front.
         val session = mutableClassDefBy(members.session)
-        session.methods.single { it.name == members.sessionRequest && it.parameterTypes.isEmpty() }
+        session.methods.single { it.name == members.sessionRequest.name && it.parameterTypes.isEmpty() }
             .guardAtEntry(PATCH, "invoke-static/range { p0 .. p0 }, $FEED_MUTE->holdSessionFocus(Ljava/lang/Object;)Z", "return-void")
         val page = resolveNativeFocus()
         requirePublic("the page focus helper ${page.helper}", classDefBy(page.helper).accessFlags)
@@ -245,13 +327,8 @@ private fun BytecodePatchContext.installFeedMuteBridges(
         invoke-virtual { p0, p1 }, $TT_VIDEO_ENGINE->${members.setMute.name}(Z)V
         return-void
     """)
-    for ((name, member) in listOf("abandonSessionFocus" to members.sessionAbandon, "requestSessionFocus" to members.sessionRequest)) {
-        rewrite(name, 1, """
-            check-cast p0, ${members.session}
-            invoke-virtual { p0 }, ${members.session}->$member()V
-            return-void
-        """)
-    }
+    rewrite("abandonSessionFocus", 1, sessionCall(members, members.sessionAbandon))
+    rewrite("requestSessionFocus", 1, sessionCall(members, members.sessionRequest))
     for ((name, member) in listOf("abandonPageFocus" to pageAbandon, "requestPageFocus" to pageRequest)) {
         rewrite(name, 1, """
             check-cast p0, $pageHelper
