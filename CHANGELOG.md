@@ -1,3 +1,16 @@
+# [0.9.0-dev.8](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.7...v0.9.0-dev.8) (2026-11-08)
+
+
+### Bug Fixes
+
+* **tiktok:** reject stale comment responses across videos ([fe66c83](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/fe66c83eb61bd83ade189a7d051e5f0976801dc7))
+
+
+
+
+
+## 0.9.0-dev.8
+
 # [0.9.0-dev.7](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.6...v0.9.0-dev.7) (2026-11-02)
 
 
