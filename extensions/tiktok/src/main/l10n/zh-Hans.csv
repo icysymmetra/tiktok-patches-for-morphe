@@ -597,7 +597,7 @@ Follow probe,跟随探头
 Followers,追随者
 Following,正在关注
 Follows you,跟着你
-"For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.",对于OLED屏幕。 5 秒没有触摸后，视频上的按钮、标题和选项卡会变暗四分之一，您的下一次触摸会将它们恢复。 Shift 还会每 2 分钟将信息流上的所有内容移动几个像素.
+"For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.",适用于 OLED 屏幕。视频上方的按钮、说明文字和标签会在上次唤醒几秒后变暗，下方的开关决定什么能唤醒它们。移位还会每 2 分钟把信息流上的所有内容移动几个像素.
 For You,为你
 "For You, Following and the other feed tabs stay behind a calm panel and won't swipe. Messages, profiles and search work as usual, a link to one video still opens that video, and the app opens on Inbox instead of the feed.",对于您来说，关注和其他信息流选项卡保留在平静的面板后面并且不会滑动。消息、个人资料和搜索照常工作，指向一个视频的链接仍然会打开该视频，并且应用程序会在收件箱而不是信息流中打开.
 Forced %1$d gates of %2$d. The rest don't take a true or false value. Restart TikTok to apply this.,强制 %2$d 的 %1$d 门。其余的不采用 true 或 false 值。重新启动 TikTok 以应用此操作.
@@ -2182,3 +2182,24 @@ Choose which posts appear in your feeds,Choose which posts appear in your feeds
 "Filters, translation, copy options and split view","Filters, translation, copy options and split view"
 Change the region TikTok reads,Change the region TikTok reads
 "Playback, gestures, privacy, screen time and system","Playback, gestures, privacy, screen time and system"
+Dim after,变暗前等待
+How long the controls stay bright after they last woke.,控件在上次唤醒后保持明亮的时长.
+Dim to,变暗到
+"How bright the dimmed controls are, compared with how TikTok draws them.",变暗后的控件相对于 TikTok 原本绘制时的亮度.
+Wake the controls when,唤醒控件的方式
+Pick what brings the dimmed controls back. A tap still does what it always does.,选择什么能让变暗的控件恢复。点按仍会照常生效.
+I tap a dimmed control,点按变暗的控件
+I tap the video,点按视频
+I scroll or swipe,滚动或滑动
+I come back from another screen,从其他界面返回
+I press and hold,长按
+Wakes when: %1$s,唤醒方式：%1$s
+Nothing wakes them. They stay dimmed.,没有任何操作能唤醒它们，它们会一直保持变暗.
+What dims,变暗的内容
+Pick the parts of the screen the guard dims.,选择防护会让屏幕哪些部分变暗.
+Buttons over the video,视频上方的按钮
+Caption and music,说明文字和音乐
+Top tabs and search,顶部标签和搜索
+Bottom tabs and bars,底部标签和栏
+Dims: %1$s,变暗：%1$s
+Nothing is dimmed.,没有内容变暗.

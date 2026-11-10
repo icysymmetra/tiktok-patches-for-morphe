@@ -47,6 +47,9 @@ public final class SwitchListPreference extends Preference {
 
     private final List<Item> items;
     private final String description;
+    /** The state line's two English keys: one with the labels that are on, one for none. */
+    private final String stateKey;
+    private final String noneKey;
     /** The dialog on screen and its unsaved boxes, kept so a recreated screen can reopen both. */
     private AlertDialog openDialog;
     private boolean[] openChoices;
@@ -57,11 +60,22 @@ public final class SwitchListPreference extends Preference {
      */
     public SwitchListPreference(Context context, String key, String title, String description,
             List<Item> items) {
+        this(context, key, title, description, items, "Hidden: %1$s", "Nothing hidden.");
+    }
+
+    /**
+     * For a family whose switches don't hide anything: {@code stateKey} names the ones that are
+     * on ("Wakes on: %1$s"), {@code noneKey} says none are. Both are English keys.
+     */
+    public SwitchListPreference(Context context, String key, String title, String description,
+            List<Item> items, String stateKey, String noneKey) {
         super(context);
         setKey(key);
         setTitle(L10n.t(context, title));
         this.description = L10n.t(context, description);
         this.items = Collections.unmodifiableList(new ArrayList<>(items));
+        this.stateKey = stateKey;
+        this.noneKey = noneKey;
     }
 
     /** The switches behind the row, for whatever counts settings by row. */
@@ -82,8 +96,8 @@ public final class SwitchListPreference extends Preference {
         for (Item item : items) if (item.setting.savedValue()) on.add(item.label);
         String joined = String.join(", ", on);
         String state = on.isEmpty()
-                ? L10n.t(getContext(), "Nothing hidden.")
-                : L10n.f(getContext(), "Hidden: %1$s", joined);
+                ? L10n.t(getContext(), noneKey)
+                : L10n.f(getContext(), stateKey, joined);
         return description + "\n" + state;
     }
 

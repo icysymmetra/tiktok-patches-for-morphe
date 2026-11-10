@@ -52,6 +52,11 @@ final class TapThroughControls {
     private static final Map<View, Boolean> PHOTO_EXITS = new WeakHashMap<>();
     private static final Map<Window, Boolean> WRAPPED = new WeakHashMap<>();
 
+    /** Whether this class watches {@code window}'s touches, for OverlayTiming's export. */
+    static boolean watches(Window window) {
+        return WRAPPED.containsKey(window);
+    }
+
     private TapThroughControls() {
     }
 

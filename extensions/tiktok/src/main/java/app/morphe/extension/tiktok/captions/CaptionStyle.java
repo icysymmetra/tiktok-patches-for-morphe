@@ -48,7 +48,8 @@ public final class CaptionStyle {
      * the text dmb and the strip dm5, the names 47.1.4 keeps, so the names are written for the build.
      */
     private static final String[] TEXT_IDS = {"47.4.3:dm5"};
-    private static final String[] BACKGROUND_IDS = {"47.4.3:dly"};
+    /** The strip, which Burn-in guard also dims as a whole (VideoOverlayHider's subtitle target). */
+    public static final String[] BACKGROUND_IDS = {"47.4.3:dly"};
     private static final String TEXT = String.join("|", TEXT_IDS);
     private static final String BACKGROUND = String.join("|", BACKGROUND_IDS);
     private static final ResourceIdCache RESOURCE_IDS = new ResourceIdCache();

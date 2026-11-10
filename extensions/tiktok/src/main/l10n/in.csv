@@ -7,7 +7,7 @@ Burn-in guard,Pelindung burn-in layar
 Couldn't write the caption on this video. Saving it without.,Keterangan tidak bisa ditulis di video ini. Disimpan tanpa keterangan.
 Dim when idle,Redupkan saat diam
 Dim when idle and shift,Redupkan saat diam dan geser
-"For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.","Untuk layar OLED. Setelah 5 detik tanpa sentuhan, tombol, keterangan, dan tab di atas video meredup menjadi seperempat, dan sentuhan berikutnya mengembalikannya. Geser juga memindahkan semua yang ada di feed beberapa piksel setiap 2 menit."
+"For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.","Untuk layar OLED. Tombol, keterangan, dan tab di atas video meredup beberapa detik setelah terakhir kali dibangunkan, dan sakelar di bawah memilih apa yang membangunkannya. Geser juga memindahkan semua yang ada di feed beberapa piksel setiap 2 menit."
 Importing new history ended Undo for the earlier clear. You can clear the imported history.,Impor riwayat baru mengakhiri opsi Urungkan untuk penghapusan sebelumnya. Anda dapat menghapus riwayat yang diimpor.
 %1$d setting in that file can't be restored here and was skipped,%1$d pengaturan dalam berkas tidak dapat dipulihkan di sini dan dilewati
 %1$d settings in that file can't be restored here and were skipped,%1$d pengaturan dalam berkas tidak dapat dipulihkan di sini dan dilewati
@@ -2184,3 +2184,24 @@ Choose which posts appear in your feeds,Choose which posts appear in your feeds
 "Filters, translation, copy options and split view","Filters, translation, copy options and split view"
 Change the region TikTok reads,Change the region TikTok reads
 "Playback, gestures, privacy, screen time and system","Playback, gestures, privacy, screen time and system"
+Dim after,Redupkan setelah
+How long the controls stay bright after they last woke.,Berapa lama kontrol tetap terang setelah terakhir kali dibangunkan.
+Dim to,Redupkan ke
+"How bright the dimmed controls are, compared with how TikTok draws them.","Seberapa terang kontrol yang diredupkan, dibandingkan dengan cara TikTok menggambarnya."
+Wake the controls when,Bangunkan kontrol saat
+Pick what brings the dimmed controls back. A tap still does what it always does.,Pilih apa yang mengembalikan kontrol yang diredupkan. Ketukan tetap melakukan fungsinya seperti biasa.
+I tap a dimmed control,Saya mengetuk kontrol yang redup
+I tap the video,Saya mengetuk video
+I scroll or swipe,Saya menggulir atau menggeser
+I come back from another screen,Saya kembali dari layar lain
+I press and hold,Saya menekan lama
+Wakes when: %1$s,Bangun saat: %1$s
+Nothing wakes them. They stay dimmed.,Tidak ada yang membangunkannya. Kontrol tetap redup.
+What dims,Yang diredupkan
+Pick the parts of the screen the guard dims.,Pilih bagian layar yang diredupkan oleh pelindung.
+Buttons over the video,Tombol di atas video
+Caption and music,Keterangan dan musik
+Top tabs and search,Tab atas dan pencarian
+Bottom tabs and bars,Tab bawah dan bilah
+Dims: %1$s,Diredupkan: %1$s
+Nothing is dimmed.,Tidak ada yang diredupkan.

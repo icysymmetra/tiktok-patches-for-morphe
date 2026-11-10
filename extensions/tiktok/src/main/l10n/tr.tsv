@@ -6,7 +6,7 @@ Burn-in guard	Ekran yanması koruması
 Couldn't write the caption on this video. Saving it without.	Açıklama bu videonun üzerine yazılamadı. Açıklamasız kaydediliyor.
 Dim when idle	Boştayken karart
 Dim when idle and shift	Boştayken karart ve kaydır
-For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.	OLED ekranlar için. 5 saniye dokunulmazsa videonun üzerindeki düğmeler, açıklama ve sekmeler dörtte bire kadar kararır, bir sonraki dokunuşun onları geri getirir. Kaydırma ayrıca akıştaki her şeyi 2 dakikada bir birkaç piksel kaydırır.
+For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.	OLED ekranlar için. Videonun üzerindeki düğmeler, açıklama ve sekmeler son uyandıktan birkaç saniye sonra kararır; aşağıdaki anahtarlar onları neyin uyandıracağını seçer. Kaydırma ayrıca akıştaki her şeyi 2 dakikada bir birkaç piksel kaydırır.
 Importing new history ended Undo for the earlier clear. You can clear the imported history.	Yeni geçmişi içe aktarmak önceki temizlemeyi geri alma seçeneğini sonlandırdı. İçe aktarılan geçmişi temizleyebilirsiniz.
 %1$d setting in that file can't be restored here and was skipped	Dosyadaki %1$d ayar burada geri yüklenemedi ve atlandı
 %1$d settings in that file can't be restored here and were skipped	Dosyadaki %1$d ayar burada geri yüklenemedi ve atlandı
@@ -2205,3 +2205,24 @@ Promotions, overlays, profile and inbox controls	Promotions, overlays, profile a
 Filters, translation, copy options and split view	Filters, translation, copy options and split view
 Change the region TikTok reads	Change the region TikTok reads
 Playback, gestures, privacy, screen time and system	Playback, gestures, privacy, screen time and system
+Dim after	Karartma süresi
+How long the controls stay bright after they last woke.	Kontroller son uyandıktan sonra ne kadar süre parlak kalır.
+Dim to	Karartma düzeyi
+How bright the dimmed controls are, compared with how TikTok draws them.	Karartılan kontrollerin, TikTok'un çizdiğine göre ne kadar parlak olduğu.
+Wake the controls when	Kontrolleri uyandır
+Pick what brings the dimmed controls back. A tap still does what it always does.	Karartılan kontrolleri neyin geri getireceğini seç. Bir dokunuş yine her zamanki işini yapar.
+I tap a dimmed control	Karartılmış bir kontrole dokununca
+I tap the video	Videoya dokununca
+I scroll or swipe	Kaydırınca
+I come back from another screen	Başka bir ekrandan dönünce
+I press and hold	Basılı tutunca
+Wakes when: %1$s	Uyandıran: %1$s
+Nothing wakes them. They stay dimmed.	Hiçbir şey uyandırmaz. Karartılmış kalırlar.
+What dims	Neler kararır
+Pick the parts of the screen the guard dims.	Korumanın kararttığı ekran bölümlerini seç.
+Buttons over the video	Videonun üzerindeki düğmeler
+Caption and music	Açıklama ve müzik
+Top tabs and search	Üst sekmeler ve arama
+Bottom tabs and bars	Alt sekmeler ve çubuklar
+Dims: %1$s	Kararan: %1$s
+Nothing is dimmed.	Hiçbir şey kararmaz.

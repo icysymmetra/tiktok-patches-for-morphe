@@ -6,7 +6,7 @@ Burn-in guard	Protezione dal burn-in
 Couldn't write the caption on this video. Saving it without.	Non è stato possibile scrivere la descrizione su questo video. Viene salvato senza.
 Dim when idle	Attenua quando inattivo
 Dim when idle and shift	Attenua quando inattivo e sposta
-For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.	Per schermi OLED. Dopo 5 secondi senza tocchi, i pulsanti, la didascalia e le schede sopra il video si attenuano a un quarto, e il tocco successivo li riporta. Sposta muove anche tutto il feed di qualche pixel ogni 2 minuti.
+For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.	Per schermi OLED. I pulsanti, la didascalia e le schede sopra il video si attenuano qualche secondo dopo l'ultimo risveglio, e gli interruttori qui sotto scelgono cosa li risveglia. Sposta muove anche tutto il feed di qualche pixel ogni 2 minuti.
 Importing new history ended Undo for the earlier clear. You can clear the imported history.	L'importazione di una nuova cronologia impedisce di annullare la cancellazione precedente. Puoi cancellare la cronologia importata.
 %1$d setting in that file can't be restored here and was skipped	%1$d impostazione del file non può essere ripristinata qui ed è stata saltata
 %1$d settings in that file can't be restored here and were skipped	%1$d impostazioni del file non possono essere ripristinate qui e sono state saltate
@@ -2205,3 +2205,24 @@ Promotions, overlays, profile and inbox controls	Promotions, overlays, profile a
 Filters, translation, copy options and split view	Filters, translation, copy options and split view
 Change the region TikTok reads	Change the region TikTok reads
 Playback, gestures, privacy, screen time and system	Playback, gestures, privacy, screen time and system
+Dim after	Attenua dopo
+How long the controls stay bright after they last woke.	Per quanto tempo i controlli restano luminosi dopo l'ultimo risveglio.
+Dim to	Attenua al
+How bright the dimmed controls are, compared with how TikTok draws them.	Quanto sono luminosi i controlli attenuati, rispetto a come li disegna TikTok.
+Wake the controls when	Risveglia i controlli quando
+Pick what brings the dimmed controls back. A tap still does what it always does.	Scegli cosa riporta i controlli attenuati. Un tocco fa comunque quello che fa sempre.
+I tap a dimmed control	Tocco un controllo attenuato
+I tap the video	Tocco il video
+I scroll or swipe	Scorro o faccio uno swipe
+I come back from another screen	Torno da un'altra schermata
+I press and hold	Tengo premuto
+Wakes when: %1$s	Si risvegliano quando: %1$s
+Nothing wakes them. They stay dimmed.	Niente li risveglia. Restano attenuati.
+What dims	Cosa si attenua
+Pick the parts of the screen the guard dims.	Scegli le parti dello schermo che la protezione attenua.
+Buttons over the video	Pulsanti sopra il video
+Caption and music	Didascalia e musica
+Top tabs and search	Schede in alto e ricerca
+Bottom tabs and bars	Schede in basso e barre
+Dims: %1$s	Attenuati: %1$s
+Nothing is dimmed.	Niente viene attenuato.

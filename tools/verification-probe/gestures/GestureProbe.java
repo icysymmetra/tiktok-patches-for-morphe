@@ -90,7 +90,7 @@ public final class GestureProbe extends Instrumentation {
             result.putString("bounds", bounds.toShortString());
             List<GestureSequence.Event> events = null;
             if (mode.equals("pinch")) {
-                Rect rail = anchor(root, "mud"), comment = anchor(root, "eq2");
+                Rect rail = anchor(root, "ljn"), comment = anchor(root, "eq2");
                 if (!rail.contains(comment)) throw new IllegalStateException("Comment button is not on the observed rail");
                 float x = comment.exactCenterX(), y = comment.exactCenterY();
                 float otherX = bounds.exactCenterX();
