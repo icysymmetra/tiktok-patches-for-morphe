@@ -1,3 +1,29 @@
+# [0.9.0](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.1...v0.9.0) (2026-11-10)
+
+
+### Bug Fixes
+
+* **build:** verify Linux tools and generate release metadata ([c890bad](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/c890badc10bbee6415dffcfbc83f7f7886dcb7c6))
+* **build:** verify the official Patcher 2.0 package ([5f03ac6](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/5f03ac60d01bc5fc427302aacdd908f4be08f1f0))
+* **tiktok:** preserve comment editor libraries and recycled video layout ([228f052](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/228f052a0dbf068d307d5eed2f9af10375380b26))
+* **tiktok:** preserve widget lift after native strip height reset ([dec6211](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/dec62111bc2ca5dc9ea1f29e3fc29dc7a0291102)), closes [#195](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/195)
+* **tiktok:** prevent download quality recursion and capture menu stalls ([c4f398b](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/c4f398b6990470d80859ac89b57c5d5f07a44666))
+* **tiktok:** reject stale comment responses across videos ([fe66c83](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/fe66c83eb61bd83ade189a7d051e5f0976801dc7))
+* **tiktok:** repair comment links, share persistence and cover transitions ([7ec2af1](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/7ec2af1fef7a910524f3ea0c9807caf64bf6967b)), closes [#3](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/3) [#158](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/158) [#195](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/195) [#204](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/204)
+* **tiktok:** retain Java-loaded libraries used by photo comments ([0b947b5](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/0b947b58d6579a6884d075c5c4e9030025933b55)), closes [#201](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/201) [#201](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/201)
+* **tiktok:** settle see-through bar layout before drawing ([595e309](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/595e3097ebf712f835151cba9f2281ebb2609f89)), closes [#195](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/195)
+
+
+### Features
+
+* **tiktok:** add expanded 47.4.3 patches on Patcher 2.0 ([2b68243](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/2b68243b279877129e76a2bab68c9a8e7512198e))
+
+
+
+
+
+## 0.9.0
+
 # [0.9.0-dev.8](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0-dev.7...v0.9.0-dev.8) (2026-11-08)
 
 
