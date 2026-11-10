@@ -522,6 +522,73 @@ public class BurnInGuardTest {
         }
     }
 
+    /**
+     * TikTok's Clear display leaves the rail's slots gone, and a walk then saw no slot showing.
+     * Taken as the column's right half, the music row's reach past the rail was noted and stayed
+     * a control after the slots came back. Each walk notes the window afresh now.
+     */
+    @Test
+    public void aWalkWhileTheSlotsAreGoneLeavesNoStaleControls() {
+        try (var controller = Robolectric.buildActivity(Activity.class).setup()) {
+            feed(controller.get());
+            guard(BurnInGuard.DIM);
+            after(WAIT);
+            assertDimmed("dimmed after the wait");
+            View likeSlot = like;
+            View musicSlot = (View) disc.getParent().getParent();
+            likeSlot.setVisibility(View.GONE);
+            musicSlot.setVisibility(View.GONE);
+            VideoOverlayHider.applyTo(activity);
+            likeSlot.setVisibility(View.VISIBLE);
+            musicSlot.setVisibility(View.VISIBLE);
+            idle();
+            Rect reach = new Rect();
+            assertTrue(notes.getGlobalVisibleRect(reach));
+            tap(new int[]{reach.left + 10, reach.centerY()});
+            assertDimmed("the music row's reach is still the video");
+        }
+    }
+
+    /** With "I press and hold" off a long press wakes nothing, on a button or the video. */
+    @Test
+    public void withTheHoldSwitchOffALongPressOnAButtonWakesNothing() {
+        try (var controller = Robolectric.buildActivity(Activity.class).setup()) {
+            feed(controller.get());
+            Settings.BURN_IN_WAKE_HOLD.save(false);
+            guard(BurnInGuard.DIM);
+            after(WAIT);
+            assertDimmed("dimmed after the wait");
+            int[] at = centreOf(like);
+            send(MotionEvent.ACTION_DOWN, at[0], at[1]);
+            after(LONG_PRESS + 50);
+            send(MotionEvent.ACTION_UP, at[0], at[1]);
+            idle();
+            assertDimmed("a long press is a hold, not a tap on the button");
+        }
+    }
+
+    /**
+     * A wake from dimmed posts the pass that draws them back up. A second wake before it runs (a
+     * hold recognised, then its lift, both in the queue) must not take that pass off the queue.
+     */
+    @Test
+    public void aSecondWakeBeforeTheRestoreRunsKeepsTheRestore() {
+        try (var controller = Robolectric.buildActivity(Activity.class).setup()) {
+            feed(controller.get());
+            guard(BurnInGuard.DIM);
+            after(WAIT);
+            assertDimmed("dimmed after the wait");
+            int[] at = centreOf(like);
+            send(MotionEvent.ACTION_DOWN, at[0], at[1]);
+            send(MotionEvent.ACTION_UP, at[0], at[1]);
+            send(MotionEvent.ACTION_DOWN, at[0], at[1]);
+            send(MotionEvent.ACTION_UP, at[0], at[1]);
+            idle();
+            assertUp("the posted restore still ran");
+            assertTrue("and the wait is set again", BurnInGuard.nextPassAtForTests() > SystemClock.uptimeMillis());
+        }
+    }
+
     /** Subtitles dim with the guard on their own switch, from full whatever fade the controls have. */
     @Test
     public void subtitlesDimOnTheirOwnSwitchAndATapOnThemIsATapOnTheVideo() {

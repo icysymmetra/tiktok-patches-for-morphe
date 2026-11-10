@@ -23,6 +23,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -105,6 +106,12 @@ public final class BurnInGuard {
     private static boolean ticking;
     /** When the next timed pass is due, or -1 when none is. */
     private static long tickAt = -1L;
+    /**
+     * A wake from dimmed posted the pass that draws the controls back up. Until it runs, a later
+     * wake (a hold recognised, then its lift) only moves the touch: restarting the timer would
+     * take the posted pass off the queue and leave them drawn dimmed.
+     */
+    private static boolean restoring;
     /** The last pass's answers, which a wake between passes times the next one from. */
     private static boolean couldDim;
     private static boolean shifted;
@@ -139,7 +146,10 @@ public final class BurnInGuard {
      */
     private static long notedAt;
     static final long NOTE_EVERY_MS = 1_000L;
-    private static final long LONG_PRESS_MS = ViewConfiguration.getLongPressTimeout();
+    /** Read each time: the reader can change the touch-and-hold delay in accessibility settings. */
+    private static long longPressMs() {
+        return ViewConfiguration.getLongPressTimeout();
+    }
 
     private BurnInGuard() {
     }
@@ -157,6 +167,8 @@ public final class BurnInGuard {
      * {@link #level}, per group.
      */
     static int pass(Activity activity, int chosen, boolean allowed) {
+        // Any pass draws the current levels, the posted restore's job included.
+        restoring = false;
         String mode = allowed ? mode() : OFF;
         boolean on = !OFF.equals(mode)
                 && (FeedVisibility.isDetailPager(activity) || FeedVisibility.isOnFeed(activity));
@@ -166,7 +178,7 @@ public final class BurnInGuard {
             // While a detail pager opens or closes, the main activity behind it is on the feed
             // too and lays out as well. The timed pass belongs to the one in front.
             Activity held = passed.get();
-            if (held != activity && (held == null || held.isFinishing()
+            if (held != activity && (held == null || gone(held)
                     || activity.hasWindowFocus() || !held.hasWindowFocus())) {
                 passed = new WeakReference<>(activity);
             }
@@ -190,9 +202,10 @@ public final class BurnInGuard {
         // Subtitles are drawn at full whatever the chosen fade, so they can dim below it too.
         couldDim = on && ((anyControls && chosen > dimLevel) || GROUP_ON[SUBTITLES]);
         // A still finger held past the long-press time while the controls are up: held, they stay.
-        if (on && !holding && stillFor(now) >= LONG_PRESS_MS && Settings.BURN_IN_WAKE_HOLD.get()) {
+        if (on && !holding && stillFor(now) >= longPressMs() && Settings.BURN_IN_WAKE_HOLD.get()) {
             holding = true;
-            OverlayTiming.restarted(OverlayTiming.WAKE_HOLD);
+            if (dimmed) OverlayTiming.woke(OverlayTiming.WAKE_HOLD);
+            else OverlayTiming.restarted(OverlayTiming.WAKE_HOLD);
         }
         boolean was = dimmed;
         dimmed = couldDim && !holding && now - touchedAt >= dimAfter;
@@ -231,8 +244,21 @@ public final class BurnInGuard {
     }
 
     /** The overlay pass walked the tree, noting every control it filed. */
-    static void walked() {
-        if (guarding) notedAt = SystemClock.uptimeMillis();
+    static void walked(Activity activity) {
+        if (!guarding) return;
+        notedAt = SystemClock.uptimeMillis();
+        // This walk notes every control on the window again, so nothing decided from an earlier
+        // layout (a slot measured while TikTok's Clear display had it gone) outlives it.
+        View decor = activity.getWindow() == null ? null : activity.getWindow().peekDecorView();
+        Iterator<View> noted = CONTROLS.keySet().iterator();
+        while (noted.hasNext()) {
+            View view = noted.next();
+            if (view == null || !view.isAttachedToWindow() || view.getRootView() == decor) noted.remove();
+        }
+    }
+
+    private static boolean gone(Activity activity) {
+        return activity.isFinishing() || activity.isDestroyed();
     }
 
     /** Whether noting the rail's buttons does anything, so the pass can skip finding them otherwise. */
@@ -305,8 +331,9 @@ public final class BurnInGuard {
 
     private static void tick() {
         tickAt = -1L;
+        restoring = false;
         Activity activity = passed.get();
-        if (activity == null || activity.isFinishing()) return;
+        if (activity == null || gone(activity)) return;
         ticking = true;
         try {
             VideoOverlayHider.applyTo(activity);
@@ -327,15 +354,16 @@ public final class BurnInGuard {
         }
         // The pass runs on the window that was touched, not on one that laid out behind it.
         Activity owner = gestureOwner.get();
-        if (owner != null && owner != passed.get() && !owner.isFinishing()) passed = gestureOwner;
+        if (owner != null && owner != passed.get() && !gone(owner)) passed = gestureOwner;
         touchedAt = SystemClock.uptimeMillis();
         if (dimmed) {
             dimmed = false;
             Handler main = handler();
             main.removeCallbacks(TICK);
             tickAt = -1L;
+            restoring = true;
             main.post(TICK);
-        } else {
+        } else if (!restoring) {
             schedule(nextDue(touchedAt));
         }
     }
@@ -400,7 +428,7 @@ public final class BurnInGuard {
     /** The open gesture lifted: what it was decides which switch, if any, wakes the controls. */
     private static void finish(Window window, Activity owner, MotionEvent event) {
         boolean wasHolding = holding;
-        boolean longStill = stillFor(event.getEventTime()) >= LONG_PRESS_MS;
+        boolean longStill = stillFor(event.getEventTime()) >= longPressMs();
         boolean swipe = moved || multi;
         holding = false;
         endGesture();
@@ -410,9 +438,11 @@ public final class BurnInGuard {
             wake(-1);
             return;
         }
-        if (longStill && Settings.BURN_IN_WAKE_HOLD.get()) {
+        if (longStill) {
+            // A press and hold, whatever it held: with its switch off it wakes nothing, rather
+            // than reading as a tap on what was under the finger (the 2x lock, a long-pressed like).
             OverlayTiming.gesture(OverlayTiming.GESTURE_HOLD);
-            wake(OverlayTiming.WAKE_HOLD);
+            if (Settings.BURN_IN_WAKE_HOLD.get()) wake(OverlayTiming.WAKE_HOLD);
             return;
         }
         if (swipe) {
@@ -447,14 +477,15 @@ public final class BurnInGuard {
         if (page != null && page.getRootView() != decor) page = null;
         int px = (int) x;
         int py = (int) y;
+        boolean through = VideoOverlayHider.tapsGoThroughNow();
         for (Map.Entry<View, Integer> entry : CONTROLS.entrySet()) {
             View view = entry.getKey();
             Integer group = entry.getValue();
             if (view == null || group == null || !GROUP_ON[group]) continue;
             if (!view.isAttachedToWindow() || view.getRootView() != decor) continue;
             if (page != null && !inside(page, view)) continue;
-            if (!takesTap(view)) continue;
-            if (view.getGlobalVisibleRect(HIT) && HIT.contains(px, py)) return OverlayTiming.GESTURE_CONTROL;
+            if (!view.getGlobalVisibleRect(HIT) || !HIT.contains(px, py)) continue;
+            if (takesTap(view, through)) return OverlayTiming.GESTURE_CONTROL;
         }
         return OverlayTiming.GESTURE_VIDEO;
     }
@@ -464,8 +495,7 @@ public final class BurnInGuard {
      * and the noted buttons sit inside it. Whether taps go through is asked live, as
      * TapThroughControls does, since the marks are only rewritten by the next walk.
      */
-    private static boolean takesTap(View view) {
-        boolean through = VideoOverlayHider.tapsGoThroughNow();
+    private static boolean takesTap(View view, boolean through) {
         for (View part = view; part != null; ) {
             if (part.getVisibility() != View.VISIBLE || part.getAlpha() <= 0f) return false;
             if (through && TapThroughControls.isMarked(part)) return false;
@@ -487,7 +517,13 @@ public final class BurnInGuard {
     /** The window gained or lost focus: whatever gesture was open has ended. */
     private static void focusChanged(WeakReference<Activity> owner, boolean hasFocus) {
         if (!guarding) return;
-        if (hasFocus) gestureOwner = owner;
+        if (hasFocus) {
+            gestureOwner = owner;
+            // The window coming back in front owns the timed pass again: a dialog over an opened
+            // video took focus from both, and the feed behind may have taken it meanwhile.
+            Activity front = owner.get();
+            if (front != null && !gone(front)) passed = owner;
+        }
         boolean wasHolding = holding;
         holding = false;
         endGesture();
@@ -522,7 +558,7 @@ public final class BurnInGuard {
         if (holdPosted) main.removeCallbacks(HOLD);
         holdFor = gestureId;
         holdPosted = true;
-        main.postAtTime(HOLD, downAt + LONG_PRESS_MS);
+        main.postAtTime(HOLD, downAt + longPressMs());
     }
 
     private static void cancelHoldCheck() {
@@ -606,6 +642,7 @@ public final class BurnInGuard {
             handler.removeCallbacks(HOLD);
         }
         tickAt = -1L;
+        restoring = false;
         touchedAt = 0L;
         guarding = false;
         dimmed = false;

@@ -652,6 +652,35 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
      * and a title kept twice is a title that drifts.
      */
     @Override
+    protected void updateUIToSettingValues() {
+        super.updateUIToSettingValues();
+        updateSwitchListAvailability(getPreferenceScreen());
+    }
+
+    @Override
+    protected void updateUIAvailability() {
+        super.updateUIAvailability();
+        updateSwitchListAvailability(getPreferenceScreen());
+    }
+
+    /**
+     * A list of switches has no setting of its own under its key, so the screen's pass skips it;
+     * it follows the switches it holds, greyed and saying why like any other row.
+     */
+    private void updateSwitchListAvailability(PreferenceGroup group) {
+        if (group == null) return;
+        for (int i = 0; i < group.getPreferenceCount(); i++) {
+            Preference pref = group.getPreference(i);
+            if (pref instanceof PreferenceGroup) {
+                updateSwitchListAvailability((PreferenceGroup) pref);
+            } else if (pref instanceof SwitchListPreference) {
+                Setting<?> follows = ((SwitchListPreference) pref).availabilitySetting();
+                if (follows != null) updatePreferenceAvailability(pref, follows);
+            }
+        }
+    }
+
+    @Override
     protected void updatePreferenceAvailability(Preference pref, Setting<?> setting) {
         super.updatePreferenceAvailability(pref, setting);
         Context context = getActivity();

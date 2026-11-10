@@ -677,7 +677,7 @@ public final class VideoOverlayHider {
                     || touchScale != 1f || scaledLastPass) {
                 OverlayTiming.walked();
                 // Every control this walk files is noted for Burn-in guard's tap test.
-                BurnInGuard.walked();
+                BurnInGuard.walked(activity);
                 ViewGroup root = activity.findViewById(android.R.id.content);
                 int[] ids = TRAVERSAL.ids;
                 boolean[] hidden = TRAVERSAL.hidden;
@@ -1485,19 +1485,20 @@ public final class VideoOverlayHider {
      */
     private static void noteRailButtons(View column, List<List<View>> found, int[] selected) {
         int width = column.getWidth();
+        // Not laid out yet: nothing to measure against, and the next walk notes them.
+        if (width == 0) return;
         int railLeft = Integer.MAX_VALUE;
         for (int i = 0; i < RAIL_BUTTON_IDS.length; i++) {
             for (View button : selectedViews(found, selected, RAIL_TARGET_START + i)) {
                 View slot = childOf(column, button);
                 if (slot == null || slot.getWidth() * 2 > width) continue;
                 BurnInGuard.noteControl(slot, BurnInGuard.RAIL);
-                if (slot.getVisibility() == View.VISIBLE && slot.getWidth() > 0) {
-                    railLeft = Math.min(railLeft, slot.getLeft());
-                }
+                // Measured whether shown or not: TikTok's Clear display leaves them gone in place.
+                if (slot.getWidth() > 0) railLeft = Math.min(railLeft, slot.getLeft());
             }
         }
-        // With no narrow slot showing, the rail is taken as the column's right half.
-        if (railLeft == Integer.MAX_VALUE) railLeft = width / 2;
+        // With no button slot measured, where the rail starts isn't known; its wide row waits.
+        if (railLeft == Integer.MAX_VALUE) return;
         for (int i = 0; i < RAIL_BUTTON_IDS.length; i++) {
             for (View button : selectedViews(found, selected, RAIL_TARGET_START + i)) {
                 View slot = childOf(column, button);

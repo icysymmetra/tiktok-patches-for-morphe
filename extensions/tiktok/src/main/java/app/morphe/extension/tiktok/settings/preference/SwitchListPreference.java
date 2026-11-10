@@ -92,6 +92,28 @@ public final class SwitchListPreference extends Preference {
      */
     @Override
     public CharSequence getSummary() {
+        return stateSummary() + note;
+    }
+
+    /**
+     * Keeps only what the screen added after the row's own lines, such as the reason a greyed
+     * row gives ("Turn on Burn-in guard first."); the lines themselves are always worked out
+     * from the switches, so they can't go stale.
+     */
+    @Override
+    public void setSummary(CharSequence summary) {
+        String base = stateSummary();
+        String text = summary == null ? "" : summary.toString();
+        String added = text.startsWith(base) ? text.substring(base.length()) : "";
+        if (added.equals(note)) return;
+        note = added;
+        notifyChanged();
+    }
+
+    /** What the screen appended after the row's own lines; see {@link #setSummary}. */
+    private String note = "";
+
+    private String stateSummary() {
         List<String> on = new ArrayList<>();
         for (Item item : items) if (item.setting.savedValue()) on.add(item.label);
         String joined = String.join(", ", on);
@@ -104,6 +126,18 @@ public final class SwitchListPreference extends Preference {
     /** The check boxes, in dialog order, for the search index. */
     List<Item> items() {
         return items;
+    }
+
+    /**
+     * The setting whose availability the row follows: the first box that can be changed, or the
+     * first box when none can. The row's key names no setting, so the screen's availability pass
+     * asks for this (#191: Burn-in guard's two lists stayed open with the guard off).
+     */
+    BooleanSetting availabilitySetting() {
+        for (Item item : items) {
+            if (item.setting.isAvailable()) return item.setting;
+        }
+        return items.isEmpty() ? null : items.get(0).setting;
     }
 
     @Override
