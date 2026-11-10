@@ -1,3 +1,7 @@
+/*
+ * Forked from:
+ * https://gitlab.com/ReVanced/revanced-patches/-/blob/main/extensions/tiktok/src/main/java/app/revanced/extension/tiktok/feedfilter/ViewCountFilter.java
+ */
 package app.morphe.extension.tiktok.feedfilter;
 
 import app.morphe.extension.tiktok.Utils;

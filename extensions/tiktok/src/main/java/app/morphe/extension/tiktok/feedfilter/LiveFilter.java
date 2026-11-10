@@ -1,9 +1,12 @@
+/*
+ * Forked from:
+ * https://gitlab.com/ReVanced/revanced-patches/-/blob/main/extensions/tiktok/src/main/java/app/revanced/extension/tiktok/feedfilter/LiveFilter.java
+ */
 package app.morphe.extension.tiktok.feedfilter;
 
 import app.morphe.extension.tiktok.settings.Settings;
+import app.morphe.extension.tiktok.blockauthor.Reflect;
 import com.ss.android.ugc.aweme.feed.model.Aweme;
-
-import java.lang.reflect.Field;
 
 public class LiveFilter implements IFilter {
     private static final int AWEME_TYPE_LIVE = 101;
@@ -15,6 +18,10 @@ public class LiveFilter implements IFilter {
 
     @Override
     public boolean getFiltered(Aweme item) {
+        return isLive(item);
+    }
+
+    static boolean isLive(Aweme item) {
         return item.getLiveId() > 0
             || item.isLiveReplay()
             || hasText(item.getLiveType())
@@ -33,6 +40,7 @@ public class LiveFilter implements IFilter {
         appendEvidence(evidence, "cachedLiveRoomStruct", getValidRoomEvidence(getFieldValue(item, "cachedLiveRoomStruct"), "id"));
         appendEvidence(evidence, "roomFeedCellStruct", getRoomFeedCellEvidence(item));
         appendEvidence(evidence, "room", getValidRoomEvidence(getFieldValue(item, "room"), "roomId"));
+        appendEvidence(evidence, "selling", ShopFilter.sellsInLive(item) ? true : null);
         return evidence.length() == 0 ? "none" : evidence.toString();
     }
 
@@ -41,6 +49,26 @@ public class LiveFilter implements IFilter {
             || getValidRoomEvidence(getFieldValue(item, "cachedLiveRoomStruct"), "id") != null
             || getRoomFeedCellEvidence(item) != null
             || getValidRoomEvidence(getFieldValue(item, "room"), "roomId") != null;
+    }
+
+    /** Every room object a LIVE item can carry, the same ones read for its evidence. */
+    static java.util.List<Object> rooms(Aweme item) {
+        java.util.List<Object> rooms = new java.util.ArrayList<>(6);
+        addRoom(rooms, getFieldValue(item, "newLiveRoomData"));
+        addRoom(rooms, getFieldValue(item, "cachedLiveRoomStruct"));
+        addRoom(rooms, getFieldValue(item, "room"));
+        Object cell = invokeNoArg(item, "getRoomFeedCellStruct");
+        if (cell == null) cell = getFieldValue(item, "mRoomFeedCellStruct");
+        if (cell != null) {
+            addRoom(rooms, invokeNoArg(cell, "getNewLiveRoomData"));
+            addRoom(rooms, getFieldValue(cell, "room"));
+            addRoom(rooms, getFieldValue(cell, "newLiveRoomData"));
+        }
+        return rooms;
+    }
+
+    private static void addRoom(java.util.List<Object> rooms, Object room) {
+        if (room != null && !rooms.contains(room)) rooms.add(room);
     }
 
     private static String getRoomFeedCellEvidence(Aweme item) {
@@ -89,39 +117,11 @@ public class LiveFilter implements IFilter {
     }
 
     private static Object getFieldValue(Object instance, String name) {
-        if (instance == null) return null;
-
-        Class<?> type = instance.getClass();
-        while (type != null) {
-            try {
-                Field field = type.getDeclaredField(name);
-                field.setAccessible(true);
-                return field.get(instance);
-            } catch (NoSuchFieldException ex) {
-                type = type.getSuperclass();
-            } catch (Exception ignored) {
-                return null;
-            }
-        }
-        return null;
+        return Reflect.readField(instance, name);
     }
 
     private static Object invokeNoArg(Object instance, String name) {
-        if (instance == null) return null;
-
-        Class<?> type = instance.getClass();
-        while (type != null) {
-            try {
-                var method = type.getDeclaredMethod(name);
-                method.setAccessible(true);
-                return method.invoke(instance);
-            } catch (NoSuchMethodException ex) {
-                type = type.getSuperclass();
-            } catch (Exception ignored) {
-                return null;
-            }
-        }
-        return null;
+        return Reflect.invoke(instance, name);
     }
 
     private static boolean hasText(String value) {
@@ -134,4 +134,3 @@ public class LiveFilter implements IFilter {
         builder.append(name).append('=').append(value);
     }
 }
-

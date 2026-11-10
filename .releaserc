@@ -37,7 +37,7 @@
       "@semantic-release/exec",
       {
         "generateNotesCmd": "node scripts/changelog-for-release.js ${nextRelease.version}",
-        "prepareCmd": "jq '.version=\"${nextRelease.version}\"' patches-list.json > patches-list.json.tmp && mv patches-list.json.tmp patches-list.json"
+        "prepareCmd": "./gradlew :patches:generatePatchesList --no-daemon"
       }
     ],
     [

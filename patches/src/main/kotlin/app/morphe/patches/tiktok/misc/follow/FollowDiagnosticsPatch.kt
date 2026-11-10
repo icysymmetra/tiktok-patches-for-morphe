@@ -1,22 +1,30 @@
+/*
+ * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
+ * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ */
 package app.morphe.patches.tiktok.misc.follow
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.util.addInstructions
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
-import app.morphe.util.findMutableMethodOf
-import app.morphe.util.getReference
+import app.morphe.patches.tiktok.misc.settings.registerForBuildDetails
+import app.morphe.util.addInstructionsAtControlFlowLabel
+import app.morphe.util.argumentRegister
+import app.morphe.patcher.util.findMutableMethodOf
+import app.morphe.patcher.util.getReference
+import app.morphe.patcher.util.numberOfParameterRegisters
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction3rc
-import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction35c
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
-private const val USER_SERVICE_DESCRIPTOR = "Lcom/ss/android/ugc/aweme/userservice/api/IUserService;"
 private const val COMMON_FOLLOW_API_DESCRIPTOR = "Lcom/ss/android/ugc/aweme/userservice/CommonFollowApi;"
 private const val JEDI_FOLLOW_API_DESCRIPTOR = "Lcom/ss/android/ugc/aweme/userservice/jedi/model/JediFollowApi;"
 private const val CALL_SERVER_INTERCEPTOR_DESCRIPTOR = "Lcom/bytedance/retrofit2/CallServerInterceptor;"
@@ -32,63 +40,51 @@ private data class FollowCallPatch(
 )
 
 @Suppress("unused")
-private val followDiagnosticsPatch = bytecodePatch(
+val followDiagnosticsPatch = bytecodePatch(
     name = "Follow diagnostics",
-    description = "Adds debug-only logs around TikTok follow requests to help diagnose follow actions that do not persist. Supports TikTok 46.2.3.",
+    description = "Tells you when TikTok quietly turned down a follow, and why, since the app " +
+        "shows it as if it worked. With diagnostic logging on, the details go in the report too. " +
+        "Works as soon as you patch it in, with no switch.",
     default = true,
 ) {
+    category("Interaction")
     dependsOn(sharedExtensionPatch)
 
-    compatibleWith(*AppCompatibilities.tiktok4623())
+    compatibleWith(*AppCompatibilities.tiktok())
 
     execute {
         val patchesByMethod = linkedMapOf<Method, ArrayDeque<FollowCallPatch>>()
+        // Each anchor is a name test inside a walk over every class, and a name that no method
+        // carries any more simply never matches. Collected and counted before anything is
+        // written, so that a build which renames one fails the patch by name instead of
+        // shipping it with that hook missing, and fails it with nothing written: the patcher
+        // does not take a failed patch's writes back out, and a hook written before the walk
+        // reached a renamed one used to stay in the APK.
+        val commonFollow = mutableListOf<Method>()
+        val executeCall = mutableListOf<Method>()
+        val parseResponse = mutableListOf<Method>()
 
         classDefForEach { classDef ->
             for (method in classDef.methods) {
                 val implementation = method.implementation ?: continue
 
                 if (classDef.type == COMMON_FOLLOW_API_DESCRIPTOR && method.name == "LIZ") {
-                    val mutableMethod = mutableClassDefBy(classDef.type).findMutableMethodOf(method)
-                    patchCommonFollowApi(mutableMethod)
+                    commonFollow += method
                     continue
                 }
 
                 if (classDef.type == CALL_SERVER_INTERCEPTOR_DESCRIPTOR && method.name == NETWORK_EXECUTE_CALL_METHOD) {
-                    val mutableMethod = mutableClassDefBy(classDef.type).findMutableMethodOf(method)
-                    patchNetworkExecuteCall(mutableMethod)
+                    executeCall += method
                     continue
                 }
 
                 if (classDef.type == CALL_SERVER_INTERCEPTOR_DESCRIPTOR && method.name == NETWORK_PARSE_RESPONSE_METHOD) {
-                    val mutableMethod = mutableClassDefBy(classDef.type).findMutableMethodOf(method)
-                    patchNetworkParseResponse(mutableMethod)
+                    parseResponse += method
                     continue
                 }
 
                 implementation.instructions.forEachIndexed { index, instruction ->
-                    if (instruction.opcode != Opcode.INVOKE_INTERFACE &&
-                        instruction.opcode != Opcode.INVOKE_INTERFACE_RANGE
-                    ) {
-                        return@forEachIndexed
-                    }
-
-                    val methodReference = instruction.getReference<MethodReference>() ?: return@forEachIndexed
-
-                    val beforeInstructions = when (methodReference.definingClass) {
-                        USER_SERVICE_DESCRIPTOR -> when (methodReference.name) {
-                            "LJ" -> simpleFollowRequestInstructions(instruction)
-                            "LJFF" -> detailedFollowRequestInstructions(instruction)
-                            else -> null
-                        }
-
-                        JEDI_FOLLOW_API_DESCRIPTOR -> when (methodReference.name) {
-                            "followWithRetrofitPost" -> jediFollowRequestInstructions(instruction)
-                            else -> null
-                        }
-
-                        else -> null
-                    } ?: return@forEachIndexed
+                    val beforeInstructions = followRequestInstructions(instruction) ?: return@forEachIndexed
 
                     patchesByMethod.getOrPut(method) { ArrayDeque() }
                         .add(FollowCallPatch(index, beforeInstructions))
@@ -96,150 +92,230 @@ private val followDiagnosticsPatch = bytecodePatch(
             }
         }
 
+        check(commonFollow.size == 1) {
+            "Follow diagnostics: expected one $COMMON_FOLLOW_API_DESCRIPTOR->LIZ to hook, " +
+                "found ${commonFollow.size}."
+        }
+        check(executeCall.size == 1) {
+            "Follow diagnostics: expected one $CALL_SERVER_INTERCEPTOR_DESCRIPTOR->" +
+                "$NETWORK_EXECUTE_CALL_METHOD to hook, found ${executeCall.size}."
+        }
+        check(parseResponse.size == 1) {
+            "Follow diagnostics: expected one $CALL_SERVER_INTERCEPTOR_DESCRIPTOR->" +
+                "$NETWORK_PARSE_RESPONSE_METHOD to hook, found ${parseResponse.size}."
+        }
+        check(patchesByMethod.isNotEmpty()) {
+            "Follow diagnostics: no call site asks the follow services for a request."
+        }
+
+        // Every insertion of the three hooks is worked out, and every anchor it needs checked,
+        // before the first one is written.
+        fun mutable(method: Method) = mutableClassDefBy(method.definingClass).findMutableMethodOf(method)
+        val commonFollowMethod = mutable(commonFollow.single())
+        val executeCallMethod = mutable(executeCall.single())
+        val parseResponseMethod = mutable(parseResponse.single())
+        listOf(
+            commonFollowMethod to planCommonFollowApi(commonFollowMethod),
+            executeCallMethod to planNetworkExecuteCall(executeCallMethod),
+            parseResponseMethod to planNetworkParseResponse(parseResponseMethod),
+        ).forEach { (method, insertions) -> method.insertAll(insertions) }
+
         patchesByMethod.forEach { (method, patches) ->
             val mutableMethod = mutableClassDefBy(method.definingClass).findMutableMethodOf(method)
 
             while (patches.isNotEmpty()) {
                 val patch = patches.removeLast()
-                val moveResult = mutableMethod.implementation!!.instructions
-                    .getOrNull(patch.index + 1)
-                    ?.takeIf { it.opcode == Opcode.MOVE_RESULT_OBJECT } as? OneRegisterInstruction
-
-                mutableMethod.addInstructions(
-                    patch.index + 2,
-                    moveResult?.let { result ->
-                        if (patch.beforeInstructions.contains("logJediFollowRequest")) {
-                            "invoke-static/range {v${result.registerA} .. v${result.registerA}}, " +
-                                "$EXTENSION_CLASS_DESCRIPTOR->logFollowStream(Ljava/lang/Object;)V"
-                        } else {
-                            "invoke-static/range {v${result.registerA} .. v${result.registerA}}, " +
-                                "$EXTENSION_CLASS_DESCRIPTOR->logFollowResult(Ljava/lang/Object;)V"
-                        }
-                    } ?: "nop",
-                )
-
-                mutableMethod.addInstructions(patch.index, patch.beforeInstructions)
+                mutableMethod.patchFollowCall(patch.index, patch.beforeInstructions)
             }
         }
+        registerForBuildDetails("enableFollowDiagnostics")
     }
 }
 
-private fun patchNetworkParseResponse(method: MutableMethod) {
-    val implementation = method.implementation ?: return
-
-    val parseResponseIndex = implementation.instructions.indexOfFirst { instruction ->
-        instruction.opcode == Opcode.INVOKE_VIRTUAL &&
-            instruction.getReference<MethodReference>()?.name ==
-            "com_bytedance_retrofit2_CallServerInterceptor__parseResponse\$___twin___"
-    }
-
-    val responseIndex = if (parseResponseIndex >= 0) parseResponseIndex + 1 else -1
-    val exceptionIndex = implementation.instructions.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
-
-    if (exceptionIndex >= 0) {
-        method.addInstructions(
-            exceptionIndex + 1,
-            "invoke-static {v5, v4}, " +
-                "$EXTENSION_CLASS_DESCRIPTOR->logParseThrowable(Ljava/lang/Object;Ljava/lang/Throwable;)V",
-        )
-    }
-
-    if (responseIndex >= 0) {
-        method.addInstructions(
-            responseIndex + 1,
-            "invoke-static {v5, v3}, " +
-                "$EXTENSION_CLASS_DESCRIPTOR->logParsedResponse(Ljava/lang/Object;Ljava/lang/Object;)V",
-        )
+internal fun followRequestInstructions(instruction: Instruction): String? {
+    if (instruction.opcode != Opcode.INVOKE_INTERFACE &&
+        instruction.opcode != Opcode.INVOKE_INTERFACE_RANGE
+    ) return null
+    val methodReference = instruction.getReference<MethodReference>() ?: return null
+    // IUserService.LIZLLL and LJ both reach the CommonFollowApi hook. LJFF only observes
+    // existing follow state. Instrumenting those outer calls duplicates or invents requests.
+    return when (methodReference.definingClass) {
+        JEDI_FOLLOW_API_DESCRIPTOR -> when (methodReference.name) {
+            "followWithRetrofitPost" -> jediFollowRequestInstructions(instruction)
+            else -> null
+        }
+        else -> null
     }
 }
 
-private fun patchCommonFollowApi(method: MutableMethod) {
-    val implementation = method.implementation ?: return
-    val returnIndex = implementation.instructions.indexOfLast { it.opcode == Opcode.RETURN_OBJECT }
-    if (returnIndex >= 0) {
-        method.addInstructions(
-            returnIndex,
-            "invoke-static/range {v4 .. v4}, " +
-                "$EXTENSION_CLASS_DESCRIPTOR->logFollowResult(Ljava/lang/Object;)V",
-        )
-    }
-
-    method.addInstructions(
-        0,
-        "invoke-static/range {v5 .. v14}, " +
-            "$EXTENSION_CLASS_DESCRIPTOR->logCommonFollowRequest(IIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V",
+internal fun MutableMethod.patchFollowCall(index: Int, beforeInstructions: String) {
+    val moveResult = implementation!!.instructions.getOrNull(index + 1)
+        ?.takeIf { it.opcode == Opcode.MOVE_RESULT_OBJECT } as? OneRegisterInstruction
+    addInstructions(
+        index + 2,
+        moveResult?.let { result ->
+            "invoke-static/range {v${result.registerA} .. v${result.registerA}}, " +
+                "$EXTENSION_CLASS_DESCRIPTOR->logFollowStream(Ljava/lang/Object;)V"
+        } ?: "nop",
     )
+    addInstructions(index, beforeInstructions)
 }
 
-private fun patchNetworkExecuteCall(method: MutableMethod) {
-    val implementation = method.implementation ?: return
+/**
+ * Lines to add to one method and the index each goes in front of, every index read off the
+ * method before anything was added to it.
+ */
+internal typealias Insertions = List<Pair<Int, String>>
 
-    val requestIndex = implementation.instructions.indexOfFirst { instruction ->
+internal fun MutableMethod.insertAll(insertions: Insertions) {
+    // Highest index first. Every index was read from the untouched method, and inserting at a
+    // lower one moves all of them; this held for the lancets only because the catch handler
+    // happens to sit last on this build.
+    insertions.sortedByDescending { it.first }.forEach { (index, instruction) ->
+        addInstructionsAtControlFlowLabel(index, instruction)
+    }
+}
+
+/**
+ * Both network lancets have the same three anchors: the read of the request being sent, the
+ * result of the call TikTok's own method makes, and the exception when it throws. Every register
+ * is read off the instruction it belongs to, so the layout of the surrounding method is free to
+ * move; only the anchors themselves have to be there, and a missing one fails the build.
+ */
+internal fun planNetworkLancet(
+    method: Method,
+    twinName: String,
+    requestLogger: String?,
+    responseLogger: String,
+    throwableLogger: String,
+): Insertions {
+    val implementation = method.implementation
+        ?: throw PatchException("Follow diagnostics: ${method.name} has no body.")
+    val instructions = implementation.instructions.toList()
+
+    val requestIndex = instructions.indexOfFirst { instruction ->
         instruction.opcode == Opcode.IGET_OBJECT &&
             instruction.getReference<FieldReference>()?.name == "mOriginalRequest"
     }
+    if (requestIndex < 0) {
+        throw PatchException("Follow diagnostics: mOriginalRequest is not read in ${method.name}.")
+    }
+    val requestRegister = (instructions[requestIndex] as OneRegisterInstruction).registerA
 
-    val executeCallIndex = implementation.instructions.indexOfFirst { instruction ->
+    val twinIndex = instructions.indexOfFirst { instruction ->
         instruction.opcode == Opcode.INVOKE_VIRTUAL &&
-            instruction.getReference<MethodReference>()?.name ==
-            "com_bytedance_retrofit2_CallServerInterceptor__executeCall\$___twin___"
+            instruction.getReference<MethodReference>()?.name == twinName
+    }
+    if (twinIndex < 0) {
+        throw PatchException("Follow diagnostics: $twinName is not called in ${method.name}.")
+    }
+    val responseInstruction = instructions.getOrNull(twinIndex + 1)
+    if (responseInstruction?.opcode != Opcode.MOVE_RESULT_OBJECT) {
+        throw PatchException(
+            "Follow diagnostics: $twinName in ${method.name} is followed by " +
+                "${responseInstruction?.opcode?.name ?: "nothing"}, not a move-result-object, " +
+                "so there is no response to read.",
+        )
+    }
+    val responseRegister = (responseInstruction as OneRegisterInstruction).registerA
+
+    val exceptionIndex = instructions.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+    if (exceptionIndex < 0) {
+        throw PatchException("Follow diagnostics: ${method.name} catches nothing to report.")
+    }
+    val throwableRegister = (instructions[exceptionIndex] as OneRegisterInstruction).registerA
+
+    // Two-argument calls in the plain form, injected where the host's locals are live, so
+    // nothing can be staged into a lower register. The registers come off eight bit
+    // instructions and are refused here rather than at the assembler, which names nothing.
+    for ((what, register) in listOf("request" to requestRegister, "response" to responseRegister, "throwable" to throwableRegister)) {
+        if (register > 15) {
+            throw PatchException(
+                "Follow diagnostics: ${method.name} keeps its $what in v$register, past what " +
+                    "the plain invoke can name.",
+            )
+        }
     }
 
-    val responseIndex = if (executeCallIndex >= 0) executeCallIndex + 1 else -1
-    val exceptionIndex = implementation.instructions.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+    return listOfNotNull(
+        (exceptionIndex + 1) to
+            "invoke-static {v$requestRegister, v$throwableRegister}, $throwableLogger",
+        (twinIndex + 2) to
+            "invoke-static {v$requestRegister, v$responseRegister}, $responseLogger",
+        requestLogger?.let {
+            (requestIndex + 1) to "invoke-static/range {v$requestRegister .. v$requestRegister}, $it"
+        },
+    )
+}
 
-    if (exceptionIndex >= 0) {
-        method.addInstructions(
-            exceptionIndex + 1,
-            "invoke-static {v3, v4}, " +
-                "$EXTENSION_CLASS_DESCRIPTOR->logNetworkThrowable(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+private fun planNetworkParseResponse(method: Method) = planNetworkLancet(
+    method,
+    twinName = "com_bytedance_retrofit2_CallServerInterceptor__parseResponse\$___twin___",
+    // The parse lancet logs the request only alongside a response or a throwable: on its own it
+    // says nothing the execute lancet has not already reported for the same request.
+    requestLogger = null,
+    responseLogger = "$EXTENSION_CLASS_DESCRIPTOR->logParsedResponse(Ljava/lang/Object;Ljava/lang/Object;)V",
+    throwableLogger = "$EXTENSION_CLASS_DESCRIPTOR->logParseThrowable(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+)
+
+/**
+ * The ten parameters the extension's logCommonFollowRequest reads, in order. LIZ is matched by
+ * name alone, so this is what says the method found is the one meant: another LIZ with a
+ * different shape would otherwise be handed ten registers holding something else.
+ */
+private val COMMON_FOLLOW_PARAMETERS = listOf(
+    "I", "I", "I", "I",
+    "Ljava/lang/String;", "Ljava/lang/String;", "Ljava/lang/String;", "Ljava/lang/String;",
+    "Ljava/lang/String;", "Ljava/util/Map;",
+)
+
+internal fun patchCommonFollowApi(method: MutableMethod) = method.insertAll(planCommonFollowApi(method))
+
+private fun planCommonFollowApi(method: Method): Insertions {
+    val implementation = method.implementation
+        ?: throw PatchException("Follow diagnostics: CommonFollowApi.LIZ has no body.")
+
+    val parameters = method.parameters.map { it.type }
+    if (!AccessFlags.STATIC.isSet(method.accessFlags) || parameters != COMMON_FOLLOW_PARAMETERS) {
+        throw PatchException(
+            "Follow diagnostics: CommonFollowApi.LIZ is not the follow request this reads. " +
+                "Expected a static method taking $COMMON_FOLLOW_PARAMETERS, found " +
+                "${if (AccessFlags.STATIC.isSet(method.accessFlags)) "a static" else "an instance"} " +
+                "method taking $parameters.",
         )
     }
 
-    if (responseIndex >= 0) {
-        method.addInstructions(
-            responseIndex + 1,
-            "invoke-static {v3, v0}, " +
-                "$EXTENSION_CLASS_DESCRIPTOR->logNetworkResponse(Ljava/lang/Object;Ljava/lang/Object;)V",
+    // Where the parameters actually sit. On 46.2.3 that is v5 to v14 of fifteen registers, and
+    // it moves the moment TikTok's own method needs one more local.
+    val firstParameter = implementation.registerCount - method.numberOfParameterRegisters
+    val lastParameter = implementation.registerCount - 1
+
+    // Every way the request can answer, not the last one written. A build that returns a cached
+    // status down one path would have had that follow go unreported.
+    val returnIndices = implementation.instructions.withIndex()
+        .filter { it.value.opcode == Opcode.RETURN_OBJECT }
+        .map { it.index }
+    if (returnIndices.isEmpty()) {
+        throw PatchException("Follow diagnostics: CommonFollowApi.LIZ returns no object to read.")
+    }
+    return returnIndices.map { returnIndex ->
+        val returnRegister =
+            (implementation.instructions.elementAt(returnIndex) as OneRegisterInstruction).registerA
+        returnIndex to "invoke-static/range {v$returnRegister .. v$returnRegister}, " +
+            "$EXTENSION_CLASS_DESCRIPTOR->logFollowResult(Ljava/lang/Object;)V"
+    } + (
+        0 to "invoke-static/range {v$firstParameter .. v$lastParameter}, " +
+            "$EXTENSION_CLASS_DESCRIPTOR->logCommonFollowRequest(IIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V"
         )
-    }
-
-    if (requestIndex >= 0) {
-        method.addInstructions(
-            requestIndex + 1,
-            "invoke-static/range {v3 .. v3}, " +
-                "$EXTENSION_CLASS_DESCRIPTOR->logNetworkRequest(Ljava/lang/Object;)V",
-        )
-    }
 }
 
-private fun simpleFollowRequestInstructions(instruction: Instruction): String? {
-    val actionRegister = instruction.argumentRegister(1) ?: return null
-    val uidRegister = instruction.argumentRegister(2) ?: return null
-    val secUidRegister = instruction.argumentRegister(3) ?: return null
-
-    return if (instruction is Instruction3rc) {
-        "invoke-static/range {v$actionRegister .. v$secUidRegister}, " +
-            "$EXTENSION_CLASS_DESCRIPTOR->logSimpleFollowRequest(ILjava/lang/String;Ljava/lang/String;)V"
-    } else {
-        if (listOf(actionRegister, uidRegister, secUidRegister).any { it > 15 }) return null
-
-        "invoke-static {v$actionRegister, v$uidRegister, v$secUidRegister}, " +
-            "$EXTENSION_CLASS_DESCRIPTOR->logSimpleFollowRequest(ILjava/lang/String;Ljava/lang/String;)V"
-    }
-}
-
-private fun detailedFollowRequestInstructions(instruction: Instruction): String? {
-    val firstArgumentRegister = instruction.argumentRegister(1) ?: return null
-    val lastArgumentRegister = instruction.argumentRegister(10) ?: return null
-
-    if (instruction is Instruction3rc) {
-        return "invoke-static/range {v$firstArgumentRegister .. v$lastArgumentRegister}, " +
-            "$EXTENSION_CLASS_DESCRIPTOR->logDetailedFollowRequest(IIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V"
-    }
-
-    return null
-}
+private fun planNetworkExecuteCall(method: Method) = planNetworkLancet(
+    method,
+    twinName = "com_bytedance_retrofit2_CallServerInterceptor__executeCall\$___twin___",
+    requestLogger = "$EXTENSION_CLASS_DESCRIPTOR->logNetworkRequest(Ljava/lang/Object;)V",
+    responseLogger = "$EXTENSION_CLASS_DESCRIPTOR->logNetworkResponse(Ljava/lang/Object;Ljava/lang/Object;)V",
+    throwableLogger = "$EXTENSION_CLASS_DESCRIPTOR->logNetworkThrowable(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+)
 
 private fun jediFollowRequestInstructions(instruction: Instruction): String? {
     val firstArgumentRegister = instruction.argumentRegister(1) ?: return null
@@ -252,18 +328,3 @@ private fun jediFollowRequestInstructions(instruction: Instruction): String? {
 
     return null
 }
-
-private fun Instruction.argumentRegister(argumentIndex: Int): Int? =
-    when (this) {
-        is Instruction35c -> when (argumentIndex) {
-            0 -> registerC
-            1 -> registerD
-            2 -> registerE
-            3 -> registerF
-            4 -> registerG
-            else -> null
-        }
-
-        is Instruction3rc -> startRegister + argumentIndex
-        else -> null
-    }

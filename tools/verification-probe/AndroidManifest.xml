@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A test-only instrumentation that runs inside the patched TikTok so device checks can reach
+  Hushfeed's own settings. It has to be signed with the same key as the installed build, which
+  is what lets the platform load it into that process. Never part of a release.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="app.hushfeed.verification">
+
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="36" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <instrumentation
+        android:name="app.hushfeed.verification.Probe"
+        android:targetPackage="com.zhiliaoapp.musically"
+        android:label="Hushfeed verification probe" />
+
+    <instrumentation
+        android:name="app.hushfeed.verification.StorageProbe"
+        android:targetPackage="com.zhiliaoapp.musically"
+        android:label="Hushfeed aggregate storage probe" />
+
+    <application android:hasCode="true" android:label="Hushfeed verification probe">
+        <!-- Runs as this APK's UID, never inside the instrumented target. Only shell/platform
+             callers may start or stop the muted local fixture. It never restarts itself. -->
+        <service
+            android:name="app.hushfeed.verification.FocusFixtureService"
+            android:process=":audio_focus"
+            android:exported="true"
+            android:permission="android.permission.DUMP"
+            android:foregroundServiceType="mediaPlayback" />
+    </application>
+</manifest>

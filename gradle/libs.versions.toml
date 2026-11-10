@@ -1,29 +1,47 @@
 [versions]
-# Align with morphe-patches-template (Compatibility / Manager display names).
-morphe-patcher = "1.5.1"
-# Tracking https://github.com/google/smali/issues/100.
-smali = "b6365a84f4"
-agp = "8.2.2"
-annotation = "1.9.1"
-androidx-core = "1.16.0"
+# Patcher 2.0 dev channel. An older Manager rejects this bundle's Patcher-Version.
+morphe-patcher = "2.0.0"
+# First stable Manager release that bundled the patcher above. The release fact check holds the
+# README's stated floor to this value.
+manager-floor = "2.0.0"
+# Read by the app.morphe.patches settings plugin, not by anything in this repo: remove it and
+# configuration fails with "Version with alias smali not found in version catalog". The commit
+# resolves as com.github.MorpheApp.smali through JitPack. It is not waiting on an official
+# release, which google/smali 3.0.10 delivered on 2026-08-20: the pin has to match whatever the
+# patcher above was built against, because a mismatch puts two copies of dexlib2 on the R8
+# classpath and buildAndroid fails with "Classpath type already present".
+#noinspection GradleDependency
+smali = "4220ae75f7"
+# The Android Gradle plugin and Kotlin come from the app.morphe.patches settings plugin
+# (1.3.4 brings AGP 9.1.0 and Kotlin 2.4.10); nothing here pins them.
+annotation = "1.10.0"
 gson = "2.14.0"
-guava = "33.5.0-jre"
-hiddenapi = "6.1"
-okhttp = "4.12.0"
-protobuf = "0.9.5"
-protoc = "3.25.2"
+# Every com.google.guava:guava request in this build is rewritten to this, on the settings
+# classpath (settings.gradle.kts spells it out) and in every project graph (build.gradle.kts).
+# GHSA-xxph-c9ww-hj94 (CVE-2026-102554) covers 4.0 to 33.7.1: CompactHashMap, CompactHashSet
+# and MapMaker deserialization sized its arrays from the stream, so 72 bytes could ask for
+# gigabytes. 33.7.2 (2026-09-29) is the fix. The graphs asked for 32.0.1, 33.3.1, 33.5.0,
+# 33.6.0 and this pin's old 33.7.1. Build and patching classpath only: no Guava reaches TikTok.
+guava = "33.7.2-jre"
+# Every org.bouncycastle request in this build is rewritten to this, in :extensions:tiktok's
+# test graph and in :patches' build graph. It has to be a version that publishes all three
+# modules: 1.85.2 is a bcprov-only patch release, so forcing bcpkix and bcutil to it resolved
+# nothing and the dependency report said FAILED while the build still succeeded. 1.86
+# (2026-09-11) publishes bcprov, bcpkix and bcutil, and sits outside seven advisories:
+# CVE-2025-8916 (1.44 to 1.78), CVE-2026-5588 (1.67 to 1.83, apart from the 1.80.2 and
+# 1.81.1 maintenance releases), CVE-2025-14813 and CVE-2026-0636 (both fixed in 1.84),
+# CVE-2026-8763 and CVE-2026-13506 (both fixed in 1.85), and CVE-2026-97873 (the provider's
+# PBE and PKCS#12 key derivation, everything before 1.86). 1.86 is the first release outside
+# that last one, which is why 1.85.x would not do even with all three modules. The patcher's
+# own 1.77 is inside all seven; the Android build tools' 1.79 is outside CVE-2025-8916 but
+# inside the other six.
+bouncycastle = "1.86"
 
 [libraries]
 morphe-patcher = { module = "app.morphe:morphe-patcher", version.ref = "morphe-patcher" }
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
-androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
-hiddenapi = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", version.ref = "hiddenapi" }
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protoc" }
-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc" }
 
 [plugins]
 android-library = { id = "com.android.library" }
-protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }

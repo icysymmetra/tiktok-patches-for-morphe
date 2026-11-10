@@ -1,11 +1,15 @@
+/*
+ * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
+ * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ */
 package app.morphe.extension.tiktok.navigation;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
+/** The bottom navigation tabs. Home and Profile can't be turned off. */
 public final class BottomNavigationTabOptions {
     public static final String HOME = "HOME";
     public static final String FRIENDS = "FRIENDS";
@@ -14,217 +18,60 @@ public final class BottomNavigationTabOptions {
     public static final String PROFILE = "PROFILE";
     public static final String MALL = "MALL";
 
-    private static final String RAW_PREFIX = "RAW:";
-
-    public static final Option[] OPTIONS = {
-            new Option(HOME, "Home"),
-            new Option(FRIENDS, "Friends"),
-            new Option(PUBLISH, "Create"),
-            new Option(INBOX, "Inbox"),
-            new Option(PROFILE, "Profile"),
-            new Option(MALL, "Shop"),
+    public static final TabOption[] OPTIONS = {
+            new TabOption(HOME, "Home"),
+            new TabOption(FRIENDS, "Friends"),
+            new TabOption(PUBLISH, "Create"),
+            new TabOption(INBOX, "Inbox"),
+            new TabOption(PROFILE, "Profile"),
+            new TabOption(MALL, "Shop"),
     };
+
+    private static final TabKeys KEYS = new TabKeys(OPTIONS, aliases(), HOME, PROFILE);
 
     private BottomNavigationTabOptions() {
     }
 
+    private static Map<String, String> aliases() {
+        Map<String, String> aliases = new HashMap<>();
+        TabKeys.alias(aliases, HOME, "home", "homepage_home");
+        TabKeys.alias(aliases, FRIENDS, "friends", "friends_tab", "homepage_friends");
+        TabKeys.alias(aliases, PUBLISH, "publish", "create", "plus");
+        TabKeys.alias(aliases, INBOX, "notification", "inbox", "message");
+        TabKeys.alias(aliases, PROFILE, "user", "profile", "me");
+        TabKeys.alias(aliases, MALL, "shop", "mall", "shop_mall");
+        return aliases;
+    }
+
     public static String defaultEnabledKeys() {
-        StringBuilder builder = new StringBuilder();
-        for (Option option : OPTIONS) {
-            if (builder.length() > 0) {
-                builder.append(',');
-            }
-            builder.append(option.key);
-        }
-        return builder.toString();
+        return KEYS.defaultEnabledKeys();
     }
 
     public static Set<String> parseEnabledKeys(String keys) {
-        return parseKeys(keys, true);
+        return KEYS.parseEnabledKeys(keys);
     }
 
     public static Set<String> parseObservedKeys(String keys) {
-        return parseKeys(keys, false);
-    }
-
-    private static Set<String> parseKeys(String keys, boolean forceRequiredTabs) {
-        LinkedHashSet<String> parsed = new LinkedHashSet<>();
-        if (keys != null) {
-            for (String key : keys.split(",")) {
-                String normalized = normalizeSettingKey(key);
-                if (normalized != null) {
-                    parsed.add(normalized);
-                }
-            }
-        }
-
-        if (forceRequiredTabs) {
-            parsed.add(HOME);
-            parsed.add(PROFILE);
-        }
-        return parsed;
+        return KEYS.parseObservedKeys(keys);
     }
 
     public static String serializeEnabledKeys(Set<String> keys) {
-        StringBuilder builder = new StringBuilder();
-        for (Option option : OPTIONS) {
-            appendKey(builder, keys, option.key);
-        }
-
-        for (String key : keys) {
-            if (findOption(key) == null) {
-                appendKey(builder, keys, key);
-            }
-        }
-        return builder.toString();
+        return KEYS.serializeEnabledKeys(keys);
     }
 
-    public static List<Option> optionsForKeys(Set<String> keys) {
-        ArrayList<Option> options = new ArrayList<>();
-        for (Option option : OPTIONS) {
-            if (keys.contains(option.key)) {
-                options.add(option);
-            }
-        }
-
-        for (String key : keys) {
-            if (findOption(key) == null) {
-                options.add(new Option(key, rawLabel(key)));
-            }
-        }
-
-        return options;
+    public static List<TabOption> optionsForKeys(Set<String> keys) {
+        return KEYS.optionsForKeys(keys);
     }
 
     public static String normalizeRuntimeTag(String tag) {
-        String known = normalizeKnownRuntimeTag(tag);
-        if (known != null) {
-            return known;
-        }
-
-        String raw = normalizeRawRuntimeTag(tag);
-        return raw == null ? null : RAW_PREFIX + raw;
+        return KEYS.normalizeRuntimeTag(tag);
     }
 
-    private static String normalizeKnownRuntimeTag(String tag) {
-        if (tag == null) {
-            return null;
-        }
-
-        String normalized = tag.trim().toLowerCase(Locale.US);
-        switch (normalized) {
-            case "home":
-            case "homepage_home":
-                return HOME;
-            case "friends":
-            case "friends_tab":
-            case "homepage_friends":
-                return FRIENDS;
-            case "publish":
-            case "create":
-            case "plus":
-                return PUBLISH;
-            case "notification":
-            case "inbox":
-            case "message":
-                return INBOX;
-            case "user":
-            case "profile":
-            case "me":
-                return PROFILE;
-            case "shop":
-            case "mall":
-            case "shop_mall":
-                return MALL;
-            default:
-                return null;
-        }
-    }
-
-    public static Option findOption(String key) {
-        String normalized = normalizeSettingKey(key);
-        if (normalized == null) {
-            return null;
-        }
-
-        for (Option option : OPTIONS) {
-            if (option.key.equals(normalized)) {
-                return option;
-            }
-        }
-        return null;
-    }
-
-    private static String normalizeSettingKey(String key) {
-        if (key == null) {
-            return null;
-        }
-
-        String normalized = key.trim().toUpperCase(Locale.US);
-        for (Option option : OPTIONS) {
-            if (option.key.equals(normalized)) {
-                return option.key;
-            }
-        }
-
-        if (normalized.startsWith(RAW_PREFIX)) {
-            String raw = normalizeRawRuntimeTag(normalized.substring(RAW_PREFIX.length()));
-            return raw == null ? null : RAW_PREFIX + raw;
-        }
-        return null;
-    }
-
-    private static String normalizeRawRuntimeTag(String tag) {
-        if (tag == null) {
-            return null;
-        }
-
-        String normalized = tag.trim().toLowerCase(Locale.US)
-                .replace(',', ' ')
-                .replace('\n', ' ')
-                .replace('\r', ' ');
-        while (normalized.contains("  ")) {
-            normalized = normalized.replace("  ", " ");
-        }
-
-        return normalized.isEmpty() ? null : normalized;
-    }
-
-    private static String rawLabel(String key) {
-        if (key == null || !key.startsWith(RAW_PREFIX)) {
-            return key == null ? "Unknown tab" : key;
-        }
-
-        String raw = key.substring(RAW_PREFIX.length()).replace('_', ' ');
-        if (raw.isEmpty()) {
-            return "Unknown tab";
-        }
-
-        return raw.substring(0, 1).toUpperCase(Locale.US) + raw.substring(1);
-    }
-
-    private static void appendKey(StringBuilder builder, Set<String> keys, String key) {
-        if (!isRequiredKey(key) && !keys.contains(key)) {
-            return;
-        }
-
-        if (builder.length() > 0) {
-            builder.append(',');
-        }
-        builder.append(key);
+    public static TabOption findOption(String key) {
+        return KEYS.findOption(key);
     }
 
     public static boolean isRequiredKey(String key) {
-        return HOME.equals(key) || PROFILE.equals(key);
-    }
-
-    public static final class Option {
-        public final String key;
-        public final String label;
-
-        private Option(String key, String label) {
-            this.key = key;
-            this.label = label;
-        }
+        return KEYS.isRequiredKey(key);
     }
 }

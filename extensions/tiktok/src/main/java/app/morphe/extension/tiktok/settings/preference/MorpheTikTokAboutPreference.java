@@ -1,202 +1,81 @@
 /*
  * Forked from:
  * https://github.com/ReVanced/revanced-patches/blob/377d4e15016296b45d809697f7f69bce74badd3a/extensions/tiktok/src/main/java/app/revanced/extension/tiktok/settings/preference/ReVancedTikTokAboutPreference.java
+ * Mirror, since GitHub blocks the original: https://gitlab.com/ReVanced/revanced-patches/-/blob/main/extensions/tiktok/src/main/java/app/revanced/extension/tiktok/settings/preference/ReVancedTikTokAboutPreference.java
  */
-
 package app.morphe.extension.tiktok.settings.preference;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.preference.Preference;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import app.morphe.extension.tiktok.Utils;
+import app.morphe.extension.shared.Utils;
+import app.morphe.extension.tiktok.settings.L10n;
 
 @SuppressWarnings("deprecation")
-public class MorpheTikTokAboutPreference extends Preference {
-    private static final int CHEVRON_TAG = 0x4D535550;
+public final class MorpheTikTokAboutPreference extends Preference
+        implements app.morphe.extension.shared.settings.preference.ImmediateAction {
+    /**
+     * A key so the settings search can index this row: a keyed row with no Setting behind it is
+     * skipped by the settings framework, so nothing tries to persist it. Without one, searching
+     * "version" found nothing even though the row carries it.
+     */
+    public static final String KEY = "action_about";
+    public static final String SOURCE_URL = "https://github.com/icysymmetra/tiktok-patches-for-morphe";
 
     public MorpheTikTokAboutPreference(Context context) {
+        this(context, Utils.getPatchesReleaseVersion(), Utils.getAppVersionName());
+    }
+
+    /** The versions are handed in so a test can see the row as a patched phone shows it. */
+    MorpheTikTokAboutPreference(Context context, String bundleVersion, String appVersion) {
         super(context);
-
-        setTitle("Support my work");
-        setSummary("If you enjoy these patches, I would really appreciate the support. It genuinely means a lot to me.");
-        setIcon(SupportUi.createHeartDrawable());
-
-        setOnPreferenceClickListener(pref -> {
-            SupportUi.openSupport();
+        setKey(KEY);
+        setTitle("Metra");
+        setSummary(summaryFor(context, bundleVersion, appVersion));
+        setOnPreferenceClickListener(preference -> {
+            Utils.openLink(SOURCE_URL);
             return true;
         });
     }
 
+    /** What the row says on this phone, for the search index as much as for the row. */
+    public static CharSequence currentSummary(Context context) {
+        return summaryFor(context, Utils.getPatchesReleaseVersion(), Utils.getAppVersionName());
+    }
+
+    /**
+     * The bundle's own version and the app it is running in, where somebody filing a bug report
+     * can read both off.
+     *
+     * <p>Nothing in the app said which Hushfeed was installed. The version is stamped into the
+     * extension at patch time and only the exported diagnostic report printed it, so every one of
+     * the first three bug reports had to be asked for it separately, and the settings search had
+     * nothing to find when somebody looked for "version". The TikTok version rides along because
+     * the second question on every report is which build the bundle was applied to.
+     *
+     * <p>Empty during tests and in an unpatched build, where the stamp has not been written. The
+     * row falls back to what it always said rather than showing an empty version.
+     */
     @Override
-    protected View onCreateView(ViewGroup parent) {
-        Context context = getContext();
-        LinearLayout row = new LinearLayout(context);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setMinimumHeight(SettingsUi.dp(context, 136));
-        row.setPadding(
-                SettingsUi.dp(context, 38),
-                SettingsUi.dp(context, 16),
-                SettingsUi.dp(context, 38),
-                SettingsUi.dp(context, 16)
-        );
-        row.setBackground(SupportUi.createRowBackground(context));
-
-        FrameLayout iconFrame = new FrameLayout(context);
-        iconFrame.setId(android.R.id.icon_frame);
-        ImageView icon = new ImageView(context);
-        icon.setId(android.R.id.icon);
-        iconFrame.addView(icon, new FrameLayout.LayoutParams(
-                SettingsUi.dp(context, 22),
-                SettingsUi.dp(context, 22),
-                Gravity.CENTER
-        ));
-        row.addView(iconFrame, new LinearLayout.LayoutParams(
-                SettingsUi.dp(context, 22),
-                SettingsUi.dp(context, 22)
-        ));
-
-        LinearLayout labels = new LinearLayout(context);
-        labels.setGravity(Gravity.CENTER_VERTICAL);
-        labels.setOrientation(LinearLayout.VERTICAL);
-
-        TextView title = SettingsUi.text(context, "", 14.5f, SettingsUi.textPrimary(), 1);
-        title.setId(android.R.id.title);
-        labels.addView(title, new LinearLayout.LayoutParams(-1, -2));
-
-        TextView summary = SettingsUi.text(context, "", 12.8f, SettingsUi.textSecondary(), 0);
-        summary.setId(android.R.id.summary);
-        summary.setMaxLines(3);
-        labels.addView(summary, new LinearLayout.LayoutParams(-1, -2));
-
-        LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(0, -2, 1);
-        labelParams.leftMargin = SettingsUi.dp(context, 14);
-        labelParams.rightMargin = SettingsUi.dp(context, 10);
-        row.addView(labels, labelParams);
-
-        LinearLayout widget = new LinearLayout(context);
-        widget.setId(android.R.id.widget_frame);
-        widget.setGravity(Gravity.CENTER);
-        row.addView(widget, new LinearLayout.LayoutParams(
-                SettingsUi.dp(context, 18),
-                SettingsUi.dp(context, 18)
-        ));
-        return row;
+    public boolean actsOnTap() {
+        return true;
     }
 
-    @Override
-    protected void onBindView(View view) {
-        super.onBindView(view);
-
-        Utils.setTitleAndSummaryColor(view);
-        view.setMinimumHeight(SettingsUi.dp(getContext(), 112));
-        view.setBackground(SupportUi.createRowBackground(getContext()));
-        styleText(view);
-        styleHeart(view);
-        addChevron(view);
+    static CharSequence summaryFor(Context context, String bundleVersion, String appVersion) {
+        String source = L10n.t(context, "Opens github.com in your browser");
+        CharSequence version = versionSummary(context, bundleVersion, appVersion);
+        return version.length() == 0 ? source : version + ". " + source;
     }
 
-    private void styleText(View view) {
-        TextView title = view.findViewById(android.R.id.title);
-        if (title != null) {
-            title.setTextSize(14.5f);
-            title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        }
-        TextView summary = view.findViewById(android.R.id.summary);
-        if (summary != null) {
-            summary.setTextSize(12.8f);
-            summary.setMaxLines(3);
-        }
+    /** The compact version sentence shared by About and the master-page status card. */
+    static CharSequence versionSummary(Context context, String bundleVersion, String appVersion) {
+        if (bundleVersion == null || bundleVersion.isEmpty()) return "";
+        // "Unknown" is the literal English word Utils hands back when the package manager
+        // refuses, and splicing it into an otherwise translated sentence reads worse than
+        // leaving the app out. The bundle version is the one the reporter is asked for anyway.
+        boolean readable = appVersion != null && !appVersion.isEmpty()
+                && !"Unknown".equals(appVersion);
+        return readable
+                ? L10n.f(context, "Version %1$s for TikTok %2$s", bundleVersion, appVersion)
+                : L10n.f(context, "Version %1$s", bundleVersion);
     }
-
-    private void styleHeart(View view) {
-        ImageView icon = view.findViewById(android.R.id.icon);
-        if (icon == null) {
-            return;
-        }
-
-        int iconSize = SettingsUi.dp(getContext(), 21);
-        ViewGroup.LayoutParams params = icon.getLayoutParams();
-        params.width = iconSize;
-        params.height = iconSize;
-        if (params instanceof FrameLayout.LayoutParams) {
-            FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) params;
-            frameParams.gravity = Gravity.CENTER;
-            frameParams.topMargin = 0;
-        }
-        icon.setLayoutParams(params);
-        icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
-    }
-
-    private void addChevron(View view) {
-        View widget = view.findViewById(android.R.id.widget_frame);
-        if (!(widget instanceof ViewGroup)) {
-            return;
-        }
-
-        ViewGroup container = (ViewGroup) widget;
-        container.setVisibility(View.VISIBLE);
-        View existing = container.findViewWithTag(CHEVRON_TAG);
-        if (existing != null) {
-            return;
-        }
-
-        ImageView chevron = new ImageView(getContext());
-        chevron.setTag(CHEVRON_TAG);
-        chevron.setImageDrawable(new ChevronDrawable());
-        int size = SettingsUi.dp(getContext(), 18);
-        container.addView(chevron, new ViewGroup.LayoutParams(size, size));
-    }
-
-    private static final class ChevronDrawable extends Drawable {
-        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-        ChevronDrawable() {
-            paint.setColor(SettingsUi.isDarkMode()
-                    ? Color.argb(255, 143, 139, 140)
-                    : Color.argb(255, 135, 132, 133));
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(1.5f);
-            paint.setStrokeCap(Paint.Cap.SQUARE);
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            float centerX = getBounds().exactCenterX();
-            float centerY = getBounds().exactCenterY();
-            float offset = Math.min(getBounds().width(), getBounds().height()) * 0.17f;
-            canvas.drawLine(centerX - offset, centerY - offset, centerX + offset, centerY, paint);
-            canvas.drawLine(centerX + offset, centerY, centerX - offset, centerY + offset, paint);
-        }
-
-        @Override
-        public void setAlpha(int alpha) {
-            paint.setAlpha(alpha);
-        }
-
-        @Override
-        public void setColorFilter(ColorFilter colorFilter) {
-            paint.setColorFilter(colorFilter);
-        }
-
-        @Override
-        public int getOpacity() {
-            return PixelFormat.TRANSLUCENT;
-        }
-    }
-
 }

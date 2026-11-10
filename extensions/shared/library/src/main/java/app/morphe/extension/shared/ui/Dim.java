@@ -1,3 +1,11 @@
+/*
+ * Forked from MorpheApp/morphe-patches (GPL-3.0), by way of
+ * icysymmetra/tiktok-patches-for-morphe.
+ * https://github.com/MorpheApp/morphe-patches
+ *
+ * Imported carrying no notice of its own. Morphe hard forked ReVanced, so parts of
+ * this file may originate there.
+ */
 package app.morphe.extension.shared.ui;
 
 import android.content.res.Resources;
@@ -33,15 +41,16 @@ public final class Dim {
     public static final int dp48 = dp(48);
 
     /**
-     * Converts dp (density-independent pixels) to actual device pixels.
-     * Uses Android's official TypedValue.applyDimension() for accurate rounding.
+     * Converts dp (density-independent pixels) to actual device pixels, rounded to the nearest
+     * pixel the way the settings screens' own conversion rounds. It used to truncate, so the same
+     * 1dp line came out 2px here and 3px there at a density of 2.625.
      *
      * @param dp The dp value to convert (supports float, e.g. 1.2f).
      * @return The equivalent pixel value as int.
      */
     public static int dp(float dp) {
-        return (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, dp, METRICS);
+        return Math.round(TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, METRICS));
     }
 
     /**
