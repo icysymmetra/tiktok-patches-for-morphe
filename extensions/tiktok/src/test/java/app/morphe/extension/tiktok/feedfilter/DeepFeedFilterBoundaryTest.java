@@ -470,12 +470,13 @@ public class DeepFeedFilterBoundaryTest {
     @Test
     public void rawMetadataAdsReachEverySharedDeliveryDelegate() {
         Settings.REMOVE_ADS.save(true);
+        Settings.HIDE_PAID_PARTNERSHIP.save(true);
         Video rawAd = new Video("raw-ad", false, 500, "").withRawAd();
         Video partnership = new Video("partnership", false, 500, "").asPaidPartnership();
 
         AdsFilter classifier = new AdsFilter();
         assertTrue(classifier.getFiltered(rawAd));
-        assertTrue(classifier.getFiltered(partnership));
+        assertFalse(classifier.getFiltered(partnership));
 
         FeedItemList response = new FeedItemList();
         response.items = new ArrayList<>(Arrays.asList(rawAd, partnership));
