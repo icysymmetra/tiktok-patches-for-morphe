@@ -405,6 +405,7 @@ Default playback speed	Velocidad de reproducción predeterminada
 Device access	Acceso al dispositivo
 Device language, then original	Idioma del dispositivo, después el original
 Diagnostic data cleared. Tap again to put it back.	Se borraron los datos de diagnóstico. Toca de nuevo para restaurarlos.
+Diagnostic data couldn't be cleared. Try again.	No se pudieron borrar los datos de diagnóstico. Inténtalo de nuevo.
 Diagnostic data put back	Se restauraron los datos de diagnóstico
 Diagnostic report copied to the clipboard	Informe de diagnóstico copiado al portapapeles
 Diagnostics	Diagnóstico

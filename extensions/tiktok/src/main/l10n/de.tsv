@@ -408,6 +408,7 @@ Default playback speed	Standard-Wiedergabegeschwindigkeit
 Device access	Gerätezugriff
 Device language, then original	Gerätesprache, dann Original
 Diagnostic data cleared. Tap again to put it back.	Diagnosedaten gelöscht. Tippe erneut, um sie wiederherzustellen.
+Diagnostic data couldn't be cleared. Try again.	Die Diagnosedaten konnten nicht gelöscht werden. Versuche es erneut.
 Diagnostic data put back	Diagnosedaten wiederhergestellt
 Diagnostic report copied to the clipboard	Diagnosebericht in die Zwischenablage kopiert
 Diagnostics	Diagnose
