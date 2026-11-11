@@ -68,6 +68,7 @@ public final class CreatorExceptions {
             ShopFilter.class,
             SoundFilter.class,
             ContentMarkerFilters.PaidPartnershipFilter.class,
+            AdsFilter.CreatorCommissionFilter.class,
             ContentMarkerFilters.SeriesFilter.class,
             ContentMarkerFilters.DramaFilter.class,
             CardFilters.InsertedCardFilter.class,

@@ -567,6 +567,8 @@ Hide message streaks	Mesajlaşma serilerini gizle
 Hide new follower notifications	Yeni takipçi bildirimlerini gizle
 Hide new followers	Yeni takipçileri gizle
 Hide paid partnerships	Ücretli ortaklıkları gizle
+Hide creator commission posts	İçerik üreticisi komisyon gönderilerini gizle
+Hide creator posts labeled as earning a commission, including location-affiliate labels.	İçerik üreticisinin komisyon kazandığı belirtilen gönderileri, konum ortaklığı etiketleri dahil gizle.
 Hide people and options by name	Kişileri ve seçenekleri ada göre gizle
 Hide photo posts	Fotoğraf gönderilerini gizle
 Hide photo posts from the feed.	Fotoğraf gönderilerini akıştan gizle.
@@ -870,6 +872,7 @@ Overrides are disabled in the Feature Gate Lab.	Geçersiz kılmalar Feature Gate
 Overrides disabled. Restart TikTok to apply this.	Geçersiz kılmalar devre dışı bırakıldı. Bunu uygulamak için TikTok'u yeniden başlat.
 Overrides enabled. Restart TikTok to apply this.	Geçersiz kılmalar etkinleştirildi. Bunu uygulamak için TikTok'u yeniden başlat.
 Paid partnerships	Ücretli ortaklıklar
+Creator commission posts	İçerik üreticisi komisyon gönderileri
 People, shortcuts and sending controls	Kişiler, kısayollar ve gönderme kontrolleri
 Photo	Fotoğraf
 Photo and image posts	Fotoğraf ve görsel gönderileri
@@ -915,7 +918,7 @@ Remove	Kaldır
 Remove %1$s	Kaldır: %1$s
 Remove all overrides	Tüm geçersiz kılmaları kaldır
 Remove feed ads	Akış reklamlarını kaldır
-Remove feed ads, creator commission posts, paid partnerships, and branded content.	Akış reklamlarını, içerik üreticisi komisyon gönderilerini, ücretli ortaklıkları ve markalı içerikleri kaldır.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.	TikTok'un akışlara eklediği sponsorlu videoları ve reklam kartlarını kaldır.
 Hide the Share via row.	Şununla paylaş satırını gizle.
 Hide the actions row of the share sheet.	Paylaşım menüsündeki eylemler satırını gizle.
 Hide the magnifying glass at the top of Inbox. Search on the feed and in comments is unchanged.	Gelen Kutusu'nun üstündeki büyüteci gizle. Akıştaki ve yorumlardaki arama değişmez.

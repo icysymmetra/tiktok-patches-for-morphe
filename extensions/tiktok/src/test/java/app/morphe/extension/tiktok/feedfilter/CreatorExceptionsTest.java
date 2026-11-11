@@ -296,6 +296,7 @@ public class CreatorExceptionsTest {
         return new BooleanSetting[]{
                 Settings.REMOVE_ADS, Settings.HIDE_LIVE, Settings.HIDE_STORY, Settings.HIDE_IMAGE,
                 Settings.HIDE_SHOP, Settings.HIDE_BLOCKED_SOUNDS, Settings.HIDE_PAID_PARTNERSHIP,
+                Settings.HIDE_CREATOR_COMMISSION,
                 Settings.FILTER_LOCATION_VIDEOS, Settings.HIDE_AI_GENERATED, Settings.HIDE_VERIFIED,
                 Settings.HIDE_SERIES, Settings.HIDE_MINI_DRAMAS, Settings.HIDE_PLAYLIST_VIDEOS,
                 Settings.HIDE_INSERTED_CARDS, Settings.HIDE_SEEN_VIDEOS, Settings.HIDE_PROMOTIONAL_MUSIC,

@@ -558,6 +558,8 @@ Hide message streaks	Nachrichten-Serien ausblenden
 Hide new follower notifications	Follower-Hinweise ausblenden
 Hide new followers	Neue Follower ausblenden
 Hide paid partnerships	Bezahlte Partnerschaften ausblenden
+Hide creator commission posts	Posts mit Creator-Provision ausblenden
+Hide creator posts labeled as earning a commission, including location-affiliate labels.	Posts ausblenden, bei denen Creator laut Kennzeichnung eine Provision erhalten, auch mit Standort-Partnerlabel.
 Hide people and options by name	Personen und Optionen nach Name ausblenden
 Hide photo posts	Fotobeiträge ausblenden
 Hide picture comments	Bild-Kommentare ausblenden
@@ -841,6 +843,7 @@ Overrides are disabled in the Feature Gate Lab.	Überschreibungen sind im Featur
 Overrides disabled. Restart TikTok to apply this.	Überschreibungen deaktiviert. TikTok neu starten, damit das gilt.
 Overrides enabled. Restart TikTok to apply this.	Überschreibungen aktiviert. TikTok neu starten, damit das gilt.
 Paid partnerships	Bezahlte Partnerschaften
+Creator commission posts	Posts mit Creator-Provision
 People, shortcuts and sending controls	Kontakte, Verknüpfungen und Versandoptionen
 Photo	Foto
 Photo and image posts	Foto- und Bildbeiträge
@@ -885,7 +888,7 @@ Remove	Entfernen
 Remove %1$s	%1$s entfernen
 Remove all overrides	Alle Überschreibungen entfernen
 Remove feed ads	Werbung im Feed entfernen
-Remove feed ads, creator commission posts, paid partnerships, and branded content.	Feed-Werbung, Posts mit Creator-Provision, bezahlte Partnerschaften und Markeninhalte entfernen.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.	Gesponserte Videos und Werbekarten entfernen, die TikTok in Feeds einfügt.
 Hide voting cards and poll results above the comments, including polls that have ended.	Blende Abstimmungen und ihre Ergebnisse über den Kommentaren aus, auch wenn die Abstimmung bereits beendet ist.
 Hide the Share via row.	Die Zeile „Teilen über“ ausblenden.
 Hide the actions row of the share sheet.	Die Aktionszeile des Teilen-Menüs ausblenden.

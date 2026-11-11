@@ -4,7 +4,7 @@
 
 Select `Feed filter` to add controls for ads, LIVE, Shop, stories, photo posts, and view/like-count ranges. Select `Hide AI content` and `Hide FYP unpersonalized slop videos` independently if you want either of those controls. All three use shared feed hooks, but neither standalone patch requires selecting `Feed filter`. The relevant in-app toggle or count range must also be set for a filter to act.
 
-With fresh settings, Remove feed ads is on when `Feed filter` is installed. Hide livestreams, Hide AI content, and Hide FYP unpersonalized slop videos are off. View and like ranges initially allow the full range. Existing saved settings may differ, so report the actual values on the affected device.
+With fresh settings, Remove feed ads and Hide creator commission posts are on when `Feed filter` is installed. Remove feed ads covers sponsored videos and inserted ad cards only; creator commission posts, paid partnerships and promotional music each have their own toggle, so any of them can be kept or hidden independently. Hide livestreams, Hide AI content, and Hide FYP unpersonalized slop videos are off. View and like ranges initially allow the full range. Existing saved settings may differ, so report the actual values on the affected device.
 
 `Hide AI content` checks TikTok's AI label and moderation fields on feed items. It can remove posts carrying the supported AI-generated or AI-modified signals. It cannot identify AI content that TikTok has not marked in those fields.
 

@@ -615,6 +615,8 @@ Hide message streaks	Скрывать серии сообщений
 Hide new follower notifications	Скрывать уведомления о новых подписчиках
 Hide new followers	Скрывать новых подписчиков
 Hide paid partnerships	Скрывать платные партнёрства
+Hide creator commission posts	Скрывать публикации с комиссией автора
+Hide creator posts labeled as earning a commission, including location-affiliate labels.	Скрывать публикации, где указано, что автор получает комиссию, включая партнёрские метки мест.
 Hide people and options by name	Скрывать людей и варианты по названию
 Hide photo posts	Скрывать фотопубликации
 Hide picture comments	Скрывать комментарии-картинки
@@ -901,6 +903,7 @@ Overrides are disabled in the Feature Gate Lab.	Переопределения �
 Overrides disabled. Restart TikTok to apply this.	Переопределения отключены. Перезапустите TikTok, чтобы это применить.
 Overrides enabled. Restart TikTok to apply this.	Переопределения включены. Перезапустите TikTok, чтобы это применить.
 Paid partnerships	Платные партнёрства
+Creator commission posts	Публикации с комиссией автора
 People, shortcuts and sending controls	Люди, ярлыки и настройки отправки
 Photo	Фото
 Photo and image posts	Публикации с фото и изображениями
@@ -945,7 +948,7 @@ Remove	Удалить
 Remove %1$s	Удалить %1$s
 Remove all overrides	Удалить все переопределения
 Remove feed ads	Убирать рекламу из ленты
-Remove feed ads, creator commission posts, paid partnerships, and branded content.	Убирать рекламу из ленты, публикации с комиссией автора, платные партнёрства и брендированный контент.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.	Убирать спонсорские видео и рекламные карточки, которые TikTok вставляет в ленты.
 Hide voting cards and poll results above the comments, including polls that have ended.	Скрывать карточки голосования и результаты опросов над комментариями, включая уже завершённые опросы.
 Hide the Share via row.	Скрывать строку «Поделиться через».
 Hide the actions row of the share sheet.	Скрывать строку действий в меню «Поделиться».

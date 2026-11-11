@@ -555,6 +555,8 @@ Hide message streaks	Esconder as sequências de mensagens
 Hide new follower notifications	Esconder as notificações de novos seguidores
 Hide new followers	Esconder os novos seguidores
 Hide paid partnerships	Esconder as parcerias pagas
+Hide creator commission posts	Ocultar posts com comissão do criador
+Hide creator posts labeled as earning a commission, including location-affiliate labels.	Ocultar posts de criadores marcados como geradores de comissão, incluindo selos de afiliado de locais.
 Hide people and options by name	Esconder pessoas e opções por nome
 Hide photo posts	Esconder as publicações de fotos
 Hide picture comments	Esconder os comentários com imagem
@@ -838,6 +840,7 @@ Overrides are disabled in the Feature Gate Lab.	As substituições estão deslig
 Overrides disabled. Restart TikTok to apply this.	Substituições desativadas. Reinicie o TikTok para aplicar.
 Overrides enabled. Restart TikTok to apply this.	Substituições ativadas. Reinicie o TikTok para aplicar.
 Paid partnerships	Parcerias pagas
+Creator commission posts	Posts com comissão do criador
 People, shortcuts and sending controls	Pessoas, atalhos e controles de envio
 Photo	Foto
 Photo and image posts	Publicações de fotos e imagens
@@ -882,7 +885,7 @@ Remove	Remover
 Remove %1$s	Remover %1$s
 Remove all overrides	Remover todas as substituições
 Remove feed ads	Remover os anúncios do feed
-Remove feed ads, creator commission posts, paid partnerships, and branded content.	Remover anúncios do feed, posts com comissão do criador, parcerias pagas e conteúdo de marca.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.	Remover vídeos patrocinados e os cards de anúncio que o TikTok insere nos feeds.
 Hide voting cards and poll results above the comments, including polls that have ended.	Oculte os cartões de votação e os resultados acima dos comentários, incluindo enquetes encerradas.
 Hide the Share via row.	Esconder a linha Compartilhar via.
 Hide the actions row of the share sheet.	Esconder a linha de ações da folha de compartilhamento.

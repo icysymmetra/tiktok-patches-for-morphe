@@ -567,6 +567,8 @@ Hide message streaks	Mesaj seriyalarını gizlədin
 Hide new follower notifications	Yeni izləyici bildirişlərini gizlədin
 Hide new followers	Yeni izləyiciləri gizlədin
 Hide paid partnerships	Ödənişli tərəfdaşlıqları gizlədin
+Hide creator commission posts	Yaradıcı komissiyalı paylaşımları gizlədin
+Hide creator posts labeled as earning a commission, including location-affiliate labels.	Komissiya qazandığı qeyd olunan yaradıcı paylaşımlarını, məkan tərəfdaşlığı etiketləri daxil olmaqla, gizlədin.
 Hide people and options by name	İnsanları və seçimləri adına görə gizlədin
 Hide photo posts	Foto paylaşımlarını gizlədin
 Hide photo posts from the feed.	Foto paylaşımlarını lentdən gizlədin.
@@ -870,6 +872,7 @@ Overrides are disabled in the Feature Gate Lab.	Feature Gate Lab-da əvəzləmə
 Overrides disabled. Restart TikTok to apply this.	Əvəzləmələr söndürüldü. Tətbiq etmək üçün TikTok-u yenidən başladın.
 Overrides enabled. Restart TikTok to apply this.	Əvəzləmələr yandırıldı. Tətbiq etmək üçün TikTok-u yenidən başladın.
 Paid partnerships	Ödənişli tərəfdaşlıqlar
+Creator commission posts	Yaradıcı komissiyalı paylaşımlar
 People, shortcuts and sending controls	İnsanlar, qısayollar və göndərmə idarəetmələri
 Photo	Foto
 Photo and image posts	Foto və şəkil paylaşımları
@@ -915,7 +918,7 @@ Remove	Silin
 Remove %1$s	%1$s silin
 Remove all overrides	Bütün əvəzləmələri silin
 Remove feed ads	Lent reklamlarını silin
-Remove feed ads, creator commission posts, paid partnerships, and branded content.	Lent reklamlarını, yaradıcı komissiyalı paylaşımları, ödənişli tərəfdaşlıqları və brendli məzmunu silin.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.	TikTok-un lentlərə əlavə etdiyi sponsorlu videoları və reklam kartlarını silin.
 Hide the Share via row.	Share via sətrini gizlədin.
 Hide the actions row of the share sheet.	Paylaşma vərəqinin əməliyyatlar sətrini gizlədin.
 Hide the magnifying glass at the top of Inbox. Search on the feed and in comments is unchanged.	Gələnlərin yuxarısındakı böyüdücü şüşəni gizlədin. Lentdəki və şərhlərdəki axtarış dəyişmir.

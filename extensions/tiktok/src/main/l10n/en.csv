@@ -471,6 +471,7 @@ Country filters,Country filters
 Counts under the buttons,Counts under the buttons
 Cover saved to %1$s,Cover saved to %1$s
 Create,Create
+Creator commission posts,Creator commission posts
 Creator exceptions,Creator exceptions
 Creators and sounds,Creators and sounds
 Creators hidden on this phone,Creators hidden on this phone
@@ -712,6 +713,8 @@ Hide comments made of an image or a sticker instead of words.,Hide comments made
 Hide comments when a username or display name contains one of these entries. Separate entries with commas. Uses the same rules as blocked comment words.,Hide comments when a username or display name contains one of these entries. Separate entries with commas. Uses the same rules as blocked comment words.
 Hide controls after each video starts. Tap to restore them.,Hide controls after each video starts. Tap to restore them.
 Hide conversations,Hide conversations
+Hide creator commission posts,Hide creator commission posts
+"Hide creator posts labeled as earning a commission, including location-affiliate labels.","Hide creator posts labeled as earning a commission, including location-affiliate labels."
 Hide effect and template tags,Hide effect and template tags
 Hide every direct message conversation. Leaves the Inbox empty apart from whatever else is still turned on.,Hide every direct message conversation. Leaves the Inbox empty apart from whatever else is still turned on.
 "Hide feed videos with place badges, even when they aren't paid ads. To keep the video and hide only its badge, use Hide location labels in Feed screen.","Hide feed videos with place badges, even when they aren't paid ads. To keep the video and hide only its badge, use Hide location labels in Feed screen."
@@ -1353,7 +1356,7 @@ Remove,Remove
 Remove %1$s,Remove %1$s
 Remove all overrides,Remove all overrides
 Remove feed ads,Remove feed ads
-"Remove feed ads, creator commission posts, paid partnerships, and branded content.","Remove feed ads, creator commission posts, paid partnerships, and branded content."
+Remove sponsored videos and the ad cards TikTok inserts into feeds.,Remove sponsored videos and the ad cards TikTok inserts into feeds.
 Remove story rings,Remove story rings
 Remove the LIVE ring,Remove the LIVE ring
 Remove the imported font,Remove the imported font

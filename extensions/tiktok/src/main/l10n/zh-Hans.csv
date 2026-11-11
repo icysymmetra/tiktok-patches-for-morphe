@@ -703,6 +703,8 @@ Hide new follower notifications,隐藏新关注者通知
 Hide new followers,隐藏新关注者
 Hide online status,隐藏在线状态
 Hide paid partnerships,隐藏付费合作伙伴关系
+Hide creator commission posts,隐藏创作者佣金帖子
+"Hide creator posts labeled as earning a commission, including location-affiliate labels.",隐藏标注创作者可获得佣金的帖子，包括地点联盟标签.
 Hide people and options by name,按姓名隐藏人员和选项
 Hide photo posts,隐藏照片帖子
 Hide photo posts from the feed.,隐藏信息流中的照片帖子.
@@ -1183,6 +1185,7 @@ Overrides disabled. Restart TikTok to apply this.,覆盖禁用。重新启动 Ti
 Overrides enabled. Restart TikTok to apply this.,覆盖已启用。重新启动 TikTok 以应用此操作.
 Own profile counts,自己的个人资料很重要
 Paid partnerships,付费合作伙伴
+Creator commission posts,创作者佣金帖子
 Pass TikTok's install checks,通过 TikTok 的安装检查
 Pause,暂停
 Pause Metra,暂停Hushfeed
@@ -1310,7 +1313,7 @@ Remove,删除
 Remove %1$s,删除 %1$s
 Remove all overrides,删除所有覆盖
 Remove feed ads,删除信息流广告
-"Remove feed ads, creator commission posts, paid partnerships, and branded content.",删除信息流广告、创作者佣金帖子、付费合作伙伴关系和品牌内容.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.,删除 TikTok 插入信息流的赞助视频和广告卡片.
 Remove story rings,删除故事环
 Remove the LIVE ring,取下 LIVE 环
 Remove the imported font,删除导入的字体
