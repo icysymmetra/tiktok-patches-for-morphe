@@ -124,7 +124,7 @@ final class EdgeDragProbe {
                 throw new IllegalStateException("native window is clipped; coordinate mapping refused");
             }
             comments = unique(decor, activity.getResources().getIdentifier("eq2", "id", TARGET));
-            rail = unique(decor, activity.getResources().getIdentifier("mud", "id", TARGET));
+            rail = unique(decor, activity.getResources().getIdentifier("ljn", "id", TARGET));
             commentBounds = visibleBounds(comments); railBounds = visibleBounds(rail);
             if (!railBounds.contains(commentBounds)) throw new IllegalStateException("comments are outside the observed native rail");
             pager = pagerAbove(rail);

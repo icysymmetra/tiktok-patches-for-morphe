@@ -6,7 +6,7 @@ Burn-in guard	Защита от выгорания экрана
 Couldn't write the caption on this video. Saving it without.	Не удалось написать описание на этом видео. Оно сохраняется без него.
 Dim when idle	Затемнять при бездействии
 Dim when idle and shift	Затемнять при бездействии и сдвигать
-For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.	Для OLED-экранов. Через 5 секунд без касаний кнопки, подпись и вкладки поверх видео затемняются до четверти, а следующее касание возвращает их. Сдвиг также смещает всё в ленте на несколько пикселей каждые 2 минуты.
+For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.	Для OLED-экранов. Кнопки, подпись и вкладки поверх видео затемняются через несколько секунд после последнего пробуждения, а переключатели ниже выбирают, что их будит. Сдвиг также смещает всё в ленте на несколько пикселей каждые 2 минуты.
 Importing new history ended Undo for the earlier clear. You can clear the imported history.	После импорта новой истории нельзя отменить предыдущую очистку. Вы можете очистить импортированную историю.
 %1$d setting in that file can't be restored here and was skipped	%1$d настройку из файла нельзя восстановить здесь, и она пропущена
 %1$d settings in that file can't be restored here and were skipped	%1$d настроек из файла нельзя восстановить здесь, и они пропущены
@@ -2385,3 +2385,24 @@ Promotions, overlays, profile and inbox controls	Promotions, overlays, profile a
 Filters, translation, copy options and split view	Filters, translation, copy options and split view
 Change the region TikTok reads	Change the region TikTok reads
 Playback, gestures, privacy, screen time and system	Playback, gestures, privacy, screen time and system
+Dim after	Затемнять через
+How long the controls stay bright after they last woke.	Сколько элементы управления остаются яркими после последнего пробуждения.
+Dim to	Затемнять до
+How bright the dimmed controls are, compared with how TikTok draws them.	Насколько ярки затемнённые элементы по сравнению с тем, как их рисует TikTok.
+Wake the controls when	Будить элементы, когда
+Pick what brings the dimmed controls back. A tap still does what it always does.	Выберите, что возвращает затемнённые элементы. Касание по-прежнему делает то же, что и всегда.
+I tap a dimmed control	Я касаюсь затемнённого элемента
+I tap the video	Я касаюсь видео
+I scroll or swipe	Я прокручиваю или провожу пальцем
+I come back from another screen	Я возвращаюсь с другого экрана
+I press and hold	Я нажимаю и удерживаю
+Wakes when: %1$s	Будят: %1$s
+Nothing wakes them. They stay dimmed.	Ничто их не будит. Они остаются затемнёнными.
+What dims	Что затемняется
+Pick the parts of the screen the guard dims.	Выберите части экрана, которые затемняет защита.
+Buttons over the video	Кнопки поверх видео
+Caption and music	Подпись и музыка
+Top tabs and search	Верхние вкладки и поиск
+Bottom tabs and bars	Нижние вкладки и панели
+Dims: %1$s	Затемняются: %1$s
+Nothing is dimmed.	Ничего не затемняется.

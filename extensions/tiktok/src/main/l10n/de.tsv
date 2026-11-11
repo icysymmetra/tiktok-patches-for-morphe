@@ -6,7 +6,7 @@ Burn-in guard	Einbrennschutz
 Couldn't write the caption on this video. Saving it without.	Die Beschreibung konnte nicht ins Video geschrieben werden. Es wird ohne gespeichert.
 Dim when idle	Bei Inaktivität abdunkeln
 Dim when idle and shift	Bei Inaktivität abdunkeln und verschieben
-For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.	Für OLED-Bildschirme. Nach 5 Sekunden ohne Berührung werden die Schaltflächen, die Beschreibung und die Tabs über dem Video auf ein Viertel abgedunkelt, und deine nächste Berührung holt sie zurück. Verschieben bewegt außerdem alles im Feed alle 2 Minuten um ein paar Pixel.
+For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.	Für OLED-Bildschirme. Die Schaltflächen, die Beschreibung und die Tabs über dem Video werden ein paar Sekunden nach dem letzten Aufwecken abgedunkelt, und die Schalter darunter legen fest, was sie aufweckt. Verschieben bewegt außerdem alles im Feed alle 2 Minuten um ein paar Pixel.
 Importing new history ended Undo for the earlier clear. You can clear the imported history.	Durch den Import ist das Rückgängigmachen des früheren Löschens beendet. Du kannst den importierten Verlauf löschen.
 %1$d setting in that file can't be restored here and was skipped	%1$d Einstellung in der Datei kann hier nicht wiederhergestellt werden und wurde übersprungen
 %1$d settings in that file can't be restored here and were skipped	%1$d Einstellungen in der Datei können hier nicht wiederhergestellt werden und wurden übersprungen
@@ -2208,3 +2208,24 @@ Promotions, overlays, profile and inbox controls	Promotions, overlays, profile a
 Filters, translation, copy options and split view	Filter, Übersetzung, Kopieroptionen und geteilte Ansicht
 Change the region TikTok reads	Change the region TikTok reads
 Playback, gestures, privacy, screen time and system	Playback, gestures, privacy, screen time and system
+Dim after	Abdunkeln nach
+How long the controls stay bright after they last woke.	Wie lange die Bedienelemente hell bleiben, nachdem sie zuletzt aufgeweckt wurden.
+Dim to	Abdunkeln auf
+How bright the dimmed controls are, compared with how TikTok draws them.	Wie hell die abgedunkelten Bedienelemente sind, verglichen damit, wie TikTok sie zeichnet.
+Wake the controls when	Bedienelemente aufwecken bei
+Pick what brings the dimmed controls back. A tap still does what it always does.	Wähle, was die abgedunkelten Bedienelemente zurückholt. Ein Tippen tut weiterhin, was es immer tut.
+I tap a dimmed control	Tippen auf ein abgedunkeltes Element
+I tap the video	Tippen auf das Video
+I scroll or swipe	Scrollen oder Wischen
+I come back from another screen	Rückkehr von einem anderen Bildschirm
+I press and hold	Gedrückthalten
+Wakes when: %1$s	Aufwecken bei: %1$s
+Nothing wakes them. They stay dimmed.	Nichts weckt sie auf. Sie bleiben abgedunkelt.
+What dims	Was abgedunkelt wird
+Pick the parts of the screen the guard dims.	Wähle die Bereiche des Bildschirms, die der Schutz abdunkelt.
+Buttons over the video	Schaltflächen über dem Video
+Caption and music	Beschreibung und Musik
+Top tabs and search	Obere Tabs und Suche
+Bottom tabs and bars	Untere Tabs und Leisten
+Dims: %1$s	Abgedunkelt: %1$s
+Nothing is dimmed.	Nichts wird abgedunkelt.

@@ -73,7 +73,7 @@ public class VideoOverlayHiderTest {
         int exitId = 0x7f0a0f41, seekId = 0x7f0a0f42, railId = 0x7f0a0f43;
         VideoOverlayHider.resolveForTests("47.4.3:e_3", exitId);
         VideoOverlayHider.resolveForTests("video_seek_bar", seekId);
-        VideoOverlayHider.resolveForTests("47.4.3:mud", railId);
+        VideoOverlayHider.resolveForTests("47.4.3:ljn", railId);
         boolean previousHide = Settings.HIDE_CLEAR_DISPLAY_CONTROLS.get();
         int previousFade = Settings.FADE_CONTROLS_OPACITY.get();
         Settings.HIDE_CLEAR_DISPLAY_CONTROLS.save(true);
@@ -140,7 +140,7 @@ public class VideoOverlayHiderTest {
             Settings.FADE_CONTROLS_OPACITY.save(previousFade);
             VideoOverlayHider.resolveForTests("47.4.3:e_3", 0);
             VideoOverlayHider.resolveForTests("video_seek_bar", 0);
-            VideoOverlayHider.resolveForTests("47.4.3:mud", 0);
+            VideoOverlayHider.resolveForTests("47.4.3:ljn", 0);
         }
     }
 
@@ -313,7 +313,7 @@ public class VideoOverlayHiderTest {
         int cellId = 0x7f0a0a31;
         int actionBarId = 0x7f0a0a32;
         VideoOverlayHider.resolveForTests("view_rootview", cellId);
-        VideoOverlayHider.resolveForTests("47.4.3:mud", actionBarId);
+        VideoOverlayHider.resolveForTests("47.4.3:ljn", actionBarId);
         for (int i = 0; i < names.length; i++) {
             VideoOverlayHider.resolveForTests(names[i], 0x7f0a0a40 + i);
         }
@@ -397,7 +397,7 @@ public class VideoOverlayHiderTest {
         } finally {
             Settings.TOUCH_TARGET_SCALE.resetToDefault();
             VideoOverlayHider.resolveForTests("view_rootview", 0);
-            VideoOverlayHider.resolveForTests("47.4.3:mud", 0);
+            VideoOverlayHider.resolveForTests("47.4.3:ljn", 0);
             for (String name : names) {
                 VideoOverlayHider.resolveForTests(name, 0);
             }
@@ -554,7 +554,7 @@ public class VideoOverlayHiderTest {
         int captionId = 0x7f0a0001;
         int columnId = 0x7f0a0002;
         VideoOverlayHider.resolveForTests("desc", captionId);
-        VideoOverlayHider.resolveForTests("47.4.3:mud", columnId);
+        VideoOverlayHider.resolveForTests("47.4.3:ljn", columnId);
         try (var controller = Robolectric.buildActivity(Activity.class).setup()) {
             Activity activity = controller.get();
             Utils.setContext(activity);
@@ -618,7 +618,7 @@ public class VideoOverlayHiderTest {
         int currentCountTextId = 0x7f0a0507;
         int oldCountTextId = 0x7f0a0508;
         VideoOverlayHider.resolveForTests("view_rootview", cellId);
-        VideoOverlayHider.resolveForTests("47.4.3:mud", currentColumnId);
+        VideoOverlayHider.resolveForTests("47.4.3:ljn", currentColumnId);
         VideoOverlayHider.resolveForTests("kzj", oldColumnId);
         VideoOverlayHider.resolveForTests("47.4.3:g8a", currentLikeId);
         VideoOverlayHider.resolveForTests("fws", oldLikeId);
@@ -693,7 +693,7 @@ public class VideoOverlayHiderTest {
             Settings.HIDE_FEED_ACTION_BAR.save(false);
             Settings.HIDE_RAIL_LIKE.save(false);
             Settings.HIDE_RAIL_COUNTS.save(false);
-            String[] names = {"view_rootview", "47.4.3:mud", "kzj", "47.4.3:g8a", "fws",
+            String[] names = {"view_rootview", "47.4.3:ljn", "kzj", "47.4.3:g8a", "fws",
                     "47.4.3:g8c", "fwu", "47.4.3:g8b", "fwt"};
             for (String name : names) VideoOverlayHider.resolveForTests(name, 0);
         }
@@ -3005,13 +3005,13 @@ public class VideoOverlayHiderTest {
 
     private static void resolveFadeIds() {
         VideoOverlayHider.resolveForTests("view_rootview", FADE_CELL_ID);
-        VideoOverlayHider.resolveForTests("47.4.3:mud", FADE_COLUMN_ID);
+        VideoOverlayHider.resolveForTests("47.4.3:ljn", FADE_COLUMN_ID);
         VideoOverlayHider.resolveForTests("47.4.3:uwq", FADE_TABS_ID);
     }
 
     private static void clearFadeIds() {
         VideoOverlayHider.resolveForTests("view_rootview", 0);
-        VideoOverlayHider.resolveForTests("47.4.3:mud", 0);
+        VideoOverlayHider.resolveForTests("47.4.3:ljn", 0);
         VideoOverlayHider.resolveForTests("47.4.3:uwq", 0);
     }
 
@@ -3077,7 +3077,7 @@ public class VideoOverlayHiderTest {
     public void theCaptionFrameAndMusicDiscFadeBesideTheColumn() {
         int column471 = 0x7f0a0d11, frame471 = 0x7f0a0d12, disc = 0x7f0a0d13;
         resolveFadeIds();
-        VideoOverlayHider.resolveForTests("47.4.3:mud", column471);
+        VideoOverlayHider.resolveForTests("47.4.3:ljn", column471);
         VideoOverlayHider.resolveForTests("47.4.3:bqr", frame471);
         VideoOverlayHider.resolveForTests("videomusiccoverblock", disc);
         boolean overlays = app.morphe.extension.tiktok.settings.SettingsStatus.videoOverlaysEnabled;
@@ -3125,7 +3125,7 @@ public class VideoOverlayHiderTest {
             Settings.FADE_CONTROLS_OPACITY.save(100);
             app.morphe.extension.tiktok.settings.SettingsStatus.videoOverlaysEnabled = overlays;
             clearFadeIds();
-            VideoOverlayHider.resolveForTests("47.4.3:mud", 0);
+            VideoOverlayHider.resolveForTests("47.4.3:ljn", 0);
             VideoOverlayHider.resolveForTests("47.4.3:bqr", 0);
             VideoOverlayHider.resolveForTests("videomusiccoverblock", 0);
         }

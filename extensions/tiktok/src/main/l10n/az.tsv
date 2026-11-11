@@ -6,7 +6,7 @@ Burn-in guard	Ekran yanmasından qoruma
 Couldn't write the caption on this video. Saving it without.	Açıqlamanı bu videonun üzərinə yazmaq alınmadı. Onsuz saxlanılır.
 Dim when idle	Toxunulmayanda solğunlaşdır
 Dim when idle and shift	Toxunulmayanda solğunlaşdır və sürüşdür
-For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.	OLED ekranlar üçün. 5 saniyə toxunulmadıqda videonun üzərindəki düymələr, başlıq və tablar dörddə birə qədər solğunlaşır, növbəti toxunuşunuz onları geri qaytarır. Sürüşdürmə həmçinin lentdəki hər şeyi hər 2 dəqiqədən bir bir neçə piksel tərpədir.
+For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.	OLED ekranlar üçün. Videonun üzərindəki düymələr, başlıq və tablar sonuncu dəfə oyandıqdan bir neçə saniyə sonra solğunlaşır, aşağıdakı açarlar isə onları nəyin oyadacağını seçir. Sürüşdürmə həmçinin lentdəki hər şeyi hər 2 dəqiqədən bir bir neçə piksel tərpədir.
 Importing new history ended Undo for the earlier clear. You can clear the imported history.	Yeni tarixçənin idxalı əvvəlki təmizləməni geri qaytarmaq imkanını bitirdi. İdxal olunmuş tarixçəni təmizləyə bilərsiniz.
 %1$d setting in that file can't be restored here and was skipped	Bu fayldakı %1$d ayar burada bərpa edilə bilmir və ötürüldü
 %1$d settings in that file can't be restored here and were skipped	Bu fayldakı %1$d ayar burada bərpa edilə bilmir və ötürüldü
@@ -2205,3 +2205,24 @@ Promotions, overlays, profile and inbox controls	Promotions, overlays, profile a
 Filters, translation, copy options and split view	Filters, translation, copy options and split view
 Change the region TikTok reads	Change the region TikTok reads
 Playback, gestures, privacy, screen time and system	Playback, gestures, privacy, screen time and system
+Dim after	Solğunlaşma vaxtı
+How long the controls stay bright after they last woke.	İdarəetmə elementləri sonuncu dəfə oyandıqdan sonra nə qədər parlaq qalır.
+Dim to	Solğunluq səviyyəsi
+How bright the dimmed controls are, compared with how TikTok draws them.	Solğunlaşmış elementlər TikTok-un çəkdiyi ilə müqayisədə nə qədər parlaqdır.
+Wake the controls when	İdarəetmə elementlərini oyat
+Pick what brings the dimmed controls back. A tap still does what it always does.	Solğunlaşmış elementləri nəyin geri qaytaracağını seçin. Toxunuş yenə də həmişəki işini görür.
+I tap a dimmed control	Solğun elementə toxunanda
+I tap the video	Videoya toxunanda
+I scroll or swipe	Sürüşdürəndə
+I come back from another screen	Başqa ekrandan qayıdanda
+I press and hold	Basıb saxlayanda
+Wakes when: %1$s	Oyadır: %1$s
+Nothing wakes them. They stay dimmed.	Heç nə oyatmır. Solğun qalırlar.
+What dims	Nə solğunlaşır
+Pick the parts of the screen the guard dims.	Qorumanın solğunlaşdırdığı ekran hissələrini seçin.
+Buttons over the video	Videonun üzərindəki düymələr
+Caption and music	Başlıq və musiqi
+Top tabs and search	Yuxarı tablar və axtarış
+Bottom tabs and bars	Aşağı tablar və zolaqlar
+Dims: %1$s	Solğunlaşır: %1$s
+Nothing is dimmed.	Heç nə solğunlaşmır.

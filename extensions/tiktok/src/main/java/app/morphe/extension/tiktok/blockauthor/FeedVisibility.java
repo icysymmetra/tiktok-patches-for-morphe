@@ -150,11 +150,20 @@ public final class FeedVisibility {
     }
 
     static boolean isDetailVisible() {
+        return visibleDetailPage() != null;
+    }
+
+    /**
+     * The root of the detail page showing inside the main activity, as a photo opened from
+     * search does, or null. The feed's cells stay attached under it in the same window, so
+     * whatever asks where a tap landed has to look inside this view only.
+     */
+    public static View visibleDetailPage() {
         for (PageState state : DETAIL_PAGES.values()) {
             View view = state.view.get();
-            if (state.resumed && state.visible && view != null && view.isShown()) return true;
+            if (state.resumed && state.visible && view != null && view.isShown()) return view;
         }
-        return false;
+        return null;
     }
 
     private FeedVisibility() {

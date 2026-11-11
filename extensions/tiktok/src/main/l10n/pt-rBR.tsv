@@ -6,7 +6,7 @@ Burn-in guard	Proteção contra burn-in
 Couldn't write the caption on this video. Saving it without.	Não deu para escrever a legenda neste vídeo. Salvando sem ela.
 Dim when idle	Escurecer quando parado
 Dim when idle and shift	Escurecer quando parado e deslocar
-For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.	Para telas OLED. Depois de 5 segundos sem toque, os botões, a legenda e as abas sobre o vídeo escurecem para um quarto, e o próximo toque os traz de volta. Deslocar também move tudo no feed alguns pixels a cada 2 minutos.
+For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes.	Para telas OLED. Os botões, a legenda e as abas sobre o vídeo escurecem alguns segundos depois da última vez que acordaram, e as chaves abaixo escolhem o que os acorda. Deslocar também move tudo no feed alguns pixels a cada 2 minutos.
 Importing new history ended Undo for the earlier clear. You can clear the imported history.	Importar um novo histórico encerrou a opção de desfazer a limpeza anterior. Você pode limpar o histórico importado.
 %1$d setting in that file can't be restored here and was skipped	%1$d configuração do arquivo não pode ser restaurada aqui e foi ignorada
 %1$d settings in that file can't be restored here and were skipped	%1$d configurações do arquivo não podem ser restauradas aqui e foram ignoradas
@@ -2205,3 +2205,24 @@ Promotions, overlays, profile and inbox controls	Promotions, overlays, profile a
 Filters, translation, copy options and split view	Filters, translation, copy options and split view
 Change the region TikTok reads	Change the region TikTok reads
 Playback, gestures, privacy, screen time and system	Playback, gestures, privacy, screen time and system
+Dim after	Escurecer depois de
+How long the controls stay bright after they last woke.	Quanto tempo os controles ficam claros depois da última vez que acordaram.
+Dim to	Escurecer para
+How bright the dimmed controls are, compared with how TikTok draws them.	O quanto os controles escurecidos ficam claros, comparado com como o TikTok os desenha.
+Wake the controls when	Acordar os controles quando
+Pick what brings the dimmed controls back. A tap still does what it always does.	Escolha o que traz de volta os controles escurecidos. Um toque continua fazendo o que sempre faz.
+I tap a dimmed control	Eu toco num controle escurecido
+I tap the video	Eu toco no vídeo
+I scroll or swipe	Eu rolo ou deslizo
+I come back from another screen	Eu volto de outra tela
+I press and hold	Eu toco e seguro
+Wakes when: %1$s	Acordam quando: %1$s
+Nothing wakes them. They stay dimmed.	Nada os acorda. Eles ficam escurecidos.
+What dims	O que escurece
+Pick the parts of the screen the guard dims.	Escolha as partes da tela que a proteção escurece.
+Buttons over the video	Botões sobre o vídeo
+Caption and music	Legenda e música
+Top tabs and search	Abas de cima e busca
+Bottom tabs and bars	Abas de baixo e barras
+Dims: %1$s	Escurecem: %1$s
+Nothing is dimmed.	Nada escurece.

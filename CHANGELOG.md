@@ -1,3 +1,34 @@
+# [0.10.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.10.0-dev.1...v0.10.0-dev.2) (2026-11-11)
+
+
+### Bug Fixes
+
+* **tiktok:** refine Simplified Chinese translations ([7f9c470](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/7f9c47074ad96134631f7a895f5bf91b5a309a0e))
+
+
+
+
+
+## 0.10.0-dev.2
+
+# [0.10.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0...v0.10.0-dev.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* **tiktok:** keep Burn-in guard's restore and tap notes in step with the screen ([489e9ee](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/489e9eeb21c160d48368acec0662c105c6fd71fa)), closes [#191](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/191)
+
+
+### Features
+
+* **tiktok:** make Burn-in guard ignore scrolling and fix the 47.4.3 rail column ([7bdef1d](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/7bdef1d9b18849289166be82cedc59aaceaa3c39)), closes [#191](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/191)
+
+
+
+
+
+## 0.10.0-dev.1
+
 # [0.9.0](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.8.1...v0.9.0) (2026-11-10)
 
 
