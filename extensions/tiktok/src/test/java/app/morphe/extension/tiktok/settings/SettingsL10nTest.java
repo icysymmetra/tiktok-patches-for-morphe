@@ -497,6 +497,12 @@ public class SettingsL10nTest {
         assertNotEquals("a dropped full stop", terminator("Hide the caption."),
                 terminator("Beschreibung ausblenden"));
         assertNotEquals("a changed terminator", terminator("Really?"), terminator("Wirklich."));
+        assertNotEquals("a Chinese full stop is still a sentence ending",
+                terminator("Hide the caption"), terminator("\u9690\u85cf\u6587\u6848\u3002"));
+        assertNotEquals("a Chinese question mark cannot become a full stop",
+                terminator("Really?"), terminator("\u786e\u5b9a\u3002"));
+        assertNotEquals("an ellipsis cannot become a single full stop",
+                terminator("Loading..."), terminator("Loading."));
         // And the one full stop that is not a terminator, against the sentence it must not
         // excuse. The relaxation reads the length of the last word, so a sentence that happens
         // to end in a short word is the case worth pinning.
@@ -506,6 +512,19 @@ public class SettingsL10nTest {
                 endsInAnAbbreviation("No está en la caché actual."));
         assertFalse("a value with no full stop was called an abbreviation",
                 endsInAnAbbreviation("Komentar min/maks"));
+    }
+
+    @Test public void theTranslationShapeCheckAcceptsEquivalentPunctuation() {
+        assertEquals("a Chinese full stop closes the same sentence", '.', terminator("\u5df2\u4fdd\u5b58\u3002"));
+        assertEquals("a full-width question mark is a question", '?', terminator("\u786e\u5b9a\uff1f"));
+        assertEquals("a full-width exclamation mark is an exclamation", '!', terminator("\u5b8c\u6210\uff01"));
+        assertEquals("a full-width colon introduces the same list", ':', terminator("\u9009\u9879\uff1a"));
+        assertEquals("a Unicode ellipsis and three dots have the same role",
+                terminator("Loading page %1$s..."), terminator("\u6b63\u5728\u52a0\u8f7d\u7b2c %1$s \u9875\u2026"));
+        assertEquals("a Chinese double ellipsis has the same role",
+                terminator("Loading..."), terminator("\u6b63\u5728\u52a0\u8f7d\u2026\u2026"));
+        assertEquals("surrounding whitespace does not change the ending", '.', terminator(" \u5df2\u4fdd\u5b58\u3002 \n"));
+        assertEquals("a label needs no sentence ending", ' ', terminator("\u97f3\u91cf"));
     }
 
     /** Every placeholder in order, numbered or bare, so a change of either kind shows up. */
@@ -541,12 +560,19 @@ public class SettingsL10nTest {
         return letters > 0 && letters <= 4;
     }
 
-    /** The character a string ends a sentence with, or a space when it ends with none. */
+    /** The sentence-ending role, independent of full-width punctuation or ellipsis spelling. */
     private static char terminator(String text) {
         String trimmed = text.trim();
         if (trimmed.isEmpty()) return ' ';
+        if (trimmed.endsWith("...")) return '\u2026';
         char last = trimmed.charAt(trimmed.length() - 1);
-        return ".!?:\u2026".indexOf(last) >= 0 ? last : ' ';
+        switch (last) {
+            case '\u3002': return '.';
+            case '\uff01': return '!';
+            case '\uff1f': return '?';
+            case '\uff1a': return ':';
+            default: return ".!?:\u2026".indexOf(last) >= 0 ? last : ' ';
+        }
     }
 
     @Test public void everyRuntimeToastGoesThroughTheTable() throws Exception {

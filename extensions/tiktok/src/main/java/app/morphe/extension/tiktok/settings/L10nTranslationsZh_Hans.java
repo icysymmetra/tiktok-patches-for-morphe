@@ -435,7 +435,7 @@ final class L10nTranslationsZh_Hans {
         table.put("Added to this account.",
                 "已添加到此账户。");
         table.put("Adds Export CSV and Export JSON buttons under the search box, so Search within comments must be on. They save the comments and replies loaded so far to a file you pick. Open the reply threads you want first.",
-                "在搜索框下方添加“导出 CSV”和“导出 JSON”按钮，因此必须开启“在评论内搜索”。它们会把目前已加载的评论和回复保存到你选择的文件。请先展开你想保存的回复串。");
+                "在搜索框下方添加“导出 CSV”和“导出 JSON”按钮，因此必须开启“在评论中搜索”。它们会把目前已加载的评论和回复保存到你选择的文件。请先展开你想保存的回复串。");
         table.put("Adds Save cover next to Download when you share a video, so you save the cover only when you want it. While this is on, Download saves just the video, even with Save the cover as well on.",
                 "分享视频时，在“下载”旁边添加“保存封面”，这样只有在你需要时才保存封面。开启后，“下载”只保存视频，即使“同时保存封面”已开启。");
         table.put("Adds TikTok's translate button next to the comment count. One tap translates every comment, and another shows the originals again.",
@@ -4340,7 +4340,7 @@ final class L10nTranslationsZh_Hans {
         table.put("Use {creator}, {date} and {video_id} to build the name. Start with {creator}/ to put each creator in a folder. The file ending is added for you.",
                 "用 {creator}、{date} 和 {video_id} 组合文件名。以 {creator}/ 开头可把每个创作者放进单独文件夹。扩展名会自动添加。");
         table.put("Use {creator}, {date}, {video_id} and {index} to build the name. {index} numbers the photos of a slideshow saved with Download original photos. TikTok's own save button numbers files by folder instead. The file ending is added for you.",
-                "用 {creator}、{date}、{video_id} 和 {index} 组合文件名。{index} 给用“保存原图”保存的图集照片编号。TikTok 自己的保存按钮按文件夹编号。扩展名会自动添加。");
+                "用 {creator}、{date}、{video_id} 和 {index} 组合文件名。{index} 给用“下载原始照片”保存的图集照片编号。TikTok 自己的保存按钮按文件夹编号。扩展名会自动添加。");
         table.put("Use {date} and {media_id} to build the name. Works for image and video stickers.",
                 "用 {date} 和 {media_id} 组合文件名。适用于图片和视频贴纸。");
         table.put("User ID copied",
