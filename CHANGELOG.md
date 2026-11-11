@@ -1,3 +1,16 @@
+# [0.10.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.10.0-dev.1...v0.10.0-dev.2) (2026-11-11)
+
+
+### Bug Fixes
+
+* **tiktok:** refine Simplified Chinese translations ([7f9c470](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/7f9c47074ad96134631f7a895f5bf91b5a309a0e))
+
+
+
+
+
+## 0.10.0-dev.2
+
 # [0.10.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0...v0.10.0-dev.1) (2026-11-10)
 
 
