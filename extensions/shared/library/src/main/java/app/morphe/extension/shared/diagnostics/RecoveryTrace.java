@@ -123,7 +123,7 @@ final class RecoveryTrace {
     private static final class ThreadBlock {
         final String tid, state, name;
         final boolean nativeDump;
-        /** Why the thread is in the report; never its name, which can be anything an app set. */
+        /** Why the thread is in the report. Its name is shown only if {@link #nameLabel} allows it. */
         String role = "lock_owner";
         final List<String> body = new ArrayList<>();
         ThreadBlock(String tid, String name, String header, boolean nativeDump) {
@@ -304,9 +304,34 @@ final class RecoveryTrace {
      */
     static final int MIN_DETAIL = 12 * 1024, CANDIDATE_RESERVE = 4 * 1024;
 
+    /**
+     * Thread names Android's runtime and framework give their own threads, as the kernel keeps
+     * them (15 characters). Only these are shown: any other name is whatever the app chose and
+     * can hold anything, so it stays out (#215 needs to know which thread is the collector).
+     */
+    private static final Pattern RUNTIME_NAME = Pattern.compile("^(?:Signal Catcher|perfetto_hprof_"
+            + "|ADB-JDWP Connec|Jit thread pool|HeapTaskDaemon|ReferenceQueueD|FinalizerDaemon|FinalizerWatchd"
+            + "|perfetto_hprof_listener|ReferenceQueueDaemon|FinalizerWatchdogDaemon|ADB-JDWP Connection Control Thread"
+            + "|Profile Saver|RenderThread|hwuiTask\\d{1,2}|binder:\\d{1,7}_[0-9A-F]{1,4}|HwBinder:\\d{1,7}_[0-9A-F]{1,4}"
+            + "|queued-work-loo|Thread-\\d{1,6}|pool-\\d{1,4}-thread-|AsyncTask #\\d{1,4}|FileObserver|CleanupReferenc)$");
+    /**
+     * App threads whose name mentions the collector or TikTok's runtime tuning. Their names
+     * aren't known in advance and the rest of the name could be anything, so only the category is
+     * shown, never the text (#215 review).
+     */
+    private static final Pattern GC_NAME = Pattern.compile("(?i).*(?:jato|gc).*");
+
+    /** " name=..." for a runtime or framework thread, a category for a collector-related one, nothing else. */
+    static String nameLabel(String name) {
+        if (name == null || name.isEmpty() || name.length() > 40) return "";
+        if (RUNTIME_NAME.matcher(name).matches()) return " name=\"" + name + "\"";
+        if (GC_NAME.matcher(name).matches()) return " name_kind=gc_or_jato";
+        return "";
+    }
+
     /** A thread's overview row: its first frames, with or without their symbols. */
     private static String summaryRow(ThreadBlock thread, boolean symbols) {
-        StringBuilder row = new StringBuilder("  tid=").append(thread.tid).append('\n');
+        StringBuilder row = new StringBuilder("  tid=").append(thread.tid).append(nameLabel(thread.name)).append('\n');
         int frames = 0;
         for (String line : thread.body) {
             if (frames >= SUMMARY_FRAMES) break;
@@ -352,7 +377,8 @@ final class RecoveryTrace {
 
         /** @return false when the limit stopped it; a thread with a header counts as rendered */
         private boolean render(ThreadBlock thread, ArrayDeque<ThreadBlock> queue, int limit) {
-            String head = "thread tid=" + thread.tid + " role=" + thread.role + " state=" + thread.state + "\n";
+            String head = "thread tid=" + thread.tid + " role=" + thread.role + " state=" + thread.state
+                    + nameLabel(thread.name) + "\n";
             if (!fits(head.length(), limit)) return false;
             out.append(head);
             int count = 0;

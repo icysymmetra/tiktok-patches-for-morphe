@@ -52,9 +52,17 @@ public final class RecoveryCapture {
 
     interface OpenTrace { InputStream open() throws Exception; }
     static final class Exit {
-        final String process; final int pid, reason; final long at; final OpenTrace trace;
+        final String process, description; final int pid, reason, importance, status;
+        final long at, pssKb, rssKb; final OpenTrace trace;
         Exit(String process, int pid, int reason, long at, OpenTrace trace) {
+            this(process, pid, reason, at, trace, null, -1, -1, -1, -1);
+        }
+        /** What Android recorded about the death beside the trace: its own wording and the memory. */
+        Exit(String process, int pid, int reason, long at, OpenTrace trace, String description,
+                long pssKb, long rssKb, int importance, int status) {
             this.process = process; this.pid = pid; this.reason = reason; this.at = at; this.trace = trace;
+            this.description = description; this.pssKb = pssKb; this.rssKb = rssKb;
+            this.importance = importance; this.status = status;
         }
     }
     interface Source {
@@ -62,6 +70,8 @@ public final class RecoveryCapture {
         default long elapsed() { return now(); }
         List<Exit> history(Context context) throws Exception;
         String build(Context context);
+        /** Starts the readings for this session, until the lease ends on the elapsed clock. */
+        default void timeline(Context context, int pid, long sessionAt, long untilElapsed) {}
     }
 
     @TargetApi(30)
@@ -73,7 +83,8 @@ public final class RecoveryCapture {
         public String build(Context context) {
             return "android_sdk: " + Build.VERSION.SDK_INT + "\nandroid_release: "
                     + Build.VERSION.RELEASE.replaceAll("[^A-Za-z0-9._-]", "_")
-                    + "\n" + BuildDetails.section(BuildDetails.readMetadata(context));
+                    + "\n" + device(context)
+                    + BuildDetails.section(BuildDetails.readMetadata(context));
         }
         public List<Exit> history(Context c) {
             ActivityManager am = (ActivityManager) c.getSystemService(Context.ACTIVITY_SERVICE);
@@ -81,9 +92,63 @@ public final class RecoveryCapture {
             List<ApplicationExitInfo> history = am.getHistoricalProcessExitReasons(c.getPackageName(), 0, 16);
             List<Exit> result = new ArrayList<>();
             if (history != null) for (ApplicationExitInfo e : history) result.add(new Exit(
-                    e.getProcessName(), e.getPid(), e.getReason(), e.getTimestamp(), e::getTraceInputStream));
+                    e.getProcessName(), e.getPid(), e.getReason(), e.getTimestamp(), e::getTraceInputStream,
+                    e.getDescription(), e.getPss(), e.getRss(), e.getImportance(), e.getStatus()));
             return result;
         }
+        public void timeline(Context context, int pid, long sessionAt, long untilElapsed) {
+            // The lease's own clock, which keeps counting while the phone sleeps (#215 review).
+            RecoveryTimeline.start(context.getFilesDir(), pid, sessionAt, untilElapsed, context.getClassLoader());
+        }
+    }
+
+    /**
+     * The phone, its ROM and the runtime's memory limits. A ROM sets the heap ceiling a
+     * large-heap app such as TikTok gets, and Android's runtime module can differ by ROM, so
+     * these say which phone and which limits a report came from (#215).
+     */
+    @TargetApi(30)
+    static String device(Context context) {
+        StringBuilder out = new StringBuilder();
+        line(out, "device_manufacturer", Build.MANUFACTURER);
+        line(out, "device_model", Build.MODEL);
+        line(out, "device_name", Build.DEVICE);
+        line(out, "rom_display", Build.DISPLAY);
+        line(out, "rom_fingerprint", Build.FINGERPRINT);
+        line(out, "rom_security_patch", Build.VERSION.SECURITY_PATCH);
+        out.append("art_module_version: ").append(artModule(context)).append('\n');
+        out.append("heap_max_mb: ").append(Runtime.getRuntime().maxMemory() / (1024 * 1024)).append('\n');
+        try {
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            if (am != null) {
+                ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
+                am.getMemoryInfo(memory);
+                out.append("memory_class_mb: ").append(am.getMemoryClass())
+                        .append("\nlarge_memory_class_mb: ").append(am.getLargeMemoryClass())
+                        .append("\nlow_ram_device: ").append(am.isLowRamDevice())
+                        .append("\ntotal_ram_mb: ").append(memory.totalMem / (1024 * 1024))
+                        .append("\nlow_memory_threshold_mb: ").append(memory.threshold / (1024 * 1024)).append('\n');
+            }
+        } catch (Throwable unavailable) { out.append("memory_class_mb: unavailable\n"); }
+        return out.toString();
+    }
+
+    private static void line(StringBuilder out, String name, String value) {
+        String safe = value == null ? "unknown" : value.replaceAll("[^A-Za-z0-9._:/,+-]", "_");
+        out.append(name).append(": ").append(safe.length() > 160 ? safe.substring(0, 160) : safe).append('\n');
+    }
+
+    /** The version of Android's updatable runtime (ART) module, Google's or the ROM's own. */
+    @TargetApi(30)
+    private static String artModule(Context context) {
+        for (String name : new String[] {"com.google.android.art", "com.android.art"}) {
+            try {
+                android.content.pm.PackageInfo info = context.getPackageManager()
+                        .getPackageInfo(name, android.content.pm.PackageManager.MATCH_APEX);
+                return name + "@" + info.getLongVersionCode();
+            } catch (Throwable absent) { /* Try the other name. */ }
+        }
+        return "unknown";
     }
 
     static void start(Context supplied, String trial, Source source) {
@@ -159,6 +224,7 @@ public final class RecoveryCapture {
         if (collect) {
             final JSONArray sessions = previous;
             final String collectorBuild = safeBuild(source.build(context));
+            final boolean[] registered = {false};
             data.update(s -> {
                 s.put("checks", s.optInt("checks", s.optInt("starts")) + 1);
                 if (s.optInt("starts") >= MAX_STARTS) return;
@@ -168,7 +234,14 @@ public final class RecoveryCapture {
                 JSONArray next = new JSONArray();
                 for (int i = Math.max(0, sessions.length() - 3); i < sessions.length(); i++) next.put(sessions.get(i));
                 next.put(session); s.put("sessions", next);
+                registered[0] = true;
             });
+            // Only a tracked session is read back later, so only it takes readings, and only for
+            // what is left of the lease.
+            if (registered[0]) {
+                try { source.timeline(context, source.pid(), now, before.optLong("started_elapsed") + LEASE_MS); }
+                catch (Throwable unavailable) { /* The trace is still recovered without readings. */ }
+            }
             List<Exit> exits = null;
             String historyStatus = "available";
             try { exits = probe(() -> source.history(context), 1500); }
@@ -212,7 +285,10 @@ public final class RecoveryCapture {
                 // the trace existed and the fault was ours.
                 if (!confirmed && !retryable && existing == null && !trace.status.equals("parse_error")) continue;
                 found++;
-                String incident = fitForStore(incident(context, id, exit, trace, session, collectorBuild, confirmed));
+                // Readings from before the last clear stay cleared, even if a file outlived it.
+                long clearedThrough = data.read().optLong("cleared_through");
+                String incident = fitForStore(incident(context, id, exit, trace, session, collectorBuild, confirmed,
+                        clearedThrough));
                 JSONObject entry = new JSONObject().put("id", id).put("at", exit.at).put("report", incident)
                         .put("hash", RecoveryPublisher.sha(incident)).put("retryable", retryable);
                 retain(data, entry, generation);
@@ -298,17 +374,35 @@ public final class RecoveryCapture {
     }
 
     private static String incident(Context context, String id, Exit exit, RecoveryTrace.Result trace,
-            JSONObject session, String collectorBuild, boolean confirmed) {
+            JSONObject session, String collectorBuild, boolean confirmed, long clearedThrough) {
         return "MORPHE DIAGNOSTIC REPORT\nschema: 1\nsource: "
                 + (confirmed ? "recovery_trial" : "recovery_trial_status") + "\nincident: " + id
                 + (confirmed ? "" : "\ncapture_status: trace_probe_" + trace.status
                         + "\nThis is capture availability information, not a confirmed crash.")
                 + "\npackage: " + context.getPackageName() + "\npid: " + exit.pid + "\nexit_timestamp_ms: " + exit.at
-                + "\nexit_reason: " + exit.reason + "\ntrace_status: " + trace.status
+                + "\nexit_reason: " + exit.reason + exitDetails(exit) + "\ntrace_status: " + trace.status
                 + (trace.shape.isEmpty() ? "" : "\ntrace_shape: " + trace.shape)
                 + "\n\n[FAILED SESSION BUILD]\n" + session.optString("build")
-                + "\n[COLLECTOR BUILD]\n" + collectorBuild
+                // The same build twice is the usual case; the room goes to the stacks instead.
+                + "\n[COLLECTOR BUILD]\n" + (collectorBuild.equals(session.optString("build"))
+                        ? "same_as_failed_session\n" : collectorBuild)
+                + "\n" + RecoveryTimeline.section(context.getFilesDir(), exit.pid, session.optLong("at"), exit.at,
+                        clearedThrough)
                 + "\n[RECOVERED THREADS]\n" + trace.text;
+    }
+
+    /** Android's own account of the death: its wording, and the process's memory when it died. */
+    static String exitDetails(Exit exit) {
+        StringBuilder out = new StringBuilder();
+        if (exit.description != null) {
+            String text = DiagnosticRedactor.redact(exit.description).replaceAll("[\\r\\n\\t]+", " ").trim();
+            out.append("\nexit_description: ").append(text.length() > 300 ? text.substring(0, 300) + "..." : text);
+        }
+        if (exit.pssKb >= 0) out.append("\nexit_pss_kb: ").append(exit.pssKb);
+        if (exit.rssKb >= 0) out.append("\nexit_rss_kb: ").append(exit.rssKb);
+        if (exit.importance >= 0) out.append("\nexit_importance: ").append(exit.importance);
+        if (exit.status >= 0) out.append("\nexit_status: ").append(exit.status);
+        return out.toString();
     }
 
     static JSONObject find(JSONObject state, String id) {
@@ -357,6 +451,9 @@ public final class RecoveryCapture {
         RecoveryStore data = store;
         if (data == null && context == null) return "";
         if (data == null) store = data = new RecoveryStore(context);
+        // Readings not yet in an incident go too, on disk and in the running sampler. Ones already
+        // copied into an incident travel with it, so restoring the incidents restores them.
+        RecoveryTimeline.clear(context == null ? null : context.getFilesDir());
         synchronized (RecoveryStore.LOCK) {
             String saved = data.clear(); report = ""; return saved;
         }
