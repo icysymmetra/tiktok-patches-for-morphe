@@ -1,3 +1,16 @@
+# [0.11.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.2...v0.11.0-dev.3) (2026-11-12)
+
+
+### Features
+
+* **Diagnostics:** record the minutes before a recovery-trial freeze ([fc33d85](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/fc33d8566010e8199fab7129e43d3be23440f73e)), closes [#215](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/215)
+
+
+
+
+
+## 0.11.0-dev.3
+
 # [0.11.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.1...v0.11.0-dev.2) (2026-11-12)
 
 
