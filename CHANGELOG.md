@@ -1,3 +1,16 @@
+# [0.10.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.10.0-dev.2...v0.10.0-dev.3) (2026-11-12)
+
+
+### Features
+
+* **Diagnostics:** add bounded recovery reports for startup failures ([6f8cc07](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/6f8cc0715a24cd6670131ac724a7d4b40dc429de))
+
+
+
+
+
+## 0.10.0-dev.3
+
 # [0.10.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.10.0-dev.1...v0.10.0-dev.2) (2026-11-11)
 
 
