@@ -1,3 +1,7 @@
+/*
+ * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
+ * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ */
 package app.morphe.extension.shared.diagnostics;
 
 import android.annotation.TargetApi;
@@ -189,7 +193,14 @@ public final class RecoveryCapture {
                     RecoveryTrace.Intake intake = probe(() -> {
                         try (InputStream in = exit.trace.open()) { return RecoveryTrace.readBounded(in); }
                     }, traceTimeout);
-                    trace = RecoveryTrace.parse(intake);
+                    try { trace = RecoveryTrace.parse(intake, exit.pid); }
+                    catch (RuntimeException | StackOverflowError parserFault) {
+                        // A parser fault is ours, not Android's: it gets its own name, so it can't
+                        // pass for a trace Android withheld, and isn't retried on the same bytes.
+                        trace = new RecoveryTrace.Result("parse_error", "", "bytes="
+                                + (intake.bytes == null ? 0 : intake.bytes.length) + " input_cut=" + intake.cut
+                                + " fault=" + parserFault.getClass().getSimpleName());
+                    }
                 } catch (Exception unavailable) {
                     trace = new RecoveryTrace.Result(unavailable instanceof ProbeBusy ? "probe_busy"
                             : unavailable instanceof java.util.concurrent.TimeoutException ? "timeout" : "read_error", "");
@@ -197,9 +208,11 @@ public final class RecoveryCapture {
                 boolean retryable = trace.status.equals("timeout") || trace.status.equals("probe_busy") || trace.status.equals("read_error");
                 // Ordinary exits with no ANR evidence are not reported as errors.
                 boolean confirmed = exit.reason == 6 || exit.reason == 4 || exit.reason == 5 || !trace.text.isEmpty();
-                if (!confirmed && !retryable && existing == null) continue;
+                // A parser fault is kept even on an ordinary exit: it is the one record that says
+                // the trace existed and the fault was ours.
+                if (!confirmed && !retryable && existing == null && !trace.status.equals("parse_error")) continue;
                 found++;
-                String incident = incident(context, id, exit, trace, session, collectorBuild, confirmed);
+                String incident = fitForStore(incident(context, id, exit, trace, session, collectorBuild, confirmed));
                 JSONObject entry = new JSONObject().put("id", id).put("at", exit.at).put("report", incident)
                         .put("hash", RecoveryPublisher.sha(incident)).put("retryable", retryable);
                 retain(data, entry, generation);
@@ -243,6 +256,30 @@ public final class RecoveryCapture {
         });
     }
 
+    /**
+     * The most one incident may take in the store once JSON-escaped. MAX_OUTPUT bounds a report
+     * in characters, but escaping can double that ("/" is written "\/"), and the store refuses a
+     * whole write past its limit, which would lose the incident. Three of these, four sessions
+     * with their builds and the export journal stay under {@link RecoveryStore#MAX_BYTES}.
+     */
+    static final int MAX_STORED_INCIDENT = 60 * 1024;
+    private static final String STORE_TRIM = "\n[report trimmed to fit private storage]\n";
+
+    /** Drops whole lines from the end of the report until its escaped form fits. */
+    static String fitForStore(String report) {
+        if (storedBytes(report) <= MAX_STORED_INCIDENT) return report;
+        String text = report;
+        while (text.length() > 0 && storedBytes(text + STORE_TRIM) > MAX_STORED_INCIDENT) {
+            int end = text.lastIndexOf('\n', Math.max(0, text.length() - 2 - (text.length() / 16)));
+            text = end <= 0 ? "" : text.substring(0, end + 1);
+        }
+        return text + STORE_TRIM;
+    }
+
+    static int storedBytes(String value) {
+        return JSONObject.quote(value).getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
+    }
+
     private static String safeBuild(String value) {
         String safe = DiagnosticRedactor.redact(value);
         return safe.length() > 4096 ? safe.substring(0, 4096) + "\n[build details truncated]" : safe;
@@ -268,6 +305,7 @@ public final class RecoveryCapture {
                         + "\nThis is capture availability information, not a confirmed crash.")
                 + "\npackage: " + context.getPackageName() + "\npid: " + exit.pid + "\nexit_timestamp_ms: " + exit.at
                 + "\nexit_reason: " + exit.reason + "\ntrace_status: " + trace.status
+                + (trace.shape.isEmpty() ? "" : "\ntrace_shape: " + trace.shape)
                 + "\n\n[FAILED SESSION BUILD]\n" + session.optString("build")
                 + "\n[COLLECTOR BUILD]\n" + collectorBuild
                 + "\n[RECOVERED THREADS]\n" + trace.text;

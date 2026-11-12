@@ -53,7 +53,8 @@ public class RecoveryCaptureTest {
         public long elapsed() { return now - bootEpoch; }
         public int pid() { return pid; }
         public boolean main(Context c) { return true; }
-        public String build(Context context) { return "source_commit: test-build\n"; }
+        String build = "source_commit: test-build\n";
+        public String build(Context context) { return build; }
         public List<RecoveryCapture.Exit> history(Context c) { return exits; }
     }
     private RecoveryCapture.Exit exit(String process, int reason, long time, RecoveryCapture.OpenTrace stream) {
@@ -124,10 +125,327 @@ public class RecoveryCaptureTest {
         for (String privateText : new String[]{"account@", "secret", "/private", "alice", "Messages", "0x1234"})
             assertFalse(privateText, r.text.contains(privateText));
     }
+    /**
+     * What Android 15 stores when the Java dump fails (#215): StackTracesDumpHelper's uptime
+     * header, then debuggerd's native backtrace, whose headers say sysTid= and never tid=.
+     */
+    static final String NATIVE_TRACE = "----- dumping pid: 101 at 3141592\n"
+            + "\n\n----- pid 101 at 2026-11-12 05:21:41.640 +0400 -----\n"
+            + "Cmd line: com.zhiliaoapp.musically\nABI: 'arm64'\n"
+            + "\n\"zhiliaoapp.musi\" sysTid=101\n"
+            + "    #00 pc 000000000008a2c8  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+24) (BuildId: 0f1e2d)\n"
+            + "    #01 pc 00000000004f1a3c  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::WaitHoldingLocks(art::Thread*)+140) (BuildId: 9a8b7c)\n"
+            + "    #02 pc 0000000000123456  /data/app/~~Zx9q==/com.zhiliaoapp.musically-Ab3==/lib/arm64/libsscronet.so (BuildId: 77aa)\n"
+            + "    #03 pc 0000000000003f10  /memfd:jit-cache (deleted) (offset 0x2000000) (com.ss.android.ugc.aweme.Player.open+212)\n"
+            + "    #04 pc 0000000000a1b2c3  /data/app/~~Zx9q==/com.zhiliaoapp.musically-Ab3==/base.apk!libmetasec_ov.so (offset 0x1b4000) (BuildId: 1234)\n"
+            + "\n\"Signal Catcher\" sysTid=104\n"
+            + "    #00 pc 000000000008a2c8  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+24) (BuildId: 0f1e2d)\n"
+            + "    #01 pc 00000000006c0d10  /apex/com.android.art/lib64/libart.so (art::ThreadList::SuspendAllInternal(art::Thread*, art::Thread*, art::Thread*, bool)+1020) (BuildId: 9a8b7c)\n"
+            + "\n\"tp-io-4 alice@example.com\" sysTid=130\n"
+            + "    #00 pc 000000000008a2c8  /apex/com.android.runtime/lib64/bionic/libc.so (__epoll_pwait+8) (BuildId: 0f1e2d)\n"
+            + "\n\"HeapTaskDaemon\" sysTid=110\n"
+            + "    #00 pc 000000000008a2c8  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+24) (BuildId: 0f1e2d)\n"
+            + "\n\"secret-worker\" sysTid=140\n"
+            + "    #00 pc 0000000000055500  /data/app/~~Zx9q==/com.zhiliaoapp.musically-Ab3==/lib/arm64/libttheif.so (BuildId: 5150)\n"
+            + "\n----- end 101 -----\n";
+
+    @Test public void aNativeOnlyDumpYieldsTheMainThreadAndTheRuntimesOwnThreads() throws Exception {
+        RecoveryTrace.Result r = RecoveryTrace.read(
+                new ByteArrayInputStream(NATIVE_TRACE.getBytes(StandardCharsets.UTF_8)), 101);
+        assertEquals(r.text, "captured", r.status);
+        assertTrue(r.shape, r.shape.contains("format=native java_threads=0 native_threads=5"));
+        assertTrue(r.text, r.text.startsWith("thread tid=101 role=main state=native_dump\n"));
+        assertTrue(r.text, r.text.contains("thread tid=104 role=signal_catcher"));
+        assertTrue(r.text, r.text.contains("thread tid=110 role=gc_daemon"));
+        // A worker with an unrecognised top frame gets detail as a candidate; the parked one keeps
+        // only its top frame, in the summary.
+        assertTrue(r.text, r.text.contains("thread tid=140 role=candidate"));
+        assertFalse(r.text, r.text.contains("thread tid=130"));
+        assertTrue(r.text, r.text.contains("[OTHER NATIVE THREADS, FIRST FRAMES]\n  tid=130\n"
+                + "    #00 pc 000000000008a2c8 libc.so (__epoll_pwait+8)\n"));
+        // An unnamed stripped frame keeps its pc, which can be symbolised against the APK later.
+        assertTrue(r.text, r.text.contains("  tid=140\n    #00 pc 0000000000055500 libttheif.so\n"));
+        assertTrue(r.text, r.text.indexOf("[CANDIDATE STACKS]\nthread tid=140 role=candidate")
+                > r.text.indexOf("[OTHER NATIVE THREADS"));
+        assertTrue(r.shape, r.shape.contains(
+                "detailed=4 detail_slots_skipped=0 summarized=2 unsummarized=0 summary_symbolized=1 candidates=1 main_frames=5"));
+        assertTrue(r.text, r.text.contains("libart.so (art::ThreadList::SuspendAllInternal(art::Thread*, art::Thread*, art::Thread*, bool)+1020)"));
+        assertTrue(r.text, r.text.contains("native: #02 pc 0000000000123456 libsscronet.so"));
+        assertTrue(r.text, r.text.contains("jit-cache (com.ss.android.ugc.aweme.Player.open+212)"));
+        assertTrue(r.text, r.text.contains("native: #04 pc 0000000000a1b2c3 libmetasec_ov.so"));
+        for (String privateText : new String[]{"/data/app", "~~", "Zx9q", "Ab3", "alice", "secret", "zhiliaoapp.musi", "BuildId"})
+            assertFalse(privateText, r.text.contains(privateText));
+    }
+
+    @Test public void withoutAPidTheFirstNativeThreadIsTheMainThread() {
+        RecoveryTrace.Result r = RecoveryTrace.select(NATIVE_TRACE, false);
+        assertTrue(r.text, r.text.startsWith("thread tid=101 role=main"));
+    }
+
+    @Test public void aRecoveredNativeOnlyAnrReportsItsThreadsAndShape() throws Exception {
+        Source s = firstLaunch(); s.now = 2000; s.pid = 102;
+        s.exits = Collections.singletonList(exit(context.getPackageName(), 6, 1500,
+                () -> new ByteArrayInputStream(NATIVE_TRACE.getBytes(StandardCharsets.UTF_8))));
+        RecoveryCapture.recover(context, "unit-v1", s, data);
+        String report = RecoveryCapture.cachedReport();
+        assertTrue(report, report.contains("trace_status: captured"));
+        assertTrue(report, report.contains("trace_shape: bytes="));
+        assertTrue(report, report.contains("format=native"));
+        assertTrue(report, report.contains("thread tid=101 role=main state=native_dump"));
+    }
+
+    @Test public void aZeroOffsetSymbolKeepsItsName() {
+        // FormatFrame leaves out "+0", so the symbol slot has no offset.
+        assertEquals("native: #00 pc 0000000000012340 libart.so (art_quick_generic_jni_trampoline)",
+                RecoveryTrace.nativeFrame("#00 pc 0000000000012340  /apex/com.android.art/lib64/libart.so "
+                        + "(art_quick_generic_jni_trampoline) (BuildId: 9a8b7c)"));
+        assertEquals("native: #01 pc 00000000000a0000 libc.so",
+                RecoveryTrace.nativeFrame("#01 pc 00000000000a0000  /apex/com.android.runtime/lib64/bionic/libc.so"));
+        assertEquals("native: #02 pc 0000000000003f10 jit-cache (com.example.Player.open)",
+                RecoveryTrace.nativeFrame("#02 pc 0000000000003f10  /memfd:jit-cache (deleted) (offset 0x2000000) (com.example.Player.open)"));
+    }
+
+    @Test public void aJavaDumpCutAfterItsHeaderGivesWayToTheNativeFallback() throws Exception {
+        String mixed = "----- pid 101 at 2026-11-12 05:21:41 -----\n\"main\" prio=5 tid=1 Native\n"
+                + NATIVE_TRACE.substring(NATIVE_TRACE.indexOf("\n\n----- pid"));
+        RecoveryTrace.Result r = RecoveryTrace.read(new ByteArrayInputStream(mixed.getBytes(StandardCharsets.UTF_8)), 101);
+        assertEquals(r.text, "captured", r.status);
+        assertTrue(r.shape, r.shape.contains("format=mixed java_threads=1 native_threads=5"));
+        assertTrue(r.text, r.text.startsWith("thread tid=101 role=main state=native_dump\n"));
+        assertTrue(r.text, r.text.contains("role=signal_catcher"));
+    }
+
+    @Test public void aJavaMainWithFramesKeepsTheNativeMainAlongside() throws Exception {
+        String mixed = "\"main\" prio=5 tid=1 Blocked\n  | group=\"main\" sCount=1 sysTid=101 nice=-10\n"
+                + "  at app.example.Player.open(Player.java:42)\n"
+                + NATIVE_TRACE.substring(NATIVE_TRACE.indexOf("\n\n----- pid"));
+        RecoveryTrace.Result r = RecoveryTrace.read(new ByteArrayInputStream(mixed.getBytes(StandardCharsets.UTF_8)), 101);
+        assertTrue(r.text, r.text.startsWith("thread tid=1 role=main state=Blocked\n"));
+        assertTrue(r.text, r.text.contains("thread tid=101 role=main_native state=native_dump"));
+    }
+
+    /** A native thread whose top frame is in a stripped library, so it qualifies as a candidate. */
+    private static String busyNativeThread(int tid) {
+        return "\n\"worker\" sysTid=" + tid + "\n"
+                + "    #00 pc 0000000000055500  /data/app/~~Zx9q==/x-Ab3==/lib/arm64/libbusy.so (BuildId: 5150)\n";
+    }
+
+    @Test public void provenLockOwnersComeBeforeNativeGuesswork() throws Exception {
+        StringBuilder trace = new StringBuilder("\"main\" prio=5 tid=1 Blocked\n  | group=\"main\" sysTid=101\n"
+                + "  at app.example.Player.open(Player.java:42)\n"
+                + "  - waiting to lock <0x1234> (a java.lang.Object) held by thread 9\n"
+                + "\"owner\" prio=5 tid=9 Runnable\n  at app.example.Cache.fill(Cache.java:7)\n");
+        trace.append(NATIVE_TRACE, NATIVE_TRACE.indexOf("\n\n----- pid"), NATIVE_TRACE.indexOf("\n----- end"));
+        for (int tid = 200; tid < 210; tid++) trace.append(busyNativeThread(tid));
+        RecoveryTrace.Result r = RecoveryTrace.read(
+                new ByteArrayInputStream(trace.toString().getBytes(StandardCharsets.UTF_8)), 101);
+        assertTrue(r.text, r.text.contains("thread tid=9 role=lock_owner state=Runnable\n  at app.example.Cache.fill"));
+        assertTrue(r.text, r.text.indexOf("tid=9 role=lock_owner") < r.text.indexOf("role=signal_catcher"));
+        // Running out of detailed slots never costs the summary.
+        assertTrue(r.text, r.text.contains("[OTHER NATIVE THREADS, FIRST FRAMES]\n"));
+        assertTrue(r.text, r.text.contains("  tid=209\n    #00 pc 0000000000055500 libbusy.so\n"));
+        assertTrue(r.shape, r.shape.contains("unsummarized=0"));
+        assertTrue(r.shape, r.shape.contains("candidates=4"));
+    }
+
+    @Test public void aLongJavaSectionCannotCrowdOutTheNativeFallback() throws Exception {
+        StringBuilder trace = new StringBuilder("\"main\" prio=5 tid=1 Native\n");
+        for (int tid = 2; tid <= RecoveryTrace.MAX_THREADS; tid++) {
+            trace.append("\"w\" prio=5 tid=").append(tid).append(" Waiting\n");
+        }
+        trace.append(NATIVE_TRACE, NATIVE_TRACE.indexOf("\n\n----- pid"), NATIVE_TRACE.length());
+        RecoveryTrace.Result r = RecoveryTrace.read(
+                new ByteArrayInputStream(trace.toString().getBytes(StandardCharsets.UTF_8)), 101);
+        assertEquals(r.text, "captured", r.status);
+        assertTrue(r.text, r.text.startsWith("thread tid=101 role=main state=native_dump\n"));
+        assertTrue(r.text, r.text.contains("role=signal_catcher"));
+    }
+
+    @Test public void aJavaOnlyLockChainKeepsTheWholeLimit() throws Exception {
+        // Eight threads each waiting on the next, forty ordinary frames apiece: about 30 KiB.
+        StringBuilder trace = new StringBuilder();
+        for (int t = 1; t <= 8; t++) {
+            trace.append('"').append(t == 1 ? "main" : "w" + t).append("\" prio=5 tid=").append(t).append(" Blocked\n");
+            for (int f = 0; f < 40; f++) {
+                trace.append("  at com.ss.android.ugc.aweme.feed.controller.PlayerController.step").append(f)
+                        .append("(SourceFile:16778093)\n");
+            }
+            if (t < 8) trace.append("  - waiting to lock <0x").append(1000 + t).append("> (a java.lang.Object) held by thread ")
+                    .append(t + 1).append('\n');
+        }
+        RecoveryTrace.Result r = RecoveryTrace.read(
+                new ByteArrayInputStream(trace.toString().getBytes(StandardCharsets.UTF_8)), 101);
+        assertEquals(r.shape, "captured", r.status);
+        assertTrue(r.shape, r.shape.contains("detailed=8"));
+        assertTrue(String.valueOf(r.text.length()), r.text.length() > 28 * 1024);
+    }
+
+    /** A native dump shaped like TikTok's on an older phone: long runtime stacks, short workers. */
+    private static String realisticNativeDump(int threads) { return realisticNativeDump(threads, 101); }
+
+    private static String realisticNativeDump(int threads, int pid) {
+        StringBuilder trace = new StringBuilder("\n\n----- pid 101 at 2026-11-12 05:21:41.640 +0400 -----\n"
+                + "Cmd line: com.zhiliaoapp.musically\nABI: 'arm64'\n");
+        String[] names = {"zhiliaoapp.musi", "Signal Catcher", "HeapTaskDaemon"};
+        for (int i = 0; i < threads; i++) {
+            trace.append("\n\"").append(i < names.length ? names[i] : "tp-io-" + i).append("\" sysTid=").append(pid + i).append('\n');
+            int frames = i < names.length ? 30 : 8;
+            for (int f = 0; f < frames; f++) {
+                if (f == 0) trace.append("    #00 pc 000000000008a2c8  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+24) (BuildId: 0f1e2d3c4b5a69788796a5b4c3d2e1f0)\n");
+                else if (f % 3 == 1) trace.append(String.format("    #%02d pc 00000000004f1a3c  /apex/com.android.art/lib64/libart.so "
+                        + "(art::ConditionVariable::WaitHoldingLocks(art::Thread*)+140) (BuildId: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d)\n", f));
+                else if (f % 3 == 2) trace.append(String.format("    #%02d pc 0000000000123456  /data/app/~~Zx9qAbCdEf==/com.zhiliaoapp.musically-Ab3DeFgH==/lib/arm64/libsscronet.so "
+                        + "(BuildId: 77aa66bb55cc44dd33ee22ff11009988)\n", f));
+                else trace.append(String.format("    #%02d pc 0000000000003f10  /memfd:jit-cache (deleted) (offset 0x2000000) "
+                        + "(com.ss.android.ugc.aweme.feed.controller.PlayerController.onRender+212)\n", f));
+            }
+        }
+        return trace.append("\n----- end 101 -----\n").toString();
+    }
+
+    @Test public void aRealisticNativeDumpSummarisesEveryThread() throws Exception {
+        for (int threads : new int[]{150, 200, 250}) {
+            RecoveryTrace.Result r = RecoveryTrace.read(new ByteArrayInputStream(
+                    realisticNativeDump(threads).getBytes(StandardCharsets.UTF_8)), 101);
+            assertTrue(threads + " " + r.shape, r.shape.contains("unsummarized=0"));
+            assertTrue(threads + " " + r.shape, r.shape.contains("summarized=" + (threads - 3)));
+            assertTrue(threads + " " + r.text.length(), r.text.length() <= RecoveryTrace.MAX_OUTPUT);
+            assertTrue(r.text, r.text.startsWith("thread tid=101 role=main state=native_dump\n"));
+            assertTrue(r.text, r.text.contains("role=signal_catcher"));
+        }
+    }
+
+    @Test public void threeFullSizedReportsFitTheStoreAndTheExport() throws Exception {
+        // The store refuses anything over its limit, and that refusal would drop every incident,
+        // so the largest reports the parser can now produce must still fit three at a time.
+        Source s = new Source();
+        s.build = "source_commit: " + String.join("", Collections.nCopies(6000, "b")) + "\n";
+        RecoveryCapture.recover(context, "unit-v1", s, data);
+        for (int launch = 2; launch <= 4; launch++) {
+            s.now = launch * 1000L; s.pid = 100 + launch;
+            int failed = 99 + launch;
+            String dump = realisticNativeDump(250, failed);
+            s.exits = Arrays.asList(new RecoveryCapture.Exit(context.getPackageName(), failed, 6,
+                    launch * 1000L - 500, () -> new ByteArrayInputStream(dump.getBytes(StandardCharsets.UTF_8))));
+            RecoveryCapture.recover(context, "unit-v1", s, data);
+        }
+        org.json.JSONArray kept = data.read().getJSONArray("incidents");
+        assertEquals(3, kept.length());
+        for (int i = 0; i < kept.length(); i++) {
+            // Each must also pass render's own per-report limit, or the export skips it.
+            assertTrue(kept.getJSONObject(i).getString("report").length() <= 64 * 1024);
+        }
+        String report = RecoveryCapture.cachedReport();
+        assertEquals(3, report.split("MORPHE DIAGNOSTIC REPORT", -1).length - 1);
+        assertEquals(3, report.split("role=signal_catcher", -1).length - 1);
+        assertTrue(new File(context.getFilesDir(), "metra_recovery_v1.json").length() <= RecoveryStore.MAX_BYTES);
+    }
+
+    @Test public void reportsThatEscapeLargeAreTrimmedNotLost() throws Exception {
+        // Escaping writes "/" as "\/", so a report within MAX_OUTPUT characters could double in
+        // the store; three of them once overflowed it and the third incident was lost.
+        String name = String.join("", Collections.nCopies(1000, "a/")) + "X.m";
+        StringBuilder java = new StringBuilder("\"main\" prio=5 tid=1 Blocked\n");
+        for (int f = 0; f < 40; f++) java.append("  at ").append(name).append(f).append("(SourceFile:1)\n");
+        String trace = java.toString();
+        Source s = new Source();
+        RecoveryCapture.recover(context, "unit-v1", s, data);
+        for (int launch = 2; launch <= 4; launch++) {
+            s.now = launch * 1000L; s.pid = 100 + launch;
+            s.exits = Arrays.asList(new RecoveryCapture.Exit(context.getPackageName(), 99 + launch, 6,
+                    launch * 1000L - 500, () -> new ByteArrayInputStream(trace.getBytes(StandardCharsets.UTF_8))));
+            RecoveryCapture.recover(context, "unit-v1", s, data);
+        }
+        org.json.JSONArray kept = data.read().getJSONArray("incidents");
+        assertEquals(3, kept.length());
+        for (int i = 0; i < kept.length(); i++) {
+            String report = kept.getJSONObject(i).getString("report");
+            assertTrue(RecoveryCapture.storedBytes(report) <= RecoveryCapture.MAX_STORED_INCIDENT);
+            assertTrue(report, report.endsWith("[report trimmed to fit private storage]\n"));
+            assertTrue(report, report.contains("thread tid=1 role=main"));
+        }
+        assertEquals(3, RecoveryCapture.cachedReport().split("MORPHE DIAGNOSTIC REPORT", -1).length - 1);
+    }
+
+    @Test public void anOrdinaryReportIsStoredUntouched() {
+        String report = "MORPHE DIAGNOSTIC REPORT\nthread tid=1 role=main\n";
+        assertSame(report, RecoveryCapture.fitForStore(report));
+    }
+
+    @Test public void theOutputLimitHoldsAfterRedaction() throws Exception {
+        StringBuilder trace = new StringBuilder();
+        for (int tid = 101; tid < 101 + RecoveryTrace.MAX_THREADS; tid++) {
+            trace.append("\n\"t\" sysTid=").append(tid).append('\n');
+            for (int f = 0; f < 50; f++) {
+                trace.append("    #").append(f).append(" pc 00000000004f1a3c  /apex/com.android.art/lib64/libart.so ")
+                        .append("(fe80::1:2:3::Thread").append(f).append("(art::Thread*, art::Thread*, art::Thread*)+1020)\n");
+            }
+        }
+        RecoveryTrace.Result r = RecoveryTrace.read(
+                new ByteArrayInputStream(trace.toString().getBytes(StandardCharsets.UTF_8)), 101);
+        assertTrue(String.valueOf(r.text.length()), r.text.length() <= RecoveryTrace.MAX_OUTPUT);
+        assertTrue(r.text.endsWith("\n"));
+        assertEquals("truncated", r.status);
+    }
+
+    @Test public void aRenamedJavaMainIsFoundByItsKernelThread() throws Exception {
+        String trace = "\"renamed-ui\" prio=5 tid=1 Runnable\n  | group=\"main\" sCount=0 sysTid=101 nice=-10\n"
+                + "  at app.example.Player.open(Player.java:42)\n";
+        RecoveryTrace.Result r = RecoveryTrace.read(new ByteArrayInputStream(trace.getBytes(StandardCharsets.UTF_8)), 101);
+        assertEquals("captured", r.status);
+        assertTrue(r.text, r.text.startsWith("thread tid=1 role=main state=Runnable\n"));
+        assertFalse(r.text, r.text.contains("renamed"));
+    }
+
+    @Test public void aMainWithNoFramesIsNotCalledCaptured() throws Exception {
+        RecoveryTrace.Result r = RecoveryTrace.read(new ByteArrayInputStream(
+                "\"main\" prio=5 tid=1 Native\n".getBytes(StandardCharsets.UTF_8)), 101);
+        assertEquals("main_without_frames", r.status);
+    }
+
+    @Test public void aSplitCharacterInAThreadNameKeepsTheStacks() throws Exception {
+        byte[] head = "\n\"zhiliaoapp.mus".getBytes(StandardCharsets.UTF_8);
+        byte[] tail = ("\" sysTid=101\n    #00 pc 000000000008a2c8  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+24)\n")
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] trace = new byte[head.length + 1 + tail.length];
+        System.arraycopy(head, 0, trace, 0, head.length);
+        trace[head.length] = (byte) 0xe2; // the first byte of a three-byte character, cut off
+        System.arraycopy(tail, 0, trace, head.length + 1, tail.length);
+        RecoveryTrace.Result r = RecoveryTrace.read(new ByteArrayInputStream(trace), 101);
+        assertEquals(r.text, "captured", r.status);
+        assertTrue(r.shape, r.shape.contains("decode_replaced=true"));
+        assertTrue(r.text, r.text.contains("libc.so (syscall+24)"));
+    }
+
+    @Test public void commonRuntimeSymbolsSurviveRedaction() throws Exception {
+        String[] symbols = {
+                "art::ThreadList::SuspendAllInternal(art::Thread*, art::Thread*, art::Thread*, bool)+1020",
+                "art::gc::Heap::WaitForGcToCompleteLocked(art::gc::GcCause, art::Thread*)+80",
+                "art::Monitor::Lock<(art::LockReason)1>(art::Thread*)+404",
+                "art::ConditionVariable::WaitHoldingLocks(art::Thread*)+140",
+                "android::IPCThreadState::talkWithDriver(bool)+256",
+        };
+        StringBuilder trace = new StringBuilder("\"x\" sysTid=101\n");
+        for (int i = 0; i < symbols.length; i++) {
+            trace.append("    #0").append(i).append(" pc 00000000004f1a3c  /apex/com.android.art/lib64/libart.so (")
+                    .append(symbols[i]).append(") (BuildId: 9a8b7c)\n");
+        }
+        RecoveryTrace.Result r = RecoveryTrace.read(new ByteArrayInputStream(trace.toString().getBytes(StandardCharsets.UTF_8)), 101);
+        for (String symbol : symbols) assertTrue(symbol + "\n" + r.text, r.text.contains("(" + symbol + ")"));
+    }
+
+    @Test public void aJavaDumpStillReportsItsShape() throws Exception {
+        RecoveryTrace.Result r = RecoveryTrace.read(trace());
+        assertTrue(r.shape, r.shape.contains("format=java java_threads=3 native_threads=0"));
+    }
+
     @Test public void traceInputIsBoundedAndInvalidTextIsNotExported() throws Exception {
         byte[] large = new byte[RecoveryTrace.MAX_INPUT + 20]; Arrays.fill(large, (byte) 'a');
         assertEquals("truncated_no_main", RecoveryTrace.read(new ByteArrayInputStream(large)).status);
-        assertEquals("invalid_text", RecoveryTrace.read(new ByteArrayInputStream(new byte[]{(byte) 0xff})).status);
+        RecoveryTrace.Result invalid = RecoveryTrace.read(new ByteArrayInputStream(new byte[]{(byte) 0xff}));
+        assertEquals("no_main_thread", invalid.status);
+        assertTrue(invalid.shape, invalid.shape.contains("decode_replaced=true"));
+        assertEquals("", invalid.text);
     }
     @Test public void completedStateSurvivesANewStoreAndFailedOversizedWrite() throws Exception {
         data.update(s -> s.put("marker", "last-complete"));
