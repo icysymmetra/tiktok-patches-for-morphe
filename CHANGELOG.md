@@ -1,3 +1,16 @@
+# [0.11.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.1...v0.11.0-dev.2) (2026-11-12)
+
+
+### Bug Fixes
+
+* **Diagnostics:** recognise native ANR recovery traces ([533640a](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/533640aaa5a6a41d1f3c502cd3faee8c24e75f3d)), closes [#215](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/215)
+
+
+
+
+
+## 0.11.0-dev.2
+
 # [0.11.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.10.0...v0.11.0-dev.1) (2026-11-12)
 
 
