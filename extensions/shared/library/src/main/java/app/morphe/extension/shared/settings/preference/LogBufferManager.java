@@ -12,10 +12,12 @@ import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.content.ContentValues;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.AtomicFile;
 import android.database.Cursor;
@@ -26,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +49,7 @@ import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.DiagnosticEvent;
 import app.morphe.extension.shared.diagnostics.DiagnosticRedactor;
 import app.morphe.extension.shared.diagnostics.BuildDetails;
+import app.morphe.extension.shared.diagnostics.RecoveryCapture;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.HushfeedPause;
 
@@ -56,6 +60,7 @@ public final class LogBufferManager {
      * English below, which is what a bundle carrying no table gets.
      */
     public static CharSequence clearedMessage;
+    public static CharSequence clearFailedMessage;
     public static CharSequence nothingToClearMessage;
     public static CharSequence restoredMessage;
     public static CharSequence nothingToRestoreMessage;
@@ -99,6 +104,7 @@ public final class LogBufferManager {
         final app.morphe.extension.shared.diagnostics.FeedFilterCounters.Snapshot feedFilter;
         final String javaCrash;
         final String nativeCrash;
+        final String recovered;
         final List<String> layout;
         final app.morphe.extension.shared.diagnostics.MainThreadStallProbe.Snapshot stall;
 
@@ -109,7 +115,8 @@ public final class LogBufferManager {
                 String javaCrash,
                 String nativeCrash,
                 List<String> layout,
-                app.morphe.extension.shared.diagnostics.MainThreadStallProbe.Snapshot stall
+                app.morphe.extension.shared.diagnostics.MainThreadStallProbe.Snapshot stall,
+                String recovered
         ) {
             this.events = events;
             this.hooks = hooks;
@@ -118,11 +125,12 @@ public final class LogBufferManager {
             this.nativeCrash = nativeCrash;
             this.layout = layout;
             this.stall = stall;
+            this.recovered = recovered;
         }
 
         boolean isEmpty() {
             return events.isEmpty() && hooks.isEmpty() && feedFilter.isEmpty()
-                    && javaCrash.isEmpty() && nativeCrash.isEmpty() && layout.isEmpty() && stall.isEmpty();
+                    && javaCrash.isEmpty() && nativeCrash.isEmpty() && recovered.isEmpty() && layout.isEmpty() && stall.isEmpty();
         }
     }
 
@@ -213,6 +221,7 @@ public final class LogBufferManager {
         // shared background threads for as long as it stalls.
         boolean started = Utils.runOnOwnThread("morphe-diagnostic-export", () -> {
             try {
+                if (!buildDetailsOnly) RecoveryCapture.loadForExport(app);
                 String exportText = buildDetailsOnly ? BuildDetails.report() : buildExportText();
                 if (exportText.isEmpty()) {
                     Utils.showToastShort(say(nothingToExportMessage, "No matching diagnostics found."));
@@ -238,30 +247,7 @@ public final class LogBufferManager {
         String fileName = "morphe-diagnostics-" + fileTimestamp() + "-"
                 + Long.toHexString(System.nanoTime()) + ".txt";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ContentResolver resolver = context.getContentResolver();
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
-            values.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain");
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH,
-                    Environment.DIRECTORY_DOWNLOADS + "/Morphe");
-            values.put(MediaStore.MediaColumns.IS_PENDING, 1);
-            Uri pendingUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-            if (pendingUri == null) throw new IOException("Could not create report file");
-            try {
-                try (OutputStream output = resolver.openOutputStream(pendingUri, "w")) {
-                    writeText(output, exportText);
-                }
-                String savedName = providerDisplayName(resolver, pendingUri);
-                values.clear();
-                values.put(MediaStore.MediaColumns.IS_PENDING, 0);
-                if (resolver.update(pendingUri, values, null, null) != 1) {
-                    throw new IOException("Could not publish report file");
-                }
-                return Environment.DIRECTORY_DOWNLOADS + "/Morphe/" + savedName;
-            } catch (Exception error) {
-                deleteIncomplete(resolver, pendingUri, error);
-                throw error;
-            }
+            return writeVerifiedReport(context, fileName, exportText, null);
         }
 
         File directory = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
@@ -283,15 +269,130 @@ public final class LogBufferManager {
         }
     }
 
-    private static String providerDisplayName(ContentResolver resolver, Uri uri) throws IOException {
+    private static String publishedDisplayName(ContentResolver resolver, Uri uri) throws IOException {
         try (Cursor cursor = resolver.query(uri,
-                new String[]{MediaStore.MediaColumns.DISPLAY_NAME}, null, null, null)) {
+                Build.VERSION.SDK_INT >= 30 ? new String[]{MediaStore.MediaColumns.DISPLAY_NAME,
+                        MediaStore.MediaColumns.IS_PENDING, MediaStore.MediaColumns.IS_TRASHED}
+                        : new String[]{MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.IS_PENDING}, null, null, null)) {
             if (cursor == null || !cursor.moveToFirst()) throw new IOException("Could not read saved report name");
             int column = cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME);
             if (column < 0) throw new IOException("Saved report name is unavailable");
             String name = cursor.getString(column);
             if (name == null || name.isEmpty()) throw new IOException("Saved report name is empty");
+            int pending = cursor.getColumnIndex(MediaStore.MediaColumns.IS_PENDING);
+            if (pending < 0 || cursor.isNull(pending) || cursor.getInt(pending) != 0)
+                throw new IOException("Report is still pending");
+            if (Build.VERSION.SDK_INT >= 30 && (cursor.isNull(2) || cursor.getInt(2) != 0))
+                throw new IOException("Report is in the trash");
             return name;
+        }
+    }
+
+    /** Worker-only. A receipt is written only after publication and a byte-for-byte readback. */
+    public static String writeVerifiedReport(Context context, String name, String text,
+            app.morphe.extension.shared.diagnostics.RecoveryPublisher.Journal journal) throws Exception {
+        if (Build.VERSION.SDK_INT < 29) throw new IOException("Recovery export requires Android 10");
+        if (context == null || name == null || !name.matches("[A-Za-z0-9._-]+\\.txt"))
+            throw new IOException("Invalid report destination");
+        byte[] expected = text.getBytes(StandardCharsets.UTF_8);
+        if (journal != null && expected.length > 1024 * 1024) throw new IOException("Report exceeds export limit");
+        ContentResolver resolver = context.getContentResolver();
+        String savedUri = journal == null ? "" : journal.uri();
+        Uri uri = savedUri.isEmpty() ? null : Uri.parse(savedUri);
+        if (uri != null && (!"content".equals(uri.getScheme()) || !MediaStore.AUTHORITY.equals(uri.getAuthority())
+                || uri.getPath() == null || !uri.getPath().startsWith("/external/downloads/"))) throw new IOException("Invalid report receipt URI");
+        if (uri == null && journal != null) {
+            // Recover the narrow insert/receipt gap. Name includes a hash, and ownership is checked.
+            try (Cursor c = recoveryQuery(resolver, MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.MediaColumns._ID},
+                    MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ? AND " + MediaStore.MediaColumns.RELATIVE_PATH
+                            + "=? AND " + MediaStore.MediaColumns.OWNER_PACKAGE_NAME + "=?",
+                    new String[]{name.substring(0, name.length() - 4) + "%", Environment.DIRECTORY_DOWNLOADS + "/Morphe/", context.getPackageName()}, false)) {
+                if (c == null) throw new IOException("Could not reconcile report receipt");
+                if (c.moveToFirst()) {
+                    uri = ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, c.getLong(0));
+                    if (c.moveToNext()) throw new IOException("Ambiguous report receipt");
+                }
+            }
+        }
+        if (uri != null) {
+            if (Build.VERSION.SDK_INT < 30) throw new IOException("Recovery export requires Android 11");
+            try (Cursor c = recoveryQuery(resolver, uri, new String[]{MediaStore.MediaColumns.DISPLAY_NAME,
+                    MediaStore.MediaColumns.OWNER_PACKAGE_NAME, MediaStore.MediaColumns.IS_PENDING,
+                    MediaStore.MediaColumns.IS_TRASHED}, null, null, true)) {
+                if (c == null) throw new IOException("Could not read report receipt");
+                if (!c.moveToFirst()) uri = null;
+                else if (c.isNull(3) || c.getInt(3) != 0) uri = null;
+                else {
+                    String foundName = c.getString(0);
+                    if (foundName == null || !foundName.startsWith(name.substring(0, name.length() - 4))
+                            || !foundName.endsWith(".txt") || !context.getPackageName().equals(c.getString(1)))
+                        throw new IOException("Report receipt ownership mismatch");
+                    if (c.getInt(2) == 0) {
+                        verifyReportBytes(resolver, uri, expected);
+                        if (journal != null && !journal.active()) throw new IOException("Recovery evidence was cleared");
+                        if (journal != null) journal.verified(uri.toString(), foundName,
+                                app.morphe.extension.shared.diagnostics.RecoveryPublisher.sha(text));
+                        return Environment.DIRECTORY_DOWNLOADS + "/Morphe/" + foundName;
+                    }
+                }
+            }
+        }
+        if (uri == null) {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain");
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Morphe");
+            values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+            uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) throw new IOException("Could not create report file");
+        }
+        try {
+            if (journal != null && !journal.active()) throw new IOException("Recovery evidence was cleared");
+            if (journal != null) journal.created(uri.toString());
+            try (OutputStream output = resolver.openOutputStream(uri, "wt")) { writeText(output, text); }
+            verifyReportBytes(resolver, uri, expected);
+            if (journal != null && !journal.active()) throw new IOException("Recovery evidence was cleared");
+            ContentValues published = new ContentValues(); published.put(MediaStore.MediaColumns.IS_PENDING, 0);
+            if (resolver.update(uri, published, null, null) != 1) throw new IOException("Could not publish report file");
+            String actualName = publishedDisplayName(resolver, uri);
+            verifyReportBytes(resolver, uri, expected);
+            if (journal != null && !journal.active()) throw new IOException("Recovery evidence was cleared");
+            if (journal != null) journal.verified(uri.toString(), actualName,
+                    app.morphe.extension.shared.diagnostics.RecoveryPublisher.sha(text));
+            return Environment.DIRECTORY_DOWNLOADS + "/Morphe/" + actualName;
+        } catch (Exception failed) {
+            // Recovery keeps its pending URI and private incident so the next process can resume.
+            boolean remove = journal == null;
+            if (journal != null) try { remove = !journal.active(); }
+            catch (Exception receiptFailure) { failed.addSuppressed(receiptFailure); }
+            if (remove) deleteIncomplete(resolver, uri, failed);
+            throw failed;
+        }
+    }
+
+    private static Cursor recoveryQuery(ContentResolver resolver, Uri uri, String[] columns,
+            String selection, String[] selectionArgs, boolean includeTrash) throws IOException {
+        if (Build.VERSION.SDK_INT < 30) throw new IOException("Recovery export requires Android 11");
+        Bundle args = new Bundle();
+        args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection);
+        args.putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs);
+        args.putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE);
+        args.putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, includeTrash ? MediaStore.MATCH_INCLUDE : MediaStore.MATCH_EXCLUDE);
+        return resolver.query(uri, columns, args, null);
+    }
+
+    private static void verifyReportBytes(ContentResolver resolver, Uri uri, byte[] expected) throws IOException {
+        try (InputStream in = resolver.openInputStream(uri)) {
+            if (in == null) throw new IOException("Report cannot be read back");
+            byte[] bytes = new byte[4096]; int at = 0;
+            while (at < expected.length) {
+                int n = in.read(bytes, 0, Math.min(bytes.length, expected.length - at));
+                if (n <= 0) throw new IOException("Report was truncated");
+                for (int i = 0; i < n; i++) if (bytes[i] != expected[at + i]) throw new IOException("Report contents differ");
+                at += n;
+            }
+            if (in.read() != -1) throw new IOException("Report contains unexpected trailing bytes");
         }
     }
 
@@ -379,7 +480,9 @@ public final class LogBufferManager {
         // report worth sending on its own and ignores "Included diagnostics".
         List<String> layout = app.morphe.extension.shared.diagnostics.ScreenLayout.lines();
         List<String> stall = app.morphe.extension.shared.diagnostics.MainThreadStallProbe.lines();
+        String recovered = app.morphe.extension.shared.diagnostics.RecoveryCapture.cachedReport();
         boolean worthReporting = paused || !crash.isEmpty() || !npthCrash.isEmpty() || events.length() > 0
+                || !recovered.isEmpty()
                 || !layout.isEmpty() || !stall.isEmpty()
                 || (hooks.length() > 0
                         && app.morphe.extension.shared.diagnostics.HookStatus.anyMissing());
@@ -397,6 +500,8 @@ public final class LogBufferManager {
                     .append(HushfeedPause.reason().name().toLowerCase(java.util.Locale.ROOT))
                     .append("), every hook a setting controls takes TikTok's own path\n");
         }
+
+        if (!recovered.isEmpty()) report.append("\n[RECOVERED FAILURES]\n").append(recovered).append('\n');
 
         if (!crash.isEmpty()) {
             report.append("\n[LATEST JAVA CRASH]\n").append(crash);
@@ -677,8 +782,15 @@ public final class LogBufferManager {
 
     public static void clearLogBuffer() {
         boolean restorable;
+        boolean recoveryFailed = false;
         synchronized (CLEAR_UNDO_LOCK) {
             Context context = Utils.getContext();
+            String recovered;
+            try { recovered = RecoveryCapture.clear(context); }
+            catch (Exception unavailable) {
+                // Preserve unreadable recovery evidence, but do not block clearing other categories.
+                recovered = ""; recoveryFailed = true;
+            }
             ClearSnapshot removed = new ClearSnapshot(
                     new ArrayList<>(logBuffer),
                     app.morphe.extension.shared.diagnostics.HookStatus.snapshotAndClear(),
@@ -686,14 +798,16 @@ public final class LogBufferManager {
                     readCrashReport(context),
                     readNpthCrashReport(context),
                     app.morphe.extension.shared.diagnostics.ScreenLayout.snapshotAndClear(),
-                    app.morphe.extension.shared.diagnostics.MainThreadStallProbe.snapshotAndClear()
+                    app.morphe.extension.shared.diagnostics.MainThreadStallProbe.snapshotAndClear(),
+                    recovered
             );
             clearLogBufferData();
             clearCrashReports(context);
             lastClear = removed.isEmpty() ? null : removed;
             restorable = lastClear != null;
         }
-        Utils.showToastShort(restorable
+        if (recoveryFailed) Utils.showToastLong(say(clearFailedMessage, "Diagnostic data couldn't be cleared. Try again."));
+        else Utils.showToastShort(restorable
                 ? say(clearedMessage, "Diagnostic data cleared. Tap again to put it back.")
                 : say(nothingToClearMessage, "There is no diagnostic data to clear."));
     }
@@ -717,6 +831,7 @@ public final class LogBufferManager {
                     Context context = Utils.getContext();
                     restoreCrashReportIfMissing(context, CRASH_FILE, saved.javaCrash);
                     restoreCrashReportIfMissing(context, NPTH_CRASH_FILE, saved.nativeCrash);
+                    RecoveryCapture.restore(context, saved.recovered);
                     restoreLogBufferData(saved.events);
                     app.morphe.extension.shared.diagnostics.HookStatus.restore(saved.hooks);
                     app.morphe.extension.shared.diagnostics.FeedFilterCounters.restore(saved.feedFilter);

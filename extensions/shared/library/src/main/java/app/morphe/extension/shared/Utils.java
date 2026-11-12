@@ -569,6 +569,8 @@ public class Utils {
     }
 
     public static void setContext(Context appContext) {
+        // Explicit trial path only; schedule recovery before logging or settings can stall.
+        app.morphe.extension.shared.diagnostics.RecoveryCapture.onContext(appContext);
         // Intentionally use logger before context is set,
         // to expose any bugs in the 'no context available' logger code.
         Logger.printInfo(() -> "Set context: " + appContext);

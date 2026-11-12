@@ -400,6 +400,7 @@ Default playback speed,Kecepatan pemutaran bawaan
 Device access,Akses perangkat
 "Device language, then original","Bahasa perangkat, lalu bahasa asli"
 Diagnostic data cleared. Tap again to put it back.,Data diagnostik dihapus. Ketuk lagi untuk mengembalikannya.
+Diagnostic data couldn't be cleared. Try again.,Data diagnostik tidak dapat dihapus. Coba lagi.
 Diagnostic data put back,Data diagnostik dikembalikan
 Diagnostic report copied to the clipboard,Laporan diagnostik disalin ke papan klip
 Diagnostics,Diagnostik

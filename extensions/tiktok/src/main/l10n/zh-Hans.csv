@@ -504,6 +504,7 @@ Details: %1$s,详细信息：%1$s
 Device access,设备访问
 "Device language, then original",设备语言，然后是原文
 Diagnostic data cleared. Tap again to put it back.,诊断数据已清除。再点一次可恢复。
+Diagnostic data couldn't be cleared. Try again.,无法清除诊断数据。请重试。
 Diagnostic data put back,诊断数据已恢复
 Diagnostic report copied to the clipboard,诊断报告已复制到剪贴板
 Diagnostics,诊断
