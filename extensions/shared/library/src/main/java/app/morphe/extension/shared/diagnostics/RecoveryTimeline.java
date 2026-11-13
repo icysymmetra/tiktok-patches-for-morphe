@@ -42,6 +42,8 @@ final class RecoveryTimeline {
     static final int MAX_SAMPLES = 72;
     /** What a report may take of the store's budget for one incident. */
     static final int MAX_SECTION = 6 * 1024;
+    /** Trial state has its own small allowance, so it never displaces heap/GC readings. */
+    static final int MAX_SOFT_REFERENCE = 192;
     static final int MAX_FILE = 16 * 1024;
     static final int KEEP_FILES = 5;
     /** When TikTok's runtime tuning is read: after its startup task, then every two minutes. */
@@ -49,10 +51,15 @@ final class RecoveryTimeline {
     static final int MAX_JATO = 1600;
     static final String HEADING = "[TIMELINE BEFORE EXIT]\n";
     private static final String JATO_LINE = "J ";
+    private static final String SOFT_REFERENCE_LINE = "S ";
 
     /** {@code elapsed} is the clock the lease is kept on: it keeps running while the phone sleeps. */
     interface Clock { long wall(); long elapsed(); }
-    interface Probe { String sample(); String jato(); }
+    interface Probe {
+        String sample(); String jato();
+        default String softReference() { return ""; }
+        default void saved() {}
+    }
 
     private RecoveryTimeline() {}
 
@@ -63,6 +70,20 @@ final class RecoveryTimeline {
     private static final Object FILES_LOCK = new Object();
     private static long clears;
     private static volatile File lastFilesDir;
+    private static final Object READING_WAKE = new Object();
+    private static boolean readingRequested;
+
+    /** The first bypass of each installer requests an early reading on the existing sampler. */
+    static void requestReading() {
+        synchronized (READING_WAKE) { readingRequested = true; READING_WAKE.notifyAll(); }
+    }
+    static void resetReadingRequest() { synchronized (READING_WAKE) { readingRequested = false; } }
+    private static void awaitReading() throws InterruptedException {
+        synchronized (READING_WAKE) {
+            if (!readingRequested) READING_WAKE.wait(PERIOD_MS);
+            readingRequested = false;
+        }
+    }
 
     static void clear(File filesDir) {
         File target = filesDir != null ? filesDir : lastFilesDir;
@@ -82,6 +103,10 @@ final class RecoveryTimeline {
 
     /** Starts the readings for this session until {@code untilElapsed} on the elapsed-realtime clock. */
     static void start(File filesDir, int pid, long sessionAt, long untilElapsed, ClassLoader loader) {
+        start(filesDir, pid, sessionAt, untilElapsed, loader, () -> {});
+    }
+    static void start(File filesDir, int pid, long sessionAt, long untilElapsed, ClassLoader loader,
+            Runnable saved) {
         final Handler main = new Handler(Looper.getMainLooper());
         // When the outstanding ping was sent, or 0 when it was answered. Written before posting,
         // so a post that blocks on the queue's lock still shows as a main thread that's late.
@@ -111,6 +136,10 @@ final class RecoveryTimeline {
                 return reading(sent == 0 ? 0 : SystemClock.elapsedRealtime() - sent);
             }
             public String jato() { return jatoState(loader); }
+            public String softReference() {
+                return RecoveryCapture.softReferenceTrialEnabled() ? RecoveryCapture.softReferenceState() : "";
+            }
+            public void saved() { saved.run(); }
         };
         Thread sampler = new Thread(() -> {
             try { run(filesDir, pid, sessionAt, untilElapsed, clock, probe, true); }
@@ -132,20 +161,28 @@ final class RecoveryTimeline {
         // push it out; it carries the time it was last confirmed.
         String jatoLine = null, lastJato = null;
         int count = 0;
+        long nextJatoElapsed = clock.elapsed() + JATO_FIRST * PERIOD_MS;
         long seenClears;
         synchronized (FILES_LOCK) { seenClears = clears; }
         while (true) {
-            if (sleep) Thread.sleep(PERIOD_MS);
+            if (sleep) awaitReading();
             // Checked after the wait, so a phone asleep past the lease takes no further reading.
             if (clock.elapsed() >= untilElapsed) return;
             count++;
             lines.addLast(clock.wall() + " " + probe.sample());
-            if (count == JATO_FIRST || (count > JATO_FIRST && (count - JATO_FIRST) % JATO_EVERY == 0)) {
+            // One current process-state record, not repeated in the ring of heap/GC readings.
+            // Date it when observed, so Clear can discard a pre-clear observation normally.
+            String softReference = probe.softReference();
+            String softReferenceLine = softReference.isEmpty() ? "" : SOFT_REFERENCE_LINE + clock.wall()
+                    + " " + softReference.substring(0, Math.min(softReference.length(), 128)) + "\n";
+            // First-hit wakeups add readings without moving the startup/config observation earlier.
+            if (clock.elapsed() >= nextJatoElapsed) {
                 String jato = probe.jato();
                 if (jato.length() > MAX_JATO) jato = jato.substring(0, MAX_JATO) + " [truncated]";
                 if (lastJato != null && !jato.equals(lastJato)) lines.addLast(clock.wall() + " jato_changed");
                 lastJato = jato;
                 jatoLine = JATO_LINE + clock.wall() + " " + jato + "\n";
+                nextJatoElapsed = clock.elapsed() + JATO_EVERY * PERIOD_MS;
             }
             while (lines.size() > MAX_SAMPLES) lines.removeFirst();
             synchronized (FILES_LOCK) {
@@ -155,17 +192,24 @@ final class RecoveryTimeline {
                     seenClears = clears; lines.clear(); jatoLine = null; lastJato = null;
                     continue;
                 }
-                write(target, header + (jatoLine == null ? "" : jatoLine), lines);
+                write(target, header + (jatoLine == null ? "" : jatoLine) + softReferenceLine, lines);
             }
+            probe.saved();
             if (!sleep && count >= MAX_SAMPLES * 4) return;
         }
     }
 
     private static void write(File target, String head, ArrayDeque<String> lines) throws Exception {
-        StringBuilder out = new StringBuilder(head);
-        for (String line : lines) out.append(line).append('\n');
-        byte[] bytes = out.toString().getBytes(StandardCharsets.UTF_8);
-        if (bytes.length > MAX_FILE) return;
+        byte[] bytes;
+        while (true) {
+            StringBuilder out = new StringBuilder(head);
+            for (String line : lines) out.append(line).append('\n');
+            bytes = out.toString().getBytes(StandardCharsets.UTF_8);
+            if (bytes.length <= MAX_FILE) break;
+            // Keep saving the newest readings if unusually wide runtime counters fill the file.
+            if (lines.size() <= 1) return;
+            lines.removeFirst();
+        }
         File parent = target.getParentFile();
         if (parent != null && !parent.isDirectory() && !parent.mkdirs()) return;
         AtomicFile file = new AtomicFile(target);
@@ -185,7 +229,7 @@ final class RecoveryTimeline {
         String own = file(filesDir, pid, sessionAt).getName();
         List<File> others = new ArrayList<>();
         for (File f : files) if (!f.getName().equals(own)) others.add(f);
-        others.sort((a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+        java.util.Collections.sort(others, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
         for (int i = KEEP_FILES - 1; i < others.size(); i++) //noinspection ResultOfMethodCallIgnored
             others.get(i).delete();
     }
@@ -217,18 +261,25 @@ final class RecoveryTimeline {
             return HEADING + "not_recorded\n";
         }
         String jato = "jato_latest: not_read\n";
+        String softReference = "";
         List<String> rendered = new ArrayList<>();
         long last = 0;
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i];
             boolean isJato = line.startsWith(JATO_LINE);
-            if (isJato) line = line.substring(JATO_LINE.length());
+            boolean isSoftReference = line.startsWith(SOFT_REFERENCE_LINE);
+            if (isJato || isSoftReference) line = line.substring(2);
             int space = line.indexOf(' ');
             if (space <= 0) continue;
             long at;
             try { at = Long.parseLong(line.substring(0, space)); } catch (NumberFormatException bad) { continue; }
             if (at <= clearedThrough) continue;
             String body = line.substring(space + 1);
+            if (isSoftReference) {
+                softReference = "softref_latest: " + relative(at - exitAt) + " "
+                        + body.substring(0, Math.min(body.length(), 128)) + "\n";
+                continue;
+            }
             if (isJato) {
                 String value = body.length() > MAX_JATO + 16 ? body.substring(0, MAX_JATO) + " [truncated]" : body;
                 jato = "jato_latest: " + relative(at - exitAt) + " " + value + "\n";
@@ -248,6 +299,8 @@ final class RecoveryTimeline {
         while (from > 0 && used + rendered.get(from - 1).length() + 1 <= budget) used += rendered.get(--from).length() + 1;
         if (from > 0) out.append(omittedNote(from));
         for (int i = from; i < rendered.size(); i++) out.append(rendered.get(i)).append('\n');
+        // This bounded metadata is additional to the unchanged six-KiB readings allowance.
+        out.append(softReference);
         return out.toString();
     }
 

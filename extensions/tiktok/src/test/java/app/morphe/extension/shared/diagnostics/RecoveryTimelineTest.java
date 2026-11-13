@@ -48,6 +48,20 @@ public class RecoveryTimelineTest {
         return new String(Files.readAllBytes(RecoveryTimeline.file(files, pid, at).toPath()), StandardCharsets.UTF_8);
     }
 
+    @Test public void earlyWakeReadingsDoNotAdvanceTheFirstOrSubsequentJatoSnapshots() throws Exception {
+        List<Long> observed = new ArrayList<>();
+        Fake fake = new Fake() {
+            @Override public String sample() {
+                String value = super.sample();
+                if (samples <= 2) { elapsed -= RecoveryTimeline.PERIOD_MS; wall -= RecoveryTimeline.PERIOD_MS; }
+                return value;
+            }
+            @Override public String jato() { observed.add(elapsed); return super.jato(); }
+        };
+        RecoveryTimeline.run(files, 101, 7, 160_000, fake, fake, false);
+        assertEquals(Arrays.asList(20_000L, 140_000L), observed);
+    }
+
     @Test public void readingsStopAtTheEndOfTheLeaseAndKeepOnlyTheNewest() throws Exception {
         Fake fake = new Fake();
         RecoveryTimeline.run(files, 101, 7, 200 * RecoveryTimeline.PERIOD_MS, fake, fake, false);
@@ -140,6 +154,72 @@ public class RecoveryTimelineTest {
         }
     }
 
+    @Test public void reporterSizedReadingsKeepTheirHistoryWithTrialStateSeparate() throws Exception {
+        Fake fake = new Fake() {
+            @Override public String sample() {
+                super.sample();
+                // A rendered line is 108 characters including its t-... prefix and newline.
+                return "heap=64/512M " + String.join("", Collections.nCopies(87, "x"));
+            }
+            @Override public String softReference() {
+                return "softref_selected=true softref_v1_bypassed=0 softref_v2_bypassed=1";
+            }
+        };
+        fake.jato = String.join("", Collections.nCopies(646, "j"));
+        RecoveryTimeline.run(files, 101, 7, 72 * RecoveryTimeline.PERIOD_MS, fake, fake, false);
+        long exit = fake.wall - RecoveryTimeline.PERIOD_MS + 135_000;
+        String section = RecoveryTimeline.section(files, 101, 7, exit);
+        int readings = 0;
+        for (String line : section.split("\n")) if (line.startsWith("t-") && line.contains(" heap=")) {
+            readings++; assertEquals(line, 108, line.length() + 1);
+            assertFalse(line, line.contains("softref_"));
+        }
+        assertTrue("retained " + readings + " readings", readings >= 49);
+        assertTrue(section, section.contains("last_saved_reading_before_exit_s=135\n"));
+        assertEquals(1, section.split("softref_selected=true", -1).length - 1);
+        assertTrue(section.length() <= RecoveryTimeline.MAX_SECTION + RecoveryTimeline.MAX_SOFT_REFERENCE);
+        assertTrue(Files.size(RecoveryTimeline.file(files, 101, 7).toPath()) <= RecoveryTimeline.MAX_FILE);
+    }
+
+    @Test public void ordinaryRecoveryAddsNoSoftReferenceRecord() throws Exception {
+        Fake fake = new Fake();
+        RecoveryTimeline.run(files, 101, 7, 10 * RecoveryTimeline.PERIOD_MS, fake, fake, false);
+        assertFalse(file(101, 7).contains("\nS "));
+        assertFalse(RecoveryTimeline.section(files, 101, 7, fake.wall).contains("softref_"));
+    }
+
+    @Test public void wideReadingsKeepUpdatingRatherThanSilentlyStoppingAtTheFileLimit() throws Exception {
+        Fake fake = new Fake() {
+            @Override public String sample() {
+                return super.sample() + " " + String.join("", Collections.nCopies(300, "x"));
+            }
+            @Override public String softReference() { return "softref_selected=true softref_v2_bypassed=1"; }
+        };
+        fake.jato = String.join("", Collections.nCopies(RecoveryTimeline.MAX_JATO, "j"));
+        RecoveryTimeline.run(files, 101, 7, 200 * RecoveryTimeline.PERIOD_MS, fake, fake, false);
+        assertTrue(file(101, 7).contains(" heap=200/512M "));
+        assertTrue(Files.size(RecoveryTimeline.file(files, 101, 7).toPath()) <= RecoveryTimeline.MAX_FILE);
+    }
+
+    @Test public void clearDropsSavedObservationsButNewReadingsRetainProcessBypassFacts() throws Exception {
+        RecoveryCapture.softReferenceV2Bypassed();
+        Fake fake = new Fake() {
+            @Override public String sample() {
+                String value = super.sample();
+                if (samples == 10) RecoveryTimeline.clear(files);
+                return value;
+            }
+            @Override public String softReference() { return RecoveryCapture.softReferenceState(); }
+        };
+        RecoveryTimeline.run(files, 101, 7, 20 * RecoveryTimeline.PERIOD_MS, fake, fake, false);
+        String section = RecoveryTimeline.section(files, 101, 7, fake.wall);
+        assertFalse(section, section.contains("heap=9/") || section.contains("heap=10/"));
+        assertTrue(section, section.contains("softref_v2_bypassed=1"));
+        assertEquals(1, section.split("softref_v2_bypassed=1", -1).length - 1);
+        String filtered = RecoveryTimeline.section(files, 101, 7, fake.wall, fake.wall);
+        assertFalse(filtered, filtered.contains("softref_"));
+    }
+
     @Test public void oldFilesArePrunedButThisSessionKeepsItsOwn() throws Exception {
         File dir = RecoveryTimeline.dir(files); assertTrue(dir.mkdirs());
         for (int pid = 1; pid <= 9; pid++) {
@@ -192,6 +272,7 @@ public class RecoveryTimelineTest {
         for (String field : new String[] {"heap=", "M gc=", "ms bgc=", "ms alloc=", "M freed=", " thr=", " rss=", " nat=", " main=ok"})
             assertTrue(reading, reading.contains(field));
         assertTrue(RecoveryTimeline.reading(12_000).endsWith(" main=late_12s"));
+        assertFalse(reading, reading.contains("softref_"));
     }
 
     // Stand-ins for TikTok's tuning classes: static flags and numbers, and a config object.

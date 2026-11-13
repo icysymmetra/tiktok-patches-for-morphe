@@ -338,7 +338,50 @@ public class RecoveryCaptureTest {
         String report = RecoveryCapture.cachedReport();
         assertEquals(3, report.split("MORPHE DIAGNOSTIC REPORT", -1).length - 1);
         assertEquals(3, report.split("role=signal_catcher", -1).length - 1);
+        String activation = String.join("", Collections.nCopies(6000, "/"));
+        for (int i = 0; i < 3; i++) RecoveryCapture.saveActivation(data, "activation" + i, activation, 0);
+        assertEquals(3, data.read().getJSONArray("activations").length());
+        assertEquals(3, data.read().getJSONArray("incidents").length());
+        assertEquals(3, RecoveryCapture.render(data.read()).split("role=signal_catcher", -1).length - 1);
         assertTrue(new File(context.getFilesDir(), "metra_recovery_v1.json").length() <= RecoveryStore.MAX_BYTES);
+    }
+
+    @Test public void maximumEscapedIncidentsBuildsActivationsAndJournalFitTogether() throws Exception {
+        String incident = String.join("", Collections.nCopies(RecoveryCapture.MAX_STORED_INCIDENT / 2 - 1, "/"));
+        assertEquals(RecoveryCapture.MAX_STORED_INCIDENT, RecoveryCapture.storedBytes(incident));
+        org.json.JSONArray incidents = new org.json.JSONArray(), sessions = new org.json.JSONArray();
+        for (int i = 0; i < 3; i++) incidents.put(new JSONObject().put("id", "incident" + i)
+                .put("at", Long.MAX_VALUE).put("report", incident).put("hash", RecoveryPublisher.sha(incident)));
+        String build = String.join("", Collections.nCopies(RecoveryCapture.MAX_STORED_BUILD / 2 - 1, "/"));
+        for (int i = 0; i < 4; i++) sessions.put(new JSONObject().put("pid", Integer.MAX_VALUE)
+                .put("at", Long.MAX_VALUE).put("build", build));
+        String journalField = String.join("", Collections.nCopies(RecoveryPublisher.MAX_JOURNAL_FIELD, "/"));
+        String hash = RecoveryPublisher.sha(incident);
+        data.update(state -> state.put("trial", "issue215-softref-v1-00000000-0000-0000-0000-000000000000")
+                .put("started", Long.MAX_VALUE).put("started_elapsed", Long.MAX_VALUE)
+                .put("export_until", Long.MAX_VALUE).put("boot_epoch", Long.MAX_VALUE)
+                .put("sessions", sessions).put("incidents", incidents)
+                .put("export", new JSONObject().put("uri", journalField).put("name", journalField)
+                        .put("hash", hash).put("verified_hash", hash).put("attempts", 3).put("status", "verified")));
+        String activation = String.join("", Collections.nCopies(5929, "/"))
+                + String.join("", Collections.nCopies(71, "\u0001"));
+        assertEquals(RecoveryCapture.MAX_STORED_ACTIVATION - 2, RecoveryCapture.storedBytes(activation));
+        for (int i = 0; i < 3; i++) RecoveryCapture.saveActivation(data,
+                "issue215-softref-v1-00000000-0000-0000-0000-000000000000-2147483647-9223372036854775807-" + i,
+                activation, 0);
+        assertEquals(3, data.read().getJSONArray("incidents").length());
+        assertEquals(3, data.read().getJSONArray("activations").length());
+        assertTrue(new File(context.getFilesDir(), "metra_recovery_v1.json").length() <= RecoveryStore.MAX_BYTES);
+        assertFalse(RecoveryCapture.render(data.read()).isEmpty());
+    }
+
+    @Test public void multibyteBuildsAreBoundedByEscapedBytesAsWellAsCharacters() throws Exception {
+        Source s = new Source();
+        s.build = String.join("", Collections.nCopies(6000, "\u4e2d"));
+        RecoveryCapture.recover(context, "unit-v1", s, data);
+        String build = data.read().getJSONArray("sessions").getJSONObject(0).getString("build");
+        assertTrue(RecoveryCapture.storedBytes(build) <= RecoveryCapture.MAX_STORED_BUILD);
+        assertTrue(build.endsWith("[build details truncated]"));
     }
 
     @Test public void reportsThatEscapeLargeAreTrimmedNotLost() throws Exception {

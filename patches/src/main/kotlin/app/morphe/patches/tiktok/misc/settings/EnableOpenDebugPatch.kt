@@ -15,6 +15,7 @@ import app.morphe.util.returnEarly
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.diagnostics.resolveShareTimingWrites
+import app.morphe.patches.tiktok.misc.diagnostics.applySoftReferenceTrial
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.patcher.util.numberOfParameterRegisters
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -44,11 +45,30 @@ val enableOpenDebugPatch = bytecodePatch(
             "Re-patching starts a fresh trial. No uploads or other settings changes. Leave off for normal use.",
     )
 
+    val softReferenceTrial by booleanOption(
+        key = "softReferenceTrial",
+        default = false,
+        title = "Soft-reference compatibility trial",
+        description = "Requested TikTok 47.4.3 global trial only. Disables one cache optimization " +
+            "and enables the automatic recovery report trial. May change cache performance. " +
+            "Leave off for normal use.",
+    )
+
     execute {
-        if (recoveryTrial == true) {
+        if (softReferenceTrial == true) {
+            check(packageMetadata.packageName == "com.zhiliaoapp.musically" &&
+                packageMetadata.versionName == "47.4.3") {
+                "Soft-reference trial requires TikTok 47.4.3 global."
+            }
+            applySoftReferenceTrial()
+            mutableClassDefBy("Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;").methods
+                .single { it.name == "softReferenceTrialEnabled" && it.parameterTypes.isEmpty() }
+                .returnEarly(true)
+        }
+        if (recoveryTrial == true || softReferenceTrial == true) {
             mutableClassDefBy("Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;").methods
                 .single { it.name == "trialId" && it.parameterTypes.isEmpty() }
-                .returnEarly("issue215-v1-${java.util.UUID.randomUUID()}")
+                .returnEarly("issue215-${if (softReferenceTrial == true) "softref-v1" else "v1"}-${java.util.UUID.randomUUID()}")
         }
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,

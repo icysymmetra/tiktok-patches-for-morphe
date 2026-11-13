@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,9 +28,12 @@ import org.json.JSONObject;
 public final class RecoveryCapture {
     static final long LEASE_MS = 30 * 60_000L, EXPORT_LEASE_MS = 24 * 60 * 60_000L;
     static final int MAX_STARTS = 3, MAX_CHECKS = MAX_STARTS + 1, MAX_INCIDENTS = 3;
+    static final int MAX_STORED_BUILD = 8 * 1024, MAX_STORED_ACTIVATION = 12 * 1024;
     static final long TRACE_TIMEOUT_MS = 10_000;
     private static final AtomicBoolean STARTED = new AtomicBoolean(), EXPORTING = new AtomicBoolean();
     private static final AtomicBoolean PROBE_BUSY = new AtomicBoolean();
+    private static final AtomicInteger ACTIVATION_MASK = new AtomicInteger();
+    private static final AtomicBoolean EXPORT_REQUESTED = new AtomicBoolean();
     private static volatile RecoveryStore store;
     private static volatile String report = "";
     private static final ThreadPoolExecutor PROBE = new ThreadPoolExecutor(1, 1, 0,
@@ -41,6 +45,84 @@ public final class RecoveryCapture {
 
     /** Patched by Diagnostic tools only when its explicit recovery-trial option is selected. */
     public static String trialId() { return ""; }
+
+    /** Selected only by the explicit, exact-target patch option. */
+    public static boolean softReferenceTrialEnabled() { return false; }
+    private static final AtomicInteger SOFT_V1 = new AtomicInteger(), SOFT_V2 = new AtomicInteger();
+    public static void softReferenceV1Bypassed() { softReferenceBypassed(SOFT_V1); }
+    public static void softReferenceV2Bypassed() { softReferenceBypassed(SOFT_V2); }
+    private static void softReferenceBypassed(AtomicInteger counter) {
+        // No storage, logger, main-queue work or native calls on the intercepted startup route.
+        int value;
+        do { value = counter.get(); if (value >= 1_000_000) return; }
+        while (!counter.compareAndSet(value, value + 1));
+        if (value == 0) RecoveryTimeline.requestReading();
+    }
+    static String softReferenceState() {
+        return softReferenceState(SOFT_V1.get(), SOFT_V2.get());
+    }
+    private static String softReferenceState(int v1, int v2) {
+        return "softref_selected=" + softReferenceTrialEnabled()
+                + " softref_v1_bypassed=" + v1 + " softref_v2_bypassed=" + v2;
+    }
+
+    /** Called only by the existing sampler, after a reading. Never on the intercepted route. */
+    static void saveSoftReferenceActivation(Context context, int pid, long sessionAt) {
+        if (!softReferenceTrialEnabled()) return;
+        try {
+            RecoveryStore data = store;
+            if (data == null || !recordSoftReferenceActivation(data, trialId(), pid, sessionAt,
+                    System.currentTimeMillis())) return;
+            refresh(data); publish(context, data);
+        } catch (Throwable unavailable) { /* Retry from a later reading within the existing lease. */ }
+    }
+
+    /** At most two successful updates: the first encounter, then the other installer's first hit. */
+    static boolean recordSoftReferenceActivation(RecoveryStore data, String trial, int pid,
+            long sessionAt, long observedAt) throws Exception {
+        // Only sampler work takes this lock. It serializes the mask, receipt replacement and Clear.
+        synchronized (RecoveryStore.LOCK) {
+            int v1 = SOFT_V1.get(), v2 = SOFT_V2.get();
+            int mask = (v1 > 0 ? 1 : 0) | (v2 > 0 ? 2 : 0);
+            if ((mask & ~ACTIVATION_MASK.get()) == 0) return false;
+            JSONObject state = data.read();
+            if (!trial.equals(state.optString("trial")) || state.optLong("cleared_through") >= sessionAt)
+                return false;
+            JSONArray sessions = state.optJSONArray("sessions");
+            JSONObject session = null;
+            if (sessions != null) for (int i = 0; i < sessions.length(); i++) {
+                JSONObject value = sessions.getJSONObject(i);
+                if (value.optInt("pid") == pid && value.optLong("at") == sessionAt) session = value;
+            }
+            if (session == null) return false;
+            String text = "MORPHE DIAGNOSTIC REPORT\nschema: 1\nsource: soft_reference_trial_activation"
+                    + "\nThis records an installer bypass, not a crash or proof of a fix."
+                    + "\ntrial: " + trial + "\npid: " + pid + "\nsession_started_ms: " + sessionAt
+                    + "\nobserved_ms: " + observedAt
+                    + "\n" + softReferenceState(v1, v2) + "\n\n[SESSION BUILD]\n" + session.optString("build");
+            saveActivation(data, trial + "-" + pid + "-" + sessionAt, text, state.optInt("generation"));
+            ACTIVATION_MASK.set(mask);
+            return true;
+        }
+    }
+
+    /** Separate from failures, so an activation receipt cannot evict an unsent failure. */
+    static void saveActivation(RecoveryStore data, String id, String text, int generation) throws Exception {
+        if (text.length() > 6000 || storedBytes(text) > MAX_STORED_ACTIVATION)
+            throw new java.io.IOException("activation too long");
+        String hash = RecoveryPublisher.sha(text);
+        data.update(state -> {
+            if (state.optInt("generation") != generation) return;
+            JSONArray previous = state.optJSONArray("activations");
+            JSONArray next = new JSONArray();
+            next.put(new JSONObject().put("id", id).put("report", text).put("hash", hash));
+            if (previous != null) for (int i = 0; i < previous.length() && next.length() < MAX_STARTS; i++) {
+                JSONObject item = previous.getJSONObject(i);
+                if (!id.equals(item.optString("id"))) next.put(item);
+            }
+            state.put("activations", next);
+        });
+    }
 
     public static void onContext(Context supplied) {
         try {
@@ -83,6 +165,7 @@ public final class RecoveryCapture {
         public String build(Context context) {
             return "android_sdk: " + Build.VERSION.SDK_INT + "\nandroid_release: "
                     + Build.VERSION.RELEASE.replaceAll("[^A-Za-z0-9._-]", "_")
+                    + "\nsoft_reference_trial: " + softReferenceTrialEnabled()
                     + "\n" + device(context)
                     + BuildDetails.section(BuildDetails.readMetadata(context));
         }
@@ -98,7 +181,8 @@ public final class RecoveryCapture {
         }
         public void timeline(Context context, int pid, long sessionAt, long untilElapsed) {
             // The lease's own clock, which keeps counting while the phone sleeps (#215 review).
-            RecoveryTimeline.start(context.getFilesDir(), pid, sessionAt, untilElapsed, context.getClassLoader());
+            RecoveryTimeline.start(context.getFilesDir(), pid, sessionAt, untilElapsed, context.getClassLoader(),
+                    () -> saveSoftReferenceActivation(context, pid, sessionAt));
         }
     }
 
@@ -335,8 +419,10 @@ public final class RecoveryCapture {
     /**
      * The most one incident may take in the store once JSON-escaped. MAX_OUTPUT bounds a report
      * in characters, but escaping can double that ("/" is written "\/"), and the store refuses a
-     * whole write past its limit, which would lose the incident. Three of these, four sessions
-     * with their builds and the export journal stay under {@link RecoveryStore#MAX_BYTES}.
+     * whole write past its limit, which would lose the incident. Budget three incidents (180 KiB),
+     * four escaped session builds (32 KiB), three escaped activation reports (36 KiB)
+     * and the export journal under {@link RecoveryStore#MAX_BYTES}. The maximum-size store test
+     * covers activations as well as failures. Trial metadata has its own small timeline allowance.
      */
     static final int MAX_STORED_INCIDENT = 60 * 1024;
     private static final String STORE_TRIM = "\n[report trimmed to fit private storage]\n";
@@ -358,7 +444,13 @@ public final class RecoveryCapture {
 
     private static String safeBuild(String value) {
         String safe = DiagnosticRedactor.redact(value);
-        return safe.length() > 4096 ? safe.substring(0, 4096) + "\n[build details truncated]" : safe;
+        String marker = "\n[build details truncated]";
+        if (safe.length() > 4096) safe = safe.substring(0, 4096) + marker;
+        if (storedBytes(safe) <= MAX_STORED_BUILD) return safe;
+        // A character limit alone does not bound UTF-8 or JSON escaping in the shared store.
+        do { safe = safe.substring(0, Math.max(0, safe.length() - 128)); }
+        while (storedBytes(safe + marker) > MAX_STORED_BUILD);
+        return safe + marker;
     }
 
     private static JSONObject matchingSession(JSONArray sessions, Exit exit) {
@@ -414,11 +506,22 @@ public final class RecoveryCapture {
     }
 
     private static void publish(Context context, RecoveryStore data) {
+        EXPORT_REQUESTED.set(true);
         if (!EXPORTING.compareAndSet(false, true)) return;
         Thread writer = new Thread(() -> {
-            try { RecoveryPublisher.publish(context, data); }
+            try {
+                do {
+                    EXPORT_REQUESTED.set(false);
+                    RecoveryPublisher.publish(context, data);
+                } while (EXPORT_REQUESTED.get());
+            }
             catch (Throwable unavailable) { /* Durable incident survives for a later launch/manual export. */ }
-            finally { EXPORTING.set(false); }
+            finally {
+                EXPORTING.set(false);
+                // An activation can arrive while an older report owns the exporter. Drain that
+                // request without adding a second concurrent publisher or relying on a relaunch.
+                if (EXPORT_REQUESTED.get()) publish(context, data);
+            }
         }, "MetraRecoveryExport");
         writer.setDaemon(true); writer.start();
     }
@@ -426,6 +529,14 @@ public final class RecoveryCapture {
     static String render(JSONObject state) throws Exception {
         JSONArray items = state.optJSONArray("incidents");
         StringBuilder out = new StringBuilder();
+        JSONArray activations = state.optJSONArray("activations");
+        if (activations != null) for (int i = 0; i < Math.min(activations.length(), MAX_STARTS); i++) {
+            JSONObject item = activations.getJSONObject(i);
+            String value = item.optString("report");
+            if (value.length() > 6000 || !RecoveryPublisher.sha(value).equals(item.optString("hash"))) continue;
+            if (out.length() > 0) out.append("\n\n");
+            out.append(DiagnosticRedactor.redact(value));
+        }
         if (items != null) for (int i = 0; i < Math.min(items.length(), MAX_INCIDENTS); i++) {
             JSONObject item = items.getJSONObject(i);
             String value = item.optString("report");
@@ -464,5 +575,11 @@ public final class RecoveryCapture {
         data.restoreIfEmpty(saved); refresh(data);
     }
 
-    static void resetForTests() { STARTED.set(false); EXPORTING.set(false); store = null; report = ""; }
+    static void resetForTests() {
+        STARTED.set(false); EXPORTING.set(false); store = null; report = "";
+        // Process facts survive Clear; only a new process (or this test reset) zeros them.
+        SOFT_V1.set(0); SOFT_V2.set(0); RecoveryTimeline.resetReadingRequest();
+        ACTIVATION_MASK.set(0);
+        EXPORT_REQUESTED.set(false);
+    }
 }

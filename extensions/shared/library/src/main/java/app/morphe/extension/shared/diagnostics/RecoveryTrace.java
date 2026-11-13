@@ -372,7 +372,9 @@ final class RecoveryTrace {
                 if (has(thread)) continue;
                 if (!render(thread, queue, limit)) { bytesCut = true; break; }
             }
-            queue.removeIf(this::has);
+            for (java.util.Iterator<ThreadBlock> iterator = queue.iterator(); iterator.hasNext();) {
+                if (has(iterator.next())) iterator.remove();
+            }
         }
 
         /** @return false when the limit stopped it; a thread with a header counts as rendered */

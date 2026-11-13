@@ -97,11 +97,16 @@ final class RecoveryStore {
             JSONObject state = readLocked();
             if (!state.has("trial") && !state.has("incidents")) return "";
             org.json.JSONArray incidents = state.optJSONArray("incidents");
-            String before = incidents == null || incidents.length() == 0 ? "" : new JSONObject()
-                    .put("incidents", incidents).put("export", state.optJSONObject("export"))
+            org.json.JSONArray activations = state.optJSONArray("activations");
+            boolean empty = (incidents == null || incidents.length() == 0)
+                    && (activations == null || activations.length() == 0);
+            String before = empty ? "" : new JSONObject()
+                    .put("incidents", incidents == null ? new org.json.JSONArray() : incidents)
+                    .put("activations", activations).put("export", state.optJSONObject("export"))
                     .put("cleared_through_before", state.optLong("cleared_through")).toString();
             state.put("cleared_through", Math.max(state.optLong("cleared_through"), System.currentTimeMillis()));
-            state.remove("incidents"); state.remove("export"); state.put("generation", state.optInt("generation") + 1);
+            state.remove("incidents"); state.remove("activations"); state.remove("export");
+            state.put("generation", state.optInt("generation") + 1);
             // Clearing evidence does not rearm the lease on the next launch.
             writeLocked(state.toString()); return before;
         }
@@ -111,10 +116,15 @@ final class RecoveryStore {
         synchronized (LOCK) {
             JSONObject state = readLocked();
             org.json.JSONArray current = state.optJSONArray("incidents");
-            if (current == null || current.length() == 0) {
+            org.json.JSONArray active = state.optJSONArray("activations");
+            if ((current == null || current.length() == 0) && (active == null || active.length() == 0)) {
                 JSONObject snapshot = new JSONObject(saved);
                 org.json.JSONArray incidents = snapshot.getJSONArray("incidents");
                 if (incidents.length() > RecoveryCapture.MAX_INCIDENTS) throw new java.io.IOException("incident count");
+                org.json.JSONArray activations = snapshot.optJSONArray("activations");
+                if (activations != null && activations.length() > RecoveryCapture.MAX_STARTS)
+                    throw new java.io.IOException("activation count");
+                if (activations != null) state.put("activations", activations);
                 state.put("incidents", incidents).put("generation", state.optInt("generation") + 1);
                 state.put("cleared_through", snapshot.optLong("cleared_through_before"));
                 if (snapshot.has("export")) state.put("export", snapshot.getJSONObject("export"));
