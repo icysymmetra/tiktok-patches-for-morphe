@@ -187,6 +187,24 @@ public class RecoveryTimelineTest {
         assertFalse(file(101, 7).contains("\nS "));
         assertFalse(RecoveryTimeline.section(files, 101, 7, fake.wall).contains("softref_"));
     }
+    @Test public void controlMetadataKeepsReporterHistoryAndDoesNotBecomeAReading() throws Exception {
+        Fake fake = new Fake() {
+            @Override public String sample() {
+                super.sample(); return "heap=64/512M " + String.join("", Collections.nCopies(87, "x"));
+            }
+            @Override public String control() { return String.join("", Collections.nCopies(RecoveryTimeline.MAX_CONTROL, "c")); }
+        };
+        fake.jato = String.join("", Collections.nCopies(646, "j"));
+        RecoveryTimeline.run(files, 101, 7, 72 * RecoveryTimeline.PERIOD_MS, fake, fake, false);
+        String section = RecoveryTimeline.section(files, 101, 7, fake.wall - RecoveryTimeline.PERIOD_MS + 135_000);
+        int count = 0;
+        for (String line : section.split("\n")) if (line.startsWith("t-") && line.contains(" heap=")) count++;
+        assertTrue("retained " + count, count >= 49);
+        assertEquals(1, section.split("control_latest:", -1).length - 1);
+        assertTrue(section.contains("last_saved_reading_before_exit_s=135\n"));
+        assertTrue(section.length() <= RecoveryTimeline.MAX_SECTION + RecoveryTimeline.MAX_CONTROL + 64);
+        assertFalse(RecoveryTimeline.section(files, 101, 7, fake.wall, fake.wall).contains("control_latest:"));
+    }
 
     @Test public void wideReadingsKeepUpdatingRatherThanSilentlyStoppingAtTheFileLimit() throws Exception {
         Fake fake = new Fake() {

@@ -11,6 +11,8 @@ package app.morphe.patches.tiktok.misc.settings
 import app.morphe.util.addInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.booleanOption
+import app.morphe.patcher.patch.stringOption
+import app.morphe.patches.tiktok.misc.diagnostics.configureControlTrial
 import app.morphe.util.returnEarly
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
@@ -54,7 +56,26 @@ val enableOpenDebugPatch = bytecodePatch(
             "Leave off for normal use.",
     )
 
+    val controlArm by stringOption(
+        key = "controlArm", default = "off", required = true,
+        values = mapOf("Off" to "off", "Minimal diagnostic control" to "minimal", "Feature reference" to "reference"),
+        title = "Issue 215 diagnostic comparison",
+        description = "Requested 47.4.3 global trials only. Records bounded GC-tuning observations and automatic reports. " +
+            "The label does not select patches: use the supplied selection. Preserves GC behavior. Leave off normally.",
+    )
+
     execute {
+        val arm = controlArm ?: "off"
+        check(arm in setOf("off", "minimal", "reference")) { "Unknown diagnostic control arm" }
+        if (arm != "off") {
+            check(packageMetadata.packageName == "com.zhiliaoapp.musically" && packageMetadata.versionName == "47.4.3") {
+                "Diagnostic controls require TikTok 47.4.3 global"
+            }
+            check(softReferenceTrial != true) { "Control comparisons preserve the stock soft-reference behavior" }
+            mutableClassDefBy("Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;").methods
+                .single { it.name == "controlArm" && it.parameterTypes.isEmpty() }.returnEarly(arm)
+        }
+        configureControlTrial(arm)
         if (softReferenceTrial == true) {
             check(packageMetadata.packageName == "com.zhiliaoapp.musically" &&
                 packageMetadata.versionName == "47.4.3") {
@@ -65,10 +86,10 @@ val enableOpenDebugPatch = bytecodePatch(
                 .single { it.name == "softReferenceTrialEnabled" && it.parameterTypes.isEmpty() }
                 .returnEarly(true)
         }
-        if (recoveryTrial == true || softReferenceTrial == true) {
+        if (recoveryTrial == true || softReferenceTrial == true || arm != "off") {
             mutableClassDefBy("Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;").methods
                 .single { it.name == "trialId" && it.parameterTypes.isEmpty() }
-                .returnEarly("issue215-${if (softReferenceTrial == true) "softref-v1" else "v1"}-${java.util.UUID.randomUUID()}")
+                .returnEarly("issue215-${if (arm != "off") "control-v1" else if (softReferenceTrial == true) "softref-v1" else "v1"}-${java.util.UUID.randomUUID()}")
         }
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,

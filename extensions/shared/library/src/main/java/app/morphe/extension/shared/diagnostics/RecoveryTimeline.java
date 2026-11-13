@@ -44,6 +44,7 @@ final class RecoveryTimeline {
     static final int MAX_SECTION = 6 * 1024;
     /** Trial state has its own small allowance, so it never displaces heap/GC readings. */
     static final int MAX_SOFT_REFERENCE = 192;
+    static final int MAX_CONTROL = 1024;
     static final int MAX_FILE = 16 * 1024;
     static final int KEEP_FILES = 5;
     /** When TikTok's runtime tuning is read: after its startup task, then every two minutes. */
@@ -52,12 +53,14 @@ final class RecoveryTimeline {
     static final String HEADING = "[TIMELINE BEFORE EXIT]\n";
     private static final String JATO_LINE = "J ";
     private static final String SOFT_REFERENCE_LINE = "S ";
+    private static final String CONTROL_LINE = "C ";
 
     /** {@code elapsed} is the clock the lease is kept on: it keeps running while the phone sleeps. */
     interface Clock { long wall(); long elapsed(); }
     interface Probe {
         String sample(); String jato();
         default String softReference() { return ""; }
+        default String control() { return ""; }
         default void saved() {}
     }
 
@@ -139,6 +142,7 @@ final class RecoveryTimeline {
             public String softReference() {
                 return RecoveryCapture.softReferenceTrialEnabled() ? RecoveryCapture.softReferenceState() : "";
             }
+            public String control() { return RecoveryCapture.controlArm().isEmpty() ? "" : ControlObservation.state(); }
             public void saved() { saved.run(); }
         };
         Thread sampler = new Thread(() -> {
@@ -167,7 +171,7 @@ final class RecoveryTimeline {
         while (true) {
             if (sleep) awaitReading();
             // Checked after the wait, so a phone asleep past the lease takes no further reading.
-            if (clock.elapsed() >= untilElapsed) return;
+            if (clock.elapsed() >= untilElapsed) { ControlObservation.stopWatching(); return; }
             count++;
             lines.addLast(clock.wall() + " " + probe.sample());
             // One current process-state record, not repeated in the ring of heap/GC readings.
@@ -175,6 +179,9 @@ final class RecoveryTimeline {
             String softReference = probe.softReference();
             String softReferenceLine = softReference.isEmpty() ? "" : SOFT_REFERENCE_LINE + clock.wall()
                     + " " + softReference.substring(0, Math.min(softReference.length(), 128)) + "\n";
+            String control = probe.control();
+            String controlLine = control.isEmpty() ? "" : CONTROL_LINE + clock.wall() + " "
+                    + control.substring(0, Math.min(control.length(), MAX_CONTROL)) + "\n";
             // First-hit wakeups add readings without moving the startup/config observation earlier.
             if (clock.elapsed() >= nextJatoElapsed) {
                 String jato = probe.jato();
@@ -192,7 +199,7 @@ final class RecoveryTimeline {
                     seenClears = clears; lines.clear(); jatoLine = null; lastJato = null;
                     continue;
                 }
-                write(target, header + (jatoLine == null ? "" : jatoLine) + softReferenceLine, lines);
+                write(target, header + (jatoLine == null ? "" : jatoLine) + softReferenceLine + controlLine, lines);
             }
             probe.saved();
             if (!sleep && count >= MAX_SAMPLES * 4) return;
@@ -262,19 +269,26 @@ final class RecoveryTimeline {
         }
         String jato = "jato_latest: not_read\n";
         String softReference = "";
+        String control = "";
         List<String> rendered = new ArrayList<>();
         long last = 0;
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i];
             boolean isJato = line.startsWith(JATO_LINE);
             boolean isSoftReference = line.startsWith(SOFT_REFERENCE_LINE);
-            if (isJato || isSoftReference) line = line.substring(2);
+            boolean isControl = line.startsWith(CONTROL_LINE);
+            if (isJato || isSoftReference || isControl) line = line.substring(2);
             int space = line.indexOf(' ');
             if (space <= 0) continue;
             long at;
             try { at = Long.parseLong(line.substring(0, space)); } catch (NumberFormatException bad) { continue; }
             if (at <= clearedThrough) continue;
             String body = line.substring(space + 1);
+            if (isControl) {
+                control = "control_latest: " + relative(at - exitAt) + " "
+                        + body.substring(0, Math.min(body.length(), MAX_CONTROL)) + "\n";
+                continue;
+            }
             if (isSoftReference) {
                 softReference = "softref_latest: " + relative(at - exitAt) + " "
                         + body.substring(0, Math.min(body.length(), 128)) + "\n";
@@ -300,7 +314,7 @@ final class RecoveryTimeline {
         if (from > 0) out.append(omittedNote(from));
         for (int i = from; i < rendered.size(); i++) out.append(rendered.get(i)).append('\n');
         // This bounded metadata is additional to the unchanged six-KiB readings allowance.
-        out.append(softReference);
+        out.append(softReference).append(control);
         return out.toString();
     }
 

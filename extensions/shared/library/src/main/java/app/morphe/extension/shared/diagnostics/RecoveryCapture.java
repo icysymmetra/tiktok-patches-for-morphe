@@ -45,6 +45,49 @@ public final class RecoveryCapture {
 
     /** Patched by Diagnostic tools only when its explicit recovery-trial option is selected. */
     public static String trialId() { return ""; }
+    public static String controlArm() { return ""; }
+    private static String controlReceiptKey = "";
+
+    static boolean recordControlReceipt(RecoveryStore data, String trial, int pid, long sessionAt,
+            long observedAt, String arm, String profile, String observation) throws Exception {
+        synchronized (RecoveryStore.LOCK) {
+            JSONObject state = data.read();
+            if (!trial.equals(state.optString("trial")) || state.optLong("cleared_through") >= sessionAt) return false;
+            JSONArray sessions = state.optJSONArray("sessions");
+            JSONObject session = null;
+            if (sessions != null) for (int i = 0; i < sessions.length(); i++) {
+                JSONObject s = sessions.getJSONObject(i);
+                if (s.optInt("pid") == pid && s.optLong("at") == sessionAt) session = s;
+            }
+            if (session == null) return false;
+            // Publish bounded phase changes and the provisional exposure threshold, not a file per sample/minute.
+            String key = trial + ":" + pid + ":" + sessionAt + ":" + observation.split(" resumed_s=", 2)[0];
+            String seconds = observation.contains(" resumed_s=") ? observation.split(" resumed_s=", 2)[1].split(" ", 2)[0] : "0";
+            boolean exposed = false;
+            try { exposed = Long.parseLong(seconds) >= 1200; } catch (NumberFormatException unknown) { /* Unknown is not stable. */ }
+            key += ":exposure20=" + exposed;
+            if (key.equals(controlReceiptKey)) return false;
+            String text = "MORPHE DIAGNOSTIC REPORT\nschema: 1\nsource: diagnostic_control_observation"
+                    + "\nThis is a startup/observation receipt, not a crash or proof of stability."
+                    + "\ntrial: " + trial + "\npid: " + pid + "\nsession_started_ms: " + sessionAt
+                    + "\nobserved_ms: " + observedAt + "\ndeclared_arm: " + arm + "\n" + profile
+                    + "\n" + observation + "\nNative return codes do not identify a cause or independently prove heap writes."
+                    + "\n\n[SESSION BUILD]\n" + session.optString("build");
+            saveActivation(data, trial + "-control-" + pid + "-" + sessionAt, text, state.optInt("generation"));
+            controlReceiptKey = key;
+            return true;
+        }
+    }
+    private static void saveControlObservation(Context context, int pid, long sessionAt) {
+        if (controlArm().isEmpty()) return;
+        try {
+            RecoveryStore data = store;
+            if (data != null && recordControlReceipt(data, trialId(), pid, sessionAt, System.currentTimeMillis(),
+                    controlArm(), ControlObservation.profile(), ControlObservation.state())) {
+                refresh(data); publish(context, data);
+            }
+        } catch (Throwable unavailable) { /* Retry within the existing sampling lease. */ }
+    }
 
     /** Selected only by the explicit, exact-target patch option. */
     public static boolean softReferenceTrialEnabled() { return false; }
@@ -128,6 +171,12 @@ public final class RecoveryCapture {
         try {
             String trial = trialId();
             if (trial.isEmpty() || supplied == null || Build.VERSION.SDK_INT < 30) return;
+            // Repeated context hooks can supply the Application before first Activity resume,
+            // even when attachBaseContext's early ContextImpl did not expose it yet.
+            if (!controlArm().isEmpty() && supplied.getPackageName().equals(Application.getProcessName())) {
+                Context app = supplied.getApplicationContext();
+                if (app instanceof Application) ControlObservation.watch((Application) app);
+            }
             start(supplied, trial, new AndroidSource());
         } catch (Throwable unavailable) { /* Never interrupt the host's startup. */ }
     }
@@ -166,6 +215,7 @@ public final class RecoveryCapture {
             return "android_sdk: " + Build.VERSION.SDK_INT + "\nandroid_release: "
                     + Build.VERSION.RELEASE.replaceAll("[^A-Za-z0-9._-]", "_")
                     + "\nsoft_reference_trial: " + softReferenceTrialEnabled()
+                    + (controlArm().isEmpty() ? "" : "\ndeclared_control_arm: " + controlArm() + "\n" + ControlObservation.profile())
                     + "\n" + device(context)
                     + BuildDetails.section(BuildDetails.readMetadata(context));
         }
@@ -180,9 +230,14 @@ public final class RecoveryCapture {
             return result;
         }
         public void timeline(Context context, int pid, long sessionAt, long untilElapsed) {
+            if (!controlArm().isEmpty()) {
+                Context app = context.getApplicationContext();
+                if (app instanceof Application) ControlObservation.watch((Application) app);
+                saveControlObservation(context, pid, sessionAt);
+            }
             // The lease's own clock, which keeps counting while the phone sleeps (#215 review).
             RecoveryTimeline.start(context.getFilesDir(), pid, sessionAt, untilElapsed, context.getClassLoader(),
-                    () -> saveSoftReferenceActivation(context, pid, sessionAt));
+                    () -> { saveSoftReferenceActivation(context, pid, sessionAt); saveControlObservation(context, pid, sessionAt); });
         }
     }
 
@@ -274,7 +329,7 @@ public final class RecoveryCapture {
         long elapsed = source.elapsed(), bootEpoch = now - elapsed;
         JSONObject before = data.read();
         if (before.optBoolean("capture_disabled") && (before.optString("trial").isEmpty()
-                || trial.equals(before.optString("trial")))) { refresh(data); return; }
+                || trial.equals(before.optString("trial")))) { ControlObservation.stopWatching(); refresh(data); return; }
         if (!trial.equals(before.optString("trial"))) {
             data.update(s -> {
                 // A new trial retains earlier unsent incidents but gets its own finite lease.
@@ -295,6 +350,7 @@ public final class RecoveryCapture {
         if (previous == null) previous = new JSONArray();
         final int generation = before.optInt("generation");
         if (!clockMatches || age < 0 || age > LEASE_MS) {
+            ControlObservation.stopWatching();
             if (previous.length() > 0 && before.optLong("cleared_through") == 0) {
                 String status = !clockMatches || age < 0 ? "boot_or_clock_changed" : "collection_window_expired";
                 JSONObject last = previous.getJSONObject(previous.length() - 1);
@@ -305,6 +361,7 @@ public final class RecoveryCapture {
         }
         // A fourth, read-only check can recover the third tracked start's failure.
         boolean collect = before.optInt("checks", before.optInt("starts")) < MAX_CHECKS;
+        if (!collect || before.optInt("starts") >= MAX_STARTS) ControlObservation.stopWatching();
         if (collect) {
             final JSONArray sessions = previous;
             final String collectorBuild = safeBuild(source.build(context));
@@ -324,7 +381,7 @@ public final class RecoveryCapture {
             // what is left of the lease.
             if (registered[0]) {
                 try { source.timeline(context, source.pid(), now, before.optLong("started_elapsed") + LEASE_MS); }
-                catch (Throwable unavailable) { /* The trace is still recovered without readings. */ }
+                catch (Throwable unavailable) { ControlObservation.stopWatching(); /* Trace recovery remains available. */ }
             }
             List<Exit> exits = null;
             String historyStatus = "available";
@@ -378,16 +435,24 @@ public final class RecoveryCapture {
                 retain(data, entry, generation);
             }
             JSONArray retained = data.read().optJSONArray("incidents");
-            if (found == 0 && previous.length() > 0 && (retained == null || retained.length() == 0)
+            if (found == 0 && previous.length() > 0 && (!controlArm().isEmpty() || retained == null || retained.length() == 0)
                     && previous.getJSONObject(previous.length() - 1).optLong("at") > before.optLong("cleared_through")) {
                 JSONObject last = previous.getJSONObject(previous.length() - 1);
                 String id = trial + "-status-" + last.optLong("at") + "-" + last.optInt("pid");
                 availability(data, id, historyStatus.equals("available") ? "no_matching_failure_trace" : "history_" + historyStatus,
                         historyStatus, now, generation, "previous_pid: " + last.optInt("pid")
-                                + "\nprevious_started_ms: " + last.optLong("at") + "\n[TRIAL BUILD]\n" + collectorBuild);
+                                + "\nprevious_started_ms: " + last.optLong("at") + "\n[TRIAL BUILD]\n" + collectorBuild
+                                + (controlArm().isEmpty() ? "" : controlStatusObservation(context, last, now, before.optLong("cleared_through"))));
             }
         }
         refresh(data);
+    }
+
+    private static String controlStatusObservation(Context context, JSONObject session, long now, long cleared) {
+        String section = RecoveryTimeline.section(context.getFilesDir(), session.optInt("pid"), session.optLong("at"), now, cleared);
+        for (String line : section.split("\n")) if (line.startsWith("control_latest:"))
+            return "\n[PRIOR SESSION OBSERVATION RELATIVE TO STATUS TIME]\n" + line + "\n";
+        return "\nprior_control_observation: not_recorded\n";
     }
 
     private static void availability(RecoveryStore data, String id, String status, String history,
@@ -396,7 +461,8 @@ public final class RecoveryCapture {
         String text = "MORPHE DIAGNOSTIC REPORT\nschema: 1\nsource: recovery_trial_status\nincident: " + id
                 + "\ncapture_timestamp_ms: " + now + "\ncapture_status: " + status + "\nhistory_status: " + history
                 + "\nThis is capture availability information, not a confirmed crash.\n" + details;
-        retain(data, new JSONObject().put("id", id).put("at", now).put("report", text)
+        if (!controlArm().isEmpty()) saveActivation(data, id, text, generation);
+        else retain(data, new JSONObject().put("id", id).put("at", now).put("report", text)
                 .put("hash", RecoveryPublisher.sha(text)), generation);
     }
 
@@ -566,6 +632,7 @@ public final class RecoveryCapture {
         // copied into an incident travel with it, so restoring the incidents restores them.
         RecoveryTimeline.clear(context == null ? null : context.getFilesDir());
         synchronized (RecoveryStore.LOCK) {
+            ControlObservation.stopWatching();
             String saved = data.clear(); report = ""; return saved;
         }
     }
@@ -581,5 +648,6 @@ public final class RecoveryCapture {
         SOFT_V1.set(0); SOFT_V2.set(0); RecoveryTimeline.resetReadingRequest();
         ACTIVATION_MASK.set(0);
         EXPORT_REQUESTED.set(false);
+        controlReceiptKey = ""; ControlObservation.resetForTests();
     }
 }

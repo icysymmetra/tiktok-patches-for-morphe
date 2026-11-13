@@ -28,8 +28,9 @@ fun sharedExtensionPatch(
     extensionName: String,
     isYouTubeOrYouTubeMusic: Boolean,
     vararg hooks: ExtensionHook,
+    afterHooks: ((BytecodePatchContext) -> Unit)? = null,
 ) = bytecodePatch {
-    dependsOn(sharedExtensionPatch(isYouTubeOrYouTubeMusic, *hooks))
+    dependsOn(sharedExtensionPatch(isYouTubeOrYouTubeMusic, *hooks, afterHooks = afterHooks))
 
     extendWith("extensions/$extensionName.mpe")
 }
@@ -43,6 +44,7 @@ fun sharedExtensionPatch(
 fun sharedExtensionPatch(
     isYouTubeOrYouTubeMusic: Boolean,
     vararg hooks: ExtensionHook,
+    afterHooks: ((BytecodePatchContext) -> Unit)? = null,
 ) = bytecodePatch {
     val extensionName = if (isYouTubeOrYouTubeMusic) "shared-youtube" else "shared"
     extendWith("extensions/$extensionName.mpe")
@@ -55,6 +57,7 @@ fun sharedExtensionPatch(
     finalize {
         // The hooks are made in finalize to ensure that the context is hooked before any other patches.
         hooks.forEach { hook -> hook(EXTENSION_CLASS_DESCRIPTOR) }
+        afterContextHooks(afterHooks)
 
         // Modify Utils method to include the patches release version.
         MorpheUtilsPatchesVersionFingerprint.method.apply {
@@ -82,6 +85,9 @@ fun sharedExtensionPatch(
         }
     }
 }
+
+context(context: BytecodePatchContext)
+private fun afterContextHooks(callback: ((BytecodePatchContext) -> Unit)?) { callback?.invoke(context) }
 
 /** Resolve only a local file URI. No URL connection or JAR handle is opened here. */
 internal fun localBundleFile(classUrl: URL?): File {
