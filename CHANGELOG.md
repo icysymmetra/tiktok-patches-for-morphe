@@ -1,3 +1,16 @@
+# [0.11.0-dev.4](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.3...v0.11.0-dev.4) (2026-11-13)
+
+
+### Features
+
+* **Diagnostics:** add opt-in soft-reference compatibility trial ([251b9f7](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/251b9f75a2b2698b72d12f9795dea8e0b5929dab))
+
+
+
+
+
+## 0.11.0-dev.4
+
 # [0.11.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.2...v0.11.0-dev.3) (2026-11-12)
 
 
