@@ -1,3 +1,16 @@
+# [0.11.0-dev.5](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.4...v0.11.0-dev.5) (2026-11-13)
+
+
+### Features
+
+* **diagnostics:** add bounded issue 215 control comparisons ([331720c](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/331720c4ba4c82498f1a087f8feb5c45b2910fb2))
+
+
+
+
+
+## 0.11.0-dev.5
+
 # [0.11.0-dev.4](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.3...v0.11.0-dev.4) (2026-11-13)
 
 
