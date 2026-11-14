@@ -1,3 +1,16 @@
+# [0.11.0-dev.7](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.6...v0.11.0-dev.7) (2026-11-14)
+
+
+### Bug Fixes
+
+* **comments:** cancel stale text animations when rows are rebound ([9d49872](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/9d49872992889bd87752dbfde2134f613f846ba1))
+
+
+
+
+
+## 0.11.0-dev.7
+
 # [0.11.0-dev.6](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.5...v0.11.0-dev.6) (2026-11-14)
 
 
