@@ -52,9 +52,9 @@ class PhotoSaveJobFixturesTest {
     /** The image job above does not see Download video's separate native conversion entry. */
     @Test
     fun `each declared conversion is intercepted before native state with only the Aweme argument`() {
-        val owners = mapOf("47.4.3" to "LX/0Cs0;")
+        val owners = mapOf("47.6.15" to "LX/0M9H;")
         // The method-id entry call's name is the build's own (47.0.3 obfuscated it), although its owner/proto hold.
-        val frameEntries = mapOf("47.4.3" to "push")
+        val frameEntries = mapOf("47.6.15" to "push")
         Fixtures.forEachDeclared { apk ->
             val container = Fixtures.dexContainer(apk, Opcodes.getDefault())
             val matches = container.dexEntryNames.asSequence().flatMap { entry ->
@@ -74,7 +74,7 @@ class PhotoSaveJobFixturesTest {
             val method = MutableMethod(native)
             val original = method.implementation!!.instructions.toList()
             val registers = method.implementation!!.registerCount
-            assertEquals("the captured native frame", 14, registers)
+            assertEquals("the captured native frame", 15, registers)
             val push = original.indexOfFirst {
                 it.getReference<MethodReference>()?.let { ref ->
                     ref.definingClass == "Lcom/bytedance/pumbaa/utility/method_id/MethodIDManager;" &&

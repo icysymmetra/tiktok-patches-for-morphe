@@ -51,7 +51,7 @@ class FeedMuteAnchorsTest {
 
             val members = resolveFeedMuteMembers(play, setIsMute, abandon, request) { classes[it] }
             val session = classes.getValue(members.session)
-            val sessionRequest = session.methods.single { it.name == members.sessionRequest && it.parameterTypes.isEmpty() }
+            val sessionRequest = session.methods.single { it.name == members.sessionRequest.name && it.parameterTypes.isEmpty() }
             val body = sessionRequest.implementation!!
             assertTrue("$version: ${members.session}->${members.sessionRequest}() has no local for the guard",
                 body.registerCount - 1 >= 1)

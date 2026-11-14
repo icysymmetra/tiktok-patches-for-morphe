@@ -19,14 +19,8 @@ class InboxQueryRequestFixturesTest {
     @Test fun `all reviewed native request entries guard before effects and retain every original instruction`() {
         assertEquals(13, loadedInboxRequestSpecs.size)
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
             loadedInboxRequestSpecs.forEach { spec ->
-                val entry = when (spec.owner) {
-                    INBOX_PAGE_LOADER -> "classes8.dex"
-                    "Lcom/ss/android/ugc/aweme/inbox/widget/v2/InboxWidgetContainer;" -> "classes9.dex"
-                    else -> "classes39.dex"
-                }
-                val owner = dex.getEntry(entry)!!.dexFile.classes.single { it.type == spec.owner }
+                val owner = Fixtures.classIn(apk, spec.owner)
                 val native = owner.methods.single { it.name == spec.name && it.parameterTypes.map(CharSequence::toString) == spec.parameters }
                 assertTrue("${spec.owner}->${spec.name}", spec.fingerprint.takes(native, owner))
                 val mutable = MutableMethod(native)

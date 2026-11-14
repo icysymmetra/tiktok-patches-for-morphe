@@ -17,7 +17,7 @@ class SharePanelFixturesTest {
     @Test
     fun `every declared native panel safely reports its action row in both layouts`() {
         val expected = mapOf(
-            "47.4.3" to ("LX/0ILc;" to 0x7f0a013a),
+            "47.6.15" to ("LX/1Epw;" to 0x7f0a013a),
         )
         assertEquals(Fixtures.declaredVersions().toSet(), expected.keys)
         Fixtures.forEachDeclared { apk ->
@@ -29,7 +29,7 @@ class SharePanelFixturesTest {
             assertEquals(owner, native.definingClass)
             assertEquals("onAttachedToWindow", native.name)
             assertEquals(20, native.implementation!!.registerCount)
-            assertEquals(listOf(SharePanelRow(30, 5), SharePanelRow(92, 0)), native.sharePanelRows())
+            assertEquals(listOf(SharePanelRow(33, 5), SharePanelRow(99, 0)), native.sharePanelRows())
             assertEquals(listOf(id), native.implementation!!.instructions.filterIsInstance<NarrowLiteralInstruction>()
                 .map { it.narrowLiteral }.filter { it in SHARE_ACTION_IDS })
 

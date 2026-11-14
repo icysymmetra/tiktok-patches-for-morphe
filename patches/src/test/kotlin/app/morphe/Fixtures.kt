@@ -4,6 +4,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.DexFileFactory
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
+import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.MultiDexContainer
 import java.io.File
 import java.io.OutputStream
@@ -60,6 +61,33 @@ internal object Fixtures {
             }
         }
         return checkNotNull(result)
+    }
+
+    /**
+     * Every class in [container], whichever dex entry holds it. Which entry a class sits in is
+     * packaging, and R8 moves classes between entries from build to build, so an anchor reads the
+     * class itself and not the entry it happened to land in.
+     */
+    fun classes(container: MultiDexContainer<out DexBackedDexFile>): Sequence<ClassDef> =
+        container.dexEntryNames.asSequence()
+            .flatMap { container.getEntry(it)!!.dexFile.classes.asSequence() }
+
+    /** The one class [type] in [container]. */
+    fun classIn(container: MultiDexContainer<out DexBackedDexFile>, type: String): ClassDef =
+        classes(container).filter { it.type == type }.singleOrNull()
+            ?: throw AssertionError("$type is not in this APK, or is in it more than once.")
+
+    private val indexes = ConcurrentHashMap<File, SoftReference<Map<String, ClassDef>>>()
+
+    /**
+     * The class [type] in [apk], whichever dex entry holds it. Tests used to name the entry, and
+     * 47.6.15 moved those classes into other entries: the lookup follows the class itself.
+     */
+    fun classIn(apk: File, type: String): ClassDef {
+        val file = apk.canonicalFile
+        val index = indexes[file]?.get() ?: classes(dexContainer(apk)).associateBy { it.type }
+            .also { indexes[file] = SoftReference(it) }
+        return index[type] ?: throw AssertionError("$type is not in ${apk.name}.")
     }
 
     /** The files in the fixture folder that [accept] takes, sorted by name. */

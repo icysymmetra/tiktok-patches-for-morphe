@@ -162,8 +162,12 @@ internal object FollowFeedFingerprint : Fingerprint(
             name = "getItems",
         ),
     ),
+    // 47.6.15 compiles the fetch as a static `(self, mode, type, cursor, mask)`, Kotlin's
+    // default-argument shape, where 47.4.3 kept a plain two-argument method. The preload cache's
+    // one-argument reader returns the same type and calls getItems too, but carries none of the
+    // "feed" strings, so the count is what keeps it out.
     custom = { method, _ ->
-        method.parameterTypes.size == 2 && method.implementation?.instructions?.any {
+        method.parameterTypes.size == 5 && method.implementation?.instructions?.any {
             it.getReference<MethodReference>()?.let { reference ->
                 reference.definingClass == "Lcom/ss/android/ugc/aweme/follow/presenter/FollowFeedList;" &&
                     reference.name == "getItems"
@@ -295,8 +299,12 @@ internal fun <M : Method> coldStartOrchestrators(golden: Method, offline: Method
     }.keys.toList()
 }
 
-/** The cold start's FeedItemList stores: the orchestrator's, the golden method's and the offline method's. */
-internal const val COLD_START_STORES = 5
+/**
+ * The cold start's FeedItemList stores: the orchestrator's, the golden method's and the offline
+ * method's. 47.6.15's orchestrator keeps two caches where 47.4.3 kept three, so the one store, one
+ * golden store and one offline store make four.
+ */
+internal const val COLD_START_STORES = 4
 
 internal object ColdStartOfflineCacheFingerprint : Fingerprint(
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
@@ -1209,6 +1217,8 @@ internal object LiveDrawRoomPageFingerprint : Fingerprint(
         "I",
         "Z",
         "Z",
+        "Z",
+        // 47.6.15 added a fifth boolean to the bridge; the pager still sits at p1.
         "Z",
         "Z",
         "I",

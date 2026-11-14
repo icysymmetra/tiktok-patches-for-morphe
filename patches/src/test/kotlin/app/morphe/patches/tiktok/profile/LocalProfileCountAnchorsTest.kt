@@ -40,7 +40,7 @@ class LocalProfileCountAnchorsTest {
 
     @Test fun `47 4 3 has one older count bind and four formatter results delivered to profile TextViews`() {
         Fixtures.forEachDeclared { apk ->
-            assertEquals("47.4.3", Fixtures.versionOf(apk))
+            assertEquals("47.6.15", Fixtures.versionOf(apk))
             val found = find(apk)
             assertEquals("gr", found.legacy.first.name)
             assertEquals("V", found.legacy.first.returnType)
@@ -207,7 +207,7 @@ class LocalProfileCountAnchorsTest {
 
     private fun find(apk: File): Found = synchronized(cache) {
         cache.getOrPut(apk.absolutePath) {
-            val classes = Fixtures.dexContainer(apk, Opcodes.getDefault()).getEntry("classes12.dex")!!.dexFile.classes.associateBy { it.type }
+            val classes = Fixtures.classes(Fixtures.dexContainer(apk, Opcodes.getDefault())).associateBy { it.type }
             val legacy = classes.getValue(RELATION_COMPONENT).methods.flatMap { method -> method.profileCountTexts().map { method to it } }
             assertEquals("older count sites", 1, legacy.size)
             val sites = ProfileCountMetric.entries.associateWith { metric ->
