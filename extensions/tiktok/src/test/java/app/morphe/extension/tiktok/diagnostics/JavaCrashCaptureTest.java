@@ -116,6 +116,10 @@ public class JavaCrashCaptureTest {
         assertFalse(raw.contains("CRASH_SENTINEL"));
         assertFalse(raw.contains("CRASH_THREAD_SENTINEL"));
         assertTrue(raw.contains("JavaCrashCaptureTest"));
+        assertTrue(raw.contains("\nboot_epoch_ms: "));
+        assertTrue(raw.contains("\ncaptured_elapsed_ms: "));
+        assertTrue(raw.contains("\nprocess_started_elapsed_ms: "));
+        assertEquals(1,raw.split("timestamp_utc:",-1).length-1);
     }
 
     @Test public void aWriteCutShortLeavesTheLastWholeReportReadable() throws Exception {
@@ -130,7 +134,7 @@ public class JavaCrashCaptureTest {
         java.nio.file.Files.write(base.toPath(), "schema: 1\ncomp".getBytes(java.nio.charset.StandardCharsets.UTF_8));
 
         assertEquals(whole, LogBufferManager.readCrashReport(context));
-        assertFalse("the half written copy is gone once the whole one is back", backup.exists());
+        assertTrue("reading preserves the committed backup without modifying a possible writer", backup.exists());
     }
 
     @Test public void aReportPastTheCeilingSaysSoAndIsCutOnACharacter() throws Exception {

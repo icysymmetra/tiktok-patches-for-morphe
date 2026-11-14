@@ -10,9 +10,14 @@ package app.morphe.patches.tiktok.misc.settings
 
 import app.morphe.util.addInstruction
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.patch.booleanOption
+import app.morphe.patcher.patch.stringOption
+import app.morphe.patches.tiktok.misc.diagnostics.configureControlTrial
+import app.morphe.util.returnEarly
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.diagnostics.resolveShareTimingWrites
+import app.morphe.patches.tiktok.misc.diagnostics.applySoftReferenceTrial
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.patcher.util.numberOfParameterRegisters
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -33,7 +38,60 @@ val enableOpenDebugPatch = bytecodePatch(
 
     compatibleWith(*AppCompatibilities.tiktokAndPineDrama())
 
+    val recoveryTrial by booleanOption(
+        key = "recoveryTrial",
+        default = false,
+        title = "Automatic recovery report trial",
+        description = "Requested trials on Android 11 or later only: captures failures from up to " +
+            "three process starts in 30 minutes. Reopen after a freeze to save a report in Downloads/Morphe. " +
+            "Re-patching starts a fresh trial. No uploads or other settings changes. Leave off for normal use.",
+    )
+
+    val softReferenceTrial by booleanOption(
+        key = "softReferenceTrial",
+        default = false,
+        title = "Soft-reference compatibility trial",
+        description = "Requested TikTok 47.4.3 global trial only. Disables one cache optimization " +
+            "and enables the automatic recovery report trial. May change cache performance. " +
+            "Leave off for normal use.",
+    )
+
+    val controlArm by stringOption(
+        key = "controlArm", default = "off", required = true,
+        values = mapOf("Off" to "off", "Minimal diagnostic control" to "minimal", "Feature reference" to "reference",
+            "GC policy compatibility trial" to "gc_policy"),
+        title = "Issue 215 diagnostic comparison",
+        description = "Requested 47.4.3 global trials only. Records bounded GC-tuning observations and automatic reports. " +
+            "The label does not select patches: use the supplied selection. GC policy mode suppresses three tuning mechanisms. Leave off normally.",
+    )
+
     execute {
+        val arm = controlArm ?: "off"
+        check(arm in setOf("off", "minimal", "reference", "gc_policy")) { "Unknown diagnostic control arm" }
+        if (arm != "off") {
+            check(packageMetadata.packageName == "com.zhiliaoapp.musically" && packageMetadata.versionName == "47.4.3") {
+                "Diagnostic controls require TikTok 47.4.3 global"
+            }
+            check(softReferenceTrial != true) { "Control modes select their reference policy; leave the standalone soft-reference option off" }
+            mutableClassDefBy("Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;").methods
+                .single { it.name == "controlArm" && it.parameterTypes.isEmpty() }.returnEarly(arm)
+        }
+        configureControlTrial(arm)
+        if (softReferenceTrial == true || arm == "gc_policy") {
+            check(packageMetadata.packageName == "com.zhiliaoapp.musically" &&
+                packageMetadata.versionName == "47.4.3") {
+                "Soft-reference trial requires TikTok 47.4.3 global."
+            }
+            if (softReferenceTrial == true) applySoftReferenceTrial()
+            mutableClassDefBy("Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;").methods
+                .single { it.name == "softReferenceTrialEnabled" && it.parameterTypes.isEmpty() }
+                .returnEarly(true)
+        }
+        if (recoveryTrial == true || softReferenceTrial == true || arm != "off") {
+            mutableClassDefBy("Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;").methods
+                .single { it.name == "trialId" && it.parameterTypes.isEmpty() }
+                .returnEarly("issue215-${if (arm != "off") "control-v3" else if (softReferenceTrial == true) "softref-v1" else "v1"}-${java.util.UUID.randomUUID()}")
+        }
         SettingsStatusLoadFingerprint.method.addInstruction(
             0,
             "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableDiagnostics()V",

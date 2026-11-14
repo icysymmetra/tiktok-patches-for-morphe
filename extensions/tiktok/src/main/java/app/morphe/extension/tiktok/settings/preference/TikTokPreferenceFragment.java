@@ -550,6 +550,8 @@ public class TikTokPreferenceFragment extends AbstractPreferenceFragment {
                         RestartPendingPreference.label(feedbackContext)));
         app.morphe.extension.shared.settings.preference.LogBufferManager.clearedMessage =
                 L10n.t(context, "Diagnostic data cleared. Tap again to put it back.");
+        app.morphe.extension.shared.settings.preference.LogBufferManager.clearFailedMessage =
+                L10n.t(context, "Diagnostic data couldn't be cleared. Try again.");
         app.morphe.extension.shared.settings.preference.LogBufferManager.nothingToClearMessage =
                 L10n.t(context, "There is no diagnostic data to clear");
         app.morphe.extension.shared.settings.preference.LogBufferManager.restoredMessage =

@@ -453,6 +453,7 @@ Default playback speed	Скорость воспроизведения по ум
 Device access	Доступ к устройству
 Device language, then original	Язык устройства, затем оригинал
 Diagnostic data cleared. Tap again to put it back.	Диагностические данные очищены. Нажмите ещё раз, чтобы вернуть их.
+Diagnostic data couldn't be cleared. Try again.	Не удалось очистить диагностические данные. Попробуйте ещё раз.
 Diagnostic data put back	Диагностические данные восстановлены
 Diagnostic report copied to the clipboard	Диагностический отчёт скопирован в буфер обмена
 Diagnostics	Диагностика

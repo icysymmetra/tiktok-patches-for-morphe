@@ -1,3 +1,94 @@
+# [0.11.0-dev.7](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.6...v0.11.0-dev.7) (2026-11-14)
+
+
+### Bug Fixes
+
+* **comments:** cancel stale text animations when rows are rebound ([9d49872](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/9d49872992889bd87752dbfde2134f613f846ba1))
+
+
+
+
+
+## 0.11.0-dev.7
+
+# [0.11.0-dev.6](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.5...v0.11.0-dev.6) (2026-11-14)
+
+
+### Features
+
+* **diagnostics:** add bounded GC policy trial and complete error reports ([1299ed3](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/1299ed350e4b240ffcad6123ed78421b22da040e))
+
+
+
+
+
+## 0.11.0-dev.6
+
+# [0.11.0-dev.5](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.4...v0.11.0-dev.5) (2026-11-13)
+
+
+### Features
+
+* **diagnostics:** add bounded issue 215 control comparisons ([331720c](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/331720c4ba4c82498f1a087f8feb5c45b2910fb2))
+
+
+
+
+
+## 0.11.0-dev.5
+
+# [0.11.0-dev.4](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.3...v0.11.0-dev.4) (2026-11-13)
+
+
+### Features
+
+* **Diagnostics:** add opt-in soft-reference compatibility trial ([251b9f7](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/251b9f75a2b2698b72d12f9795dea8e0b5929dab))
+
+
+
+
+
+## 0.11.0-dev.4
+
+# [0.11.0-dev.3](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.2...v0.11.0-dev.3) (2026-11-12)
+
+
+### Features
+
+* **Diagnostics:** record the minutes before a recovery-trial freeze ([fc33d85](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/fc33d8566010e8199fab7129e43d3be23440f73e)), closes [#215](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/215)
+
+
+
+
+
+## 0.11.0-dev.3
+
+# [0.11.0-dev.2](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.1...v0.11.0-dev.2) (2026-11-12)
+
+
+### Bug Fixes
+
+* **Diagnostics:** recognise native ANR recovery traces ([533640a](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/533640aaa5a6a41d1f3c502cd3faee8c24e75f3d)), closes [#215](https://github.com/icysymmetra/tiktok-patches-for-morphe/issues/215)
+
+
+
+
+
+## 0.11.0-dev.2
+
+# [0.11.0-dev.1](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.10.0...v0.11.0-dev.1) (2026-11-12)
+
+
+### Features
+
+* **Diagnostics:** add bounded recovery reports for startup failures ([6f8cc07](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/6f8cc0715a24cd6670131ac724a7d4b40dc429de))
+
+
+
+
+
+## 0.11.0-dev.1
+
 # [0.10.0](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.9.0...v0.10.0) (2026-11-11)
 
 

@@ -74,7 +74,7 @@ private fun MutableMethod.guardResponse(loadOwners: String, returnValue: String)
 
 /** Shared by the patches that enable or modify this native comment processor. */
 internal val commentResponseOwnershipPatch = bytecodePatch {
-    dependsOn(sharedExtensionPatch)
+    dependsOn(sharedExtensionPatch, commentTextControllerPatch)
     execute {
         val response = CommentListLoadedFingerprint.method
         val parameter = response.requestedVideoParameter()

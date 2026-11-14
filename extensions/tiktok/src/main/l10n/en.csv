@@ -504,6 +504,7 @@ Details: %1$s,Details: %1$s
 Device access,Device access
 "Device language, then original","Device language, then original"
 Diagnostic data cleared. Tap again to put it back.,Diagnostic data cleared. Tap again to put it back.
+Diagnostic data couldn't be cleared. Try again.,Diagnostic data couldn't be cleared. Try again.
 Diagnostic data put back,Diagnostic data put back
 Diagnostic report copied to the clipboard,Diagnostic report copied to the clipboard
 Diagnostics,Diagnostics
