@@ -156,8 +156,14 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
         addPreference(new TogglePreference(
                 context,
                 "Remove feed ads",
-                "Remove feed ads, creator commission posts, paid partnerships, and branded content.",
+                "Remove sponsored videos and the ad cards TikTok inserts into feeds.",
                 Settings.REMOVE_ADS
+        ));
+        addPreference(new TogglePreference(
+                context,
+                "Hide creator commission posts",
+                "Hide creator posts labeled as earning a commission, including location-affiliate labels.",
+                Settings.HIDE_CREATOR_COMMISSION
         ));
         addPreference(new TogglePreference(
                 context,

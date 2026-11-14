@@ -556,6 +556,8 @@ Hide message streaks	Ocultar las rachas de mensajes
 Hide new follower notifications	Ocultar las notificaciones de nuevos seguidores
 Hide new followers	Ocultar los nuevos seguidores
 Hide paid partnerships	Ocultar las colaboraciones pagadas
+Hide creator commission posts	Ocultar publicaciones con comisión para creadores
+Hide creator posts labeled as earning a commission, including location-affiliate labels.	Oculta las publicaciones marcadas porque el creador gana una comisión, incluidas las etiquetas de afiliados de ubicaciones.
 Hide people and options by name	Ocultar personas y opciones por nombre
 Hide photo posts	Ocultar las publicaciones de fotos
 Hide picture comments	Ocultar los comentarios con imagen
@@ -839,6 +841,7 @@ Overrides are disabled in the Feature Gate Lab.	Las sustituciones están desacti
 Overrides disabled. Restart TikTok to apply this.	Sustituciones desactivadas. Reinicia TikTok para que se aplique.
 Overrides enabled. Restart TikTok to apply this.	Sustituciones activadas. Reinicia TikTok para que se aplique.
 Paid partnerships	Colaboraciones pagadas
+Creator commission posts	Publicaciones con comisión para creadores
 People, shortcuts and sending controls	Personas, atajos y controles de envío
 Photo	Foto
 Photo and image posts	Publicaciones de fotos e imágenes
@@ -883,7 +886,7 @@ Remove	Quitar
 Remove %1$s	Quitar %1$s
 Remove all overrides	Quitar todas las sustituciones
 Remove feed ads	Quitar los anuncios del feed
-Remove feed ads, creator commission posts, paid partnerships, and branded content.	Quita los anuncios del feed, las publicaciones con comisión para creadores, las colaboraciones pagadas y el contenido de marca.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.	Quita los videos patrocinados y las tarjetas de anuncios que TikTok inserta en los feeds.
 Hide voting cards and poll results above the comments, including polls that have ended.	Oculta las tarjetas de votación y sus resultados sobre los comentarios, incluidas las encuestas finalizadas.
 Hide the Share via row.	Ocultar la fila Compartir con.
 Hide the actions row of the share sheet.	Ocultar la fila de acciones del panel de compartir.

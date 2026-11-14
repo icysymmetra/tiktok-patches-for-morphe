@@ -559,6 +559,8 @@ Hide message streaks	Nascondi le serie di messaggi
 Hide new follower notifications	Nascondi le notifiche di nuovi follower
 Hide new followers	Nascondi i nuovi follower
 Hide paid partnerships	Nascondi le collaborazioni a pagamento
+Hide creator commission posts	Nascondi i post con commissione per il creator
+Hide creator posts labeled as earning a commission, including location-affiliate labels.	Nasconde i post dei creator contrassegnati come fonte di commissioni, comprese le etichette di affiliazione dei luoghi.
 Hide people and options by name	Nascondi persone e opzioni per nome
 Hide photo posts	Nascondi i post fotografici
 Hide picture comments	Nascondi i commenti con immagini
@@ -842,6 +844,7 @@ Overrides are disabled in the Feature Gate Lab.	Le sovrascritture sono disattiva
 Overrides disabled. Restart TikTok to apply this.	Sovrascritture disattivate. Riavvia TikTok per applicare la modifica.
 Overrides enabled. Restart TikTok to apply this.	Sovrascritture attivate. Riavvia TikTok per applicare la modifica.
 Paid partnerships	Collaborazioni a pagamento
+Creator commission posts	Post con commissione per il creator
 People, shortcuts and sending controls	Persone, scorciatoie e opzioni di invio
 Photo	Foto
 Photo and image posts	Post con foto e immagini
@@ -886,7 +889,7 @@ Remove	Rimuovi
 Remove %1$s	Rimuovi %1$s
 Remove all overrides	Rimuovi tutte le sovrascritture
 Remove feed ads	Rimuovi gli annunci dal feed
-Remove feed ads, creator commission posts, paid partnerships, and branded content.	Rimuove gli annunci dal feed, i post con commissione per il creator, le collaborazioni a pagamento e i contenuti brandizzati.
+Remove sponsored videos and the ad cards TikTok inserts into feeds.	Rimuove i video sponsorizzati e le schede pubblicitarie che TikTok inserisce nei feed.
 Hide voting cards and poll results above the comments, including polls that have ended.	Nasconde le schede di voto e i risultati dei sondaggi sopra i commenti, anche per i sondaggi già conclusi.
 Hide the Share via row.	Nascondi la riga "Condividi con".
 Hide the actions row of the share sheet.	Nascondi la riga delle azioni nel menu di condivisione.

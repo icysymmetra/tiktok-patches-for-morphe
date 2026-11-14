@@ -24,6 +24,7 @@ import org.robolectric.annotation.Config;
 @Config(sdk = 28)
 public class AdsFilterTest {
     private final AdsFilter filter = new AdsFilter();
+    private final AdsFilter.CreatorCommissionFilter commission = new AdsFilter.CreatorCommissionFilter();
 
     public static class Video extends Aweme {
         String anchorsExtras;
@@ -98,7 +99,7 @@ public class AdsFilterTest {
         Video video = video("{\"panel_top_disclosure_label\":"
                 + "{\"display_text\":\"Creator earns commission\"}}");
 
-        assertTrue(filter.getFiltered(video));
+        assertTrue(commission.getFiltered(video));
         assertTrue(HookStatus.missing("feed ad disclosures").isEmpty());
     }
 
@@ -107,18 +108,18 @@ public class AdsFilterTest {
                 + "{\"display_text\":\"  \","
                 + "\"truncatable_text\":\"El creador recibe una comisión\"}}");
 
-        assertTrue(filter.getFiltered(video));
+        assertTrue(commission.getFiltered(video));
     }
 
     @Test public void ordinaryAnchorMetadataIsKept() {
-        assertFalse(filter.getFiltered(video("{\"product_cnt\":1,\"anchor_type\":4}")));
+        assertFalse(commission.getFiltered(video("{\"product_cnt\":1,\"anchor_type\":4}")));
     }
 
     @Test public void locationAffiliateCommissionIsFilteredBeforeAnyLabelRenders() {
         Video video = video(null);
         video.contentModel = new Content(new Business(new Alliance(1, "Creator earns commission")));
 
-        assertTrue(filter.getFiltered(video));
+        assertTrue(commission.getFiltered(video));
         assertTrue(HookStatus.missing("feed ad disclosures").isEmpty());
     }
 
@@ -126,7 +127,7 @@ public class AdsFilterTest {
         Video video = video(null);
         video.contentModel = new Content(new Business(new Alliance(1, "يحصل المنشئ على عمولة")));
 
-        assertTrue(filter.getFiltered(video));
+        assertTrue(commission.getFiltered(video));
     }
 
     @Test public void ordinaryLocationsAndIncompleteAllianceMetadataAreKept() {
@@ -135,10 +136,10 @@ public class AdsFilterTest {
                 new Alliance(0, "label"), new Alliance(2, "label"),
                 new Alliance(1, null), new Alliance(1, "")}) {
             video.contentModel = new Content(new Business(alliance));
-            assertFalse(filter.getFiltered(video));
+            assertFalse(commission.getFiltered(video));
         }
         video.contentModel = new Content(null);
-        assertFalse(filter.getFiltered(video));
+        assertFalse(commission.getFiltered(video));
     }
 
     @Test public void locationDisclosureHydrationInvalidatesTheFeedSignature() {
@@ -155,19 +156,19 @@ public class AdsFilterTest {
             public boolean showBottomLabel() { throw new IllegalStateException("host failure"); }
         }));
 
-        assertFalse(filter.getFiltered(video));
+        assertFalse(commission.getFiltered(video));
     }
 
     @Test public void aBlankDisclosureIsNotAdEvidence() {
-        assertFalse(filter.getFiltered(video("{\"panel_top_disclosure_label\":"
+        assertFalse(commission.getFiltered(video("{\"panel_top_disclosure_label\":"
                 + "{\"display_text\":\" \",\"truncatable_text\":\"\"}}")));
-        assertFalse(filter.getFiltered(video("{\"panel_top_disclosure_label\":{}}")));
+        assertFalse(commission.getFiltered(video("{\"panel_top_disclosure_label\":{}}")));
     }
 
     @Test public void malformedOrWrongTypeDisclosureIsKept() {
-        assertFalse(filter.getFiltered(video("{not-json")));
-        assertFalse(filter.getFiltered(video("{\"panel_top_disclosure_label\":true}")));
-        assertFalse(filter.getFiltered(video("{\"panel_top_disclosure_label\":"
+        assertFalse(commission.getFiltered(video("{not-json")));
+        assertFalse(commission.getFiltered(video("{\"panel_top_disclosure_label\":true}")));
+        assertFalse(commission.getFiltered(video("{\"panel_top_disclosure_label\":"
                 + "{\"display_text\":42}}")));
     }
 
@@ -178,22 +179,26 @@ public class AdsFilterTest {
         softAd.softAd = true;
         Video rawAd = video(null);
         rawAd.rawAd = new AwemeRawAd();
-        Video promotional = video(null);
-        promotional.promotionalMusic = true;
 
         assertTrue(filter.getFiltered(ad));
         assertTrue(filter.getFiltered(softAd));
         assertTrue(filter.getFiltered(rawAd));
-        assertTrue(filter.getFiltered(promotional));
     }
 
-    @Test public void brandedContentIsIncludedInRemoveFeedAds() {
+    @Test public void removeFeedAdsLeavesTheCategoriesWithTheirOwnSwitches() {
+        Video promotional = video(null);
+        promotional.promotionalMusic = true;
         Video branded = video(null);
         branded.commerceVideoAuthInfo = new Object() {
             public long getBrandedContentType() { return 1L; }
         };
+        Video commissioned = video("{\"panel_top_disclosure_label\":"
+                + "{\"display_text\":\"Creator earns commission\"}}");
 
-        assertTrue(filter.getFiltered(branded));
+        assertFalse(filter.getFiltered(promotional));
+        assertFalse(filter.getFiltered(branded));
+        assertFalse(filter.getFiltered(commissioned));
+        assertFalse(commission.getFiltered(branded));
     }
 
     @Test public void aCreatorPostTikTokRunsAsAnAdIsAnAdAndIsCounted() {
@@ -230,7 +235,7 @@ public class AdsFilterTest {
     @Test public void missingAnchorGetterFailsOpenAndNamesTheContract() {
         VideoWithoutAnchors video = new VideoWithoutAnchors();
 
-        assertFalse(filter.getFiltered(video));
+        assertFalse(commission.getFiltered(video));
         assertEquals(java.util.Collections.singletonList(
                         "method " + VideoWithoutAnchors.class.getName() + "#getAnchorsExtras"),
                 HookStatus.missing("feed ad disclosures"));

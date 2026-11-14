@@ -27,11 +27,21 @@ public class AdsFilter implements IFilter {
         return item.isAd()
                 || item.isSoftAd()
                 || item.getAwemeRawAd() != null
-                || item.isWithPromotionalMusic()
                 || isPseudoAd(item)
-                || isLemon8PromoCard(item)
-                || hasCreatorCommissionDisclosure(item)
-                || ContentMarkerFilters.hasPaidPartnershipMarker(item);
+                || isLemon8PromoCard(item);
+    }
+
+    /** Creator posts carrying a commission or location-affiliate disclosure label. */
+    public static final class CreatorCommissionFilter implements IFilter {
+        @Override
+        public boolean getEnabled() {
+            return Settings.HIDE_CREATOR_COMMISSION.get();
+        }
+
+        @Override
+        public boolean getFiltered(Aweme item) {
+            return hasCreatorCommissionDisclosure(item);
+        }
     }
 
     /** The CardInsertInfo card type of the Lemon8 install promo card TikTok slots into For You. */

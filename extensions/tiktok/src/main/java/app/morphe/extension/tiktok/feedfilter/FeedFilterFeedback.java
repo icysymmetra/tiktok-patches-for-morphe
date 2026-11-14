@@ -80,6 +80,8 @@ final class FeedFilterFeedback {
                 new MarkerSwitch(feedFilter, Settings.HIDE_SHOP.key, "Hide TikTok Shop"));
         MARKER_SWITCHES.put("PaidPartnershipFilter",
                 new MarkerSwitch(feedFilter, Settings.HIDE_PAID_PARTNERSHIP.key, "Hide paid partnerships"));
+        MARKER_SWITCHES.put("CreatorCommissionFilter",
+                new MarkerSwitch(feedFilter, Settings.HIDE_CREATOR_COMMISSION.key, "Hide creator commission posts"));
         MARKER_SWITCHES.put("LocationBadgeFilter",
                 new MarkerSwitch(feedFilter, Settings.FILTER_LOCATION_VIDEOS.key, "Filter location-tagged videos"));
         MARKER_SWITCHES.put("AiGeneratedFilter",
@@ -316,6 +318,7 @@ final class FeedFilterFeedback {
         if ("ShopFilter".equals(reason)) return "Shop posts";
         if ("SoundFilter".equals(reason)) return "Blocked sounds";
         if ("PaidPartnershipFilter".equals(reason)) return "Paid partnerships";
+        if ("CreatorCommissionFilter".equals(reason)) return "Creator commission posts";
         if ("LocationBadgeFilter".equals(reason)) return "Location-tagged videos";
         if ("AiGeneratedFilter".equals(reason)) return "AI-generated posts";
         if ("VerifiedFilter".equals(reason)) return "Verified accounts";

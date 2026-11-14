@@ -169,6 +169,7 @@ public class DeepFeedFilterBoundaryTest {
         save(Settings.HIDE_SHOP);
         save(Settings.HIDE_BLOCKED_SOUNDS);
         save(Settings.HIDE_PAID_PARTNERSHIP);
+        save(Settings.HIDE_CREATOR_COMMISSION);
         save(Settings.FILTER_LOCATION_VIDEOS);
         save(Settings.HIDE_AI_GENERATED);
         save(Settings.HIDE_VERIFIED);
@@ -237,6 +238,7 @@ public class DeepFeedFilterBoundaryTest {
         Settings.HIDE_SHOP.save(false);
         Settings.HIDE_BLOCKED_SOUNDS.save(false);
         Settings.HIDE_PAID_PARTNERSHIP.save(false);
+        Settings.HIDE_CREATOR_COMMISSION.save(false);
         Settings.FILTER_LOCATION_VIDEOS.save(false);
         Settings.HIDE_AI_GENERATED.save(false);
         Settings.HIDE_VERIFIED.save(false);
@@ -288,6 +290,7 @@ public class DeepFeedFilterBoundaryTest {
     @Test
     public void repeatedResponseIsRescannedWhenCommissionMetadataArrives() {
         Settings.REMOVE_ADS.save(true);
+        Settings.HIDE_CREATOR_COMMISSION.save(true);
         BaseSettings.DEBUG.save(true);
         FeedItemList page = new FeedItemList();
         Video video = new Video("late-commission", false, 500, "");
@@ -399,6 +402,7 @@ public class DeepFeedFilterBoundaryTest {
     @Test
     public void aKeptVideoStillGoesWhenItsAdMetadataArrivesLate() {
         Settings.REMOVE_ADS.save(true);
+        Settings.HIDE_CREATOR_COMMISSION.save(true);
         Settings.MAX_PUBLICATION_AGE_DAYS.save(1);
         Video video = new Video("kept-then-commission", false, 500, "").postedHoursAgo(1);
         FeedItemList page = new FeedItemList();
@@ -414,6 +418,7 @@ public class DeepFeedFilterBoundaryTest {
     @Test
     public void feedItemListReadCatchesCommissionDisclosureMissedByTheResponseHook() {
         Settings.REMOVE_ADS.save(true);
+        Settings.HIDE_CREATOR_COMMISSION.save(true);
         FeedItemList page = new FeedItemList();
         Video video = new Video("late-read-commission", false, 500, "")
                 .withCreatorCommissionDisclosure();
@@ -427,6 +432,7 @@ public class DeepFeedFilterBoundaryTest {
     @Test
     public void feedItemListReadCatchesLateLocationAllianceMetadata() {
         Settings.REMOVE_ADS.save(true);
+        Settings.HIDE_CREATOR_COMMISSION.save(true);
         FeedItemList page = new FeedItemList();
         Video video = new Video("native-commission", false, 500, "");
         page.items = new ArrayList<>(List.of(video));
@@ -443,6 +449,7 @@ public class DeepFeedFilterBoundaryTest {
     @Test
     public void responseDropsLocationCommissionBeforeDisplayAndKeepsOrdinaryVideo() {
         Settings.REMOVE_ADS.save(true);
+        Settings.HIDE_CREATOR_COMMISSION.save(true);
         Video commission = new Video("location-commission", false, 500, "");
         commission.contentModel = new AdsFilterTest.Content(new AdsFilterTest.Business(
                 new AdsFilterTest.Alliance(1, "Creator earns commission")));
@@ -455,6 +462,7 @@ public class DeepFeedFilterBoundaryTest {
         assertEquals(List.of(ordinary), page.items);
         assertEquals(List.of(ordinary), FeedItemsFilter.filterProfileAds(List.of(commission, ordinary)));
         Settings.REMOVE_ADS.save(false);
+        Settings.HIDE_CREATOR_COMMISSION.save(false);
         assertEquals(List.of(commission, ordinary),
                 FeedItemsFilter.filterProfileAds(List.of(commission, ordinary)));
     }
@@ -462,12 +470,13 @@ public class DeepFeedFilterBoundaryTest {
     @Test
     public void rawMetadataAdsReachEverySharedDeliveryDelegate() {
         Settings.REMOVE_ADS.save(true);
+        Settings.HIDE_PAID_PARTNERSHIP.save(true);
         Video rawAd = new Video("raw-ad", false, 500, "").withRawAd();
         Video partnership = new Video("partnership", false, 500, "").asPaidPartnership();
 
         AdsFilter classifier = new AdsFilter();
         assertTrue(classifier.getFiltered(rawAd));
-        assertTrue(classifier.getFiltered(partnership));
+        assertFalse(classifier.getFiltered(partnership));
 
         FeedItemList response = new FeedItemList();
         response.items = new ArrayList<>(Arrays.asList(rawAd, partnership));

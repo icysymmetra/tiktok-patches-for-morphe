@@ -41,6 +41,7 @@ public final class FeedItemsFilter {
     static final String FINAL_INSERT_SOURCE = "FinalInsert:";
 
     private static final AdsFilter ADS_FILTER = new AdsFilter();
+    private static final AdsFilter.CreatorCommissionFilter COMMISSION_FILTER = new AdsFilter.CreatorCommissionFilter();
     private static final LocationBadgeFilter LOCATION_FILTER = new LocationBadgeFilter();
     private static final SeenVideoFilter SEEN_FILTER = new SeenVideoFilter();
     private static final AdvancedFeedRules.QualityFilter QUALITY_FILTER = new AdvancedFeedRules.QualityFilter();
@@ -52,6 +53,7 @@ public final class FeedItemsFilter {
         new ShopFilter(),
         new SoundFilter(),
         new ContentMarkerFilters.PaidPartnershipFilter(),
+        COMMISSION_FILTER,
         LOCATION_FILTER,
         new ContentMarkerFilters.AiGeneratedFilter(),
         new ContentMarkerFilters.VerifiedFilter(),
@@ -87,6 +89,8 @@ public final class FeedItemsFilter {
     private static final List<IFilter> FOR_YOU_FILTERS = forYouFilters();
     private static volatile List<IFilter> RANGE_FILTERS = createRangeFilters();
     private static final List<IFilter> AD_ONLY_FILTERS = List.of(ADS_FILTER);
+    /** Profile lists and feed insertions also carry creator-commission posts. */
+    private static final List<IFilter> AD_ROUTE_FILTERS = List.of(ADS_FILTER, COMMISSION_FILTER);
     /**
      * The Following tab's rules where TikTok reads its list. On 47.1.4 the tab never loads
      * through the response hook, so this read is the only place its videos meet the feed rules,
@@ -980,14 +984,15 @@ public final class FeedItemsFilter {
         // that read the same as a hook that never ran.
         FeedFilterCounters.sawList(source, items == null ? 0 : items.size());
         if (items == null || items.isEmpty()) return items;
-        if (!ADS_FILTER.getEnabled()) {
+        List<IFilter> active = getActiveFilters(AD_ROUTE_FILTERS);
+        if (active.isEmpty()) {
             FeedCapture.noRules(source);
             return items;
         }
 
         boolean verbose = BaseSettings.DEBUG.get();
         FeedCapture.Batch capture = FeedCapture.batch(source, items.size());
-        if (capture != null) capture.rules(AD_ONLY_FILTERS, null);
+        if (capture != null) capture.rules(active, null);
         ArrayList kept = null;
         int removed = 0;
         int notVideos = 0;
@@ -1001,7 +1006,7 @@ public final class FeedItemsFilter {
                 nameNotVideo(source, container);
                 if (capture != null) capture.notVideo();
             }
-            String matched = item == null ? null : getFilterReason(AD_ONLY_FILTERS, item);
+            String matched = item == null ? null : getFilterReason(active, item);
             String reason = matched != null && own.owns(item) ? null : matched;
             if (reason == null) {
                 if (kept != null) kept.add(container);

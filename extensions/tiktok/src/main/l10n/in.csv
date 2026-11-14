@@ -551,6 +551,8 @@ Hide message streaks,Sembunyikan rentetan pesan
 Hide new follower notifications,Sembunyikan notifikasi pengikut baru
 Hide new followers,Sembunyikan pengikut baru
 Hide paid partnerships,Sembunyikan kemitraan berbayar
+Hide creator commission posts,Sembunyikan postingan komisi kreator
+"Hide creator posts labeled as earning a commission, including location-affiliate labels.","Sembunyikan postingan kreator yang diberi label mendapatkan komisi, termasuk label afiliasi lokasi."
 Hide people and options by name,Sembunyikan orang dan opsi berdasarkan nama
 Hide photo posts,Sembunyikan publikasi foto
 Hide picture comments,Sembunyikan komentar bergambar
@@ -836,6 +838,7 @@ Overrides are disabled in the Feature Gate Lab.,Penggantian dimatikan di Feature
 Overrides disabled. Restart TikTok to apply this.,Penggantian dinonaktifkan. Mulai ulang TikTok agar berlaku.
 Overrides enabled. Restart TikTok to apply this.,Penggantian diaktifkan. Mulai ulang TikTok agar berlaku.
 Paid partnerships,Kemitraan berbayar
+Creator commission posts,Postingan komisi kreator
 "People, shortcuts and sending controls","Orang, pintasan, dan kontrol pengiriman"
 Photo,Foto
 Photo and image posts,Kiriman foto dan gambar
@@ -880,7 +883,7 @@ Remove,Hapus
 Remove %1$s,Hapus %1$s
 Remove all overrides,Hapus semua penggantian
 Remove feed ads,Hapus iklan di feed
-"Remove feed ads, creator commission posts, paid partnerships, and branded content.","Hapus iklan di feed, postingan komisi kreator, kemitraan berbayar, dan konten bermerek."
+Remove sponsored videos and the ad cards TikTok inserts into feeds.,Hapus video bersponsor dan kartu iklan yang disisipkan TikTok ke feed.
 "Hide voting cards and poll results above the comments, including polls that have ended.","Sembunyikan kartu jajak pendapat dan hasilnya di atas komentar, termasuk jajak pendapat yang sudah berakhir."
 Hide the Share via row.,Sembunyikan baris Bagikan lewat.
 Hide the actions row of the share sheet.,Sembunyikan baris aksi di menu bagikan.
