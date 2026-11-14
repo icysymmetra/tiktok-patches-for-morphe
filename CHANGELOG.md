@@ -1,3 +1,16 @@
+# [0.11.0-dev.6](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.5...v0.11.0-dev.6) (2026-11-14)
+
+
+### Features
+
+* **diagnostics:** add bounded GC policy trial and complete error reports ([1299ed3](https://github.com/icysymmetra/tiktok-patches-for-morphe/commit/1299ed350e4b240ffcad6123ed78421b22da040e))
+
+
+
+
+
+## 0.11.0-dev.6
+
 # [0.11.0-dev.5](https://github.com/icysymmetra/tiktok-patches-for-morphe/compare/v0.11.0-dev.4...v0.11.0-dev.5) (2026-11-13)
 
 
