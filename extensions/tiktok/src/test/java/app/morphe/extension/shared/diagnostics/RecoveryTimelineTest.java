@@ -193,6 +193,7 @@ public class RecoveryTimelineTest {
                 super.sample(); return "heap=64/512M " + String.join("", Collections.nCopies(87, "x"));
             }
             @Override public String control() { return String.join("", Collections.nCopies(RecoveryTimeline.MAX_CONTROL, "c")); }
+            @Override public String policy() { return String.join("", Collections.nCopies(RecoveryTimeline.MAX_POLICY, "p")); }
         };
         fake.jato = String.join("", Collections.nCopies(646, "j"));
         RecoveryTimeline.run(files, 101, 7, 72 * RecoveryTimeline.PERIOD_MS, fake, fake, false);
@@ -202,7 +203,9 @@ public class RecoveryTimelineTest {
         assertTrue("retained " + count, count >= 49);
         assertEquals(1, section.split("control_latest:", -1).length - 1);
         assertTrue(section.contains("last_saved_reading_before_exit_s=135\n"));
-        assertTrue(section.length() <= RecoveryTimeline.MAX_SECTION + RecoveryTimeline.MAX_CONTROL + 64);
+        assertTrue(section.length() <= RecoveryTimeline.MAX_SECTION + RecoveryTimeline.MAX_CONTROL + RecoveryTimeline.MAX_POLICY + 96);
+        assertEquals(1, section.split("policy_latest:", -1).length - 1);
+        assertFalse(RecoveryTimeline.section(files, 101, 7, fake.wall, fake.wall).contains("policy_latest:"));
         assertFalse(RecoveryTimeline.section(files, 101, 7, fake.wall, fake.wall).contains("control_latest:"));
     }
 

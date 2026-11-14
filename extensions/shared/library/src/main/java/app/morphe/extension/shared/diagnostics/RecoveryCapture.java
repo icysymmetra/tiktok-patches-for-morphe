@@ -72,8 +72,12 @@ public final class RecoveryCapture {
                     + "\ntrial: " + trial + "\npid: " + pid + "\nsession_started_ms: " + sessionAt
                     + "\nobserved_ms: " + observedAt + "\ndeclared_arm: " + arm + "\n" + profile
                     + "\n" + observation + "\nNative return codes do not identify a cause or independently prove heap writes."
-                    + "\n\n[SESSION BUILD]\n" + session.optString("build");
-            saveActivation(data, trial + "-control-" + pid + "-" + sessionAt, text, state.optInt("generation"));
+                    + "\n\n[SESSION BUILD]\n";
+            String build = session.optString("build");
+            int remaining = Math.max(0, 6000 - text.length());
+            if (build.length() > remaining) build = build.substring(0, Math.max(0, remaining - 22)) + "\n[build truncated]\n";
+            text += build;
+            saveActivation(data, trial + "-control-" + pid + "-" + sessionAt, fitControlActivation(text), state.optInt("generation"));
             controlReceiptKey = key;
             return true;
         }
@@ -83,7 +87,7 @@ public final class RecoveryCapture {
         try {
             RecoveryStore data = store;
             if (data != null && recordControlReceipt(data, trialId(), pid, sessionAt, System.currentTimeMillis(),
-                    controlArm(), ControlObservation.profile(), ControlObservation.state())) {
+                    controlArm(), ControlObservation.profile(), PolicyObservation.state() + " " + ControlObservation.state())) {
                 refresh(data); publish(context, data);
             }
         } catch (Throwable unavailable) { /* Retry within the existing sampling lease. */ }
@@ -199,6 +203,8 @@ public final class RecoveryCapture {
     interface Source {
         long now(); int pid(); boolean main(Context context);
         default long elapsed() { return now(); }
+        default long processStartedElapsed() { return -1; }
+        default String capturePreference(Context context) { return "unknown"; }
         List<Exit> history(Context context) throws Exception;
         String build(Context context);
         /** Starts the readings for this session, until the lease ends on the elapsed clock. */
@@ -210,6 +216,8 @@ public final class RecoveryCapture {
         public long now() { return System.currentTimeMillis(); }
         public long elapsed() { return SystemClock.elapsedRealtime(); }
         public int pid() { return Process.myPid(); }
+        public long processStartedElapsed() { return Process.getStartElapsedRealtime(); }
+        public String capturePreference(Context context) { return CrashEvidence.capturePreference(context); }
         public boolean main(Context c) { return c.getPackageName().equals(Application.getProcessName()); }
         public String build(Context context) {
             return "android_sdk: " + Build.VERSION.SDK_INT + "\nandroid_release: "
@@ -309,8 +317,8 @@ public final class RecoveryCapture {
         coordinator.setDaemon(true); coordinator.start();
     }
 
-    private interface Job<T> { T run() throws Exception; }
-    private static <T> T probe(Job<T> job, long millis) throws Exception {
+    interface Job<T> { T run() throws Exception; }
+    static <T> T probe(Job<T> job, long millis) throws Exception {
         // A timed-out Binder/stream operation may keep running. Never queue more behind it.
         if (!PROBE_BUSY.compareAndSet(false, true)) throw new ProbeBusy();
         Future<T> future;
@@ -318,7 +326,7 @@ public final class RecoveryCapture {
         catch (RuntimeException rejected) { PROBE_BUSY.set(false); throw rejected; }
         return future.get(millis, TimeUnit.MILLISECONDS);
     }
-    private static final class ProbeBusy extends Exception {}
+    static final class ProbeBusy extends Exception {}
 
     static void recover(Context context, String trial, Source source, RecoveryStore data) throws Exception {
         recover(context, trial, source, data, TRACE_TIMEOUT_MS);
@@ -365,13 +373,16 @@ public final class RecoveryCapture {
         if (collect) {
             final JSONArray sessions = previous;
             final String collectorBuild = safeBuild(source.build(context));
+            final long processStarted=source.processStartedElapsed();
+            final String capturePreference=source.capturePreference(context);
             final boolean[] registered = {false};
             data.update(s -> {
                 s.put("checks", s.optInt("checks", s.optInt("starts")) + 1);
                 if (s.optInt("starts") >= MAX_STARTS) return;
                 s.put("starts", s.optInt("starts") + 1);
                 JSONObject session = new JSONObject().put("pid", source.pid()).put("at", now)
-                        .put("build", collectorBuild);
+                        .put("build", collectorBuild).put("process_started_elapsed_ms",processStarted)
+                        .put("capture_preference_at_start",capturePreference);
                 JSONArray next = new JSONArray();
                 for (int i = Math.max(0, sessions.length() - 3); i < sessions.length(); i++) next.put(sessions.get(i));
                 next.put(session); s.put("sessions", next);
@@ -450,9 +461,25 @@ public final class RecoveryCapture {
 
     private static String controlStatusObservation(Context context, JSONObject session, long now, long cleared) {
         String section = RecoveryTimeline.section(context.getFilesDir(), session.optInt("pid"), session.optLong("at"), now, cleared);
-        for (String line : section.split("\n")) if (line.startsWith("control_latest:"))
-            return "\n[PRIOR SESSION OBSERVATION RELATIVE TO STATUS TIME]\n" + line + "\n";
+        StringBuilder observation = new StringBuilder();
+        for (String line : section.split("\n")) if (line.startsWith("control_latest:") || line.startsWith("policy_latest:") || line.startsWith("softref_latest:"))
+            observation.append(line).append('\n');
+        if (observation.length() > 0) return "\n[PRIOR SESSION OBSERVATION RELATIVE TO STATUS TIME]\n" + observation;
         return "\nprior_control_observation: not_recorded\n";
+    }
+
+    static String fitControlActivation(String text) {
+        String marker = "\n[PRIOR SESSION OBSERVATION RELATIVE TO STATUS TIME]";
+        int at = text.indexOf(marker);
+        String head = at < 0 ? text : text.substring(0, at), tail = at < 0 ? "" : text.substring(at);
+        String omitted = "\n[build truncated]\n";
+        int limit = Math.max(0, 6000 - tail.length() - omitted.length());
+        boolean cut = head.length() > limit;
+        if (cut) head = head.substring(0, limit);
+        while (storedBytes(head + (cut ? omitted : "") + tail) > MAX_STORED_ACTIVATION && !head.isEmpty()) {
+            head = head.substring(0, Math.max(0, head.length() - 128)); cut = true;
+        }
+        return head + (cut ? omitted : "") + tail;
     }
 
     private static void availability(RecoveryStore data, String id, String status, String history,
@@ -461,7 +488,7 @@ public final class RecoveryCapture {
         String text = "MORPHE DIAGNOSTIC REPORT\nschema: 1\nsource: recovery_trial_status\nincident: " + id
                 + "\ncapture_timestamp_ms: " + now + "\ncapture_status: " + status + "\nhistory_status: " + history
                 + "\nThis is capture availability information, not a confirmed crash.\n" + details;
-        if (!controlArm().isEmpty()) saveActivation(data, id, text, generation);
+        if (!controlArm().isEmpty()) saveActivation(data, id, fitControlActivation(text), generation);
         else retain(data, new JSONObject().put("id", id).put("at", now).put("report", text)
                 .put("hash", RecoveryPublisher.sha(text)), generation);
     }
@@ -648,6 +675,6 @@ public final class RecoveryCapture {
         SOFT_V1.set(0); SOFT_V2.set(0); RecoveryTimeline.resetReadingRequest();
         ACTIVATION_MASK.set(0);
         EXPORT_REQUESTED.set(false);
-        controlReceiptKey = ""; ControlObservation.resetForTests();
+        controlReceiptKey = ""; ControlObservation.resetForTests(); PolicyObservation.resetForTests();
     }
 }

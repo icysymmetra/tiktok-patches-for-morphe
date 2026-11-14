@@ -59,6 +59,11 @@ internal fun configureControlTrial(arm: String) {
     if (arm == "off") return
     val classes = mutableListOf<ClassDef>(); context.classDefForEach { classes += it }
     val target = heapObservationTargets(classes) // Resolve everything before mutating.
+    val policy = policyTargets(classes)
+    val references = softReferenceInstallers(classes)
+    check(references.all { it.implementation!!.registerCount > 3 && it.implementation!!.instructions.first().opcode == Opcode.CONST_CLASS }) {
+        "GC policy trial: reference entry locals changed"
+    }
     val owner = context.mutableClassDefBy(target.wrapper.definingClass)
     val original = owner.findMutableMethodOf(target.wrapper)
     val method = MutableMethod(ImmutableMethod(original.definingClass, original.name, original.parameters,
@@ -89,6 +94,20 @@ internal fun configureControlTrial(arm: String) {
             val register = (instruction as OneRegisterInstruction).registerA
             provider.addInstructionsAtControlFlowLabel(index, "invoke-static/range {v$register .. v$register}, $OBSERVER->configObserved(Ljava/lang/Object;)V")
         }
+    applyPolicyObservations(policy, arm == "gc_policy")
+    references.forEachIndexed { index, original ->
+        val method = context.mutableClassDefBy(original.definingClass).findMutableMethodOf(original)
+        method.addInstructions(0, """
+            const/4 v0, $index
+            invoke-static {v0}, Lapp/morphe/extension/shared/diagnostics/PolicyObservation;->referenceRequest(I)Z
+            move-result v0
+            if-eqz v0, :original
+            invoke-static {}, Lapp/morphe/extension/shared/diagnostics/RecoveryCapture;->softReferenceV${index + 1}Bypassed()V
+            return-void
+            :original
+            nop
+        """.trimIndent())
+    }
 }
 
 /** Run after the shared context hooks too, which are injected by a deeper dependency's finalizer. */

@@ -65,6 +65,12 @@ public class RecoveryCaptureTest {
         Source source = new Source(); RecoveryCapture.recover(context, "unit-v1", source, data); return source;
     }
 
+    @Test public void staleUndoCannotRollBackALaterClear() throws Exception {
+        data.update(s->s.put("trial","unit"));String older=data.clear();data.clear();
+        int generation=data.read().getInt("generation");long cleared=data.read().getLong("cleared_through");
+        data.restoreIfEmpty(older);assertEquals(generation,data.read().getInt("generation"));
+        assertEquals(cleared,data.read().getLong("cleared_through"));
+    }
     @Test public void defaultBuildNeverArmsCaptureOrCreatesAStore() {
         RecoveryCapture.onContext(context);
         assertEquals("", RecoveryCapture.trialId());
@@ -354,7 +360,8 @@ public class RecoveryCaptureTest {
                 .put("at", Long.MAX_VALUE).put("report", incident).put("hash", RecoveryPublisher.sha(incident)));
         String build = String.join("", Collections.nCopies(RecoveryCapture.MAX_STORED_BUILD / 2 - 1, "/"));
         for (int i = 0; i < 4; i++) sessions.put(new JSONObject().put("pid", Integer.MAX_VALUE)
-                .put("at", Long.MAX_VALUE).put("build", build));
+                .put("at", Long.MAX_VALUE).put("build", build).put("process_started_elapsed_ms",Long.MAX_VALUE)
+                .put("capture_preference_at_start","unknown"));
         String journalField = String.join("", Collections.nCopies(RecoveryPublisher.MAX_JOURNAL_FIELD, "/"));
         String hash = RecoveryPublisher.sha(incident);
         data.update(state -> state.put("trial", "issue215-softref-v1-00000000-0000-0000-0000-000000000000")

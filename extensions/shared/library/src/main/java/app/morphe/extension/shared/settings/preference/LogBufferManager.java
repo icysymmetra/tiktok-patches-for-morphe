@@ -754,29 +754,55 @@ public final class LogBufferManager {
         return readCrashReport(context, NPTH_CRASH_FILE);
     }
 
+    /** Immutable bounded read result. Empty/unreadable is not evidence that no error occurred. */
+    public static final class PersistedCrashReport {
+        public final String status, text, storage;
+        public PersistedCrashReport(String status, String text) { this(status,text,"unspecified"); }
+        public PersistedCrashReport(String status, String text,String storage) { this.status=status; this.text=text; this.storage=storage; }
+    }
+    public static final class CrashReportSnapshot {
+        public final PersistedCrashReport java, npth;
+        public CrashReportSnapshot(PersistedCrashReport java, PersistedCrashReport npth) { this.java=java; this.npth=npth; }
+    }
+
+    /** Worker-only: the recovery publisher places a bounded wait around this existing file lock. */
+    public static CrashReportSnapshot readCrashReportsForRecovery(Context context) {
+        if (context==null) return new CrashReportSnapshot(new PersistedCrashReport("context_unavailable",""),new PersistedCrashReport("context_unavailable",""));
+        synchronized (CRASH_FILE_LOCK) {
+            return new CrashReportSnapshot(readForRecovery(context,CRASH_FILE),readForRecovery(context,NPTH_CRASH_FILE));
+        }
+    }
+
+    private static PersistedCrashReport readForRecovery(Context context, String name) {
+        File base=new File(context.getFilesDir(),name),backup=new File(base.getPath()+".bak"),staging=new File(base.getPath()+".new");
+        // AtomicFile.openRead() can delete another process's .new or consume .bak.
+        // Read a committed inode without renaming, deleting or opening the staging file.
+        boolean legacy=backup.exists(),pending=staging.exists();
+        File selected=legacy?backup:base;
+        String storage=legacy?"legacy_backup":pending?"committed_base_with_staging":"committed_base";
+        if(!selected.exists())return new PersistedCrashReport(pending?"staging_only":"absent","",pending?"staging_only":"absent");
+        try (FileInputStream in=new FileInputStream(selected)) {
+            long length=in.getChannel().size();
+            if(length==0)return new PersistedCrashReport("empty","",storage);
+            if(length<0 || length>CRASH_MAX_BYTES)return new PersistedCrashReport("oversized","",storage);
+            byte[] bytes=new byte[(int)length];int at=0;
+            while(at<bytes.length){int n=in.read(bytes,at,bytes.length-at);if(n<=0)return new PersistedCrashReport("incomplete_read","",storage);at+=n;}
+            if(in.read()!=-1 || in.getChannel().size()!=length || (!legacy && backup.exists()))return new PersistedCrashReport("changed_during_read","",storage);
+            try {
+                String text=StandardCharsets.UTF_8.newDecoder().onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                        .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT).decode(java.nio.ByteBuffer.wrap(bytes)).toString();
+                return new PersistedCrashReport("present",text,storage);
+            } catch(java.nio.charset.CharacterCodingException malformed){return new PersistedCrashReport("malformed_utf8","",storage);}
+        } catch(java.io.FileNotFoundException missing) {
+            return new PersistedCrashReport(selected.exists()?"read_error":"changed_during_read","",storage);
+        } catch(Exception unavailable){return new PersistedCrashReport("read_error","",storage);}
+    }
+
     private static String readCrashReport(Context context, String fileName) {
         if (context == null) return "";
-        AtomicFile atomicFile = new AtomicFile(new File(context.getFilesDir(), fileName));
-
         synchronized (CRASH_FILE_LOCK) {
-            // Read through the AtomicFile the report was written with. A process that died in
-            // the middle of a write left the last whole report in the .bak file, which openRead()
-            // puts back before it opens anything; reading the base file directly read the half
-            // written one, or nothing at all, as though no crash had been saved.
-            try (FileInputStream input = atomicFile.openRead()) {
-                long length = atomicFile.getBaseFile().length();
-                if (length <= 0 || length > CRASH_MAX_BYTES) return "";
-                byte[] data = new byte[(int) length];
-                int offset = 0;
-                while (offset < data.length) {
-                    int read = input.read(data, offset, data.length - offset);
-                    if (read < 0) break;
-                    offset += read;
-                }
-                return new String(data, 0, offset, StandardCharsets.UTF_8);
-            } catch (Exception ignored) {
-                return "";
-            }
+            // Manual export and Undo must not consume another process's staging/backup either.
+            return readForRecovery(context,fileName).text;
         }
     }
 

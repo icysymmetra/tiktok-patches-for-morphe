@@ -54,6 +54,8 @@ final class RecoveryTimeline {
     private static final String JATO_LINE = "J ";
     private static final String SOFT_REFERENCE_LINE = "S ";
     private static final String CONTROL_LINE = "C ";
+    static final int MAX_POLICY = 1024;
+    private static final String POLICY_LINE = "P ";
 
     /** {@code elapsed} is the clock the lease is kept on: it keeps running while the phone sleeps. */
     interface Clock { long wall(); long elapsed(); }
@@ -61,6 +63,7 @@ final class RecoveryTimeline {
         String sample(); String jato();
         default String softReference() { return ""; }
         default String control() { return ""; }
+        default String policy() { return ""; }
         default void saved() {}
     }
 
@@ -143,6 +146,7 @@ final class RecoveryTimeline {
                 return RecoveryCapture.softReferenceTrialEnabled() ? RecoveryCapture.softReferenceState() : "";
             }
             public String control() { return RecoveryCapture.controlArm().isEmpty() ? "" : ControlObservation.state(); }
+            public String policy() { return RecoveryCapture.controlArm().isEmpty() ? "" : PolicyObservation.state(); }
             public void saved() { saved.run(); }
         };
         Thread sampler = new Thread(() -> {
@@ -182,6 +186,9 @@ final class RecoveryTimeline {
             String control = probe.control();
             String controlLine = control.isEmpty() ? "" : CONTROL_LINE + clock.wall() + " "
                     + control.substring(0, Math.min(control.length(), MAX_CONTROL)) + "\n";
+            String policy = probe.policy();
+            String policyLine = policy.isEmpty() ? "" : POLICY_LINE + clock.wall() + " "
+                    + policy.substring(0, Math.min(policy.length(), MAX_POLICY)) + "\n";
             // First-hit wakeups add readings without moving the startup/config observation earlier.
             if (clock.elapsed() >= nextJatoElapsed) {
                 String jato = probe.jato();
@@ -199,7 +206,7 @@ final class RecoveryTimeline {
                     seenClears = clears; lines.clear(); jatoLine = null; lastJato = null;
                     continue;
                 }
-                write(target, header + (jatoLine == null ? "" : jatoLine) + softReferenceLine + controlLine, lines);
+                write(target, header + (jatoLine == null ? "" : jatoLine) + softReferenceLine + controlLine + policyLine, lines);
             }
             probe.saved();
             if (!sleep && count >= MAX_SAMPLES * 4) return;
@@ -270,6 +277,7 @@ final class RecoveryTimeline {
         String jato = "jato_latest: not_read\n";
         String softReference = "";
         String control = "";
+        String policy = "";
         List<String> rendered = new ArrayList<>();
         long last = 0;
         for (int i = 1; i < lines.length; i++) {
@@ -277,13 +285,19 @@ final class RecoveryTimeline {
             boolean isJato = line.startsWith(JATO_LINE);
             boolean isSoftReference = line.startsWith(SOFT_REFERENCE_LINE);
             boolean isControl = line.startsWith(CONTROL_LINE);
-            if (isJato || isSoftReference || isControl) line = line.substring(2);
+            boolean isPolicy = line.startsWith(POLICY_LINE);
+            if (isJato || isSoftReference || isControl || isPolicy) line = line.substring(2);
             int space = line.indexOf(' ');
             if (space <= 0) continue;
             long at;
             try { at = Long.parseLong(line.substring(0, space)); } catch (NumberFormatException bad) { continue; }
             if (at <= clearedThrough) continue;
             String body = line.substring(space + 1);
+            if (isPolicy) {
+                policy = "policy_latest: " + relative(at - exitAt) + " "
+                        + body.substring(0, Math.min(body.length(), MAX_POLICY)) + "\n";
+                continue;
+            }
             if (isControl) {
                 control = "control_latest: " + relative(at - exitAt) + " "
                         + body.substring(0, Math.min(body.length(), MAX_CONTROL)) + "\n";
@@ -314,7 +328,7 @@ final class RecoveryTimeline {
         if (from > 0) out.append(omittedNote(from));
         for (int i = from; i < rendered.size(); i++) out.append(rendered.get(i)).append('\n');
         // This bounded metadata is additional to the unchanged six-KiB readings allowance.
-        out.append(softReference).append(control);
+        out.append(softReference).append(control).append(policy);
         return out.toString();
     }
 

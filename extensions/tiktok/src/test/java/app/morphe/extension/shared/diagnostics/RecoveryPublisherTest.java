@@ -119,6 +119,7 @@ public class RecoveryPublisherTest {
         assertEquals("verified", data.read().getJSONObject("export").getString("status"));
     }
     @Test public void clearedEvidenceIsNotPublishedWhenAProviderFinallyReturns() throws Exception {
+        LogBufferManager.persistCrashReport(context,matchingCrash());
         media.hold = true; Thread writer = new Thread(() -> {
             try { RecoveryPublisher.publish(context, data); } catch (Exception e) { throw new AssertionError(e); }
         }); writer.start();
@@ -177,6 +178,139 @@ public class RecoveryPublisherTest {
                 .put("report", REPORT).put("hash", RecoveryPublisher.sha(REPORT)))));
         RecoveryCapture.refresh(data);
         assertTrue(LogBufferManager.buildExportText().contains("[RECOVERED FAILURES]"));
+    }
+
+    private String matchingCrash() throws Exception {
+        android.os.SystemClock.sleep(2000);
+        long now=System.currentTimeMillis(), elapsed=android.os.SystemClock.elapsedRealtime();
+        java.text.SimpleDateFormat format=new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",java.util.Locale.US);
+        format.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+        String crash="schema: 1\ncomplete: true\ntimestamp_utc: "+format.format(new java.util.Date(now-500))
+                +"\npackage: "+context.getPackageName()+"\nprocess: "+context.getPackageName()+"\npid: 101"
+                +"\nboot_epoch_ms: "+(now-elapsed)+"\nprocess_started_elapsed_ms: "+(elapsed-1500)
+                +"\ncaptured_elapsed_ms: "+(elapsed-500)
+                +"\nexception: java.lang.IllegalStateException\nmessage: opening-panel-canary"
+                +"\n\n[STACK TRACE]\njava.lang.IllegalStateException: opening-panel-canary\n  at app.example.Panel.open(Panel.java:42)\n";
+        data.update(s->s.put("started",now-1000).put("boot_epoch",now-elapsed).put("sessions",new JSONArray().put(
+                new JSONObject().put("pid",101).put("at",now-1000).put("process_started_elapsed_ms",elapsed-1500))));
+        return crash;
+    }
+    private String exported() throws Exception {
+        JSONObject receipt=data.read().getJSONObject("export");
+        long id=Long.parseLong(Uri.parse(receipt.getString("uri")).getLastPathSegment());
+        String text=new String(Files.readAllBytes(media.rows.get(id).file.toPath()),StandardCharsets.UTF_8);
+        assertEquals(RecoveryPublisher.sha(text),receipt.getString("verified_hash"));return text;
+    }
+    @Test public void automaticReportIncludesMatchingPersistedJavaEvidenceWithoutUsingIncidentBudget() throws Exception {
+        LogBufferManager.persistCrashReport(context,matchingCrash());
+        String incidents=data.read().getJSONArray("incidents").toString();
+        RecoveryPublisher.publish(context,data);
+        String exported=exported();
+        assertTrue(exported,exported.contains("opening-panel-canary"));
+        assertTrue(exported,exported.contains("association=matched_process_session"));
+        assertEquals(incidents,data.read().getJSONArray("incidents").toString());
+    }
+    @Test public void aLatePersistedFileChangesTheExportEvenWhenIncidentsDidNotChange() throws Exception {
+        String crash=matchingCrash();RecoveryPublisher.publish(context,data);
+        String first=data.read().getJSONObject("export").getString("verified_hash");
+        assertTrue(exported().contains("channel=java read_status=absent"));
+        LogBufferManager.persistCrashReport(context,crash);RecoveryPublisher.publish(context,data);
+        assertNotEquals(first,data.read().getJSONObject("export").getString("verified_hash"));
+        assertTrue(exported().contains("opening-panel-canary"));
+        assertEquals(1,data.read().getJSONArray("incidents").length());
+    }
+    @Test public void aCauseBeyondTheOldExcerptBudgetSurvivesTheActualAutomaticExport() throws Exception {
+        String crash=matchingCrash()+"  at app.example.Deep.call(Deep.java:1)\n".repeat(800)
+                +"Caused by: java.io.IOException: deep-root-cause-canary\n";
+        LogBufferManager.persistCrashReport(context,crash);RecoveryPublisher.publish(context,data);
+        assertTrue(exported(),exported().contains("deep-root-cause-canary"));
+        assertEquals(REPORT,data.read().getJSONArray("incidents").getJSONObject(0).getString("report"));
+    }
+    @Test public void threeMaximumIncidentsAndBothFullCrashFilesFitTheAutomaticFileLimit() throws Exception {
+        String crash=matchingCrash()+"\u4e2d".repeat(19_000);
+        LogBufferManager.persistCrashReport(context,crash);
+        LogBufferManager.persistNpthCrashReport(context,crash.replace("[STACK TRACE]","[NPTH SUMMARY]")
+                .replace("exception: java.lang.IllegalStateException","source: tiktok_npth_callback\ncrash_type: anr"));
+        String full=REPORT+"x".repeat(60*1024-REPORT.length());
+        JSONArray incidents=new JSONArray();for(int i=0;i<3;i++)incidents.put(new JSONObject().put("id","full-"+i).put("report",full).put("hash",RecoveryPublisher.sha(full)));
+        data.update(s->s.put("incidents",incidents));RecoveryPublisher.publish(context,data);
+        assertTrue(exported().getBytes(StandardCharsets.UTF_8).length<1024*1024);
+        assertEquals(3,data.read().getJSONArray("incidents").length());
+        assertTrue(exported().contains("channel=npth read_status=present association=matched_process_session"));
+    }
+    @Test public void npthAndJavaEvidenceShareTheSameHashVerifiedAutomaticFile() throws Exception {
+        String crash=matchingCrash();LogBufferManager.persistCrashReport(context,crash);
+        LogBufferManager.persistNpthCrashReport(context,crash.replace("[STACK TRACE]","[NPTH SUMMARY]")
+                .replace("exception: java.lang.IllegalStateException","source: tiktok_npth_callback\ncrash_type: anr"));
+        RecoveryPublisher.publish(context,data);String text=exported();
+        assertTrue(text.contains("channel=java read_status=present association=matched_process_session"));
+        assertTrue(text.contains("channel=npth read_status=present association=matched_process_session"));
+        assertEquals(1,media.inserts);
+    }
+    @Test public void aStalledCrashReadIsBoundedAndDoesNotOwnTheStoreOrLoggerGeneration() throws Exception {
+        java.lang.reflect.Field fileLock=LogBufferManager.class.getDeclaredField("CRASH_FILE_LOCK");fileLock.setAccessible(true);
+        java.lang.reflect.Field clearLock=LogBufferManager.class.getDeclaredField("CLEAR_UNDO_LOCK");clearLock.setAccessible(true);
+        java.util.concurrent.atomic.AtomicReference<Throwable> error=new java.util.concurrent.atomic.AtomicReference<>();
+        Thread writer=new Thread(()->{try{RecoveryPublisher.publish(context,data);}catch(Throwable e){error.set(e);}});
+        synchronized(fileLock.get(null)){
+            writer.start();data.update(s->s.put("reader_lock_canary",true));
+            synchronized(clearLock.get(null)){assertTrue(data.read().getBoolean("reader_lock_canary"));}
+            writer.join(4000);assertFalse(writer.isAlive());assertNull(error.get());assertTrue(exported().contains("read_status=read_timeout"));
+        }
+        java.lang.reflect.Field busy=RecoveryCapture.class.getDeclaredField("PROBE_BUSY");busy.setAccessible(true);
+        java.util.concurrent.atomic.AtomicBoolean flag=(java.util.concurrent.atomic.AtomicBoolean)busy.get(null);
+        long until=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+        while(flag.get()&&System.nanoTime()<until)Thread.yield();
+        assertFalse("bounded worker did not drain after releasing the file lock",flag.get());
+    }
+    @Test public void aPreClearProducerCannotPutOldCrashContentIntoANewExport() throws Exception {
+        String crash=matchingCrash();data.clear();
+        // A handler may finish building its report before Clear, then acquire the write lock afterwards.
+        LogBufferManager.persistCrashReport(context,crash);
+        data.update(s->s.put("incidents",new JSONArray().put(new JSONObject().put("id","new")
+                .put("report",REPORT).put("hash",RecoveryPublisher.sha(REPORT)))));
+        RecoveryPublisher.publish(context,data);String text=exported();
+        assertTrue(text.contains("association=cleared_record"));assertFalse(text.contains("opening-panel-canary"));
+    }
+    @Test public void ordinaryClearAndUndoRestoreSupplementalEvidenceWithoutRearmingTheTrial() throws Exception {
+        Utils.setContext(context);LogBufferManager.persistCrashReport(context,matchingCrash());
+        RecoveryPublisher.publish(context,data);int starts=data.read().optInt("starts");
+        LogBufferManager.clearLogBuffer();assertEquals("",RecoveryCapture.render(data.read()));
+        assertEquals("absent",LogBufferManager.readCrashReportsForRecovery(context).java.status);
+        assertEquals(LogBufferManager.UndoResult.RESTORED,LogBufferManager.undoClear());
+        RecoveryPublisher.publish(context,data);assertTrue(exported().contains("opening-panel-canary"));
+        assertEquals(starts,data.read().optInt("starts"));
+    }
+    @Test public void undoRestoresCrashAssociationWhenRecoveryHadNoIncidentOrActivation() throws Exception {
+        Utils.setContext(context);LogBufferManager.persistCrashReport(context,matchingCrash());
+        data.update(s->{s.remove("incidents");s.remove("activations");});
+        int generation=data.read().optInt("generation");
+        LogBufferManager.clearLogBuffer();assertEquals(LogBufferManager.UndoResult.RESTORED,LogBufferManager.undoClear());
+        assertTrue(data.read().optInt("generation")>generation);
+        data.update(s->s.put("incidents",new JSONArray().put(new JSONObject().put("id","later")
+                .put("report",REPORT).put("hash",RecoveryPublisher.sha(REPORT)))));
+        RecoveryPublisher.publish(context,data);assertTrue(exported(),exported().contains("opening-panel-canary"));
+    }
+    @Test public void undoRestoresTheClearBoundaryWithoutOverwritingNewerIncidents() throws Exception {
+        Utils.setContext(context);LogBufferManager.persistCrashReport(context,matchingCrash());
+        data.update(s->{s.remove("incidents");s.remove("activations");});LogBufferManager.clearLogBuffer();
+        data.update(s->s.put("incidents",new JSONArray().put(new JSONObject().put("id","newer")
+                .put("report",REPORT+"newer-canary").put("hash",RecoveryPublisher.sha(REPORT+"newer-canary")))));
+        assertEquals(LogBufferManager.UndoResult.RESTORED,LogBufferManager.undoClear());
+        RecoveryPublisher.publish(context,data);assertTrue(exported().contains("opening-panel-canary"));
+        assertTrue(exported().contains("newer-canary"));assertEquals(1,data.read().getJSONArray("incidents").length());
+    }
+    @Test public void expiredExportLeaseDoesNotStartAnotherSupplementalExport() throws Exception {
+        LogBufferManager.persistCrashReport(context,matchingCrash());data.update(s->s.put("export_until",System.currentTimeMillis()-1));
+        RecoveryPublisher.publish(context,data);assertEquals(0,media.inserts);
+    }
+    @Test public void aLeaseThatExpiresDuringProviderIoCannotPublishItsSnapshot() throws Exception {
+        media.hold=true;java.util.concurrent.atomic.AtomicReference<Throwable> error=new java.util.concurrent.atomic.AtomicReference<>();
+        Thread writer=new Thread(()->{try{RecoveryPublisher.publish(context,data);}catch(Throwable e){error.set(e);}});writer.start();
+        assertTrue(media.entered.await(5,TimeUnit.SECONDS));
+        data.update(s->s.put("export_until",System.currentTimeMillis()-1));media.release.countDown();writer.join(5000);
+        assertFalse(writer.isAlive());assertNull(error.get());assertEquals(0,media.rows.size());
+        assertEquals(REPORT,data.read().getJSONArray("incidents").getJSONObject(0).getString("report"));
     }
 
     static final class Provider extends ContentProvider {

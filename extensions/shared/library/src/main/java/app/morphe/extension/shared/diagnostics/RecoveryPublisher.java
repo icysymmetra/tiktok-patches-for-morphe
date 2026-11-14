@@ -40,8 +40,11 @@ public final class RecoveryPublisher {
     static void publish(Context context, RecoveryStore store) throws Exception {
         JSONObject state = store.read();
         if (System.currentTimeMillis() > state.optLong("export_until", Long.MAX_VALUE)) return;
-        final String report = RecoveryCapture.render(state);
-        if (report.isEmpty()) return;
+        final String recovered = RecoveryCapture.render(state);
+        if (recovered.isEmpty()) return;
+        // One bounded snapshot per publication, outside the incident store and all its locks.
+        final String baseHash=sha(recovered);
+        final String report = recovered + "\n\n" + CrashEvidence.collect(context,state);
         final String hash = sha(report);
         final int generation = state.optInt("generation");
         JSONObject existing = state.optJSONObject("export");
@@ -59,7 +62,8 @@ public final class RecoveryPublisher {
                         public boolean active() throws Exception {
                             JSONObject s = store.read(); JSONObject j = s.optJSONObject("export");
                             return s.optInt("generation") == generation && j != null && hash.equals(j.optString("hash"))
-                                    && hash.equals(sha(RecoveryCapture.render(s)));
+                                    && System.currentTimeMillis() <= s.optLong("export_until",Long.MAX_VALUE)
+                                    && baseHash.equals(sha(RecoveryCapture.render(s)));
                         }
                         public String uri() throws Exception {
                             JSONObject j = store.read().optJSONObject("export");
