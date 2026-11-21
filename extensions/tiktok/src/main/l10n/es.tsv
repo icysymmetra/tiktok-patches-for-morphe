@@ -2,8 +2,10 @@
 Adds Save cover next to Download when you share a video, so you save the cover only when you want it. While this is on, Download saves just the video, even with Save the cover as well on.	Añade Guardar portada junto a Descargar cuando compartes un vídeo, para que guardes la portada solo cuando la quieras. Mientras esté activado, Descargar guarda solo el vídeo, aunque Guardar también la portada esté activado.
 Applies to Save the sound as well and to Save the original sound on a long press. Opus makes a smaller file, but the sound is encoded again from TikTok's copy.	Se aplica a Guardar también el sonido y a Guardar el sonido original al mantener pulsado. Opus da un archivo más pequeño, pero el sonido se vuelve a codificar a partir de la copia de TikTok.
 As TikTok sent it (M4A or MP3)	Tal como lo envía TikTok (M4A o MP3)
+Audio only	Solo audio
 Burn-in guard	Protección contra el quemado de pantalla
 Couldn't write the caption on this video. Saving it without.	No se pudo escribir la descripción en este video. Se guarda sin ella.
+Cover image only	Solo imagen de portada
 Dim when idle	Atenuar en reposo
 Dim when idle and shift	Atenuar en reposo y desplazar
 For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes.	Para pantallas OLED. Tras 5 segundos sin tocar, los botones, la descripción y las pestañas sobre el vídeo se atenúan a una cuarta parte, y tu siguiente toque los devuelve. Desplazar también mueve todo el feed unos píxeles cada 2 minutos.
@@ -23,8 +25,11 @@ Save a story from its share sheet	Guardar una historia desde el panel de compart
 Save cover	Guardar portada
 Save cover button in the share sheet	Botón Guardar portada en el panel de compartir
 Saved videos show the @username and the first line of the caption in the bottom left corner. The phone encodes the whole video again to do it, so saving takes longer. Applies to saves made by Metra.	Los videos guardados muestran el @nombre de usuario y la primera línea de la descripción en la esquina inferior izquierda. Para hacerlo, el teléfono vuelve a codificar todo el video, así que guardar tarda más. Se aplica a lo que guarda Metra.
+Show the video download menu	Mostrar el menú de descarga de video
 Sound format	Formato del sonido
 Speed up this video, double tap again to undo	Acelerar este vídeo, doble toque otra vez para deshacerlo
+The download menu couldn't open. Try again.	No se pudo abrir el menú de descarga. Inténtalo de nuevo.
+The download menu is still open	El menú de descarga sigue abierto
 TikTok only had its watermarked copy of this story, so that copy was saved to %1$s	TikTok solo tenía la copia con marca de agua de esta historia, así que esa copia se guardó en %1$s
 Translate button in comments	Botón de traducir en los comentarios
 Adds TikTok's translate button next to the comment count. One tap translates every comment, and another shows the originals again.	Añade el botón de traducir de TikTok junto al número de comentarios. Un toque traduce todos los comentarios y otro vuelve a mostrar los originales.
@@ -32,7 +37,9 @@ Translate into	Traducir al
 Type one language code here, like en.	Escribe aquí un código de idioma, como en.
 Use this account's TikTok JSON export, up to %1$s MB and %2$s entries. Dates without a time zone use this phone's time zone.	Usa la exportación JSON de TikTok de esta cuenta, con un máximo de %1$s MB y %2$s entradas. Las fechas sin zona horaria usan la de este teléfono.
 Sign in to TikTok before importing watch history.	Inicia sesión en TikTok antes de importar el historial de visualización.
+What do you want to download?	¿Qué quieres descargar?
 When TikTok starts and decides the phone's language changed, it forgets the language you picked in its settings and follows the phone. With this on, your pick stays. Counts from TikTok's next start.	Cuando TikTok se inicia y decide que el idioma del teléfono cambió, descarta el idioma que elegiste en sus ajustes y sigue al teléfono. Con esto activado, tu elección se mantiene. Cuenta desde el próximo inicio de TikTok.
+When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video.	Al tocar Descargar, elige la calidad del video, guarda solo el audio o guarda solo la portada. El menú muestra las opciones disponibles para ese video.
 Write the username and caption on the video	Escribir el nombre de usuario y la descripción en el video
 Writing the caption on the video	Escribiendo la descripción en el video
 Writing the caption on the video: %1$s	Escribiendo la descripción en el video: %1$s

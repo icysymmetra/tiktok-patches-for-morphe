@@ -127,8 +127,8 @@ public class Settings extends BaseSettings {
         // Metra's chosen default is still an override. Pause must use TikTok's own file.
         @Override protected String pausedValue() { return "auto"; }
     };
-    /** Download lists the video's renditions and saves the one picked, for that save alone. */
-    public static final BooleanSetting DOWNLOAD_ASK_QUALITY = new BooleanSetting("download_ask_quality", FALSE);
+    /** Download asks which video rendition or media file to save for this post. */
+    public static final BooleanSetting DOWNLOAD_ASK_QUALITY = new BooleanSetting("download_ask_quality", TRUE);
     public static final BooleanSetting DOWNLOAD_ORIGINAL_PHOTOS = new BooleanSetting("download_original_photos", FALSE);
     public static final BooleanSetting DOWNLOAD_PHOTOS_AS_VIDEO = new BooleanSetting("download_photos_as_video", FALSE);
     public static final IntegerSetting PHOTO_VIDEO_SECONDS = new IntegerSetting("photo_video_seconds", 3, false,
