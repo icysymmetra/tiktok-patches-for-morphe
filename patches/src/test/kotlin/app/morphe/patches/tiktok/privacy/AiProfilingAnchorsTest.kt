@@ -15,6 +15,8 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -46,7 +48,9 @@ class AiProfilingAnchorsTest {
             val lookup = taken(PitayaPluginLookupFingerprint)
             assertTrue("$version: the lookup is not static", lookup.accessFlags and STATIC != 0)
             assertEquals("$version: returnEarly() needs a void method", "V", taken(PitayaRealProviderFingerprint).returnType)
-            assertEquals("$version: returnEarly() needs a void method", "V", taken(PitayaLiteStartFingerprint).returnType)
+            val lite = classes.getValue(PITAYA_LITE)
+            assertEquals("$version: Lite exposes JNI declarations and constructors",
+                setOf("<clinit>", "<init>", "nativeCreateContext", "prepareEnv"), lite.methods.map { it.name }.toSet())
 
             val methods = classes.values.flatMap { it.methods }.filter { it.implementation != null }
             var lookups = 0
@@ -56,6 +60,13 @@ class AiProfilingAnchorsTest {
                 val at = "${method.definingClass}->${method.name}"
                 for ((index, instruction) in body.withIndex()) {
                     val call = instruction.getReference<MethodReference>()
+                    if (method.definingClass != PITAYA_LITE) {
+                        val reflection = instruction.getReference<StringReference>()?.string
+                        assertTrue("$version: $at starts or references standalone Pitaya Lite",
+                            call?.definingClass != PITAYA_LITE &&
+                                instruction.getReference<TypeReference>()?.type != PITAYA_LITE &&
+                                reflection != "com.bytedance.pitaya.api.PitayaLite")
+                    }
                     if (call != null && call.definingClass == lookup.definingClass && call.name == lookup.name &&
                         call.returnType == lookup.returnType && call.parameterTypes.isEmpty()
                     ) {

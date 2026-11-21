@@ -31,6 +31,8 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 internal const val COMMENT_MENU_BLOCK_DESCRIPTOR = "Lapp/morphe/extension/tiktok/comment/CommentMenuBlock;"
 internal const val COMMENT_MENU_PANEL = "Lcom/ss/android/ugc/aweme/comment/longpresspanel/ui/CommentLongPressFragment;"
+private const val COMMENT_MENU_REPOSITORY =
+    "Lcom/ss/android/ugc/aweme/comment/longpresspanel/repo/CommentLongPressRepository;"
 private const val USER = "Lcom/ss/android/ugc/aweme/profile/model/User;"
 private const val LIST = "Ljava/util/List;"
 
@@ -70,16 +72,23 @@ internal object CommentMenuListFingerprint : Fingerprint(
 )
 
 /**
- * The coroutine that builds the comment menu's rows. Its log names the panel's
- * `loadLongPressItems`, and the Report row it builds carries the icon the block row matches.
- * One string, not two: the log is a single literal ("CommentLongPressFragment@922.loadLongPressItems$2"
- * on 47.1.4), and the patcher lets one string load answer one wanted string only.
+ * The builder's Report row supplies the icon style for the block row. Older builds make
+ * the rows in the panel coroutine. In 47.6.15 the coroutine delegates to the repository.
  */
 internal object CommentMenuItemsFingerprint : Fingerprint(
-    name = "invokeSuspend",
-    returnType = "Ljava/lang/Object;",
-    strings = listOf(".loadLongPressItems").map { string(it, StringComparisonType.CONTAINS) },
-    custom = { method, _ -> method.reportRowIcon() != null },
+    strings = listOf("report"),
+    custom = { method, owner ->
+        val buildsRows = if (owner.type == COMMENT_MENU_REPOSITORY) {
+            method.returnType == LIST && method.parameterTypes.take(2) ==
+                listOf("Landroid/content/Context;", "Landroidx/fragment/app/Fragment;")
+        } else {
+            method.name == "invokeSuspend" && method.returnType == "Ljava/lang/Object;" &&
+                method.implementation?.instructions?.any {
+                    it.getReference<StringReference>()?.string?.contains(".loadLongPressItems") == true
+                } == true
+        }
+        buildsRows && method.reportRowIcon() != null
+    },
 )
 
 /** A share action's `key()` that answers [key] and nothing else. */

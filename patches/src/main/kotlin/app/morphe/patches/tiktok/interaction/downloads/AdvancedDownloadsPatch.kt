@@ -272,12 +272,10 @@ internal fun MutableMethod.interceptPhotoVideoConversion() {
 @Suppress("unused")
 val advancedDownloadsPatch = bytecodePatch(
     name = "Advanced downloads",
-    description = "Adds more ways to save: pick the video quality, save full-size photos, the " +
-        "sound on its own or a photo post as one video, hold a profile picture or story to save " +
-        "it, save a story or a video's cover from the share sheet, and pick videos on a profile " +
-        "grid to save in one run. Video quality starts at Highest, retaining Metra's existing " +
-        "default. Configure these controls in " +
-        "Metra settings > Downloads.",
+    description = "Tapping Download opens a menu with available video qualities and options to " +
+        "save only the audio or cover image. Also supports saving full-size photos, photo posts as " +
+        "videos, stories, profile pictures and batches from profile grids. Configure these " +
+        "controls in Metra settings > Downloads.",
 ) {
     category("Downloads")
     compatibleWith(*AppCompatibilities.tiktok())

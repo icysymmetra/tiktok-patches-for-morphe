@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Hushfeed contributors
+ * Copyright 2026 Metra contributors
  * https://github.com/SysAdminDoc/hushfeed
  *
  * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
@@ -11,7 +11,7 @@ package app.morphe.extension.tiktok.featuregatelab;
  * Do not edit: ./gradlew :patches:generateGateCatalog writes it again.
  */
 final class GeneratedGateCatalogBuilds {
-    static final String[] BUILDS = {"47.4.3"};
+    static final String[] BUILDS = {"47.6.15"};
 
     private GeneratedGateCatalogBuilds() {
     }

@@ -9,7 +9,6 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
-import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -60,20 +59,15 @@ class CommentBoxButtonsAnchorsTest {
             }
             assertEquals("the bar no longer wires four icon buttons", 4, listeners.size)
             val instructions = bar.implementation!!.instructions.toList()
-            val listenerClasses = listeners.map { index ->
-                val created = instructions.subList(index + 1, minOf(index + 4, instructions.size))
-                    .first { it.opcode == Opcode.NEW_INSTANCE }
-                build.byType.getValue(((created as ReferenceInstruction).reference as TypeReference).type)
-            }
-            val left = listenerClasses.filter { commentBoxButtonOf(it) == null }
-            assertEquals("one icon button should stay: ${listenerClasses.map { it.type }}", 1, left.size)
-            val opensEmoji = left.single().methods.any { method ->
-                method.implementation?.instructions?.any { instruction ->
-                    instruction.opcode == Opcode.SGET_OBJECT &&
-                        ((instruction as ReferenceInstruction).reference as FieldReference).let {
-                            it.name == "EMOJI" && it.type == it.definingClass
-                        }
-                } == true
+            val bodies = listeners.map { index -> instructions.commentBoxButtonListener(index) { build.byType[it] } }
+            assertTrue("each button has a listener body", bodies.none { it.isEmpty() })
+            val left = bodies.filter { commentBoxButtonOf(it) == null }
+            assertEquals("one icon button should stay", 1, left.size)
+            val opensEmoji = left.single().any { instruction ->
+                instruction.opcode == Opcode.SGET_OBJECT &&
+                    ((instruction as ReferenceInstruction).reference as FieldReference).let {
+                        it.name == "EMOJI" && it.type == it.definingClass
+                    }
             }
             assertTrue("the button that stays isn't the emoji one", opensEmoji)
         }

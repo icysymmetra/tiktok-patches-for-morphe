@@ -45,6 +45,7 @@ import app.morphe.patches.tiktok.privacy.PitayaLiteStartFingerprint
 import app.morphe.patches.tiktok.privacy.PitayaPluginLookupFingerprint
 import app.morphe.patches.tiktok.privacy.PitayaRealProviderFingerprint
 import app.morphe.patches.tiktok.privacy.installAiProfilingSwitch
+import app.morphe.patches.tiktok.privacy.pitayaLiteStartup
 import app.morphe.patcher.util.getReference
 import app.morphe.patcher.util.numberOfParameterRegisters
 import app.morphe.patcher.util.numberOfParameterRegistersLogical
@@ -135,14 +136,14 @@ class SwitchedReturnFixturesTest {
                         add(before(UpdateBootFinishedTaskFingerprint.method, UPDATE_CHECKS_SWITCH))
                         add(before(PitayaPluginLookupFingerprint.method, AI_PROFILING_SWITCH))
                         add(before(PitayaRealProviderFingerprint.method, AI_PROFILING_SWITCH))
-                        add(before(PitayaLiteStartFingerprint.method, AI_PROFILING_SWITCH))
+                        pitayaLiteStartup()?.let { add(before(it, AI_PROFILING_SWITCH)) }
                         add(before(resolveVoiceCommentPublishGate(), VOICE_COMMENTS_SWITCH, true))
                         add(before(PasskeyDeviceSupportFingerprint.method, PASSKEY_SIGN_IN_SWITCH, false))
                         add(before(translateButton.enabledRead, COMMENT_TRANSLATE_BUTTON_SWITCH, true))
                         add(before(translateButton.styleAnswer, COMMENT_TRANSLATE_BUTTON_SWITCH, true))
                     }
                     // Four tasks, the reviewed gates (two or three on the splash service), the
-                    // buffer gate, push setup, two update tasks, three Pitaya doors, the voice gate,
+                    // buffer gate, push setup, two update tasks, the Pitaya doors, the voice gate,
                     // the passkey support check and the translate button's two gates.
                     assertTrue("$version: ${splashGates().size} splash gates", splashGates().size in 5..6)
                     expected = hooks.size

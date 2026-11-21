@@ -70,9 +70,11 @@ import app.morphe.patches.tiktok.interaction.quality.SIM_BIT_RATE
 import app.morphe.patches.tiktok.interaction.quality.requireGearCodecField
 import app.morphe.patches.tiktok.interaction.quality.requirePlayerGearSetter
 import app.morphe.patches.tiktok.misc.comment.BIO_EDITOR_CLASSES
+import app.morphe.patches.tiktok.misc.comment.BIO_EDITOR_FRAGMENT
 import app.morphe.patches.tiktok.misc.comment.CommentInputLimitFingerprint
 import app.morphe.patches.tiktok.misc.comment.REPOST_NOTE_INPUTS
-import app.morphe.patches.tiktok.misc.comment.bioLimitConstants
+import app.morphe.patches.tiktok.misc.comment.bioLimitField
+import app.morphe.patches.tiktok.misc.comment.bioLimitReads
 import app.morphe.patches.tiktok.misc.comment.lengthFilterConstructions
 import app.morphe.patches.tiktok.misc.comment.repostNoteInputFingerprints
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
@@ -1015,7 +1017,7 @@ class TikTokPatchAnchorsMatchFixturesTest {
     /**
      * Lift text length limits: the comment keyboard's limit getter, the length filters each
      * repost note box builds (two alternatives in the video repost and reply boxes, one in the
-     * LIVE repost note box) and the bio editor's three comparisons with 160, on every declared
+     * LIVE repost note box) and the bio editor's reads of its shared length limit, on every declared
      * build. The getter and both filter classes are R8 names that move each build.
      */
     @Test
@@ -1040,12 +1042,13 @@ class TikTokPatchAnchorsMatchFixturesTest {
                 assertEquals("${apk.name}: ${method.definingClass} length filters", filtersPerBox[method.definingClass],
                     method.implementation!!.instructions.toList().lengthFilterConstructions(isInputFilter).size)
             }
+            val bioLimit = classes.getValue(BIO_EDITOR_FRAGMENT).methods.single { it.name == "<clinit>" }.bioLimitField()
             val bioSites = BIO_EDITOR_CLASSES.sumOf { type ->
                 classes.getValue(type).methods.sumOf { method ->
-                    method.implementation?.instructions?.toList()?.bioLimitConstants()?.size ?: 0
+                    method.implementation?.instructions?.toList()?.bioLimitReads(bioLimit)?.size ?: 0
                 }
             }
-            assertEquals("${apk.name}: bio limit comparisons", 3, bioSites)
+            assertEquals("${apk.name}: bio limit reads", 5, bioSites)
         }
     }
 

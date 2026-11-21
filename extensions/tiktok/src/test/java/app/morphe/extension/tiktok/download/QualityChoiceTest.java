@@ -132,9 +132,10 @@ public class QualityChoiceTest {
         assertNull(ShadowAlertDialog.getLatestAlertDialog());
     }
 
-    @Test public void nothingToChooseBetweenAsksNothing() {
-        assertFalse("only ByteVC2 and a rendition without an address beside Automatic",
-                QualityChoice.offer(new VideoPost("3", BVC2, NO_ADDRESS), activity));
+    @Test public void aVideoWithoutUsableSourcesAndAPhotoPostKeepTheNativeEntry() {
+        VideoPost unavailable = new VideoPost("3", BVC2, NO_ADDRESS);
+        unavailable.video.downloadNoWatermarkAddr = null;
+        assertFalse(QualityChoice.offer(unavailable, activity));
         assertFalse("a post without an id", QualityChoice.offer(new VideoPost(null, FULL, MID), activity));
         AdvancedDownloadsTest.PhotoPost photos = new AdvancedDownloadsTest.PhotoPost("4",
                 List.of(new AdvancedDownloadsTest.Photo("https://example.com/photo")));
@@ -151,12 +152,14 @@ public class QualityChoiceTest {
         AlertDialog choice = ShadowAlertDialog.getLatestAlertDialog();
         assertTrue(choice.isShowing());
         ShadowAlertDialog shadow = Shadows.shadowOf(choice);
-        assertEquals("Save in which quality?", shadow.getTitle().toString());
-        assertEquals(labels(QualityChoice.options(post.video, activity)), toStrings(shadow.getItems()));
+        assertEquals("What do you want to download?", shadow.getTitle().toString());
+        List<String> expected = labels(QualityChoice.options(post.video, activity));
+        expected.add("Audio only");
+        assertEquals(expected, toStrings(shadow.getItems()));
 
         assertTrue("a second press while it's open still takes the save", QualityChoice.offer(post, activity));
         idle();
-        assertEquals("The quality choice is still open", ShadowToast.getTextOfLatestToast());
+        assertEquals("The download menu is still open", ShadowToast.getTextOfLatestToast());
         assertSame("and asks no second time", choice, ShadowAlertDialog.getLatestAlertDialog());
 
         choice.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();
@@ -179,7 +182,7 @@ public class QualityChoiceTest {
         ShadowToast.reset();
         assertTrue(QualityChoice.offer(post, activity));
         idle();
-        assertFalse(ShadowToast.showedToast("The quality choice is still open"));
+        assertFalse(ShadowToast.showedToast("The download menu is still open"));
         assertNotSame(choice, ShadowAlertDialog.getLatestAlertDialog());
         assertTrue(ShadowAlertDialog.getLatestAlertDialog().isShowing());
     }
@@ -191,9 +194,8 @@ public class QualityChoiceTest {
             Settings.DOWNLOAD_WITHOUT_SOUND.save(false);
             VideoPost post = new VideoPost("8", FULL, MID);
             post.video.dash = true;
-            assertEquals("no sound to pair: Automatic alone, so nothing is asked",
+            assertEquals("no sound to pair: only Automatic among the video qualities",
                     1, QualityChoice.options(post.video, activity).size());
-            assertFalse(QualityChoice.offer(post, activity));
 
             Settings.DOWNLOAD_WITHOUT_SOUND.save(true);
             assertEquals("saved without sound, the picture alone is a whole file",

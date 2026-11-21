@@ -67,6 +67,8 @@ public class SavedVideoArchiveTest {
     private String oldPath, oldTemplate, oldQuality, oldExternal;
     private boolean refuseAudio;
     private String refusePath;
+    private byte[] menuCover;
+    private static final byte[] MENU_AUDIO = {4, 5, 6};
 
     @Before public void setup() throws Exception {
         oldProgress = Settings.DOWNLOAD_PROGRESS.get(); Settings.DOWNLOAD_PROGRESS.save(false);
@@ -96,6 +98,18 @@ public class SavedVideoArchiveTest {
                 requests.incrementAndGet();
                 fetched.add(url.getPath());
                 if (url.getPath().startsWith("/cover")) coverRequests.incrementAndGet();
+                byte[] payload = menuCover != null && url.getPath().equals("/cover.jpg") ? menuCover : VIDEO;
+                if (menuCover != null && url.getPath().equals("/video.mp4")) {
+                    try (var files = Files.list(MediaCache.cacheDirectory(owner.get()).toPath())) {
+                        var source = files.filter(file -> file.getFileName().toString().startsWith("sound-source-"))
+                                .findFirst().orElseThrow();
+                        org.robolectric.shadows.ShadowMediaExtractor.addTrack(
+                                org.robolectric.shadows.util.DataSource.toDataSource(source.toString()),
+                                android.media.MediaFormat.createAudioFormat("audio/mp4a-latm", 44100, 2), MENU_AUDIO);
+                    } catch (java.io.IOException error) {
+                        throw new AssertionError(error);
+                    }
+                }
                 return new FakeHttpsConnection(url) {
                     @Override public int getResponseCode() {
                         if (url.getPath().equals(refusePath)) return HTTP_NOT_FOUND;
@@ -103,10 +117,10 @@ public class SavedVideoArchiveTest {
                     }
                     @Override public String getHeaderField(String name) {
                         if (refuseAudio && url.getPath().startsWith("/audio") && "Retry-After".equals(name)) return "600";
-                        return "Content-Length".equals(name) ? String.valueOf(VIDEO.length) : null;
+                        return "Content-Length".equals(name) ? String.valueOf(payload.length) : null;
                     }
                     @Override public InputStream getInputStream() {
-                        return new ByteArrayInputStream(VIDEO) {
+                        return new ByteArrayInputStream(payload) {
                             @Override public synchronized int read(byte[] bytes, int offset, int length) {
                                 int count = super.read(bytes, offset, length);
                                 if (count < 0 && reachedEnd != null) {
@@ -128,6 +142,55 @@ public class SavedVideoArchiveTest {
                 };
             }
         });
+    }
+
+    @Test public void downloadMenuSavesOnlyTheRequestedSoundOrCover() throws Exception {
+        boolean advanced = app.morphe.extension.tiktok.settings.SettingsStatus.advancedDownloadsEnabled;
+        String photoPath = Settings.DOWNLOAD_PHOTO_PATH.savedValue();
+        String soundFormat = Settings.DOWNLOAD_SOUND_FORMAT.savedValue();
+        app.morphe.extension.tiktok.settings.SettingsStatus.advancedDownloadsEnabled = true;
+        Settings.DOWNLOAD_PHOTO_PATH.save(FOLDER);
+        Settings.DOWNLOAD_SOUND_FORMAT.save(SoundFormat.ORIGINAL);
+        Settings.DOWNLOAD_ASK_QUALITY.resetToDefault();
+        try {
+            var bitmap = android.graphics.Bitmap.createBitmap(2, 2, android.graphics.Bitmap.Config.ARGB_8888);
+            var buffer = new java.io.ByteArrayOutputStream();
+            assertTrue(bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, buffer));
+            bitmap.recycle();
+            menuCover = buffer.toByteArray();
+            assertFalse(Settings.DOWNLOAD_AUDIO_TRACK.get());
+
+            CoverPost post = new CoverPost();
+            assertTrue(OriginalPhotos.start(post, owner.get()));
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertEquals(0, requests.get());
+            AlertDialog menu = (AlertDialog) ShadowDialog.getLatestDialog();
+            assertEquals("Audio only", menu.getListView().getAdapter().getItem(1).toString());
+            menu.getListView().performItemClick(null, 1, 1);
+            awaitJobs();
+            assertEquals(List.of("/video.mp4"), fetched);
+            assertArrayEquals(MENU_AUDIO, Files.readAllBytes(new File(root, "alice/123.m4a").toPath()));
+            assertFalse(Settings.DOWNLOAD_AUDIO_TRACK.get());
+
+            assertTrue(OriginalPhotos.start(post, owner.get()));
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            menu = (AlertDialog) ShadowDialog.getLatestDialog();
+            assertEquals("Cover image only", menu.getListView().getAdapter().getItem(2).toString());
+            menu.getListView().performItemClick(null, 2, 2);
+            awaitJobs();
+            assertEquals(List.of("/video.mp4", "/cover.jpg"), fetched);
+            File image = new File(root, "123_cover.jpg");
+            assertNotNull(android.graphics.BitmapFactory.decodeFile(image.getAbsolutePath()));
+            try (var files = Files.walk(root.toPath())) {
+                assertEquals(List.of("123.m4a", "123_cover.jpg"), files.filter(Files::isRegularFile)
+                        .map(file -> file.getFileName().toString()).sorted().toList());
+            }
+        } finally {
+            app.morphe.extension.tiktok.settings.SettingsStatus.advancedDownloadsEnabled = advanced;
+            Settings.DOWNLOAD_PHOTO_PATH.save(photoPath);
+            Settings.DOWNLOAD_SOUND_FORMAT.save(soundFormat);
+            QualityChoice.resetForTests();
+        }
     }
 
     @After public void cleanup() throws Exception {

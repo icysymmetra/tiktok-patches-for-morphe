@@ -50,7 +50,7 @@ class RootSignalAnchorsTest {
                 RootSignal.WHICH_SU to "classes21.dex:LX/0jSc;->LJIILIIL()$MAP",
                 RootSignal.SU_COMMAND to "classes21.dex:LX/0jSc;->LJI()$MAP",
             )
-            assertEquals("47.4.3", Fixtures.versionOf(apk))
+            assertEquals("47.6.15", Fixtures.versionOf(apk))
             assertEquals(expected, found.targets.mapValues { (_, target) -> "${target.dex}:${signature(target.method)}" })
             assertEquals(1, found.targets.filterKeys { it != RootSignal.STATUS }.values.map { it.owner.type }.toSet().size)
             for ((signal, target) in found.targets) {

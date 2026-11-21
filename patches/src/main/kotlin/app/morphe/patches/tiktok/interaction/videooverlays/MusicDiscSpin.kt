@@ -229,10 +229,17 @@ internal object PlayAnimationTriggerFingerprint : Fingerprint(
  * hook reads (true at DISABLE, its SEVERE level).
  */
 internal object PlayAnimationDowngradeFingerprint : Fingerprint(
-    name = "getStrategyId",
-    returnType = "Ljava/lang/String;",
     parameters = listOf(),
     strings = listOf(PLAY_ANIMATION_DOWNGRADE_ID).map { string(it, StringComparisonType.CONTAINS) },
+    custom = { method, owner ->
+        when (method.name) {
+            "getStrategyId" -> method.returnType == "Ljava/lang/String;"
+            "<clinit>" -> owner.methods.any {
+                it.name == "getStrategyId" && it.returnType == "Ljava/lang/String;" && it.parameterTypes.isEmpty()
+            }
+            else -> false
+        }
+    },
 )
 
 /** Where [method] writes its one static boolean, or -1. On the strategy's class, the level's apply. */

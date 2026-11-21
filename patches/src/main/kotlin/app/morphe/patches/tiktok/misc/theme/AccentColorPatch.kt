@@ -148,14 +148,14 @@ val accentColorPatch = resourcePatch(
  * AccentColorPaletteTest holds each declared build's fixture to its entry here.
  */
 internal val ACCENT_TOKENS: Map<String, Map<String, Pair<String, String>>> = linkedMapOf(
-    "47.4.3" to linkedMapOf(
-        "UIShapePrimary" to ("ah5" to "awd"),
-        "UIShapePrimary2" to ("ah6" to "awe"),
-        "UIShapePrimary3" to ("ah7" to "awf"),
-        "UIShapePrimary4" to ("ah8" to "awg"),
-        "UIShapePrimary5" to ("ah9" to "awh"),
-        "UITextPrimary" to ("aix" to "ay6"),
-        "UITextPrimaryDisplay" to ("aiy" to "ay7"),
+    "47.6.15" to linkedMapOf(
+        "UIShapePrimary" to ("ah9" to "awj"),
+        "UIShapePrimary2" to ("ah_" to "awk"),
+        "UIShapePrimary3" to ("aha" to "awl"),
+        "UIShapePrimary4" to ("ahb" to "awm"),
+        "UIShapePrimary5" to ("ahc" to "awn"),
+        "UITextPrimary" to ("aj1" to "ayb"),
+        "UITextPrimaryDisplay" to ("aj2" to "ayc"),
     ),
 )
 
@@ -182,7 +182,10 @@ internal fun unreadAccentRefusal(versionName: String?): String {
  * AccentColorPaletteTest holds each declared build's fixture to its entry here.
  */
 internal val ACCENT_ICONS: Map<String, List<String>> = linkedMapOf(
-    "47.4.3" to listOf("bty"),
+    // 47.6.15 renamed the follow plus to buu and shipped it as WebP (res/c/ox.webp). The palette
+    // edit here rewrites PNG chunks, so this build keeps TikTok's own red rather than guess at a
+    // WebP re-encode. The accent tokens above still recolor every view that reads them.
+    "47.6.15" to emptyList(),
 )
 
 /** The drawables to recolor on this build, or a refusal. */

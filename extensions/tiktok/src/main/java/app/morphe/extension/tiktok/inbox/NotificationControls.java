@@ -45,4 +45,8 @@ public final class NotificationControls {
     public static boolean hideMessageStreaks() {
         return Settings.HIDE_MESSAGE_STREAKS.get();
     }
+
+    public static boolean filterMessageStreak(boolean visible) {
+        return visible && !hideMessageStreaks();
+    }
 }

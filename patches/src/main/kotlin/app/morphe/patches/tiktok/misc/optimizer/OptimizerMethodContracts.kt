@@ -16,6 +16,9 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private val reviewedSplashGateInstructionCounts = setOf(
     listOf(4, 4, 30),
+    // 47.6.15: the same two Boolean providers and the LX/17Z8;->LJFF() check, plus the getClass
+    // calls the compiler kept and one extra provider read.
+    listOf(4, 4, 35),
     listOf(4, 4),
 )
 

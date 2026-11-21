@@ -19,8 +19,7 @@ import org.junit.Test
 class InboxQueryPublicationFixturesTest {
     @Test fun `publication replaces only the List argument before native mask defaults and dispatch`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val owner = dex.getEntry("classes5.dex")!!.dexFile.classes.single { it.type == "Lcom/bytedance/ies/powerlist/ListState;" }
+            val owner = Fixtures.classIn(apk, "Lcom/bytedance/ies/powerlist/ListState;")
             val native = owner.methods.single { it.name == "LIZ" }
             assertTrue(InboxListPublication.takes(native, owner))
             val mutable = MutableMethod(native)
@@ -44,8 +43,7 @@ class InboxQueryPublicationFixturesTest {
 
     @Test fun `native wrapper metadata and allocated diff generation are observed without replacement`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val stubOwner = dex.getEntry("classes4.dex")!!.dexFile.classes.single { it.type == "Lcom/bytedance/ies/powerlist/PowerStub;" }
+            val stubOwner = Fixtures.classIn(apk, "Lcom/bytedance/ies/powerlist/PowerStub;")
             val stub = stubOwner.methods.single { it.name == "onChanged" && it.parameterTypes.map(CharSequence::toString) == listOf("Ljava/lang/Object;") }
             assertTrue(InboxStubPublication.takes(stub, stubOwner))
             val mutableStub = MutableMethod(stub)
@@ -60,7 +58,7 @@ class InboxQueryPublicationFixturesTest {
             assertEquals(metadata, (stubCode[receipt] as FiveRegisterInstruction).registerE)
             assertEquals(originalStub, stubCode.filterNot { it.extensionCall("onLoadedStubPublication") })
 
-            val differ = dex.getEntry("classes5.dex")!!.dexFile.classes.single { it.type == "LX/09Mk;" }
+            val differ = Fixtures.classIn(apk, "LX/09Mk;")
             val submit = differ.methods.single { it.name == "LJ" }
             assertTrue(InboxDiffSubmission.takes(submit, differ))
             val mutableSubmit = MutableMethod(submit)
@@ -77,8 +75,7 @@ class InboxQueryPublicationFixturesTest {
 
     @Test fun `diff acceptance follows real dispatch and every listener exit reaches it before native completions`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val owner = dex.getEntry("classes5.dex")!!.dexFile.classes.single { it.type == "LX/09Mk;" }
+            val owner = Fixtures.classIn(apk, "LX/09Mk;")
             val native = owner.methods.single { it.name == "LIZIZ" }
             assertTrue(InboxDiffAcceptance.takes(native, owner))
             val mutable = MutableMethod(native)
@@ -108,9 +105,7 @@ class InboxQueryPublicationFixturesTest {
 
     @Test fun `native async generation rejection happens before list acceptance or diff dispatch`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val native = dex.getEntry("classes31.dex")!!.dexFile.classes.single { it.type == "LX/14Uz;" }
-                .methods.single { it.name == "LIZ" }
+            val native = Fixtures.classIn(apk, "LX/14Uz;").methods.single { it.name == "LIZ" }
             val code = MutableMethod(native).implementation!!.instructions.toList()
             val generation = code.indexOfFirst { it.getReference<FieldReference>()?.let { field ->
                 field.definingClass == "LX/09Mk;" && field.name == "LJIIJ" } == true }
@@ -127,8 +122,7 @@ class InboxQueryPublicationFixturesTest {
 
     @Test fun `indexed callbacks keep the native helper and pair while current row clicks keep c6`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val closureOwner = dex.getEntry("classes39.dex")!!.dexFile.classes.single { it.type == INBOX_MERGED_CLOSURE }
+            val closureOwner = Fixtures.classIn(apk, INBOX_MERGED_CLOSURE)
             val closure = closureOwner.methods.single { it.name == "invoke\$43" }
             assertTrue(InboxIndexedCallback.takes(closure, closureOwner))
             val mutable = MutableMethod(closure)
@@ -147,7 +141,7 @@ class InboxQueryPublicationFixturesTest {
             assertEquals(call.registerD, bridge.registerE)
             assertEquals(call.registerE, bridge.registerF)
 
-            val cell = dex.getEntry("classes39.dex")!!.dexFile.classes.single { it.type == TEMPLATE_NOTIFICATION_CELL }
+            val cell = Fixtures.classIn(apk, TEMPLATE_NOTIFICATION_CELL)
             val click = cell.methods.single { it.name == "onClick" }
             val mutableClick = MutableMethod(click)
             val originalClick = mutableClick.implementation!!.instructions.toList()
@@ -163,8 +157,7 @@ class InboxQueryPublicationFixturesTest {
 
     @Test fun `both indexed live-data reads use the accepted aggregate without changing other native work`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val owner = dex.getEntry("classes39.dex")!!.dexFile.classes.single { it.type == INBOX_RESULT_FRAGMENT }
+            val owner = Fixtures.classIn(apk, INBOX_RESULT_FRAGMENT)
             val native = owner.methods.single { it.name == "DX" }
             assertTrue(InboxVisibleIndices.takes(native, owner))
             val mutable = MutableMethod(native)
@@ -185,8 +178,7 @@ class InboxQueryPublicationFixturesTest {
 
     @Test fun `pull and manual refresh entry guards precede every native flag listener and animation`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val spring = dex.getEntry("classes5.dex")!!.dexFile.classes.single { it.type == "LX/09Ni;" }
+            val spring = Fixtures.classIn(apk, "LX/09Ni;")
             listOf(Triple("setRefreshing", InboxSpringRefresh, "allowLoadedRefresh"),
                 Triple("LJ", InboxSpringManualRefresh, "allowLoadedManualRefresh")).forEach { (name, fingerprint, hook) ->
                 val native = spring.methods.single { it.name == name }
@@ -217,8 +209,7 @@ class InboxQueryPublicationFixturesTest {
 
     @Test fun `synthetic index gate repeats the exact native getter and field without touching yX`() {
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val owner = dex.getEntry("classes39.dex")!!.dexFile.classes.single { it.type == INBOX_MERGED_CLOSURE }
+            val owner = Fixtures.classIn(apk, INBOX_MERGED_CLOSURE)
             val native = owner.methods.single { it.name == "invoke\$43" }
             val mutable = MutableMethod(native)
             val original = mutable.implementation!!.instructions.toList()

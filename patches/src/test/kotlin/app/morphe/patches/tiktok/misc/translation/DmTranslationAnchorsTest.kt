@@ -35,7 +35,7 @@ class DmTranslationAnchorsTest {
 
     @Test fun `the declared build has exactly the typed composer editor lifecycle`() {
         Fixtures.forEachDeclared { apk ->
-            assertEquals("47.4.3", Fixtures.versionOf(apk))
+            assertEquals("47.6.15", Fixtures.versionOf(apk))
             val owners = owners(apk)
             val targets = findDmPreviewTargets(owners::get)
             assertEquals(DM_ASSEM, targets.viewCreated.definingClass)
@@ -245,11 +245,6 @@ class DmTranslationAnchorsTest {
             owner.interfaces, owner.sourceFile, owner.annotations, fields, methods)
 
     private fun owners(apk: File): Map<String, ClassDef> = cache.getOrPut(apk.canonicalPath) {
-        val container = Fixtures.dexContainer(apk)
-        val result = mutableMapOf<String, ClassDef>()
-        for (entry in listOf("classes2.dex", "classes3.dex", "classes4.dex", "classes6.dex", "classes12.dex", "classes15.dex", "classes18.dex", "classes40.dex")) {
-            for (owner in container.getEntry(entry)!!.dexFile.classes) result[owner.type] = owner
-        }
-        result
+        Fixtures.classes(Fixtures.dexContainer(apk)).associateBy { it.type }
     }
 }

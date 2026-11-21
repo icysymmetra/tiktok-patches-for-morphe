@@ -17,14 +17,10 @@ import org.junit.Test
 /** Original-DEX proof for the field-only list selection shared by seed and diagnostics. */
 class InboxRenderedModelsFixturesTest {
     @Test fun `current adapter schema declares each exact typed field and loading state hierarchy`() {
-        assertEquals(listOf("47.4.3"), Fixtures.declaredVersions())
+        assertEquals(listOf("47.6.15"), Fixtures.declaredVersions())
         Fixtures.forEachDeclared { apk ->
-            val dex = Fixtures.dexContainer(apk, Opcodes.getDefault())
-            val owners = mapOf(
-                ADAPTER to "classes5.dex", DIFF to "classes5.dex", CONFIG to "classes5.dex",
-                STUB to "classes4.dex", LOADING to "classes5.dex", MODEL to "classes5.dex",
-                STATE to "classes5.dex", PHASE to "classes5.dex", REFRESH to "classes8.dex", EMPTY to "classes5.dex"
-            ).mapValues { (type, entry) -> dex.getEntry(entry)!!.dexFile.classes.single { it.type == type } }
+            val owners = listOf(ADAPTER, DIFF, CONFIG, STUB, LOADING, MODEL, STATE, PHASE, REFRESH, EMPTY)
+                .associateWith { type -> Fixtures.classIn(apk, type) }
             val fields = listOf(
                 Triple(ADAPTER, "LLLFZ", DIFF), Triple(DIFF, "LJIIJJI", "Ljava/util/List;"),
                 Triple(ADAPTER, "LLLII", CONFIG), Triple(CONFIG, "LJ", "Z"),

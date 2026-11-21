@@ -249,7 +249,6 @@ Around the video,视频四周
 Arrange your feed and bottom tabs,整理信息流和底部标签页
 As TikTok sent it (M4A or MP3),TikTok 原样发送的文件（M4A 或 MP3）
 "Ask TikTok for search results that aren't personalized to your account. This changes results, not search buttons or suggestions.",向 TikTok 请求与你的账户无关的搜索结果。它只改变结果本身，不影响搜索按钮或建议。
-Ask for the quality on each save,每次保存时询问画质
 "Ask for the unlock your phone uses, like a fingerprint or a PIN, when TikTok starts and when you come back to it. A link you open from another app still goes to its video once you unlock. While this is on, TikTok's preview in recent apps stays blank. Needs a screen lock on the phone.",启动 TikTok 和回到应用时，要求通过手机的解锁方式验证，如指纹或 PIN。解锁后，从其他应用打开的链接仍会直达对应视频。开启后，最近任务里 TikTok 的预览会保持空白。需要手机已设置屏幕锁。
 Attention,注意
 Audio,音频
@@ -529,7 +528,6 @@ Don't start the feed on returning,返回时不恢复信息流
 Don't start the first video,不自动播放第一个视频
 Done,完成
 Double tap,双击
-"Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.",“下载”会列出该视频提供的所有画质及 TikTok 给出的对应大小，并保存你选择的画质。下一次保存仍使用上面的画质设置。
 Download original photos,下载原始照片
 Downloads,下载
 "Drag to move, release to place",拖动即可移动，松开即可放置
@@ -1428,7 +1426,6 @@ Save details beside the video,在视频旁边保存详细信息
 "Save every photo in the post at full size as a JPEG, not as the screen shows it.",把帖子里的每张照片按原始尺寸保存为 JPEG，而不是按屏幕显示的样子。
 Save field values,保存字段值
 Save full report,保存完整报告
-Save in which quality?,以哪种画质保存？
 Save media,保存媒体
 Save photo posts as a video,将照片帖子保存为视频
 Save photos,保存照片
@@ -1879,7 +1876,6 @@ The presets couldn't load. Open the Lab again.,无法加载预设。再次打开
 The profile picture couldn't be saved. Try again.,无法保存个人资料图片。请重试。
 "The proxy at %1$s asks for a password, and TikTok can't send one. Use a proxy that doesn't need one.",%1$s 的代理需要密码，TikTok 无法发送密码。请使用无需密码的代理。
 "The proxy's address, like 192.168.1.20 or proxy.example.com.",代理的地址，例如 192.168.1.20 或 proxy.example.com。
-The quality choice is still open,画质选择仍打开着
 "The record of an interrupted settings change couldn't be read, so it was set aside. Check your settings.",中断的设置更改记录无法读取，已被搁置。请检查你的设置。
 The recording couldn't be saved. Try again.,录制保存失败。请重试。
 The recording reached its size limit and was saved to %1$s,录制达到大小上限，已保存到 %1$s
@@ -2204,3 +2200,10 @@ collapsed,已折叠
 debug debugging logs logging,调试 排错 日志 记录
 expanded,已展开
 this creator,该创作者
+Audio only,仅音频
+Cover image only,仅封面图片
+Show the video download menu,显示视频下载菜单
+The download menu couldn't open. Try again.,无法打开下载菜单，请重试。
+The download menu is still open,下载菜单仍处于打开状态
+What do you want to download?,你想下载什么？
+"When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video.",点按“下载”后，可以选择视频画质，也可以仅保存音频或封面。菜单会显示该视频可用的选项。

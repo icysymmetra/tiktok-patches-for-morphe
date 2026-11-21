@@ -109,6 +109,15 @@ public class PreviewControlsCaptureTest {
         try (var owner = Robolectric.buildActivity(PageActivity.class).setup().visible()) {
             Activity activity = owner.get(); configure(activity, true);
             TikTokPreferenceFragment page = section(activity, "behavior");
+            assertNotNull(page.findPreference(Settings.SHOW_FOLLOW_STATUS.key));
+            assertNotNull(page.findPreference(Settings.LOCAL_PROFILE_COUNTS.key));
+            assertNull(page.findPreference(Settings.LOCAL_PROFILE_VERIFIED_BADGE.key));
+            assertNull(page.findPreference(Settings.HIDE_OWN_PROFILE_RESTRICTION_NOTICE.key));
+        }
+        SettingsStatus.localProfileAppearanceEnabled = true;
+        try (var owner = Robolectric.buildActivity(PageActivity.class).setup().visible()) {
+            Activity activity = owner.get(); configure(activity, true);
+            TikTokPreferenceFragment page = section(activity, "behavior");
             assertNotNull(page.findPreference(Settings.LOCAL_PROFILE_VERIFIED_BADGE.key));
             assertNotNull(page.findPreference(Settings.HIDE_OWN_PROFILE_RESTRICTION_NOTICE.key));
         }
@@ -134,6 +143,7 @@ public class PreviewControlsCaptureTest {
 
     private static void profile(boolean dark) throws Exception {
         SettingsStatus.followStatusEnabled = true;
+        SettingsStatus.localProfileAppearanceEnabled = true;
         try (var owner = Robolectric.buildActivity(PageActivity.class).setup().visible()) {
             Activity activity = owner.get(); configure(activity, dark);
             TikTokPreferenceFragment page = section(activity, "behavior");

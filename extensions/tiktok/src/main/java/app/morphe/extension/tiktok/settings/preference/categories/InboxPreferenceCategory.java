@@ -57,10 +57,12 @@ public final class InboxPreferenceCategory extends ConditionalPreferenceCategory
                     "Preview a translation of your draft before sending it.",
                     Settings.DM_TRANSLATION_PREVIEW));
         }
-        if (SettingsStatus.inboxFilterEnabled) {
+        if (SettingsStatus.inboxLoadedSearchEnabled) {
             addPreference(new TogglePreference(context, "Search loaded activity",
                     "Search Activity notifications already loaded on this screen. Loading more pauses while you search.",
                     Settings.INBOX_LOADED_SEARCH));
+        }
+        if (SettingsStatus.inboxFilterEnabled) {
             addPreference(new SectionHeadingPreference(context, "Rows"));
             addPreference(new TogglePreference(
                     context,

@@ -26,6 +26,7 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ThreeRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
@@ -54,11 +55,18 @@ internal object FeedSplitContainerFingerprint : Fingerprint(
     custom = { method, _ -> method.registersSplitContainer() },
 )
 
-internal fun Method.registersSplitContainer(): Boolean = implementation?.instructions?.any { instruction ->
-    instruction.opcode == Opcode.INVOKE_STATIC && instruction.getReference<MethodReference>()?.let {
-        it.definingClass == SPLIT_CONTAINER_MANAGER && it.parameterTypes.firstOrNull()?.toString() == "Ljava/lang/String;"
-    } == true
-} == true
+private fun Instruction.registersFeedContainer(): Boolean {
+    if (opcode != Opcode.INVOKE_STATIC) return false
+    val method = getReference<MethodReference>() ?: return false
+    val parameters = method.parameterTypes.map(CharSequence::toString)
+    // 47.6.15 calls a static method on the split service with the view and fragment first.
+    return (method.definingClass == SPLIT_CONTAINER_MANAGER && parameters.firstOrNull() == "Ljava/lang/String;") ||
+        (parameters == listOf("Landroid/view/View;", "Landroidx/fragment/app/Fragment;", "Ljava/lang/String;") &&
+            method.returnType.startsWith("L") && method.returnType != "Landroid/view/View;")
+}
+
+internal fun Method.registersSplitContainer(): Boolean =
+    implementation?.instructions?.count { it.registersFeedContainer() } == 1
 
 /**
  * The read of the server value the feed compares with -1 before it registers its split
@@ -83,9 +91,7 @@ internal fun Method.splitContainerInitRead(): Int {
     val read = reads.singleOrNull() ?: throw PatchException(
         "Split view: the feed compares ${reads.size} server values with -1 before its split container, not one.",
     )
-    val registration = instructions.indexOfFirst {
-        it.opcode == Opcode.INVOKE_STATIC && it.getReference<MethodReference>()?.definingClass == SPLIT_CONTAINER_MANAGER
-    }
+    val registration = instructions.indexOfFirst { it.registersFeedContainer() }
     if (registration < read) throw PatchException("Split view: the feed registers no split container after it reads the server value.")
     return read
 }

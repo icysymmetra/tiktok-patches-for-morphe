@@ -5,7 +5,9 @@
 package app.morphe.patches.tiktok.privacy
 
 import app.morphe.patcher.patch.BytecodePatchContext
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.tiktok.misc.extension.sharedExtensionPatch
 import app.morphe.patches.tiktok.misc.settings.SettingsStatusLoadFingerprint
@@ -39,7 +41,7 @@ val aiProfilingGovernorPatch = bytecodePatch(
 
 /**
  * The patch's hooks, without its settings row, so a test can put them on a build that carries no
- * extension. With the switch off all three run as TikTok wrote them.
+ * extension. With the switch off the native startup paths keep their original behavior.
  */
 context(patchContext: BytecodePatchContext)
 internal fun installAiProfilingSwitch() {
@@ -49,5 +51,21 @@ internal fun installAiProfilingSwitch() {
     // Should the plugin arrive another way, its engine still can't attach, and TikTok's
     // stand-in core keeps answering "host not ready".
     PitayaRealProviderFingerprint.method.returnVoidWhenOn(PATCH, AI_PROFILING_SWITCH)
-    PitayaLiteStartFingerprint.method.returnVoidWhenOn(PATCH, AI_PROFILING_SWITCH)
+    pitayaLiteStartup()?.returnVoidWhenOn(PATCH, AI_PROFILING_SWITCH)
+}
+
+context(patchContext: BytecodePatchContext)
+internal fun pitayaLiteStartup(): MutableMethod? {
+    val matches = PitayaLiteStartFingerprint.matchAllOrNull().orEmpty()
+    if (matches.size == 1) return matches.single().method
+    // On the reviewed 47.6.15 APK, Lite has JNI declarations and no managed startup
+    // caller in the base app or its feature dexes. Its plugin startup still uses the
+    // lookup and provider guarded above.
+    val lite = patchContext.classDefByOrNull(PITAYA_LITE)
+    if (matches.isEmpty() && patchContext.packageMetadata.versionName == "47.6.15" &&
+        lite != null && lite.methods.none {
+            it.name != "<init>" && it.name != "<clinit>" && it.implementation != null
+        }
+    ) return null
+    throw PatchException("$PATCH: expected one standalone Lite startup, found ${matches.size}.")
 }

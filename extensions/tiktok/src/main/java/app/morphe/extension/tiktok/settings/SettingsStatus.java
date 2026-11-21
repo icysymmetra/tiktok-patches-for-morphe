@@ -117,6 +117,7 @@ public class SettingsStatus {
         backgroundPlayEnabled = true;
     }
     public static boolean inboxFilterEnabled = false;
+    public static boolean inboxLoadedSearchEnabled = false;
     public static boolean videoFitEnabled = false;
     public static boolean refreshRateEnabled = false;
     public static boolean launcherShortcutsEnabled = false;
@@ -146,6 +147,7 @@ public class SettingsStatus {
     public static boolean lengthLimitsEnabled = false;
     public static boolean keepFavoritesTabEnabled = false;
     public static boolean followStatusEnabled = false;
+    public static boolean localProfileAppearanceEnabled = false;
     public static boolean copyIdsEnabled = false;
     public static boolean hideFeedLiveButtonEnabled = false;
     /** The side menu half of Hide feed LIVE button, which a build other than the declared one
@@ -506,6 +508,10 @@ public class SettingsStatus {
         inboxFilterEnabled = true;
     }
 
+    public static void enableInboxLoadedSearch() {
+        inboxLoadedSearchEnabled = true;
+    }
+
     public static void enableCommentTools() {
         commentToolsEnabled = true;
     }
@@ -561,6 +567,10 @@ public class SettingsStatus {
 
     public static void enableFollowStatus() {
         followStatusEnabled = true;
+    }
+
+    public static void enableLocalProfileAppearance() {
+        localProfileAppearanceEnabled = true;
     }
 
     public static void enableCopyIds() {

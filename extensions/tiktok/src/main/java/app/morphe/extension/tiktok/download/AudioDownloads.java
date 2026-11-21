@@ -40,18 +40,31 @@ final class AudioDownloads {
 
     /** Fetches the sound itself, for the downloads this extension does not handle. */
     static void start(Object aweme, Context context) {
-        if (context == null || !enabled()) return;
+        if (enabled()) start(aweme, context, false);
+    }
+
+    /** An explicit menu choice uses the audio writer even when automatic audio copies are off. */
+    static void startOnly(Object aweme, Context context) {
+        start(aweme, context, true);
+    }
+
+    static List<String> sourceUrls(Object video) {
+        List<String> sound = VideoDownloads.audioUrls(video, null);
+        return sound.isEmpty() ? VideoDownloads.sourceUrls(video) : sound;
+    }
+
+    private static void start(Object aweme, Context context, boolean explicit) {
+        if (context == null) return;
         if (android.os.Build.VERSION.SDK_INT < 29
                 && context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != android.content.pm.PackageManager.PERMISSION_GRANTED) return;
         Object video = Reflect.property(aweme, "getVideo", "video");
-        if (video == null) return;
-
         // The separate audio stream when there is one, otherwise the video, which carries it.
-        List<String> sound = VideoDownloads.audioUrls(video, null);
-        List<String> source = sound.isEmpty() ? VideoDownloads.sourceUrls(video) : sound;
-        if (source.isEmpty()) return;
-        final List<String> sourceUrls = List.copyOf(source);
+        final List<String> sourceUrls = List.copyOf(sourceUrls(video));
+        if (sourceUrls.isEmpty()) {
+            if (explicit) Utils.showToastLong(L10n.t("The sound couldn't be saved. Try again."));
+            return;
+        }
 
         String id = Reflect.string(aweme, "getAid", "aid");
         if (id == null) return;
@@ -64,6 +77,7 @@ final class AudioDownloads {
             videoPath = DownloadFilenameFormatter.destinationPath(aweme, false);
         } catch (RuntimeException exception) {
             Logger.printException(() -> "Could not work out the sound download name", exception);
+            if (explicit) Utils.showToastLong(L10n.t("The sound couldn't be saved. Try again."));
             return;
         }
         String key = "sound " + id;
@@ -76,7 +90,8 @@ final class AudioDownloads {
             try {
                 fetched = MediaCache.createTempFile(app, "sound-source-", ".mp4");
                 RemoteMedia.fetch(sourceUrls, fetched, RemoteMedia.Kind.VIDEO);
-                write(app, audioName, fetched, videoPath);
+                if (explicit) publish(app, audioName, fetched, videoPath, true);
+                else write(app, audioName, fetched, videoPath);
             } catch (IOException | RuntimeException exception) {
                 Logger.printException(() -> "Sound download failed", exception);
                 Utils.showToastLong(L10n.t("The sound couldn't be saved. Try again."));
@@ -130,6 +145,11 @@ final class AudioDownloads {
     static boolean write(Context app, String name, File source, String videoPath, boolean announce)
             throws MediaBudget.StopException {
         if (!enabled()) return false;
+        return publish(app, name, source, videoPath, announce);
+    }
+
+    private static boolean publish(Context app, String name, File source, String videoPath, boolean announce)
+            throws MediaBudget.StopException {
         File output = null;
         // Read once, so the temporary file, the name and the type all agree.
         boolean opus = SoundFormat.opus();

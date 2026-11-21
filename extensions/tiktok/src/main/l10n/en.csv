@@ -249,10 +249,10 @@ Around the video,Around the video
 Arrange your feed and bottom tabs,Arrange your feed and bottom tabs
 As TikTok sent it (M4A or MP3),As TikTok sent it (M4A or MP3)
 "Ask TikTok for search results that aren't personalized to your account. This changes results, not search buttons or suggestions.","Ask TikTok for search results that aren't personalized to your account. This changes results, not search buttons or suggestions."
-Ask for the quality on each save,Ask for the quality on each save
 "Ask for the unlock your phone uses, like a fingerprint or a PIN, when TikTok starts and when you come back to it. A link you open from another app still goes to its video once you unlock. While this is on, TikTok's preview in recent apps stays blank. Needs a screen lock on the phone.","Ask for the unlock your phone uses, like a fingerprint or a PIN, when TikTok starts and when you come back to it. A link you open from another app still goes to its video once you unlock. While this is on, TikTok's preview in recent apps stays blank. Needs a screen lock on the phone."
 Attention,Attention
 Audio,Audio
+Audio only,Audio only
 Author text size,Author text size
 Auto translate comments,Auto translate comments
 Auto-advance,Auto-advance
@@ -469,6 +469,7 @@ Country and network preferences,Country and network preferences
 Country code,Country code
 Country filters,Country filters
 Counts under the buttons,Counts under the buttons
+Cover image only,Cover image only
 Cover saved to %1$s,Cover saved to %1$s
 Create,Create
 Creator exceptions,Creator exceptions
@@ -529,7 +530,6 @@ Don't start the feed on returning,Don't start the feed on returning
 Don't start the first video,Don't start the first video
 Done,Done
 Double tap,Double tap
-"Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.","Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save."
 Download original photos,Download original photos
 Downloads,Downloads
 "Drag to move, release to place","Drag to move, release to place"
@@ -1428,7 +1428,6 @@ Save details beside the video,Save details beside the video
 "Save every photo in the post at full size as a JPEG, not as the screen shows it.","Save every photo in the post at full size as a JPEG, not as the screen shows it."
 Save field values,Save field values
 Save full report,Save full report
-Save in which quality?,Save in which quality?
 Save media,Save media
 Save photo posts as a video,Save photo posts as a video
 Save photos,Save photos
@@ -1629,6 +1628,7 @@ Show the time beside the progress bar,Show the time beside the progress bar
 Show the time played and the video's length at the end of the progress bar while it's on screen.,Show the time played and the video's length at the end of the progress bar while it's on screen.
 Show the time to the second,Show the time to the second
 Show the time zone,Show the time zone
+Show the video download menu,Show the video download menu
 Show the whole Activity and New followers lists instead of stopping at a View all button.,Show the whole Activity and New followers lists instead of stopping at a View all button.
 "Show the whole video instead of cropping it to the window. Nothing changes on a tall phone, where it already fits. On a folding phone opened up, a squarer screen or a split view the sides or the ends stop being cut off.","Show the whole video instead of cropping it to the window. Nothing changes on a tall phone, where it already fits. On a folding phone opened up, a squarer screen or a split view the sides or the ends stop being cut off."
 Show translation,Show translation
@@ -1842,6 +1842,8 @@ The comment button also opens a video's comments with its caption at the top. Th
 The cover couldn't be saved. Try again.,The cover couldn't be saved. Try again.
 The diagnostic report couldn't be saved yet. Try again in a moment.,The diagnostic report couldn't be saved yet. Try again in a moment.
 The diagnostic report couldn't be saved. Try again.,The diagnostic report couldn't be saved. Try again.
+The download menu couldn't open. Try again.,The download menu couldn't open. Try again.
+The download menu is still open,The download menu is still open
 The downloader app you chose isn't installed. Check Send links to another app under Downloads.,The downloader app you chose isn't installed. Check Send links to another app under Downloads.
 The export wasn't saved. Export again when the file app is ready.,The export wasn't saved. Export again when the file app is ready.
 The feed capture couldn't be saved. Tap the row to try again.,The feed capture couldn't be saved. Tap the row to try again.
@@ -1879,7 +1881,6 @@ The presets couldn't load. Open the Lab again.,The presets couldn't load. Open t
 The profile picture couldn't be saved. Try again.,The profile picture couldn't be saved. Try again.
 "The proxy at %1$s asks for a password, and TikTok can't send one. Use a proxy that doesn't need one.","The proxy at %1$s asks for a password, and TikTok can't send one. Use a proxy that doesn't need one."
 "The proxy's address, like 192.168.1.20 or proxy.example.com.","The proxy's address, like 192.168.1.20 or proxy.example.com."
-The quality choice is still open,The quality choice is still open
 "The record of an interrupted settings change couldn't be read, so it was set aside. Check your settings.","The record of an interrupted settings change couldn't be read, so it was set aside. Check your settings."
 The recording couldn't be saved. Try again.,The recording couldn't be saved. Try again.
 The recording reached its size limit and was saved to %1$s,The recording reached its size limit and was saved to %1$s
@@ -2139,6 +2140,7 @@ Watch history was imported for the account that chose the file. Switch back to s
 "WebP, exactly as TikTok sent it","WebP, exactly as TikTok sent it"
 What TikTok gets,What TikTok gets
 What dims,What dims
+What do you want to download?,What do you want to download?
 What gets sent each day.,What gets sent each day.
 What's new,What's new
 "When Copy link gives a short vt.tiktok.com or vm.tiktok.com link, Metra opens it once in the background to find the full video link and copies that instead. TikTok sees that visit, and it connects directly even when a proxy is on. Links you send to another app go out as they were.","When Copy link gives a short vt.tiktok.com or vm.tiktok.com link, Metra opens it once in the background to find the full video link and copies that instead. TikTok sees that visit, and it connects directly even when a proxy is on. Links you send to another app go out as they were."
@@ -2152,6 +2154,7 @@ What's new,What's new
 When to send,When to send
 "When you leave TikTok while a video plays, it keeps playing in a small window over your other apps, with a button to pause it. Works in the feed and on videos you open from a profile, search or a sound. Needs Android 8 or later.","When you leave TikTok while a video plays, it keeps playing in a small window over your other apps, with a button to pause it. Works in the feed and on videos you open from a profile, search or a sound. Needs Android 8 or later."
 "When you open TikTok from its icon, the first video in the feed waits for one tap before it plays. A link, a notification or a shortcut opens as usual.","When you open TikTok from its icon, the first video in the feed waits for one tap before it plays. A link, a notification or a shortcut opens as usual."
+"When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video.","When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video."
 "While Clear display is on, also hide the progress bar, the close button and the pause and speed buttons at the bottom. You can still drag along the bottom edge to move through the video. To leave Clear display, press and hold the video and tap Restore display, or pinch the screen.","While Clear display is on, also hide the progress bar, the close button and the pause and speed buttons at the bottom. You can still drag along the bottom edge to move through the video. To leave Clear display, press and hold the video and tap Restore display, or pinch the screen."
 "While diagnostic logging is on, a message names the part of Metra that failed. Off keeps failures in the report only.","While diagnostic logging is on, a message names the part of Metra that failed. Off keeps failures in the report only."
 Who to message,Who to message

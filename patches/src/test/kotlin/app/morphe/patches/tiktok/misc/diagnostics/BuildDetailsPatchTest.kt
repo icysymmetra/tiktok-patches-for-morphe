@@ -27,7 +27,7 @@ import org.junit.rules.TemporaryFolder
 
 class BuildDetailsPatchTest {
     @get:Rule val temporary = TemporaryFolder()
-    private val target = packageMetadata("com.zhiliaoapp.musically", "47.4.3", "2024704030")
+    private val target = packageMetadata("com.zhiliaoapp.musically", "47.6.15", "2024706150")
     private val fingerprint = "A1234567890123456789B" + "c".repeat(43)
 
     @Test fun `bundle manifest paths preserve plus spaces percent and unicode and release the jar`() {

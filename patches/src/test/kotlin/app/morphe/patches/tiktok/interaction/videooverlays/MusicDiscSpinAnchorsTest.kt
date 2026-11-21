@@ -62,7 +62,7 @@ private val DEGRADE_REGISTRATION = DiscHold("the degrade check's registration", 
     it.definingClass == MUSIC_COVER_ASSEM && it.name == "onViewCreated" && loads(it, MUSIC_COVER_DEGRADE_KEY)
 }
 private val LOAD_STRATEGY = DiscHold("the play animation's load strategy", PlayAnimationDowngradeFingerprint) {
-    it.name == "getStrategyId" && loads(it, PLAY_ANIMATION_DOWNGRADE_ID)
+    it.name in setOf("getStrategyId", "<clinit>") && loads(it, PLAY_ANIMATION_DOWNGRADE_ID)
 }
 private val DISC_HOLDS = listOf(COVER_HOLD, PLAY_SUBSCRIBER, PLAY_HOOK, DEGRADE_REGISTRATION, LOAD_STRATEGY)
 

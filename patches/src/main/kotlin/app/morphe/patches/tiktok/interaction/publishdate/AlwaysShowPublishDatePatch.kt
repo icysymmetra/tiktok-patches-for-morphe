@@ -25,6 +25,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import java.util.BitSet
@@ -143,7 +144,8 @@ internal fun Method.postTimeSite(): PostTimeSite {
 
     // Each text the check can see was last written by a date formatter's result: a static one taking
     // the time, or since 47.4.3 the inlined relative-date chain's virtual (time, locale) format and
-    // static (count, unit) ones.
+    // static (count, unit) ones. In 47.6.15 the relative formatter takes the helper as
+    // an explicit first argument, loaded from BDDateFormat just before the call.
     val formatters = sortedSetOf<Int>()
     val seenBack = BitSet()
     val pendingBack = ArrayDeque(predecessors[emptyCheck])
@@ -158,7 +160,17 @@ internal fun Method.postTimeSite(): PostTimeSite {
             val fromFormatter = instructions[at].opcode == Opcode.MOVE_RESULT_OBJECT &&
                 call != null && call.opcode in FORMATTER_CALLS &&
                 formatter != null && formatter.returnType == "Ljava/lang/String;" &&
-                formatter.parameterTypes.firstOrNull()?.toString() in setOf("J", "I")
+                (formatter.parameterTypes.firstOrNull()?.toString() in setOf("J", "I") ||
+                    (call.opcode == Opcode.INVOKE_STATIC &&
+                        formatter.parameterTypes.size == 3 &&
+                        formatter.parameterTypes[0].toString() == formatter.definingClass &&
+                        formatter.parameterTypes[1].toString() == "I" &&
+                        instructions.subList(maxOf(0, at - 6), at - 1).any {
+                            val field = it.getReference<FieldReference>()
+                            it.opcode == Opcode.SGET_OBJECT &&
+                                field?.definingClass == "Lcom/bytedance/bddatefmt/BDDateFormat;" &&
+                                field.type == formatter.definingClass
+                        }))
             if (!fromFormatter) {
                 throw PatchException("$WHAT: instruction $at writes the post time text, and it isn't a date formatter.")
             }
@@ -238,18 +250,23 @@ private fun app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.showPostTim
             reference.returnType == "J"
     }
 
-    check(regionStart >= 0 && regionEnd > regionStart) {
+    check(regionEnd >= 0 && regionEnd > regionStart) {
         "Could not find video author post-time visibility region"
     }
 
     val gateCallIndices = instructions.withIndex()
         .filter { (index, instruction) ->
-            index in regionStart..regionEnd && instruction.isStaticStringBooleanCall()
+            index in maxOf(0, regionStart) until regionEnd && instruction.isStaticStringBooleanCall()
         }
         .filter { (index, _) -> getInstruction(index + 1).opcode == Opcode.MOVE_RESULT }
         .map { it.index }
 
-    check(gateCallIndices.size == 5) {
+    // The "v3" marker is a static field read in 47.6.15. The five feed checks still
+    // share one owner and all run before the author row's first post time read.
+    val gateOwners = gateCallIndices.map {
+        getInstruction<Instruction>(it).getReference<MethodReference>()!!.definingClass
+    }.distinct()
+    check(gateCallIndices.size == 5 && (regionStart >= 0 || gateOwners.size == 1)) {
         "Expected five video author post-time visibility gates, found ${gateCallIndices.size}"
     }
 

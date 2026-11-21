@@ -23,6 +23,7 @@ import app.morphe.util.addInstructions
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.addInstructionsWithLabels
 import app.morphe.patcher.util.findMutableMethodOf
+import app.morphe.patcher.util.getReference
 import app.morphe.util.returnEarly
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
@@ -493,13 +494,22 @@ internal fun liveQualityPick(service: ClassDef, quality: Method): LiveQualityPic
         ?: throw PatchException("LIVE controls: expected one quality pick read in ${quality.name}, found $fields")
     val setters = service.methods.filter { method ->
         val body = method.implementation?.instructions?.toList().orEmpty()
-        val store = body.firstOrNull()
+        val store = body.getOrNull(body.size - 2)
+        // 47.6.15 loads the holder's singleton and calls getClass() before the store.
+        val prefix = body.dropLast(2)
+        val loadsHolder = prefix.size == 2 && prefix[0].opcode == Opcode.SGET_OBJECT &&
+            (prefix[0] as ReferenceInstruction).reference.let {
+                it is FieldReference && it.type == it.definingClass &&
+                    store?.getReference<FieldReference>()?.definingClass == it.definingClass
+            } &&
+            prefix[1].opcode == Opcode.INVOKE_VIRTUAL &&
+            prefix[1].getReference<MethodReference>()?.toString() == "Ljava/lang/Object;->getClass()Ljava/lang/Class;"
         !AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "V" &&
             method.parameterTypes.map(CharSequence::toString) == listOf("Ljava/lang/String;") &&
-            body.size == 2 && store?.opcode == Opcode.SPUT_OBJECT &&
+            (prefix.isEmpty() || loadsHolder) && store?.opcode == Opcode.SPUT_OBJECT &&
             ((store as ReferenceInstruction).reference as FieldReference).key() == field &&
             (store as OneRegisterInstruction).registerA == method.implementation!!.registerCount - 1 &&
-            body[1].opcode == Opcode.RETURN_VOID
+            body.last().opcode == Opcode.RETURN_VOID
     }
     val setter = setters.singleOrNull()
         ?: throw PatchException("LIVE controls: expected one quality pick setter in ${service.type}, found ${setters.map { it.name }}")

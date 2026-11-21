@@ -91,11 +91,16 @@ internal fun installSplashAdSwitch() {
 
     val fixedBooleanMethods = reviewedBooleanMethods(
         SPLASH_SETTING_DESCRIPTOR,
-        listOf(9, 11),
+        // Two setting reads: cold_start_upload_topview_cid_enabled (9) and, in 47.6.15, the
+        // force-skip gate reading enable_force_skip_topview inside a try/catch whose fallback is a
+        // static (15); 47.4.3 read it without the fallback, in 11.
+        listOf(9, 15),
         "SplashSettingServiceImpl",
     ) + reviewedBooleanMethods(
         REALTIME_SPLASH_DESCRIPTOR,
-        listOf(3),
+        // 47.6.15's gate reads the same LX/17MP;->LJIIIIZZ flag, with a getClass call the
+        // compiler kept before the read: four instructions where 47.4.3 had three.
+        listOf(4),
         "RealTimeSplashManagerImpl",
     )
     val splashService = patchContext.mutableClassDefBy(SPLASH_SERVICE_DESCRIPTOR)

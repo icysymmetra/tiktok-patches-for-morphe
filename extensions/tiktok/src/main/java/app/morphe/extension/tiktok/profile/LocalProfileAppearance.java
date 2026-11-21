@@ -107,11 +107,11 @@ public final class LocalProfileAppearance {
     }
 
     private static boolean ownProfile(String viewedUid, BooleanSetting setting) {
-        if (!SettingsStatus.followStatusEnabled || !setting.get()) return false;
+        if (!SettingsStatus.localProfileAppearanceEnabled || !setting.get()) return false;
         String own = SignedInUser.id();
         if (!validUid(own) || !own.equals(viewedUid)) return false;
         // Reads are fresh. Pause and account changes can occur during a native bind.
-        return setting.get() && SettingsStatus.followStatusEnabled && own.equals(SignedInUser.id());
+        return setting.get() && SettingsStatus.localProfileAppearanceEnabled && own.equals(SignedInUser.id());
     }
 
     private static boolean nickname(String component) {

@@ -25,16 +25,15 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Ask for the quality on each save: Download lists the renditions this video comes in and saves
- * the one picked, for that save alone. The list holds only what the save path can publish: the
- * playable renditions {@link QualitySelector#chooseForFile} picks from (no ByteVC2, which no other
- * player opens) and Automatic, TikTok's own file. Sizes are what TikTok lists for each source, so
- * they're said as about that much: the sound, tags and a caption written in all change the file
- * that lands. Nothing is fetched to fill them in.
+ * Download lists the playable video renditions and offers the audio or cover on their own when
+ * the post provides a source. The choice applies to this save. Sizes are estimates from the
+ * video model, so showing the menu needs no network request.
  */
 final class QualityChoice {
     /** The videos whose choice is on screen. */
     private static final Set<String> CHOOSING = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private static final Object AUDIO_ONLY = new Object();
+    private static final Object COVER_ONLY = new Object();
 
     private QualityChoice() {}
 
@@ -52,7 +51,7 @@ final class QualityChoice {
     /**
      * Download on a video, before anything is fetched. True when the choice is up (or already
      * was), or a save of this video is under way, so Download goes no further; false leaves it to
-     * the usual save. That's a post with nothing to choose between, a photo post, a phone that
+     * the usual save. That's a post with no usable source, a photo post, a phone that
      * still needs the storage permission (TikTok asks for it) or no screen to ask on.
      */
     static boolean offer(Object aweme, Context context) {
@@ -69,13 +68,17 @@ final class QualityChoice {
             Utils.showToastShort(VideoDownloads.busyMessage(id));
             return true;
         }
-        List<Option> options = options(Reflect.property(aweme, "getVideo", "video"), context);
-        if (options.size() < 2) return false;
+        Object video = Reflect.property(aweme, "getVideo", "video");
+        if (video == null) return false;
+        List<Option> options = options(video, context);
+        if (!AudioDownloads.sourceUrls(video).isEmpty()) options.add(new Option(AUDIO_ONLY, L10n.t("Audio only")));
+        if (CoverSaver.hasCover(aweme)) options.add(new Option(COVER_ONLY, L10n.t("Cover image only")));
+        if (options.isEmpty()) return false;
         Activity activity = Utils.getVisibleActivity();
         if (activity == null || activity.isFinishing() || activity.isDestroyed()) return false;
         if (!CHOOSING.add(id)) {
             // Said rather than swallowed, so a second tap doesn't read as a broken button.
-            Utils.showToastShort(L10n.t("The quality choice is still open"));
+            Utils.showToastShort(L10n.t("The download menu is still open"));
             return true;
         }
         Utils.runOnMainThread(() -> ask(aweme, id, options));
@@ -88,10 +91,13 @@ final class QualityChoice {
      */
     static List<Option> options(Object video, Context context) {
         List<Option> options = new ArrayList<>();
+        Object automatic = VideoDownloads.automaticSource(video);
+        if (!VideoDownloads.urls(automatic).isEmpty()) {
+            options.add(new Option(VideoDownloads.AUTOMATIC, sized(L10n.t("Automatic (TikTok's file)"),
+                    QualitySelector.addressSize(automatic), context)));
+        }
         Object raw = QualitySelector.rawGears(video);
         if (!(raw instanceof List<?>)) return options;
-        options.add(new Option(VideoDownloads.AUTOMATIC, sized(L10n.t("Automatic (TikTok's file)"),
-                QualitySelector.addressSize(VideoDownloads.automaticSource(video)), context)));
         boolean needsSound = Boolean.TRUE.equals(Reflect.invoke(video, "hasDashBitrate"))
                 && !Settings.DOWNLOAD_WITHOUT_SOUND.get();
         List<Object> gears = new ArrayList<>();
@@ -133,7 +139,7 @@ final class QualityChoice {
             String[] labels = new String[options.size()];
             for (int i = 0; i < labels.length; i++) labels[i] = options.get(i).label;
             AlertDialog dialog = new AlertDialog.Builder(activity)
-                    .setTitle(L10n.t("Save in which quality?"))
+                    .setTitle(L10n.t("What do you want to download?"))
                     .setItems(labels, (ignored, which) -> {
                         CHOOSING.remove(id);
                         save(aweme, activity, options.get(which).pick);
@@ -169,14 +175,21 @@ final class QualityChoice {
             }
         } catch (RuntimeException failure) {
             CHOOSING.remove(id);
-            // Download was pressed and TikTok's own save has stood aside, so Automatic runs here.
-            Logger.printException(() -> "Could not ask for the save's quality", failure);
-            save(aweme, Utils.getContext(), VideoDownloads.AUTOMATIC);
+            Logger.printException(() -> "Could not open the download menu", failure);
+            Utils.showToastShort(L10n.t("The download menu couldn't open. Try again."));
         }
     }
 
     /** The save Download would have started, at the picked rendition. */
     private static void save(Object aweme, Context context, Object pick) {
+        if (pick == AUDIO_ONLY) {
+            AudioDownloads.startOnly(aweme, context);
+            return;
+        }
+        if (pick == COVER_ONLY) {
+            CoverSaver.save(context, aweme);
+            return;
+        }
         if (!VideoDownloads.savesTheCover()) CoverSaver.beside(context, aweme);
         if (!VideoDownloads.startPicked(aweme, context, pick)) {
             Utils.showToastLong(L10n.t("The video couldn't be saved. Try again, or choose Automatic."));

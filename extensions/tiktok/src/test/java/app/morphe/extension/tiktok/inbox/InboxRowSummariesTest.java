@@ -11,6 +11,7 @@ import android.preference.PreferenceScreen;
 
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.tiktok.SettingsContextRule;
+import app.morphe.extension.tiktok.settings.Settings;
 import app.morphe.extension.tiktok.settings.SettingsStatus;
 import app.morphe.extension.tiktok.settings.preference.categories.InboxPreferenceCategory;
 
@@ -45,7 +46,8 @@ public class InboxRowSummariesTest {
     @Test public void noInboxSummaryOpensBySayingItsTitleAgain() {
         boolean[] before = {SettingsStatus.inboxFilterEnabled,
                 SettingsStatus.hideSuggestedAccountsEnabled, SettingsStatus.hideInboxStoriesEnabled,
-                SettingsStatus.expandActivityListEnabled, SettingsStatus.notificationControlsEnabled};
+                SettingsStatus.expandActivityListEnabled, SettingsStatus.notificationControlsEnabled,
+                SettingsStatus.inboxLoadedSearchEnabled};
         try (var controller = Robolectric.buildActivity(TestActivity.class).setup()) {
             var activity = controller.get();
             Utils.setContext(activity);
@@ -55,8 +57,16 @@ public class InboxRowSummariesTest {
             SettingsStatus.hideInboxStoriesEnabled = true;
             SettingsStatus.expandActivityListEnabled = true;
             SettingsStatus.notificationControlsEnabled = true;
+            SettingsStatus.inboxLoadedSearchEnabled = false;
+            PreferenceScreen filterOnly = activity.getPreferenceManager().createPreferenceScreen(activity);
+            new InboxPreferenceCategory(activity, filterOnly);
+            assertTrue(filterOnly.findPreference(Settings.HIDE_INBOX_MESSAGE_REQUESTS.key) != null);
+            assertTrue(filterOnly.findPreference(Settings.INBOX_LOADED_SEARCH.key) == null);
+
+            SettingsStatus.inboxLoadedSearchEnabled = true;
             PreferenceScreen screen = activity.getPreferenceManager().createPreferenceScreen(activity);
             new InboxPreferenceCategory(activity, screen);
+            assertTrue(screen.findPreference(Settings.INBOX_LOADED_SEARCH.key) != null);
 
             List<String> restating = new ArrayList<>();
             int rows = 0;
@@ -78,6 +88,7 @@ public class InboxRowSummariesTest {
             SettingsStatus.hideInboxStoriesEnabled = before[2];
             SettingsStatus.expandActivityListEnabled = before[3];
             SettingsStatus.notificationControlsEnabled = before[4];
+            SettingsStatus.inboxLoadedSearchEnabled = before[5];
         }
     }
 

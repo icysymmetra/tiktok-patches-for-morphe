@@ -1,3 +1,6 @@
+/*
+ * Copyright 2026 Metra contributors
+ */
 package app.morphe.patches.tiktok.misc.diagnostics
 
 import app.morphe.patcher.patch.BytecodePatchContext

@@ -161,8 +161,6 @@ class DmTranslationAccountHooksTest {
         block(cache.getOrPut(apk.canonicalPath) { owners(apk) })
     }
     private fun owners(apk: File): Map<String, ClassDef> {
-        val container = Fixtures.dexContainer(apk)
-        return listOf("classes2.dex", "classes32.dex", "classes35.dex").asSequence()
-            .flatMap { container.getEntry(it)!!.dexFile.classes.asSequence() }.associateBy { it.type }
+        return Fixtures.classes(Fixtures.dexContainer(apk)).associateBy { it.type }
     }
 }

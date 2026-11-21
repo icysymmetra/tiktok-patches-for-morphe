@@ -72,6 +72,7 @@ val coreAssetDebloatPatch = rawResourcePatch(
             nativeFiles,
             coreAssetProfiles,
             resolveStandaloneFile = { path -> get(path) },
+            versionName = packageMetadata.versionName,
         )
         BuildDetails.stripped(get(BUILD_DETAILS_ASSET), BuildChoice.CORE, result)
         result.report("Core Asset De-bloat")
@@ -150,6 +151,7 @@ val studioCreationDebloatPatch = rawResourcePatch(
             nativeFiles,
             studioAssetProfiles,
             resolveStandaloneFile = { path -> get(path) },
+            versionName = packageMetadata.versionName,
         )
         BuildDetails.stripped(get(BUILD_DETAILS_ASSET), BuildChoice.CREATION, result)
         result.report("Studio & Creation De-bloat")
@@ -185,6 +187,7 @@ val liveStreamSuiteOptimizerPatch = rawResourcePatch(
             nativeFiles,
             liveAssetProfiles,
             resolveStandaloneFile = { path -> get(path) },
+            versionName = packageMetadata.versionName,
         )
         BuildDetails.stripped(get(BUILD_DETAILS_ASSET), BuildChoice.LIVE, result)
         result.report("LIVE Stream Suite Optimizer")
@@ -276,6 +279,20 @@ internal val liveAssetProfiles = listOf(
             file("lib/armeabi-v7a/liblink_mic_sdk.so", "08b427a49d1d3dfd480de37fb56a4ac6956768a9b80b00a1ddf8cd9fa5b494d5"),
         ),
     ),
+    // 47.6.15 (APKMirror's universal APK, read on 2026-11-07) carries the same five paths, but the
+    // match container's mainV12 template and the game script were rebuilt, and so were both
+    // link-mic libraries. The invitee template is byte-identical to 47.4.3's.
+    ResourceProfile(
+        "TikTok 47.6.15",
+        listOf(
+            file("assets/native_runtime_server/game/scripts/ttmg-core.js.zip", "9727cb446d3caa26e853e43efeedba6269ed95936e661d393a55a5a4e28c6331"),
+            file("assets/offline/tiktok_live_tt_live_lynx_match_component_container/mainV12/template.js", "e7fcdda86f17ea09135f4b5c09c59cf3483d49b78f76215f4e63b0f35f3941c6"),
+            file("assets/offline/tiktok_live_tt_live_lynx_match_component_container/match_invitee_v3/template.js", "8e84ec297249a771c9c9d56438f6c509d2a0f438c759ee65e212ab14ef7cb3eb"),
+            file("lib/arm64-v8a/liblink_mic_sdk.so", "32ff13e8868600fc1a49fa2c37d2cb33276e11af0a724398438d006a8a20ef47"),
+            file("lib/armeabi-v7a/liblink_mic_sdk.so", "6589dd618fc7dfe7e38dee672f3490fe5d5d0af5d62eb592d8be6b7020bf365d"),
+        ),
+        onlyVersion = "47.6.15",
+    ),
 )
 
 internal val p2pRelayProfiles = listOf(
@@ -287,6 +304,18 @@ internal val p2pRelayProfiles = listOf(
             file("lib/armeabi-v7a/libavmdlp2pv2.so", "584388b01c531adb6fc34665f30450cdeb8e5b1e76a52e53f5ba721e5db6d431"),
             file("lib/armeabi-v7a/libp2plivevdp.so", "dd8a626f8b0efe36a883096923bed56ecb457e9408b26262c844442901dc1d09"),
         ),
+    ),
+    // 47.6.15 (APKMirror's universal APK, read on 2026-11-07) still ships all four, but rebuilt
+    // the avmdlp2pv2 pair; both p2plivevdp libraries are byte-identical to 47.4.3's.
+    ResourceProfile(
+        "TikTok 47.6.15",
+        listOf(
+            file("lib/arm64-v8a/libavmdlp2pv2.so", "3611c75139020550b58b9cbb99eff6dfb72e0d301318fed62d0d01f84a4c9620"),
+            file("lib/arm64-v8a/libp2plivevdp.so", "ed35b032fac7c169860d3f37bc3be1933df9bddc8ac6785413f9608945946337"),
+            file("lib/armeabi-v7a/libavmdlp2pv2.so", "21473bda7be31d9b4b24e71414af86d741d6f383e2d163fd2e768a339ca5f01b"),
+            file("lib/armeabi-v7a/libp2plivevdp.so", "dd8a626f8b0efe36a883096923bed56ecb457e9408b26262c844442901dc1d09"),
+        ),
+        onlyVersion = "47.6.15",
     ),
     // The split bundle ships no relay library at all, so there is nothing to empty. Only on
     // 47.4.3: another build without these files has renamed or moved them, and the strip must
@@ -307,7 +336,12 @@ internal val languageInventories = listOf(
             "ru", "sk", "sl", "sq", "sv", "sw", "ta", "te", "th", "tr", "uk", "ur", "uz", "vi", "zh", "zu",
         ),
         pathManifestSha256 = "38f412319f00a31a025e03095ea9bf4266b412c2322d2a6b0b4a031a073b0c08",
-        contentManifestSha256 = setOf("f12d6e65efec082e1fba1a5144cb2ee9d6de29b6ab672f0934c5a41facbf581d"),
+        // 47.4.3, then 47.6.15 (read on 2026-11-07): the same 64 directories and the same 207
+        // paths, with the pack contents rebuilt.
+        contentManifestSha256 = setOf(
+            "f12d6e65efec082e1fba1a5144cb2ee9d6de29b6ab672f0934c5a41facbf581d",
+            "87f96868f76cc3cf83eb89928971db2e6acfbbe406eb5cca72362761aec36460",
+        ),
     ),
     // The split bundle: 25 language splits and 102 files.
     LanguageInventoryContract(
