@@ -2048,13 +2048,9 @@ Copy the link with one press on Share,Salin tautan dengan sekali tekan Bagikan
 A press on Share under a video copies its link instead of opening the share sheet. Press Share again right after to open the sheet.,"Menekan Bagikan di bawah video akan menyalin tautannya, bukan membuka menu bagikan. Tekan Bagikan lagi tepat setelahnya untuk membuka menu."
 Full long-press menu on a creator's videos,Menu tekan lama lengkap di video kreator
 "A long press on a video you opened from someone's profile opens the same menu as on For You, not the small share sheet. It needs Long press on TikTok default.","Tekan lama pada video yang kamu buka dari profil seseorang membuka menu yang sama seperti di Untuk Kamu, bukan menu bagikan yang kecil. Perlu Tekan lama pada bawaan TikTok."
-Ask for the quality on each save,Tanyakan kualitas setiap kali menyimpan
-"Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.","Unduh menampilkan kualitas yang tersedia untuk video ini, dengan ukuran yang diberikan TikTok untuk masing-masing, lalu menyimpan yang Anda pilih. Kualitas di atas tetap sama untuk penyimpanan berikutnya."
-Save in which quality?,Simpan dalam kualitas apa?
 Automatic (TikTok's file),Otomatis (file TikTok)
 "%1$s, about %2$s","%1$s, sekitar %2$s"
 "%1$s, size unknown","%1$s, ukuran tidak diketahui"
-The quality choice is still open,Pilihan kualitas masih terbuka
 Unknown resolution,Resolusi tidak diketahui
 Make it yours.,Sesuaikan gayamu.
 Your feed. Your rules.,Feed kamu. Aturan kamu.
@@ -2206,3 +2202,10 @@ Top tabs and search,Tab atas dan pencarian
 Bottom tabs and bars,Tab bawah dan bilah
 Dims: %1$s,Diredupkan: %1$s
 Nothing is dimmed.,Tidak ada yang diredupkan.
+Audio only,Hanya audio
+Cover image only,Hanya gambar sampul
+Show the video download menu,Tampilkan menu unduhan video
+The download menu couldn't open. Try again.,Menu unduhan tidak dapat dibuka. Coba lagi.
+The download menu is still open,Menu unduhan masih terbuka
+What do you want to download?,Apa yang ingin Anda unduh?
+"When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video.","Saat mengetuk Unduh, pilih kualitas video, simpan hanya audio, atau simpan hanya gambar sampul. Menu menampilkan opsi yang tersedia untuk video tersebut."

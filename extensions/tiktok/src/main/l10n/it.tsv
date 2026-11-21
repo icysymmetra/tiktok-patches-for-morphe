@@ -2061,13 +2061,9 @@ Copy the link with one press on Share	Copia il link con un tocco su Condividi
 A press on Share under a video copies its link instead of opening the share sheet. Press Share again right after to open the sheet.	Un tocco su Condividi sotto un video ne copia il link invece di aprire il menu di condivisione. Tocca di nuovo Condividi subito dopo per aprire il menu.
 Full long-press menu on a creator's videos	Menu completo con pressione prolungata sui video di un creator
 A long press on a video you opened from someone's profile opens the same menu as on For You, not the small share sheet. It needs Long press on TikTok default.	Una pressione prolungata su un video aperto dal profilo di qualcuno apre lo stesso menu di Per te, non il menu di condivisione ridotto. Richiede che Pressione prolungata sia su Predefinito di TikTok.
-Ask for the quality on each save	Chiedi la qualità a ogni salvataggio
-Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.	Scarica elenca le qualità in cui è disponibile il video, con la dimensione che TikTok indica per ciascuna, e salva quella che scegli. La qualità qui sopra resta invariata per il salvataggio successivo.
-Save in which quality?	In che qualità salvare?
 Automatic (TikTok's file)	Automatico (il file di TikTok)
 %1$s, about %2$s	%1$s, circa %2$s
 %1$s, size unknown	%1$s, dimensione sconosciuta
-The quality choice is still open	La scelta della qualità è ancora aperta
 Unknown resolution	Risoluzione sconosciuta
 Make it yours.	Fallo tuo.
 Your feed. Your rules.	Il tuo feed. Le tue regole.
@@ -2227,3 +2223,10 @@ Top tabs and search	Schede in alto e ricerca
 Bottom tabs and bars	Schede in basso e barre
 Dims: %1$s	Attenuati: %1$s
 Nothing is dimmed.	Niente viene attenuato.
+Audio only	Solo audio
+Cover image only	Solo immagine di copertina
+Show the video download menu	Mostra il menu di download dei video
+The download menu couldn't open. Try again.	Impossibile aprire il menu di download. Riprova.
+The download menu is still open	Il menu di download è ancora aperto
+What do you want to download?	Cosa vuoi scaricare?
+When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video.	Quando tocchi Scarica, scegli la qualità del video oppure salva solo l’audio o la copertina. Il menu mostra le opzioni disponibili per quel video.

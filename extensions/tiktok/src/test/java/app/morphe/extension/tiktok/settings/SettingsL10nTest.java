@@ -207,8 +207,11 @@ public class SettingsL10nTest {
     }
 
     private static java.io.File tableFile(String language, String extension) {
-        java.io.File file = new java.io.File(l10nDirectory(), language + extension);
-        return file.isFile() ? file : null;
+        java.io.File[] files = java.util.Objects.requireNonNull(l10nDirectory().listFiles());
+        for (java.io.File file : files) {
+            if (file.isFile() && file.getName().equalsIgnoreCase(language + extension)) return file;
+        }
+        return null;
     }
 
     /** The keys are English text, so the base is a list of source strings, not a translation. */

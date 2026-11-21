@@ -249,7 +249,6 @@ Around the video,Around the video
 Arrange your feed and bottom tabs,Arrange your feed and bottom tabs
 As TikTok sent it (M4A or MP3),As TikTok sent it (M4A or MP3)
 "Ask TikTok for search results that aren't personalized to your account. This changes results, not search buttons or suggestions.","Ask TikTok for search results that aren't personalized to your account. This changes results, not search buttons or suggestions."
-Ask for the quality on each save,Ask for the quality on each save
 "Ask for the unlock your phone uses, like a fingerprint or a PIN, when TikTok starts and when you come back to it. A link you open from another app still goes to its video once you unlock. While this is on, TikTok's preview in recent apps stays blank. Needs a screen lock on the phone.","Ask for the unlock your phone uses, like a fingerprint or a PIN, when TikTok starts and when you come back to it. A link you open from another app still goes to its video once you unlock. While this is on, TikTok's preview in recent apps stays blank. Needs a screen lock on the phone."
 Attention,Attention
 Audio,Audio
@@ -531,7 +530,6 @@ Don't start the feed on returning,Don't start the feed on returning
 Don't start the first video,Don't start the first video
 Done,Done
 Double tap,Double tap
-"Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.","Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save."
 Download original photos,Download original photos
 Downloads,Downloads
 "Drag to move, release to place","Drag to move, release to place"
@@ -1430,7 +1428,6 @@ Save details beside the video,Save details beside the video
 "Save every photo in the post at full size as a JPEG, not as the screen shows it.","Save every photo in the post at full size as a JPEG, not as the screen shows it."
 Save field values,Save field values
 Save full report,Save full report
-Save in which quality?,Save in which quality?
 Save media,Save media
 Save photo posts as a video,Save photo posts as a video
 Save photos,Save photos
@@ -1884,7 +1881,6 @@ The presets couldn't load. Open the Lab again.,The presets couldn't load. Open t
 The profile picture couldn't be saved. Try again.,The profile picture couldn't be saved. Try again.
 "The proxy at %1$s asks for a password, and TikTok can't send one. Use a proxy that doesn't need one.","The proxy at %1$s asks for a password, and TikTok can't send one. Use a proxy that doesn't need one."
 "The proxy's address, like 192.168.1.20 or proxy.example.com.","The proxy's address, like 192.168.1.20 or proxy.example.com."
-The quality choice is still open,The quality choice is still open
 "The record of an interrupted settings change couldn't be read, so it was set aside. Check your settings.","The record of an interrupted settings change couldn't be read, so it was set aside. Check your settings."
 The recording couldn't be saved. Try again.,The recording couldn't be saved. Try again.
 The recording reached its size limit and was saved to %1$s,The recording reached its size limit and was saved to %1$s

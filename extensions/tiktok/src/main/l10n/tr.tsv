@@ -2061,13 +2061,9 @@ Copy the link with one press on Share	Paylaş'a tek basışla bağlantıyı kopy
 A press on Share under a video copies its link instead of opening the share sheet. Press Share again right after to open the sheet.	Bir videonun altındaki Paylaş'a basmak, paylaşım menüsünü açmak yerine videonun bağlantısını kopyalar. Menüyü açmak için hemen ardından Paylaş'a tekrar bas.
 Full long-press menu on a creator's videos	Bir içerik üreticinin videolarında tam uzun basma menüsü
 A long press on a video you opened from someone's profile opens the same menu as on For You, not the small share sheet. It needs Long press on TikTok default.	Birinin profilinden açtığın bir videoya uzun basmak, küçük paylaşım menüsü yerine Senin İçin'deki menünün aynısını açar. Uzun basma TikTok varsayılanında olmalıdır.
-Ask for the quality on each save	Her kaydetmede kaliteyi sor
-Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.	İndir, bu videonun sunulduğu kaliteleri TikTok'un her biri için verdiği boyutla listeler ve seçtiğinizi kaydeder. Yukarıdaki kalite bir sonraki kayıt için olduğu gibi kalır.
-Save in which quality?	Hangi kalitede kaydedilsin?
 Automatic (TikTok's file)	Otomatik (TikTok'un dosyası)
 %1$s, about %2$s	%1$s, yaklaşık %2$s
 %1$s, size unknown	%1$s, boyut bilinmiyor
-The quality choice is still open	Kalite seçimi hâlâ açık
 Unknown resolution	Bilinmeyen çözünürlük
 Make it yours.	Kendine göre ayarla.
 Your feed. Your rules.	Senin akışın. Senin kuralların.
@@ -2227,3 +2223,10 @@ Top tabs and search	Üst sekmeler ve arama
 Bottom tabs and bars	Alt sekmeler ve çubuklar
 Dims: %1$s	Kararan: %1$s
 Nothing is dimmed.	Hiçbir şey kararmaz.
+Audio only	Yalnızca ses
+Cover image only	Yalnızca kapak görseli
+Show the video download menu	Video indirme menüsünü göster
+The download menu couldn't open. Try again.	İndirme menüsü açılamadı. Tekrar deneyin.
+The download menu is still open	İndirme menüsü hâlâ açık
+What do you want to download?	Ne indirmek istiyorsunuz?
+When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video.	İndir’e dokunduğunuzda video kalitesini seçebilir, yalnızca sesi veya yalnızca kapak görselini kaydedebilirsiniz. Menü, o video için kullanılabilir seçenekleri gösterir.

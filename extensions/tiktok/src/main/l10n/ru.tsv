@@ -2229,13 +2229,9 @@ Copy the link with one press on Share	Копировать ссылку одни
 A press on Share under a video copies its link instead of opening the share sheet. Press Share again right after to open the sheet.	Нажатие на «Поделиться» под видео копирует его ссылку вместо того, чтобы открыть меню «Поделиться». Нажмите «Поделиться» ещё раз сразу после этого, чтобы открыть меню.
 Full long-press menu on a creator's videos	Полное меню долгого нажатия на видео автора
 A long press on a video you opened from someone's profile opens the same menu as on For You, not the small share sheet. It needs Long press on TikTok default.	Долгое нажатие на видео, открытое из чужого профиля, открывает то же меню, что и в «Рекомендациях», а не маленькое меню «Поделиться». Для этого в настройке «Долгое нажатие» должно быть выбрано «Стандарт TikTok».
-Ask for the quality on each save	Спрашивать качество при каждом сохранении
-Download lists the qualities this video comes in, with the size TikTok gives for each, and saves the one you pick. The quality above stays as it is for the next save.	При скачивании показываются все варианты качества этого видео с размером, который TikTok указывает для каждого, и сохраняется выбранный. Качество выше остаётся прежним для следующего сохранения.
-Save in which quality?	В каком качестве сохранить?
 Automatic (TikTok's file)	Автоматически (файл TikTok)
 %1$s, about %2$s	%1$s, около %2$s
 %1$s, size unknown	%1$s, размер неизвестен
-The quality choice is still open	Выбор качества всё ещё открыт
 Unknown resolution	Разрешение неизвестно
 Make it yours.	Настрой под себя.
 Your feed. Your rules.	Твоя лента. Твои правила.
@@ -2407,3 +2403,10 @@ Top tabs and search	Верхние вкладки и поиск
 Bottom tabs and bars	Нижние вкладки и панели
 Dims: %1$s	Затемняются: %1$s
 Nothing is dimmed.	Ничего не затемняется.
+Audio only	Только звук
+Cover image only	Только обложка
+Show the video download menu	Показывать меню скачивания видео
+The download menu couldn't open. Try again.	Не удалось открыть меню скачивания. Попробуйте ещё раз.
+The download menu is still open	Меню скачивания ещё открыто
+What do you want to download?	Что вы хотите скачать?
+When you tap Download, choose a video quality, save only the audio or save only the cover. The menu shows the options available for that video.	При нажатии «Скачать» выберите качество видео или сохраните только звук или обложку. В меню показаны варианты, доступные для этого видео.
