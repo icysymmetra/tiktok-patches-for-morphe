@@ -80,10 +80,6 @@ val inboxFilterPatch = bytecodePatch(
         // what it already wrote.
         val gestures = ChatMessageGestureFingerprint.method
         val gestureRegister = chatGestureRegister(gestures)
-        val notificationBinds = listOf(InboxNotificationNormalBind.method, InboxNotificationPayloadBind.method)
-        val notificationVm = InboxNotificationVmGetter.method
-        val loadedPublication = loadedInboxPublicationSeams()
-        val loadedRequests = loadedInboxRequestSeams()
         // The group chat banner's update is required on a declared build, where
         // InboxGroupBannerAnchorsTest holds it, and left out with a note on any other.
         val groupBanner = try {
@@ -103,10 +99,22 @@ val inboxFilterPatch = bytecodePatch(
             "Inbox filter: ${binding.name} does not read the ViewHolder's itemView, so it is not " +
                 "the row bind this hooks."
         }
-        notificationBinds.forEach { it.captureLoadedInboxOwner() }
-        notificationVm.captureLoadedInboxVm()
-        loadedPublication.install()
-        loadedRequests.install()
+        if (packageMetadata.versionName == "47.6.15") {
+            println("[$PATCH_NAME] Search loaded activity is unavailable on 47.6.15.")
+        } else {
+            val notificationBinds = listOf(InboxNotificationNormalBind.method, InboxNotificationPayloadBind.method)
+            val notificationVm = InboxNotificationVmGetter.method
+            val loadedPublication = loadedInboxPublicationSeams()
+            val loadedRequests = loadedInboxRequestSeams()
+            notificationBinds.forEach { it.captureLoadedInboxOwner() }
+            notificationVm.captureLoadedInboxVm()
+            loadedPublication.install()
+            loadedRequests.install()
+            SettingsStatusLoadFingerprint.method.addInstruction(
+                0,
+                "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableInboxLoadedSearch()V",
+            )
+        }
         binding.addInstruction(0,
             "invoke-static/range {p0 .. p2}, $EXTENSION_CLASS_DESCRIPTOR->onRowBound(Ljava/lang/Object;ILjava/lang/Object;)V")
         SettingsStatusLoadFingerprint.method.addInstruction(

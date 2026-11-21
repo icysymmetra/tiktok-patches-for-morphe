@@ -18,7 +18,6 @@ import app.morphe.patches.tiktok.misc.settings.settingsPatch
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.patcher.util.findMutableMethodOf
 import app.morphe.patcher.util.getReference
-import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
@@ -37,9 +36,9 @@ private const val QUICK_FAVORITES_DARK = "Lapp/morphe/extension/tiktok/favorites
 internal const val QUICK_FAVORITE_PANEL_TRACE =
     "com/ss/android/ugc/aweme/favorites/business/collection/quickfavorite/AbstractQuickFavoritePanelDialog"
 
-/** The method that opens a popup: an instance void method carrying [QUICK_FAVORITE_PANEL_TRACE] and "show". */
+/** The method that opens the popup, including the merged static callback in 47.6.15. */
 internal fun Method.isQuickFavoritePanelShow(): Boolean {
-    if (returnType != "V" || AccessFlags.STATIC.isSet(accessFlags)) return false
+    if (returnType != "V") return false
     val strings = implementation?.instructions?.mapNotNull { it.getReference<StringReference>()?.string } ?: return false
     return QUICK_FAVORITE_PANEL_TRACE in strings && "show" in strings
 }

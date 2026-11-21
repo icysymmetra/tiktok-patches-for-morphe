@@ -125,6 +125,14 @@ val showFollowStatusPatch = bytecodePatch(
             )
         }
         hookLocalProfileCounts()
-        hookLocalProfileAppearance()
+        if (packageMetadata.versionName == "47.6.15") {
+            println("[Show follow status] Local badge and warning controls are unavailable on 47.6.15.")
+        } else {
+            hookLocalProfileAppearance()
+            SettingsStatusLoadFingerprint.method.addInstruction(
+                0,
+                "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableLocalProfileAppearance()V",
+            )
+        }
     }
 }

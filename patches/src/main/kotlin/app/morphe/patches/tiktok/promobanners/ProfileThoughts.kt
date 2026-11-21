@@ -19,6 +19,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 /** The profile header's picture, yours or someone else's. Its real name is kept on 47.1.4. */
 internal const val PROFILE_AVATAR_ASSEM = "Lcom/ss/android/ugc/profile/business/avatar/ProfileAvatarAssem;"
@@ -53,21 +54,29 @@ internal object ProfileAvatarViewCreatedFingerprint : Fingerprint(
  * The callback the Thoughts builder calls with whether the bubble shows, handed in by the
  * profile picture's note binding. With true it opens a spacer above the picture, moves the
  * header down and logs the bubble as shown, all of which reads that third argument. Its class is
- * renamed on every build, so it is found by its log line and by holding the profile picture.
+ * renamed on every build. The merged static lambda on 47.6.15 casts its captured owner to
+ * ProfileAvatarAssem and takes the closure as its first argument, so visibility still sits in p3.
  */
 internal object ThoughtVisibilityCallbackFingerprint : Fingerprint(
-    name = "invoke",
     returnType = "Ljava/lang/Object;",
-    parameters = listOf("Ljava/lang/Object;", "Ljava/lang/Object;", "Ljava/lang/Object;"),
     strings = listOf(THOUGHT_VISIBILITY_LOG).map { string(it, StringComparisonType.CONTAINS) },
     custom = { method, _ -> isThoughtVisibilityCallback(method) },
 )
 
 internal fun isThoughtVisibilityCallback(method: Method): Boolean {
-    if (AccessFlags.STATIC.isSet(method.accessFlags)) return false
-    return method.implementation?.instructions?.any { instruction ->
-        instruction.getReference<FieldReference>()?.type == PROFILE_AVATAR_ASSEM
-    } == true
+    val arguments = List(3) { "Ljava/lang/Object;" }
+    val isStatic = AccessFlags.STATIC.isSet(method.accessFlags)
+    if (isStatic) {
+        return method.name.startsWith("invoke\$") &&
+            method.parameterTypes == listOf(method.definingClass) + arguments &&
+            method.implementation?.instructions?.any {
+                it.opcode == Opcode.CHECK_CAST && it.getReference<TypeReference>()?.type == PROFILE_AVATAR_ASSEM
+            } == true
+    }
+    return method.name == "invoke" && method.parameterTypes == arguments &&
+        method.implementation?.instructions?.any {
+            it.getReference<FieldReference>()?.type == PROFILE_AVATAR_ASSEM
+        } == true
 }
 
 /** The bubble's one store in the profile picture's onViewCreated, and a register free after it. */

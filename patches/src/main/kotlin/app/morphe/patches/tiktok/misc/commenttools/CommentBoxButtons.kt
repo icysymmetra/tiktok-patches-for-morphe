@@ -12,8 +12,13 @@ import app.morphe.patcher.util.getReference
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
@@ -65,10 +70,8 @@ internal fun commentBoxButtonFields(
         if (instruction.opcode != Opcode.IGET_OBJECT) return@forEachIndexed
         val field = instruction.getReference<FieldReference>() ?: return@forEachIndexed
         if (field.definingClass != BASE_INPUT_ASSEM || field.type != TUX_ICON_VIEW) return@forEachIndexed
-        val listener = instructions.subList(index + 1, minOf(index + 4, instructions.size))
-            .firstOrNull { it.opcode == Opcode.NEW_INSTANCE }
-            ?.getReference<TypeReference>()?.type ?: return@forEachIndexed
-        val button = classDefOf(listener)?.let(::commentBoxButtonOf) ?: return@forEachIndexed
+        val listener = instructions.commentBoxButtonListener(index, classDefOf)
+        val button = commentBoxButtonOf(listener) ?: return@forEachIndexed
         found.getOrPut(button) { mutableListOf() }.add(field)
     }
     return CommentBoxButton.entries.associateWith { button ->
@@ -79,8 +82,33 @@ internal fun commentBoxButtonFields(
     }
 }
 
-internal fun commentBoxButtonOf(listener: ClassDef): CommentBoxButton? {
-    val instructions = listener.methods.flatMap { it.implementation?.instructions ?: emptyList() }
+/** The merged listeners use the constructor's last argument to select a static body. */
+internal fun List<Instruction>.commentBoxButtonListener(index: Int, classDefOf: (String) -> ClassDef?): List<Instruction> {
+    val site = (index + 1 until minOf(index + 4, size)).firstOrNull { this[it].opcode == Opcode.NEW_INSTANCE }
+        ?: return emptyList()
+    val create = this[site]
+    val type = create.getReference<TypeReference>()?.type ?: return emptyList()
+    val owner = classDefOf(type) ?: return emptyList()
+    val literal = getOrNull(site + 1)
+    val call = getOrNull(site + 2)
+    val reference = call?.getReference<MethodReference>()
+    if (call?.opcode == Opcode.INVOKE_DIRECT && call is FiveRegisterInstruction &&
+        reference?.definingClass == type && reference.name == "<init>" &&
+        reference.parameterTypes == listOf("Ljava/lang/Object;", "I") &&
+        call.registerC == (create as OneRegisterInstruction).registerA &&
+        literal is NarrowLiteralInstruction && literal is OneRegisterInstruction && literal.registerA == call.registerE
+    ) {
+        val suffix = "\$${literal.narrowLiteral}"
+        val method = owner.methods.singleOrNull {
+            it.name.endsWith(suffix) && it.returnType == "V" &&
+                it.parameterTypes == listOf(type, "Landroid/view/View;")
+        }
+        if (method != null) return method.implementation?.instructions?.toList().orEmpty()
+    }
+    return owner.methods.flatMap { it.implementation?.instructions ?: emptyList() }
+}
+
+internal fun commentBoxButtonOf(instructions: List<Instruction>): CommentBoxButton? {
     if (instructions.any { it.getReference<StringReference>()?.string == "click_comment_photo" }) {
         return CommentBoxButton.PHOTO
     }

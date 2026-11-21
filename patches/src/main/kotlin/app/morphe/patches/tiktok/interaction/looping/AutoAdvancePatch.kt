@@ -137,12 +137,13 @@ internal fun MutableMethod.chooseAutoAdvanceLoadStrategy(strategyIndex: Int, str
 
 private object Availability : Fingerprint(returnType = "Z", parameters = emptyList(), strings = listOf("fyp_auto_scroll"))
 
-// The feed gate and the panel entry are two different flags. Both are anchored on the string
-// rather than on the class that reads it, because those names change every build. Parameter and
-// return types match by prefix, so "L" is any object: the factory that builds the panel entry
-// takes one and returns one, and the facade gate beside it takes none and returns Z.
-private object PanelAction : Fingerprint(returnType = "L", parameters = listOf("L"), strings = listOf("panel_auto_scroll"))
-private object PanelGate : Fingerprint(returnType = "Z", parameters = emptyList(), strings = listOf("panel_auto_scroll"))
+// In 47.6.15 the menu factory passes panel_auto_scroll to the shared flag reader directly.
+// The other literal occurrence is the component's string getter, which takes no arguments.
+private object PanelAction : Fingerprint(
+    returnType = "L",
+    parameters = listOf("L"),
+    strings = listOf("panel_auto_scroll", "createAutoScrollItem, add auto scroll item to the menu"),
+)
 private object Completion : Fingerprint(definingClass = COMPONENT, name = "onPlayCompleted",
     returnType = "V", parameters = listOf("Ljava/lang/String;"))
 private object Stop : Fingerprint(definingClass = COMPONENT, returnType = "V",
@@ -374,60 +375,42 @@ val autoAdvancePatch = bytecodePatch(
 }
 
 private fun BytecodePatchContext.installAutoScrollAvailability() {
-        val available = Availability.method
-        val returns = available.implementationOrPatchException("Auto advance").instructions
-            .withIndex().filter { it.value.opcode == Opcode.RETURN }
-        check(returns.isNotEmpty()) {
-            "Auto advance: ${available.name} returns nothing this can answer for."
-        }
-        returns.asReversed().forEach { (index, instruction) ->
-            val register = (instruction as OneRegisterInstruction).registerA
-            available.addInstructionsAtControlFlowLabel(index, """
-                invoke-static/range {v$register .. v$register}, $EXTENSION->available(Z)Z
-                move-result v$register
-            """)
-        }
-        // TikTok's own Auto scroll action in the video panel hangs off a second flag, so an
-        // account outside the rollout never sees the entry however the feed gate answers. Both
-        // reads go through the same switch.
-        val panelAction = PanelAction.method
-        val panelInstructions = panelAction.implementationOrPatchException("Auto advance").instructions.toList()
-        val panelStringIndex = panelInstructions.indexOfFirst {
-            it.opcode == Opcode.CONST_STRING &&
-                it.getReference<StringReference>()?.string == "panel_auto_scroll"
-        }
-        check(panelStringIndex >= 0) {
-            "Auto advance: the panel_auto_scroll string is gone from the settings panel."
-        }
-        // The answer of the call the key is handed to, followed through the key's register. The
-        // first move-result after the string was taken before, and a call landing between the
-        // string and the settings read owns a result of its own, which the switch would then
-        // have overridden instead.
-        val panelResultIndex = panelAction.indexOfLiteralCallResult(panelStringIndex)
-        val panelRegister = (panelInstructions[panelResultIndex] as OneRegisterInstruction).registerA
-        panelAction.addInstructions(
-            panelResultIndex + 1,
-            """
-                invoke-static/range {v$panelRegister .. v$panelRegister}, $EXTENSION->panelAvailable(Z)Z
-                move-result v$panelRegister
-            """,
-        )
-
-        val panelGate = PanelGate.method
-        val panelReturns = panelGate.implementationOrPatchException("Auto advance").instructions.withIndex()
-            .filter { it.value.opcode == Opcode.RETURN }
-        check(panelReturns.isNotEmpty()) {
-            "Auto advance: ${panelGate.name} returns nothing this can answer for."
-        }
-        panelReturns.asReversed().forEach { (index, instruction) ->
-            val register = (instruction as OneRegisterInstruction).registerA
-            panelGate.addInstructionsAtControlFlowLabel(
-                index,
-                """
-                    invoke-static/range {v$register .. v$register}, $EXTENSION->panelAvailable(Z)Z
-                    move-result v$register
-                """,
-            )
-        }
-
+    val available = Availability.method
+    val returns = available.implementationOrPatchException("Auto advance").instructions
+        .withIndex().filter { it.value.opcode == Opcode.RETURN }
+    check(returns.isNotEmpty()) {
+        "Auto advance: ${available.name} returns nothing this can answer for."
+    }
+    returns.asReversed().forEach { (index, instruction) ->
+        val register = (instruction as OneRegisterInstruction).registerA
+        available.addInstructionsAtControlFlowLabel(index, """
+            invoke-static/range {v$register .. v$register}, $EXTENSION->available(Z)Z
+            move-result v$register
+        """)
+    }
+    // TikTok's own Auto scroll action in the video panel hangs off a second flag, so an
+    // account outside the rollout never sees the entry however the feed gate answers. Both
+    // reads go through the same switch.
+    val panelAction = PanelAction.method
+    val panelInstructions = panelAction.implementationOrPatchException("Auto advance").instructions.toList()
+    val panelStringIndex = panelInstructions.indexOfFirst {
+        it.opcode == Opcode.CONST_STRING &&
+            it.getReference<StringReference>()?.string == "panel_auto_scroll"
+    }
+    check(panelStringIndex >= 0) {
+        "Auto advance: the panel_auto_scroll string is gone from the settings panel."
+    }
+    // The answer of the call the key is handed to, followed through the key's register. The
+    // first move-result after the string was taken before, and a call landing between the
+    // string and the settings read owns a result of its own, which the switch would then
+    // have overridden instead.
+    val panelResultIndex = panelAction.indexOfLiteralCallResult(panelStringIndex)
+    val panelRegister = (panelInstructions[panelResultIndex] as OneRegisterInstruction).registerA
+    panelAction.addInstructions(
+        panelResultIndex + 1,
+        """
+            invoke-static/range {v$panelRegister .. v$panelRegister}, $EXTENSION->panelAvailable(Z)Z
+            move-result v$panelRegister
+        """,
+    )
 }

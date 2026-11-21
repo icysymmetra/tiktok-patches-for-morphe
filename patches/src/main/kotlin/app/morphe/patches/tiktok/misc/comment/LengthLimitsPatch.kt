@@ -19,6 +19,7 @@ import app.morphe.util.addInstructions
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findInstructionIndicesReversedOrThrow
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
@@ -46,6 +47,7 @@ internal val REPOST_NOTE_INPUTS = listOf(
 
 /** The classes of the bio editor that compare the bio with its limit. */
 internal val BIO_EDITOR_CLASSES = listOf("${PROFILE_EDIT}ProfileEditBioViewModel;", "${PROFILE_EDIT}ProfileEditBioAssem;")
+internal const val BIO_EDITOR_FRAGMENT = "${PROFILE_EDIT}ProfileEditBioFragment;"
 
 /**
  * The comment box's limit: the getter the comment keyboard sizes its length filter and its
@@ -95,12 +97,25 @@ internal fun Instruction.lengthFilterMaxRegister(): Int = when (this) {
     else -> throw IllegalStateException("Not an invoke: $opcode")
 }
 
-/** The indices of the constants that load the bio limit. */
-internal fun List<Instruction>.bioLimitConstants(): List<Int> = indices.filter { index ->
-    val instruction = this[index]
-    (instruction.opcode == Opcode.CONST_16 || instruction.opcode == Opcode.CONST) &&
-        (instruction as NarrowLiteralInstruction).narrowLiteral == BIO_LIMIT
+/** In 47.6.15 the editor reads the limit from the field its fragment initializes to 160. */
+internal fun Method.bioLimitField(): FieldReference {
+    val code = implementation!!.instructions.toList()
+    return code.zipWithNext().mapNotNull { (literal, store) ->
+        if (literal.opcode !in listOf(Opcode.CONST_16, Opcode.CONST) ||
+            (literal as NarrowLiteralInstruction).narrowLiteral != BIO_LIMIT ||
+            store.opcode != Opcode.SPUT ||
+            (literal as OneRegisterInstruction).registerA != (store as OneRegisterInstruction).registerA
+        ) return@mapNotNull null
+        ((store as ReferenceInstruction).reference as? FieldReference)
+            ?.takeIf { it.definingClass == BIO_EDITOR_FRAGMENT && it.type == "I" }
+    }.singleOrNull() ?: throw PatchException("The bio editor's shared limit field could not be resolved")
 }
+
+internal fun List<Instruction>.bioLimitReads(field: FieldReference): List<Int> =
+    indices.filter { index ->
+        val instruction = this[index]
+        instruction.opcode == Opcode.SGET && (instruction as ReferenceInstruction).reference == field
+    }
 
 private fun MutableMethod.limitBefore(index: Int, register: Int) = addInstructionsAtControlFlowLabel(index, """
     invoke-static/range { v$register .. v$register }, $LIMITS->limit(I)I
@@ -136,22 +151,23 @@ val liftLengthLimitsPatch = bytecodePatch(
             }
         }
 
-        var bioSites = 0
-        BIO_EDITOR_CLASSES.forEach { type ->
-            mutableClassDefBy(type).methods.forEach { method ->
-                if (method.implementation == null) return@forEach
-                method.instructions.toList().bioLimitConstants().reversed().forEach { index ->
-                    val register = method.getInstruction<OneRegisterInstruction>(index).registerA
-                    method.addInstructions(index + 1, """
-                        invoke-static/range { v$register .. v$register }, $LIMITS->limit(I)I
-                        move-result v$register
-                    """)
-                    bioSites++
-                }
+        val bioLimit = classDefBy(BIO_EDITOR_FRAGMENT).methods.single { it.name == "<clinit>" }.bioLimitField()
+        val bioSites = BIO_EDITOR_CLASSES.flatMap { type ->
+            mutableClassDefBy(type).methods.filter { it.implementation != null }.map { method ->
+                method to method.instructions.toList().bioLimitReads(bioLimit)
             }
         }
-        // The overflow check, the mention check and the counter, on every declared build.
-        if (bioSites != 3) throw PatchException("The bio editor compares with $BIO_LIMIT at $bioSites places, not 3")
+        val bioReadCount = bioSites.sumOf { (_, sites) -> sites.size }
+        if (bioReadCount != 5) throw PatchException("The bio editor reads its shared limit at $bioReadCount places, expected 5")
+        bioSites.forEach { (method, sites) ->
+            sites.asReversed().forEach { index ->
+                val register = method.getInstruction<OneRegisterInstruction>(index).registerA
+                method.addInstructions(index + 1, """
+                    invoke-static/range { v$register .. v$register }, $LIMITS->limit(I)I
+                    move-result v$register
+                """)
+            }
+        }
 
         SettingsStatusLoadFingerprint.method.addInstruction(0,
             "invoke-static {}, Lapp/morphe/extension/tiktok/settings/SettingsStatus;->enableLengthLimits()V")

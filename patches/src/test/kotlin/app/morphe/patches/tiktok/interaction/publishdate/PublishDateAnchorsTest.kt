@@ -38,7 +38,7 @@ class PublishDateAnchorsTest {
 
             val site = runCatching { method.postTimeSite() }.getOrElse { throw AssertionError("$version: ${it.message}", it) }
             assertEquals("$version: date formatters, text and item registers",
-                Triple(9, 0, 11), Triple(site.formatters, site.textRegister, site.itemRegister))
+                Triple(9, 0, 12), Triple(site.formatters, site.textRegister, site.itemRegister))
 
             val instructions = method.implementation!!.instructions.toList()
             assertEquals("$version: the hook follows the empty check", Opcode.IF_NEZ, instructions[site.insertAt - 1].opcode)

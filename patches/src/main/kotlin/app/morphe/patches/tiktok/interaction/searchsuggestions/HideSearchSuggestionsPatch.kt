@@ -183,11 +183,23 @@ private object NativeGuessSearchFingerprint : Fingerprint(
     custom = { method, _ -> isNativeGuessSearchGate(method) },
 )
 
+private const val REENTRY_FRAGMENT =
+    "Lcom/ss/android/ugc/aweme/search/middle/DynamicSingleIntermediateFragmentNew;"
+
 private object SearchReentryFingerprint : Fingerprint(
-    definingClass = "Lcom/ss/android/ugc/aweme/search/middle/DynamicSingleIntermediateFragmentNew;",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
-    returnType = "V",
     strings = listOf("show_suggest_search_words", "searchTransferEnter").map { string(it, StringComparisonType.CONTAINS) },
+    custom = { method, owner ->
+        if (AccessFlags.STATIC.isSet(method.accessFlags)) {
+            // R8 moved the reentry body into a merged lambda that casts its captured fragment.
+            method.name.startsWith("invoke\$") && method.returnType == "Ljava/lang/Object;" &&
+                method.parameterTypes == listOf(owner.type) &&
+                method.implementation?.instructions?.any {
+                    it.opcode == Opcode.CHECK_CAST && it.getReference<TypeReference>()?.type == REENTRY_FRAGMENT
+                } == true
+        } else {
+            owner.type == REENTRY_FRAGMENT && method.returnType == "V"
+        }
+    },
 )
 
 private const val SUGGEST_WORD = "Lcom/ss/android/ugc/aweme/discover/model/suggest/Word;"

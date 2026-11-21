@@ -37,6 +37,19 @@ private const val BOTTOM_TAB_SCENE = "scene_get_bottom_tab"
  */
 private fun Method.isTabModelList(classDef: ClassDef, scene: String): Boolean {
     val instructions = implementation?.instructions?.toList() ?: return false
+    // 47.6.15 can schedule a compatibility refresh before returning the list. These
+    // two getters tag the refresh with TOP_TAB or BOTTOM_TAB and return their cached list.
+    val tabMarker = if (scene == TOP_TAB_SCENE) "TOP_TAB" else "BOTTOM_TAB"
+    val load = instructions.getOrNull(instructions.size - 2)
+    val result = instructions.lastOrNull()
+    if (load?.opcode == Opcode.IGET_OBJECT && result?.opcode == Opcode.RETURN_OBJECT &&
+        (load as TwoRegisterInstruction).registerA == (result as OneRegisterInstruction).registerA &&
+        load.getReference<FieldReference>()?.let { it.definingClass == classDef.type && it.type == COPY_ON_WRITE } == true &&
+        instructions.any {
+            val field = it.getReference<FieldReference>()
+            it.opcode == Opcode.SGET_OBJECT && field?.name == tabMarker && field.type == field.definingClass
+        }
+    ) return true
     if (instructions.size != 3) return false
     if (instructions[0].opcode != Opcode.INVOKE_VIRTUAL) return false
     if (instructions[1].opcode != Opcode.IGET_OBJECT) return false
@@ -308,10 +321,17 @@ internal fun Method.coldStartTab(): ColdStartTab? {
     } ?: return null
     val switch = instructions[switchAt] as FiveRegisterInstruction
     if (switch.registerCount != 4) return null
-    val intentResult = instructions[switchAt - 2]
+    // The intent is loaded before the optional deferred switch on 47.6.15.
+    val intentAt = (1 until switchAt - 1).lastOrNull { i ->
+        val instruction = instructions[i]
+        if (!instruction.opcode.setsRegister()) return@lastOrNull false
+        val destination = (instruction as? OneRegisterInstruction)?.registerA ?: return@lastOrNull false
+        destination == switch.registerD || (instruction.opcode.setsWideRegister() && destination + 1 == switch.registerD)
+    } ?: return null
+    val intentResult = instructions[intentAt]
     if (intentResult.opcode != Opcode.MOVE_RESULT_OBJECT) return null
     if ((intentResult as OneRegisterInstruction).registerA != switch.registerD) return null
-    val getIntent = instructions[switchAt - 3]
+    val getIntent = instructions[intentAt - 1]
     val readsIntent = getIntent.opcode == Opcode.INVOKE_VIRTUAL && getIntent.getReference<MethodReference>()?.let {
         it.name == "getIntent" && it.returnType == INTENT && it.parameterTypes.isEmpty()
     } == true

@@ -39,7 +39,7 @@ public class LocalProfileAppearanceTest {
     @Before public void setUp() {
         PausedProcess.set(false);
         SignedInUser.idForTests = "account-a";
-        SettingsStatus.followStatusEnabled = true;
+        SettingsStatus.localProfileAppearanceEnabled = true;
         Settings.LOCAL_PROFILE_VERIFIED_BADGE.save(false);
         Settings.HIDE_OWN_PROFILE_RESTRICTION_NOTICE.save(false);
     }
@@ -47,7 +47,7 @@ public class LocalProfileAppearanceTest {
     @After public void tearDown() {
         PausedProcess.set(false);
         SignedInUser.idForTests = null;
-        SettingsStatus.followStatusEnabled = false;
+        SettingsStatus.localProfileAppearanceEnabled = false;
         Settings.LOCAL_PROFILE_VERIFIED_BADGE.save(false);
         Settings.HIDE_OWN_PROFILE_RESTRICTION_NOTICE.save(false);
     }
@@ -93,9 +93,9 @@ public class LocalProfileAppearanceTest {
         PausedProcess.set(true);
         assertNative();
         PausedProcess.set(false);
-        SettingsStatus.followStatusEnabled = false;
+        SettingsStatus.localProfileAppearanceEnabled = false;
         assertNative();
-        SettingsStatus.followStatusEnabled = true;
+        SettingsStatus.localProfileAppearanceEnabled = true;
         for (String uid : new String[]{"", "0", " ", "account\n", new String(new char[129]).replace('\0', 'a')}) {
             SignedInUser.idForTests = uid;
             assertNative();

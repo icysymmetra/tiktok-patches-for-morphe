@@ -75,8 +75,11 @@ public class NotificationControlsTest {
         try {
             Settings.HIDE_MESSAGE_STREAKS.save(false);
             assertFalse(NotificationControls.hideMessageStreaks());
+            assertTrue(NotificationControls.filterMessageStreak(true));
+            assertFalse(NotificationControls.filterMessageStreak(false));
             Settings.HIDE_MESSAGE_STREAKS.save(true);
             assertTrue(NotificationControls.hideMessageStreaks());
+            assertFalse(NotificationControls.filterMessageStreak(true));
         } finally {
             Settings.HIDE_MESSAGE_STREAKS.save(false);
         }

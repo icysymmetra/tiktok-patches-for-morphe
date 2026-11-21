@@ -7,6 +7,7 @@
 package app.morphe.patches.tiktok.misc.inbox
 
 import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.fieldAccess
 import app.morphe.patcher.patch.PatchException
 import app.morphe.util.addInstruction
 import app.morphe.patcher.patch.bytecodePatch
@@ -18,10 +19,13 @@ import app.morphe.patches.tiktok.misc.settings.settingsPatch
 import app.morphe.patches.tiktok.privacy.invokeSitesOf
 import app.morphe.patches.tiktok.privacy.replaceSites
 import app.morphe.patches.tiktok.shared.guardAtEntry
-import app.morphe.patches.tiktok.shared.requireLocals
 import app.morphe.patcher.util.getReference
-import app.morphe.patcher.util.numberOfParameterRegisters
+import app.morphe.util.addInstructions
+import app.morphe.util.addInstructionsAtControlFlowLabel
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val EXTENSION = "Lapp/morphe/extension/tiktok/inbox/NotificationControls;"
@@ -83,6 +87,17 @@ private object StreakReminderFingerprint : Fingerprint(
     parameters = emptyList(),
 )
 
+// In 47.6.15 the strategy adapters can read these flags without calling the model getter.
+private val streakReminderOwners = listOf(
+    "Lcom/ss/android/ugc/aweme/im/lightinteract/api/platform/strategybridge/LightInteractionMetaData;",
+    "Lcom/ss/android/ugc/aweme/im/actionbar/serviceimpl/ActionBarMetaData;",
+    "Lcom/ss/android/ugc/aweme/im/pluspanel/impl/serviceimpl/PlusPanelMetaData;",
+)
+private const val REMINDER_FIELD = "hasStreakReminderInlineMsg"
+
+private fun filterMessageStreak(register: Int) =
+    "invoke-static/range {v$register .. v$register}, $EXTENSION->filterMessageStreak(Z)Z\nmove-result v$register"
+
 @Suppress("unused")
 val notificationControlsPatch = bytecodePatch(
     name = "Notification controls",
@@ -117,26 +132,39 @@ val notificationControlsPatch = bytecodePatch(
             )
         }
 
-        for (fingerprint in listOf(ShowStreakButtonFingerprint, StreakReminderFingerprint)) {
-            val matches = fingerprint.matchAll().filter { it.method.implementation != null }
-            check(matches.isNotEmpty()) {
-                "Notification controls: no match for ${fingerprint.javaClass.simpleName} to take over."
+        val reminderGetters = StreakReminderFingerprint.matchAll().filter { it.originalMethod.implementation != null }
+        check(reminderGetters.isNotEmpty()) { "Notification controls: no streak reminder getter has a body." }
+        val buttonGetters = ShowStreakButtonFingerprint.matchAllOrNull().orEmpty()
+            .filter { it.originalMethod.implementation != null }
+        for (match in reminderGetters + buttonGetters) {
+            val method = match.method
+            val returns = method.implementation!!.instructions.withIndex().filter { it.value.opcode == Opcode.RETURN }
+            returns.asReversed().forEach { (index, instruction) ->
+                method.addInstructionsAtControlFlowLabel(index,
+                    filterMessageStreak((instruction as OneRegisterInstruction).registerA))
             }
-            matches.forEach { match ->
-                // A Kotlin getter this small can be compiled with only its own receiver, and
-                // then v0 is that receiver rather than a spare.
-                check(match.method.implementation!!.registerCount > 1) {
-                    "Notification controls: ${match.method.definingClass}->${match.method.name} has no free local register."
+        }
+        var reminderReads = 0
+        for (owner in streakReminderOwners) {
+            val reads = Fingerprint(filters = listOf(fieldAccess(
+                definingClass = owner, name = REMINDER_FIELD, opcode = Opcode.IGET_BOOLEAN,
+            ))).matchAllOrNull().orEmpty()
+            for (match in reads) {
+                // Keep the data classes' equality, hash and debugging output tied to the original value.
+                if (match.originalClassDef.type == owner) continue
+                val method = match.method
+                method.implementation!!.instructions.withIndex().filter { (_, instruction) ->
+                    instruction.opcode == Opcode.IGET_BOOLEAN && instruction.getReference<FieldReference>()?.let {
+                        it.definingClass == owner && it.name == REMINDER_FIELD && it.type == "Z"
+                    } == true
+                }.asReversed().forEach { (index, instruction) ->
+                    method.addInstructions(index + 1, filterMessageStreak((instruction as OneRegisterInstruction).registerA))
+                    reminderReads++
                 }
-                match.method.guardAtEntry(
-                    "getShowStreakButton",
-                    "invoke-static {}, $EXTENSION->hideMessageStreaks()Z",
-                    """
-                        const/4 v0, 0x0
-                        return v0
-                    """,
-                )
             }
+        }
+        check(buttonGetters.isNotEmpty() || reminderReads > 0) {
+            "Notification controls: neither the legacy streak button nor the strategy flag reads were found."
         }
 
         // Turn off push notifications. TikTok's push setup is one startup task, so a guard at its

@@ -223,6 +223,8 @@ public class ExtensionPreferenceCategory extends ConditionalPreferenceCategory {
                     "Show chosen counts on your own profile on this phone. Other people see the real counts.",
                     Settings.LOCAL_PROFILE_COUNTS));
             addPreference(new LocalProfileCountsPreference(context));
+        }
+        if (SettingsStatus.localProfileAppearanceEnabled) {
             addPreference(new TogglePreference(context, "Local verified badge",
                     "Show a verified badge on your own profile on this phone. Other people see your real status.",
                     Settings.LOCAL_PROFILE_VERIFIED_BADGE));
