@@ -31,6 +31,7 @@ public final class StallingMediaProvider extends ContentProvider {
     public volatile boolean published;
     private final CountDownLatch release = new CountDownLatch(1);
     private volatile boolean holding;
+    private String owner;
 
     private StallingMediaProvider(File file) {
         this.file = file;
@@ -38,6 +39,7 @@ public final class StallingMediaProvider extends ContentProvider {
 
     public static StallingMediaProvider register(Context context, File file) {
         StallingMediaProvider provider = new StallingMediaProvider(file);
+        provider.owner = context.getPackageName();
         ProviderInfo info = new ProviderInfo();
         info.authority = MediaStore.AUTHORITY;
         provider.attachInfo(context, info);
@@ -85,8 +87,18 @@ public final class StallingMediaProvider extends ContentProvider {
     }
 
     @Override public Cursor query(Uri uri, String[] fields, String where, String[] args, String sort) {
-        MatrixCursor cursor = new MatrixCursor(new String[]{MediaStore.MediaColumns.DISPLAY_NAME});
-        cursor.addRow(new Object[]{created.getAsString(MediaStore.MediaColumns.DISPLAY_NAME)});
+        String[] columns = fields == null ? new String[]{MediaStore.MediaColumns.DISPLAY_NAME} : fields;
+        MatrixCursor cursor = new MatrixCursor(columns);
+        if (created == null) return cursor;
+        Object[] row = new Object[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            if (MediaStore.MediaColumns._ID.equals(columns[i])) row[i] = inserts.get();
+            else if (MediaStore.MediaColumns.OWNER_PACKAGE_NAME.equals(columns[i])) row[i] = owner;
+            else if (MediaStore.MediaColumns.IS_PENDING.equals(columns[i])) row[i] = published ? 0 : 1;
+            else if (MediaStore.MediaColumns.IS_TRASHED.equals(columns[i])) row[i] = 0;
+            else row[i] = created.get(columns[i]);
+        }
+        cursor.addRow(row);
         return cursor;
     }
 

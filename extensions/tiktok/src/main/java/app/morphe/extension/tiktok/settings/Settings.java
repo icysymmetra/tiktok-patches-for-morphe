@@ -844,11 +844,48 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting SEE_THROUGH_STATUS_BAR = new BooleanSetting("see_through_status_bar", FALSE);
     /**
-     * Burn-in guard for OLED screens (BurnInGuard): "dim" draws the controls the fade covers at a
-     * quarter after a few seconds without a touch, "dim_shift" also moves the window's content a
-     * couple of dp every two minutes. Over the feed and an opened video only.
+     * Burn-in guard for OLED screens (BurnInGuard): "dim" draws the controls the fade covers at
+     * {@link #BURN_IN_DIM_LEVEL} once {@link #BURN_IN_DIM_AFTER} seconds have gone by without
+     * anything the wake switches below count (#191), "dim_shift" also moves the window's content
+     * a couple of dp every two minutes. Over the feed and an opened video only.
      */
     public static final StringSetting BURN_IN_GUARD = new StringSetting("burn_in_guard", "off");
+    /** The rows below are read only while the guard is on, so they grey with it and say so. */
+    private static final Setting.Availability BURN_IN_GUARD_ON = new Setting.Availability() {
+        @Override public boolean isAvailable() {
+            return !"off".equals(BURN_IN_GUARD.savedValue());
+        }
+
+        @Override public java.util.List<Setting<?>> getParentSettings() {
+            return Collections.singletonList(BURN_IN_GUARD);
+        }
+    };
+    public static final IntegerSetting BURN_IN_DIM_AFTER = new IntegerSetting(
+            "burn_in_dim_after", 5, false, BURN_IN_GUARD_ON).withRange(2, 60);
+    public static final IntegerSetting BURN_IN_DIM_LEVEL = new IntegerSetting(
+            "burn_in_dim_level", 25, false, BURN_IN_GUARD_ON).withRange(10, 90);
+    // What brings dimmed controls back (#191). A swipe used to, so scrolling kept them bright.
+    public static final BooleanSetting BURN_IN_WAKE_CONTROL = new BooleanSetting(
+            "burn_in_wake_control", TRUE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_WAKE_VIDEO = new BooleanSetting(
+            "burn_in_wake_video", FALSE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_WAKE_SCROLL = new BooleanSetting(
+            "burn_in_wake_scroll", FALSE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_WAKE_RETURN = new BooleanSetting(
+            "burn_in_wake_return", FALSE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_WAKE_HOLD = new BooleanSetting(
+            "burn_in_wake_hold", TRUE, false, BURN_IN_GUARD_ON);
+    // Which parts of the screen the guard dims, as BurnInGuard's groups.
+    public static final BooleanSetting BURN_IN_DIM_RAIL = new BooleanSetting(
+            "burn_in_dim_rail", TRUE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_DIM_CAPTION = new BooleanSetting(
+            "burn_in_dim_caption", TRUE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_DIM_TOP = new BooleanSetting(
+            "burn_in_dim_top", TRUE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_DIM_BOTTOM = new BooleanSetting(
+            "burn_in_dim_bottom", TRUE, false, BURN_IN_GUARD_ON);
+    public static final BooleanSetting BURN_IN_DIM_SUBTITLES = new BooleanSetting(
+            "burn_in_dim_subtitles", TRUE, false, BURN_IN_GUARD_ON);
     public static final BooleanSetting HIDE_SHARE_GUIDE = new BooleanSetting("hide_share_guide", FALSE);
     public static final BooleanSetting HIDE_RAIL_FOLLOW = new BooleanSetting("hide_rail_follow", FALSE);
     public static final BooleanSetting HIDE_RAIL_LIKE = new BooleanSetting("hide_rail_like", FALSE);

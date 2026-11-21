@@ -2417,6 +2417,52 @@ assertEquals(View.LAYOUT_DIRECTION_RTL, configuration.getLayoutDirection());
     }
 
     /**
+     * Burn-in guard's two lists of switches grey out with the guard off and say why, like its
+     * number rows. Their keys name no setting, so the screen's pass used to skip them, and both
+     * opened and saved with the guard off (#191).
+     */
+    @Test public void burnInGuardsListsGreyOutWithTheGuardOff() throws Exception {
+        try (var owner = Robolectric.buildActivity(PageActivity.class).setup().visible()) {
+            Activity activity = owner.get();
+            Utils.setContext(activity);
+            Settings.BURN_IN_GUARD.save("off");
+
+            TikTokPreferenceFragment page = attachSection(activity, "INTERFACE");
+            Preference wakes = findAnywhere(page.getPreferenceScreen(), "Wake the controls when");
+            Preference dims = findAnywhere(page.getPreferenceScreen(), "What dims");
+            assertNotNull("the wake list is not on the page", wakes);
+            assertNotNull("the dim list is not on the page", dims);
+            for (Preference list : new Preference[]{wakes, dims}) {
+                assertFalse(list.getTitle() + " is not greyed with the guard off", list.isEnabled());
+                assertTrue(list.getTitle() + " does not say why: " + list.getSummary(),
+                        String.valueOf(list.getSummary()).endsWith("Turn on Burn-in guard first."));
+            }
+
+            Settings.BURN_IN_GUARD.save("dim");
+            refreshAvailability(page);
+            for (Preference list : new Preference[]{wakes, dims}) {
+                assertTrue(list.getTitle() + " stayed greyed with the guard on", list.isEnabled());
+                assertFalse(list.getTitle() + " kept the reason: " + list.getSummary(),
+                        String.valueOf(list.getSummary()).contains("Turn on "));
+            }
+        } finally {
+            Settings.BURN_IN_GUARD.resetToDefault();
+        }
+    }
+
+    private static Preference findAnywhere(android.preference.PreferenceGroup group, String title) {
+        for (int index = 0; index < group.getPreferenceCount(); index++) {
+            Preference preference = group.getPreference(index);
+            if (title.equals(String.valueOf(preference.getTitle()))) return preference;
+            if (preference instanceof android.preference.PreferenceGroup) {
+                Preference found = findAnywhere((android.preference.PreferenceGroup) preference, title);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    /**
      * The store-region row names the switch that is off. It always named Match locale, so with
      * Match locale on and Override SIM details off it sent the reader to a switch already on.
      */

@@ -630,7 +630,33 @@ public final class InterfacePreferenceCategory extends ConditionalPreferenceCate
             addPreference(new ChoicePreference(context, "Burn-in guard", Settings.BURN_IN_GUARD,
                     new String[]{"Off", "Dim when idle", "Dim when idle and shift"},
                     new String[]{BurnInGuard.OFF, BurnInGuard.DIM, BurnInGuard.DIM_AND_SHIFT})
-                    .withNote("For OLED screens. After 5 seconds without a touch, the buttons, caption and tabs over the video dim to a quarter, and your next touch brings them back. Shift also moves everything on the feed a few pixels every 2 minutes."));
+                    .withNote("For OLED screens. The buttons, caption and tabs over the video dim a few seconds after you last woke them, and the switches below pick what wakes them. Shift also moves everything on the feed a few pixels every 2 minutes."));
+            addPreference(new NumberInputPreference(context, "Dim after",
+                    "How long the controls stay bright after they last woke.",
+                    Settings.BURN_IN_DIM_AFTER, "%1$s second", "%1$s seconds"));
+            addPreference(new NumberInputPreference(context, "Dim to",
+                    "How bright the dimmed controls are, compared with how TikTok draws them.",
+                    Settings.BURN_IN_DIM_LEVEL, "%1$s%%"));
+            List<SwitchListPreference.Item> wakes = new ArrayList<>();
+            wakes.add(new SwitchListPreference.Item(L10n.t(context, "I tap a dimmed control"), Settings.BURN_IN_WAKE_CONTROL));
+            wakes.add(new SwitchListPreference.Item(L10n.t(context, "I tap the video"), Settings.BURN_IN_WAKE_VIDEO));
+            wakes.add(new SwitchListPreference.Item(L10n.t(context, "I scroll or swipe"), Settings.BURN_IN_WAKE_SCROLL));
+            wakes.add(new SwitchListPreference.Item(L10n.t(context, "I come back from another screen"), Settings.BURN_IN_WAKE_RETURN));
+            wakes.add(new SwitchListPreference.Item(L10n.t(context, "I press and hold"), Settings.BURN_IN_WAKE_HOLD));
+            addPreference(new SwitchListPreference(context, "burn_in_wakes",
+                    "Wake the controls when",
+                    "Pick what brings the dimmed controls back. A tap still does what it always does.",
+                    wakes, "Wakes when: %1$s", "Nothing wakes them. They stay dimmed."));
+            List<SwitchListPreference.Item> dims = new ArrayList<>();
+            dims.add(new SwitchListPreference.Item(L10n.t(context, "Buttons over the video"), Settings.BURN_IN_DIM_RAIL));
+            dims.add(new SwitchListPreference.Item(L10n.t(context, "Caption and music"), Settings.BURN_IN_DIM_CAPTION));
+            dims.add(new SwitchListPreference.Item(L10n.t(context, "Top tabs and search"), Settings.BURN_IN_DIM_TOP));
+            dims.add(new SwitchListPreference.Item(L10n.t(context, "Bottom tabs and bars"), Settings.BURN_IN_DIM_BOTTOM));
+            dims.add(new SwitchListPreference.Item(L10n.t(context, "Subtitles"), Settings.BURN_IN_DIM_SUBTITLES));
+            addPreference(new SwitchListPreference(context, "burn_in_dims",
+                    "What dims",
+                    "Pick the parts of the screen the guard dims.",
+                    dims, "Dims: %1$s", "Nothing is dimmed."));
         }
     }
 

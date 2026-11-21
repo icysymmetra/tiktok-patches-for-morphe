@@ -223,6 +223,20 @@ public class FeedScreenCoverageTest {
         put("see_through_status_bar", YES, NONE, NONE);
         // The guard runs with the overlay pass, which walks both windows and no LIVE room.
         put("burn_in_guard", YES, YES, NONE);
+        // Its delay, level, wake and dim switches are read by the same pass and the same
+        // window watcher, so they reach the same windows (#191).
+        put("burn_in_dim_after", YES, YES, NONE);
+        put("burn_in_dim_level", YES, YES, NONE);
+        put("burn_in_wake_control", YES, YES, NONE);
+        put("burn_in_wake_video", YES, YES, NONE);
+        put("burn_in_wake_scroll", YES, YES, NONE);
+        put("burn_in_wake_return", YES, YES, NONE);
+        put("burn_in_wake_hold", YES, YES, NONE);
+        put("burn_in_dim_rail", YES, YES, NONE);
+        put("burn_in_dim_caption", YES, YES, NONE);
+        put("burn_in_dim_top", YES, YES, NONE);
+        put("burn_in_dim_bottom", YES, YES, NONE);
+        put("burn_in_dim_subtitles", YES, YES, NONE);
 
         // Gestures.
         put("swipe_levels", YES, YES, NONE);
@@ -398,12 +412,12 @@ public class FeedScreenCoverageTest {
         Map<String, Integer> ids = new LinkedHashMap<>();
         ids.put("desc", 0x7f0a1c02);
         ids.put("47.4.3:o7a", 0x7f0a1c03);
-        ids.put("47.4.3:mud", 0x7f0a1c04);
+        ids.put("47.4.3:ljn", 0x7f0a1c04);
         ids.put("47.4.3:f92", 0x7f0a1c05);
         Map<BooleanSetting, String> switches = new LinkedHashMap<>();
         switches.put(Settings.HIDE_FEED_CAPTION, "desc");
         switches.put(Settings.HIDE_FEED_MUSIC, "47.4.3:o7a");
-        switches.put(Settings.HIDE_FEED_ACTION_BAR, "47.4.3:mud");
+        switches.put(Settings.HIDE_FEED_ACTION_BAR, "47.4.3:ljn");
         switches.put(Settings.HIDE_FEED_SURVEYS, "47.4.3:f92");
         for (BooleanSetting setting : switches.keySet()) {
             Coverage coverage = TABLE.get(setting.key);

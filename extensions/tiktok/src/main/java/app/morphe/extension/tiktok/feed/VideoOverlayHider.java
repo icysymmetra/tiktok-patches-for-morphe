@@ -105,7 +105,14 @@ public final class VideoOverlayHider {
     private static final String[] CAPTION_IDS = {"desc"};
     /** VideoMusicTitleAssem's label container, including ordinary and matched-song titles. */
     private static final String[] MUSIC_IDS = {"47.4.3:o7a"};
-    private static final String[] ACTION_BAR_IDS = {"47.4.3:mud"};
+    /**
+     * The rail's column: the layer of the cell holding each button's slot, with the music row's
+     * slot spanning the width at its foot. On 47.4.3 it's ljn, 1080 wide from the avatar down
+     * (screen layout from the A57, 2026-11-11). The id the 47.4.3 port gave it, mud, names a
+     * 40 x 78 strip at the top of the cell, so the column was never hidden, faded or dimmed and
+     * the rail kept full brightness under Burn-in guard.
+     */
+    private static final String[] ACTION_BAR_IDS = {"47.4.3:ljn"};
     private static final String[] SURVEY_IDS = {"47.4.3:f92"};
     private static final String[] TAB_STRIP_IDS = {"47.4.3:uwq"};
     /**
@@ -275,8 +282,10 @@ public final class VideoOverlayHider {
     private static float scaleWanted = 1f;
     private static WeakReference<View> rescaleRoot = new WeakReference<>(null);
     private static final ViewTreeObserver.OnPreDrawListener RESCALE = () -> {
+        long started = System.nanoTime();
         reapplyScale();
         reapplyFade();
+        OverlayTiming.preDrawn(started);
         return true;
     };
     /** The row under each rail button holding its count, without the button itself. */
@@ -346,6 +355,8 @@ public final class VideoOverlayHider {
     private static final int STATUS_BAR_SCRIM_TARGET = DETAIL_SEARCH_BOX_TARGET + 1;
     private static final int PLAYER_VIEW_TARGET = STATUS_BAR_SCRIM_TARGET + 1;
     private static final int DETAIL_MESSAGE_BAR_TARGET = PLAYER_VIEW_TARGET + 1;
+    /** TikTok's subtitle strip (the words being said). Only Burn-in guard dims it. */
+    private static final int SUBTITLE_TARGET = DETAIL_MESSAGE_BAR_TARGET + 1;
     private static final String[][] TRAVERSAL_TARGET_IDS = traversalTargetIds();
     private static final int LOGICAL_TARGET_COUNT = TRAVERSAL_TARGET_IDS.length;
     private static final int TRAVERSAL_TARGET_COUNT = candidateCount(TRAVERSAL_TARGET_IDS);
@@ -540,6 +551,7 @@ public final class VideoOverlayHider {
 
     /** One pass over {@code activity}, the same one the layout listener runs. */
     static void applyTo(Activity activity) {
+        long started = System.nanoTime();
         try {
             if (activity.isFinishing()) {
                 return;
@@ -595,6 +607,8 @@ public final class VideoOverlayHider {
             // display does. With Keep faded controls in Clear display off, Clear display clears
             // them as it does at 100 and the fade is left to the rest of the time.
             fadedClear = clearLive && chosenFade > 0 && chosenFade < 100 && Settings.FADE_IN_CLEAR_DISPLAY.get();
+            // The chosen level. The burn-in dim is per group (BurnInGuard.level), so the checks
+            // that hide at 0 read this and never a dim.
             fadeLevel = BurnInGuard.pass(activity, chosenFade, overlaysOn);
             boolean carryHides = carry && !fadedClear;
             topBarHeld = carryHides && !RememberClearDisplayPatch.isClearDisplayNow();
@@ -657,9 +671,13 @@ public final class VideoOverlayHider {
                     || statusBar || seeThroughStatusBar || SeeThroughStatusBar.anyFilled()
                     || seeThroughBar || SeeThroughBottomBar.holdsBackground()
                     || anyRail || !HIDDEN_HERE.isEmpty() || !FADED_HERE.isEmpty() || !WIDGETS_LIFTED.isEmpty()
-                    || fadeLevel != 100 || !FADED_TO.isEmpty() || !BAR_ROWS_MOVED.isEmpty()
+                    || fadeLevel != 100 || BurnInGuard.dimsNow() || BurnInGuard.wantsControlWalk()
+                    || !FADED_TO.isEmpty() || !BAR_ROWS_MOVED.isEmpty()
                     || !CAPTIONS_LIFTED.isEmpty() || !DISCS_LIFTED.isEmpty() || !RAILS_LIFTED.isEmpty()
                     || touchScale != 1f || scaledLastPass) {
+                OverlayTiming.walked();
+                // Every control this walk files is noted for Burn-in guard's tap test.
+                BurnInGuard.walked(activity);
                 ViewGroup root = activity.findViewById(android.R.id.content);
                 int[] ids = TRAVERSAL.ids;
                 boolean[] hidden = TRAVERSAL.hidden;
@@ -699,6 +717,8 @@ public final class VideoOverlayHider {
                 // Grown, not hidden: see SeeThroughStatusBar.fill.
                 wanted[PLAYER_VIEW_TARGET] = seeThroughStatusBar;
                 wanted[BOTTOM_SPACER_TARGET] = seeThroughBar && SeeThroughBottomBar.collapseAllowed();
+                // Only ever dimmed, never hidden; most videos have none, so never "missing".
+                wanted[SUBTITLE_TARGET] = false;
                 for (int i = 0; i < RAIL_BUTTON_IDS.length; i++) {
                     wanted[RAIL_TARGET_START + i] = rail[i] || carryHides;
                 }
@@ -810,6 +830,8 @@ public final class VideoOverlayHider {
             SeeThroughStatusBar.apply(activity, seeThroughStatusBar && FeedVisibility.isOnFeed(activity));
         } catch (Throwable ex) {
             Logger.printException(() -> "Video overlay hider failed", ex);
+        } finally {
+            OverlayTiming.passed(started, BurnInGuard.askedNow());
         }
     }
 
@@ -975,7 +997,7 @@ public final class VideoOverlayHider {
     }
 
     private static String[][] traversalTargetIds() {
-        String[][] targets = new String[DETAIL_MESSAGE_BAR_TARGET + 1][];
+        String[][] targets = new String[SUBTITLE_TARGET + 1][];
         targets[CAPTION_TARGET] = CAPTION_IDS;
         targets[MUSIC_TARGET] = MUSIC_IDS;
         targets[ACTION_BAR_TARGET] = ACTION_BAR_IDS;
@@ -1009,6 +1031,7 @@ public final class VideoOverlayHider {
         targets[STATUS_BAR_SCRIM_TARGET] = STATUS_BAR_SCRIM_IDS;
         targets[PLAYER_VIEW_TARGET] = PLAYER_VIEW_IDS;
         targets[DETAIL_MESSAGE_BAR_TARGET] = DETAIL_MESSAGE_BAR_IDS;
+        targets[SUBTITLE_TARGET] = app.morphe.extension.tiktok.captions.CaptionStyle.BACKGROUND_IDS.clone();
         return targets;
     }
 
@@ -1451,6 +1474,68 @@ public final class VideoOverlayHider {
         for (int i = 0; i < group.getChildCount(); i++) {
             collectWidgetLayers(group.getChildAt(i), layerId, cellId, depth + 1, out);
         }
+    }
+
+    /**
+     * Notes the rail's buttons in {@code column} for Burn-in guard's tap test: each button's slot,
+     * which holds its count too. The column spans the cell's width, and so does the music row's
+     * slot, so a slot that wide is noted by the button's parts that sit within the rail's own
+     * slots (the disc) instead. On the A57 the row also holds a 249 px view reaching 135 px past
+     * the rail onto the video; noted, a tap on the video there would read as a tap on a control.
+     */
+    private static void noteRailButtons(View column, List<List<View>> found, int[] selected) {
+        int width = column.getWidth();
+        // Not laid out yet: nothing to measure against, and the next walk notes them.
+        if (width == 0) return;
+        int railLeft = Integer.MAX_VALUE;
+        for (int i = 0; i < RAIL_BUTTON_IDS.length; i++) {
+            for (View button : selectedViews(found, selected, RAIL_TARGET_START + i)) {
+                View slot = childOf(column, button);
+                if (slot == null || slot.getWidth() * 2 > width) continue;
+                BurnInGuard.noteControl(slot, BurnInGuard.RAIL);
+                // Measured whether shown or not: TikTok's Clear display leaves them gone in place.
+                if (slot.getWidth() > 0) railLeft = Math.min(railLeft, slot.getLeft());
+            }
+        }
+        // With no button slot measured, where the rail starts isn't known; its wide row waits.
+        if (railLeft == Integer.MAX_VALUE) return;
+        for (int i = 0; i < RAIL_BUTTON_IDS.length; i++) {
+            for (View button : selectedViews(found, selected, RAIL_TARGET_START + i)) {
+                View slot = childOf(column, button);
+                if (slot == null || slot.getWidth() * 2 <= width || !(button instanceof ViewGroup)) continue;
+                ViewGroup row = (ViewGroup) button;
+                for (int c = 0; c < row.getChildCount(); c++) {
+                    View part = row.getChildAt(c);
+                    if (part.getWidth() > 0 && leftIn(column, part) >= railLeft) {
+                        BurnInGuard.noteControl(part, BurnInGuard.RAIL);
+                    }
+                }
+            }
+        }
+    }
+
+    /** Where {@code view}'s left edge sits in {@code ancestor}, from the layout, not the screen. */
+    private static int leftIn(View ancestor, View view) {
+        int left = 0;
+        View part = view;
+        for (int depth = 0; depth < 8 && part != null && part != ancestor; depth++) {
+            left += part.getLeft();
+            android.view.ViewParent parent = part.getParent();
+            part = parent instanceof View ? (View) parent : null;
+        }
+        return left;
+    }
+
+    /** The child of {@code ancestor} that {@code view} sits in, or null when it isn't inside. */
+    private static View childOf(View ancestor, View view) {
+        View part = view;
+        for (int depth = 0; depth < 8; depth++) {
+            android.view.ViewParent parent = part.getParent();
+            if (parent == ancestor) return part;
+            if (!(parent instanceof View)) return null;
+            part = (View) parent;
+        }
+        return null;
     }
 
     private static List<View> selectedViews(List<List<View>> found, int[] selected, int target) {
@@ -1916,12 +2001,19 @@ public final class VideoOverlayHider {
                             setTransparent(view, true);
                         } else {
                             setTransparent(view, false);
-                            setFaded(view, fadeLevel, fadedClear);
+                            setFaded(view, BurnInGuard.level(BurnInGuard.BOTTOM, fadeLevel), fadedClear);
+                            BurnInGuard.noteControl(view, BurnInGuard.BOTTOM);
                         }
                     } else if (target == TOP_SEARCH_BAR_TARGET || target == TOP_SEARCH_SCRIM_TARGET) {
                         // The way back out of the page: faded like the tabs, never past the floor,
                         // and out of sight only until TikTok's own clear lands on the page.
-                        setFaded(view, topBarHeld ? 0 : Math.max(NAVIGATION_FADE_FLOOR, fadeLevel), fadedClear);
+                        // Held out of sight wins over any dim; the floor comes after the dim.
+                        setFaded(view, topBarHeld ? 0 : Math.max(NAVIGATION_FADE_FLOOR,
+                                BurnInGuard.level(BurnInGuard.TOP, fadeLevel)), fadedClear);
+                        // The scrim is only drawn; a tap on it is a tap on the video.
+                        if (target == TOP_SEARCH_BAR_TARGET && !topBarHeld) {
+                            BurnInGuard.noteControl(view, BurnInGuard.TOP);
+                        }
                     } else if (target == DETAIL_SEARCH_BOX_TARGET || target == STATUS_BAR_SCRIM_TARGET) {
                         // Invisible, not gone: the bar keeps its shape and Back stays put, and
                         // the cell's band keeps its place.
@@ -1929,7 +2021,9 @@ public final class VideoOverlayHider {
                     } else if (target == DETAIL_COMMENT_BAR_TARGET || target == DETAIL_MESSAGE_BAR_TARGET) {
                         // Hidden with its strip by the switch, Clear display and a fade of 0;
                         // otherwise faded, and out of a finger's way in the faded Clear display.
-                        setFaded(view, wanted ? 100 : fadeLevel, fadedClear && !wanted);
+                        setFaded(view, wanted ? 100 : BurnInGuard.level(BurnInGuard.BOTTOM, fadeLevel),
+                                fadedClear && !wanted);
+                        if (!wanted) BurnInGuard.noteControl(view, BurnInGuard.BOTTOM);
                         TapThroughControls.mark(view, !wanted && fadedClear);
                         setHidden(view, wanted);
                     } else if (target == LOADING_LINE_TARGET) {
@@ -1941,14 +2035,21 @@ public final class VideoOverlayHider {
                         // beside the column, so they fade here. Invisible rather than gone, so
                         // the caption doesn't move.
                         boolean gone = wanted || fadeLevel == 0;
-                        setFaded(view, gone ? 100 : fadeLevel, fadedClear);
+                        setFaded(view, gone ? 100 : BurnInGuard.level(BurnInGuard.CAPTION, fadeLevel), fadedClear);
+                        if (!gone) BurnInGuard.noteControl(view, BurnInGuard.CAPTION);
                         TapThroughControls.mark(view, !gone && fadedClear);
                         setHidden(view, gone, View.INVISIBLE);
+                    } else if (target == SUBTITLE_TARGET) {
+                        // The words being said are the video's, so the chosen fade and Clear
+                        // display leave them alone; only Burn-in guard dims them, and a tap on
+                        // them is a tap on the video.
+                        setFaded(view, BurnInGuard.level(BurnInGuard.SUBTITLES, 100));
                     } else if (target == ACTION_BAR_TARGET) {
                         // The rail's column. Fully faded it goes the way Clear display takes it,
                         // so nothing invisible takes a tap.
                         boolean gone = wanted || fadeLevel == 0;
-                        setFaded(view, gone ? 100 : fadeLevel, fadedClear);
+                        setFaded(view, gone ? 100 : BurnInGuard.level(BurnInGuard.RAIL, fadeLevel), fadedClear);
+                        if (!gone && BurnInGuard.notesRail()) noteRailButtons(view, found, selected);
                         TapThroughControls.mark(view, !gone && fadedClear);
                         setHidden(view, gone);
                     } else if (target == TAB_STRIP_TARGET || target == BOTTOM_TABS_TARGET
@@ -1969,7 +2070,14 @@ public final class VideoOverlayHider {
                         if (target == BOTTOM_TABS_DIVIDER_TARGET) setTransparent(view, false);
                         // The Following stories pill is the strip's neighbour at the top of the
                         // feed, so it fades with the tabs; it was only ever hidden (#84).
-                        setFaded(view, wanted ? 100 : Math.max(NAVIGATION_FADE_FLOOR, fadeLevel));
+                        // The strip and the stories pill sit at the top, the tabs and their
+                        // hairline at the bottom; the floor comes after the dim.
+                        int group = target == TAB_STRIP_TARGET || target == FOLLOWING_STORY_TARGET
+                                ? BurnInGuard.TOP : BurnInGuard.BOTTOM;
+                        setFaded(view, wanted ? 100 : Math.max(NAVIGATION_FADE_FLOOR,
+                                BurnInGuard.level(group, fadeLevel)));
+                        // The hairline is only drawn; a tap on it is a tap on the video.
+                        if (!wanted && target != BOTTOM_TABS_DIVIDER_TARGET) BurnInGuard.noteControl(view, group);
                         setHidden(view, wanted);
                     } else setHidden(view, wanted);
                 }
@@ -2015,7 +2123,8 @@ public final class VideoOverlayHider {
         boolean gone = fadeLevel == 0;
         for (View entry : new ArrayList<>(FULLSCREEN_ENTRIES.keySet())) {
             if (entry == null || !entry.isAttachedToWindow()) continue;
-            setFaded(entry, gone ? 100 : fadeLevel, fadedClear);
+            setFaded(entry, gone ? 100 : BurnInGuard.level(BurnInGuard.RAIL, fadeLevel), fadedClear);
+            if (!gone) BurnInGuard.noteControl(entry, BurnInGuard.RAIL);
             TapThroughControls.mark(entry, !gone && fadedClear);
             setHidden(entry, gone, View.INVISIBLE);
         }

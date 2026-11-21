@@ -27,3 +27,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :patches:buildAndroid --no-daemon
+
+      - name: Verify settings translations
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :extensions:tiktok:testDebugUnitTest --tests app.morphe.extension.tiktok.settings.SettingsL10nTest --no-daemon
