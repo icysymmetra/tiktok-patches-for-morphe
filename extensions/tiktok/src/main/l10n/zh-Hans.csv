@@ -2204,3 +2204,78 @@ collapsed,已折叠
 debug debugging logs logging,调试 排错 日志 记录
 expanded,已展开
 this creator,该创作者
+"%1$s ads, skipped %2$s times. Tap to manage them.",%1$s 条广告，已跳过 %2$s 次。点按进行管理。
+%1$s d %2$s h,%1$s 天 %2$s 小时
+%1$s h %2$s min,%1$s 小时 %2$s 分钟
+%1$s min,%1$s 分钟
+%1$s s · skipped %2$s times · %3$s,%1$s 秒 · 已跳过 %2$s 次 · %3$s
+AD,广告
+Ad,广告
+Ad range,广告片段
+"Adds Mark ad to a video's share sheet, where you cut the ad out of the video.",在视频的分享面板中添加“标记广告”，你可以在那里把广告从视频中截取出来。
+"Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.",广告会在进度条上标为绿色。简短提示会显示广告名称，点按“观看”即可返回。
+Ads in the base,库中广告
+Ads skipped,已跳过的广告
+All users,所有用户
+Also looks for the ad played slightly faster or slower.,也查找稍微加速或减速播放的同一广告。
+Check on mobile data,使用移动数据时也检查
+Check upcoming videos,提前检查后续视频
+Contributors,贡献者
+Correct,正确
+Couldn't load this video. Check the connection and try again.,无法加载此视频。请检查网络连接后重试。
+Couldn't open the ad editor. Close the share sheet and try again.,无法打开广告编辑器。请关闭分享面板后重试。
+Couldn't play this video. Close the editor and try again.,无法播放此视频。请关闭编辑器后重试。
+Delete,删除
+"Delete ""%1$s""?",删除“%1$s”？
+Delete all,全部删除
+Delete every marked ad?,删除所有已标记的广告？
+Downloading the sound…,正在下载声音…
+Downloading the video…,正在下载视频…
+Downloads marks from other users and skips their ads too. Your own marks are shared back.,下载其他用户的标记，并同样跳过这些广告。你自己的标记也会共享给他们。
+"Each check downloads the video's sound, usually a few hundred kilobytes.",每次检查都会下载视频的声音，通常为几百 KB。
+Find sped up copies,查找加速版本
+In the shared base,已在共享库中
+"Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.",在你刷到之前先监听信息流中的后续视频，这样已标记的广告从第一秒起就会被跳过。
+Loading the shared base…,正在加载共享库…
+Loading the video and its sound…,正在加载视频和声音…
+"Loose: finds more, may skip by mistake",宽松：找到更多，可能误跳
+Mark ad,标记广告
+Mark ad in the share sheet,分享面板中的“标记广告”
+Mark an ad,标记广告
+"Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.",在任意视频中标记一次广告，之后无论它的声音在哪里再次出现，即使混在音乐或噪音中，Metra 都会跳过它。
+Marked ads,已标记的广告
+Match strictness,匹配严格度
+Move on from ad-only videos,跳过整段都是广告的视频
+Name,名称
+New marks you save are sent to the shared base so others benefit right away.,你保存的新标记会发送到共享库，让其他人立即受益。
+No ads marked yet. Open a video's share sheet and tap Mark ad.,还没有标记广告。打开视频的分享面板，点按“标记广告”。
+"None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.",暂无。在视频中点按“分享”，再点按“标记广告”，然后选择广告的开始和结束位置。
+Open a video first,请先打开一个视频
+Play ad,播放广告
+Reading the sound…,正在分析声音…
+Recent checks,最近的检查
+Rename,重命名
+"Saved ""%1$s"", but its sound is weak. A longer or louder cut is found more reliably.",已保存“%1$s”，但其声音较弱。更长或更响的片段识别起来更可靠。
+"Saved ""%1$s"". This ad will be skipped in other videos.",已保存“%1$s”。此广告将在其他视频中被跳过。
+Saved everyone,为大家节省
+Saved others,为他人节省
+Share new marks automatically,自动共享新标记
+Share with everyone,与所有人共享
+Shared base,共享库
+Show a notice when skipping,跳过时显示提示
+Skip ads by sound,按声音跳过广告
+Skip marked ads,跳过已标记的广告
+Skipped for others,他人跳过次数
+Strict: only clear matches,严格：仅限明确匹配
+The shared base can't be reached right now.,目前无法连接共享库。
+There's too little sound here to recognise. Choose a louder part.,这里的声音太少，无法识别。请选择更响的部分。
+Time saved,节省的时间
+Use shared ad database,使用共享广告库
+Watch it,观看
+"When the ad is the whole video, go to the next one instead of jumping to its end.",如果整个视频都是广告，直接切换到下一个视频，而不是跳到结尾。
+Wrong,错误
+Your contribution,你的贡献
+Your marks,你的标记
+Zoom,缩放
+Voted down,已点踩
+These ads are not skipped for you. Tap Undo if you voted by mistake.,这些广告不会为你跳过。如果点错了，请点按撤消。

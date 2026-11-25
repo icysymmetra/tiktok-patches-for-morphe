@@ -2407,3 +2407,78 @@ Top tabs and search	Верхние вкладки и поиск
 Bottom tabs and bars	Нижние вкладки и панели
 Dims: %1$s	Затемняются: %1$s
 Nothing is dimmed.	Ничего не затемняется.
+%1$s ads, skipped %2$s times. Tap to manage them.	Реклам: %1$s, пропущено раз: %2$s. Нажмите, чтобы управлять ими.
+%1$s s · skipped %2$s times · %3$s	%1$s с · пропущено раз: %2$s · %3$s
+Ad	Реклама
+Adds Mark ad to a video's share sheet, where you cut the ad out of the video.	Добавляет «Отметить рекламу» в меню «Поделиться», где вы вырезаете рекламу из видео.
+Also looks for the ad played slightly faster or slower.	Ищет и ту же рекламу, ускоренную или замедленную.
+Check on mobile data	Проверять по мобильной сети
+Check upcoming videos	Проверять следующие видео заранее
+Couldn't load this video. Check the connection and try again.	Не удалось загрузить видео. Проверьте соединение и попробуйте ещё раз.
+Delete	Удалить
+Delete "%1$s"?	Удалить «%1$s»?
+Delete all	Удалить все
+Delete every marked ad?	Удалить все отмеченные рекламы?
+Downloading the sound…	Загружается звук…
+Downloading the video…	Загружается видео…
+Each check downloads the video's sound, usually a few hundred kilobytes.	Каждая проверка скачивает звук видео, обычно несколько сотен килобайт.
+Find sped up copies	Находить ускоренные копии
+Loading the video and its sound…	Загружаются видео и звук…
+Loose: finds more, may skip by mistake	Мягко: находит больше, может ошибиться
+Strict: only clear matches	Строго: только явные совпадения
+Mark ad	Отметить рекламу
+Mark ad in the share sheet	«Отметить рекламу» в меню «Поделиться»
+Mark an ad	Отметить рекламу
+Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.	Отметьте рекламу один раз в любом видео, и где бы её звук ни зазвучал снова, даже под музыкой или шумом, Metra её пропустит.
+Marked ads	Отмеченная реклама
+Match strictness	Строгость совпадения
+Move on from ad-only videos	Пролистывать видео целиком из рекламы
+Name	Название
+No ads marked yet. Open a video's share sheet and tap Mark ad.	Реклама ещё не отмечена. Откройте меню «Поделиться» у видео и нажмите «Отметить рекламу».
+None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Пока нет. В видео нажмите «Поделиться», затем «Отметить рекламу» и выберите начало и конец рекламы.
+Open a video first	Сначала откройте видео
+Play ad	Слушать рекламу
+Reading the sound…	Анализируется звук…
+Recent checks	Последние проверки
+Rename	Переименовать
+Saved "%1$s", but its sound is weak. A longer or louder cut is found more reliably.	«%1$s» сохранена, но звук слабый. Более длинный или громкий отрезок находится надёжнее.
+Saved "%1$s". This ad will be skipped in other videos.	«%1$s» сохранена. Эта реклама будет пропускаться в других видео.
+Show a notice when skipping	Показывать уведомление о пропуске
+Skip ads by sound	Пропуск рекламы по звуку
+Skip marked ads	Пропускать отмеченную рекламу
+There's too little sound here to recognise. Choose a louder part.	Здесь слишком мало звука для распознавания. Выберите часть погромче.
+Watch it	Смотреть
+When the ad is the whole video, go to the next one instead of jumping to its end.	Если реклама занимает всё видео, перейти к следующему, а не прыгать в конец.
+Zoom	Масштаб
+AD	РЕКЛ
+Use shared ad database	Использовать общую базу реклам
+Downloads marks from other users and skips their ads too. Your own marks are shared back.	Скачивает метки других пользователей и тоже пропускает их рекламу. Ваши метки отправляются обратно.
+Share new marks automatically	Делиться новыми метками автоматически
+New marks you save are sent to the shared base so others benefit right away.	Новые метки отправляются в общую базу, чтобы другие сразу получали пользу.
+Share with everyone	Поделиться со всеми
+Correct	Верно
+Wrong	Неверно
+Shared base	Общая база
+%1$s d %2$s h	%1$s д %2$s ч
+%1$s h %2$s min	%1$s ч %2$s мин
+%1$s min	%1$s мин
+Ad range	Отрезок рекламы
+Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.	Реклама отмечается зелёным на полосе прогресса. Короткое уведомление показывает название рекламы и кнопку «Смотреть», чтобы вернуться.
+Ads in the base	Реклам в базе
+Ads skipped	Пропущено реклам
+All users	Все пользователи
+Contributors	Авторов
+Couldn't open the ad editor. Close the share sheet and try again.	Не удалось открыть редактор рекламы. Закройте меню «Поделиться» и попробуйте снова.
+Couldn't play this video. Close the editor and try again.	Не удалось воспроизвести это видео. Закройте редактор и попробуйте снова.
+In the shared base	В общей базе
+Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.	Слушает следующие видео ленты до того, как вы до них дойдёте, чтобы отмеченная реклама проматывалась с первой секунды.
+Loading the shared base…	Загружаем общую базу…
+Saved everyone	Сэкономлено всем
+Saved others	Сэкономили другим
+Skipped for others	Пропущено у других
+The shared base can't be reached right now.	Общая база сейчас недоступна. Статистика обновится, когда появится сеть.
+Time saved	Сэкономлено времени
+Your contribution	Ваш вклад
+Your marks	Ваши метки
+Voted down	Ваши дизлайки
+These ads are not skipped for you. Tap Undo if you voted by mistake.	Эта реклама у вас не пропускается. Нажмите «Отменить», если дизлайк поставлен по ошибке.

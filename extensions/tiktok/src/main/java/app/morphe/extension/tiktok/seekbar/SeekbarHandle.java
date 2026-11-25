@@ -50,6 +50,12 @@ public final class SeekbarHandle {
     /** The entry of TikTok's style method, with the style it is about to apply. */
     public static void beginStyle(@Nullable LinearLayout bar, int style) {
         restyling = false;
+        // The ad marks (Skip ads by sound) follow the line's own thickness for every style.
+        try {
+            app.morphe.extension.tiktok.adskip.AdSkipBar.beginStyle(bar, style);
+        } catch (Throwable ignored) {
+            // The marks keep their last height.
+        }
         if (bar == null || (style != STYLE_REST && style != STYLE_PAUSED) || !isEnabled()) return;
         try {
             density = bar.getResources().getDisplayMetrics().density;
@@ -62,7 +68,13 @@ public final class SeekbarHandle {
     /** The handle's width or height on its way to the seek bar. */
     @Nullable
     public static Float handleSide(@Nullable Float side) {
-        return atLeast(side, HANDLE_DP);
+        Float drawn = atLeast(side, HANDLE_DP);
+        try {
+            app.morphe.extension.tiktok.adskip.AdSkipBar.handleSide(drawn);
+        } catch (Throwable ignored) {
+            // The marks keep their last gap.
+        }
+        return drawn;
     }
 
     /** The handle's corner radius. */
@@ -74,7 +86,13 @@ public final class SeekbarHandle {
     /** The line's height, for the line itself and for the chapter marks drawn on it. */
     @Nullable
     public static Float lineHeight(@Nullable Float height) {
-        return atLeast(height, LINE_DP);
+        Float drawn = atLeast(height, LINE_DP);
+        try {
+            app.morphe.extension.tiktok.adskip.AdSkipBar.lineHeight(drawn);
+        } catch (Throwable ignored) {
+            // The marks keep their last height.
+        }
+        return drawn;
     }
 
     @Nullable

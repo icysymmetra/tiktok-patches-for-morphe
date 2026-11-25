@@ -2206,3 +2206,78 @@ Top tabs and search,Tab atas dan pencarian
 Bottom tabs and bars,Tab bawah dan bilah
 Dims: %1$s,Diredupkan: %1$s
 Nothing is dimmed.,Tidak ada yang diredupkan.
+"%1$s ads, skipped %2$s times. Tap to manage them.","%1$s iklan, dilewati %2$s kali. Ketuk untuk mengelolanya."
+%1$s d %2$s h,%1$s hr %2$s j
+%1$s h %2$s min,%1$s j %2$s mnt
+%1$s min,%1$s mnt
+%1$s s · skipped %2$s times · %3$s,%1$s d · dilewati %2$s kali · %3$s
+AD,IKLAN
+Ad,Iklan
+Ad range,Rentang iklan
+"Adds Mark ad to a video's share sheet, where you cut the ad out of the video.","Menambahkan Tandai iklan ke menu bagikan video, tempat kamu memotong iklan dari video."
+"Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.","Iklan ditandai hijau di bilah progres. Pemberitahuan singkat menampilkan nama iklan, dengan Tonton untuk kembali."
+Ads in the base,Iklan di basis data
+Ads skipped,Iklan dilewati
+All users,Semua pengguna
+Also looks for the ad played slightly faster or slower.,Juga mencari iklan yang diputar sedikit lebih cepat atau lebih lambat.
+Check on mobile data,Periksa juga saat memakai data seluler
+Check upcoming videos,Periksa video berikutnya lebih awal
+Contributors,Kontributor
+Correct,Benar
+Couldn't load this video. Check the connection and try again.,Video ini tidak bisa dimuat. Periksa koneksi dan coba lagi.
+Couldn't open the ad editor. Close the share sheet and try again.,Editor iklan tidak bisa dibuka. Tutup menu bagikan dan coba lagi.
+Couldn't play this video. Close the editor and try again.,Video ini tidak bisa diputar. Tutup editor dan coba lagi.
+Delete,Hapus
+"Delete ""%1$s""?","Hapus ""%1$s""?"
+Delete all,Hapus semua
+Delete every marked ad?,Hapus semua iklan yang ditandai?
+Downloading the sound…,Mengunduh suara…
+Downloading the video…,Mengunduh video…
+Downloads marks from other users and skips their ads too. Your own marks are shared back.,Mengunduh tanda dari pengguna lain dan ikut melewati iklan mereka. Tanda milikmu juga dibagikan kembali.
+"Each check downloads the video's sound, usually a few hundred kilobytes.","Setiap pemeriksaan mengunduh suara video, biasanya beberapa ratus kilobyte."
+Find sped up copies,Temukan salinan yang dipercepat
+In the shared base,Di basis data bersama
+"Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.","Mendengarkan video berikutnya di feed sebelum kamu sampai ke sana, jadi iklan yang ditandai dilewati sejak detik pertamanya."
+Loading the shared base…,Memuat basis data bersama…
+Loading the video and its sound…,Memuat video dan suaranya…
+"Loose: finds more, may skip by mistake","Longgar: menemukan lebih banyak, bisa salah melewati"
+Mark ad,Tandai iklan
+Mark ad in the share sheet,Tandai iklan di menu bagikan
+Mark an ad,Tandai iklan
+"Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.","Tandai iklan sekali di video mana pun, dan di mana pun suaranya diputar lagi, bahkan di bawah musik atau kebisingan, Metra akan melewatinya."
+Marked ads,Iklan yang ditandai
+Match strictness,Tingkat ketat pencocokan
+Move on from ad-only videos,Lewati video yang isinya hanya iklan
+Name,Nama
+New marks you save are sent to the shared base so others benefit right away.,Tanda baru yang kamu simpan dikirim ke basis data bersama agar orang lain langsung terbantu.
+No ads marked yet. Open a video's share sheet and tap Mark ad.,Belum ada iklan yang ditandai. Buka menu bagikan video dan ketuk Tandai iklan.
+"None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.","Belum ada. Di video, ketuk Bagikan, lalu Tandai iklan, dan pilih tempat iklan dimulai dan berakhir."
+Open a video first,Buka video terlebih dahulu
+Play ad,Putar iklan
+Reading the sound…,Menganalisis suara…
+Recent checks,Pemeriksaan terbaru
+Rename,Ganti nama
+"Saved ""%1$s"", but its sound is weak. A longer or louder cut is found more reliably.","""%1$s"" disimpan, tetapi suaranya lemah. Potongan yang lebih panjang atau lebih keras lebih andal ditemukan."
+"Saved ""%1$s"". This ad will be skipped in other videos.","""%1$s"" disimpan. Iklan ini akan dilewati di video lain."
+Saved everyone,Dihemat untuk semua
+Saved others,Dihemat untuk orang lain
+Share new marks automatically,Bagikan tanda baru secara otomatis
+Share with everyone,Bagikan ke semua orang
+Shared base,Basis data bersama
+Show a notice when skipping,Tampilkan pemberitahuan saat melewati
+Skip ads by sound,Lewati iklan berdasarkan suara
+Skip marked ads,Lewati iklan yang ditandai
+Skipped for others,Dilewati orang lain
+Strict: only clear matches,Ketat: hanya kecocokan yang jelas
+The shared base can't be reached right now.,Basis data bersama tidak dapat dijangkau saat ini.
+There's too little sound here to recognise. Choose a louder part.,Suara di sini terlalu sedikit untuk dikenali. Pilih bagian yang lebih keras.
+Time saved,Waktu dihemat
+Use shared ad database,Gunakan basis data iklan bersama
+Watch it,Tonton
+"When the ad is the whole video, go to the next one instead of jumping to its end.","Jika iklan mengisi seluruh video, pindah ke video berikutnya, bukan melompat ke akhirnya."
+Wrong,Salah
+Your contribution,Kontribusimu
+Your marks,Tandaanmu
+Zoom,Perbesar
+Voted down,Tidak disukai
+These ads are not skipped for you. Tap Undo if you voted by mistake.,Iklan ini tidak dilewati untukmu. Ketuk Urungkan jika kamu salah memberi suara.

@@ -18,22 +18,25 @@ public final class OwnedShareActions {
     private OwnedShareActions() {}
 
     public static boolean owns(Object action) {
-        return ShareBlockAuthor.owns(action) || ShareSaveCover.owns(action);
+        return ShareBlockAuthor.owns(action) || ShareSaveCover.owns(action) || ShareMarkAd.owns(action);
     }
 
     public static String key(Object action) {
         String key = ShareBlockAuthor.key(action);
-        return key != null ? key : ShareSaveCover.key(action);
+        if (key == null) key = ShareSaveCover.key(action);
+        return key != null ? key : ShareMarkAd.key(action);
     }
 
     public static String label(Object action) {
         String label = ShareBlockAuthor.label(action);
-        return label != null ? label : ShareSaveCover.label(action);
+        if (label == null) label = ShareSaveCover.label(action);
+        return label != null ? label : ShareMarkAd.label(action);
     }
 
     public static boolean click(Object action, Context context, Object sharePackage) {
         return ShareBlockAuthor.click(action, context, sharePackage)
-                || ShareSaveCover.click(action, context, sharePackage);
+                || ShareSaveCover.click(action, context, sharePackage)
+                || ShareMarkAd.click(action, context, sharePackage);
     }
 
     /**
@@ -52,6 +55,7 @@ public final class OwnedShareActions {
     public static void bindIcon(Object action, ImageView image) {
         ShareBlockAuthor.bindIcon(action, image);
         ShareSaveCover.bindIcon(action, image);
+        ShareMarkAd.bindIcon(action, image);
     }
 
     /** Replaced with the reviewed native Report carrier constructor by the patch. */

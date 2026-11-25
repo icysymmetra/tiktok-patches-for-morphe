@@ -17,6 +17,12 @@ public final class MetraStartup {
     public static void onContextReady(Context context) {
         MetraLegacySettings.migrate(context);
         MediaCache.reconcileAsync(context);
+        // Shared ad database: download new marks once a day.
+        try {
+            app.morphe.extension.tiktok.adskip.SharedDb.syncIfDue();
+        } catch (Throwable ignored) {
+            // The feature is not mandatory; never block startup.
+        }
     }
     public static void onActivity(Context context) {
         MetraLegacySettings.migrate(context);

@@ -2227,3 +2227,78 @@ Top tabs and search	Pestañas superiores y búsqueda
 Bottom tabs and bars	Pestañas inferiores y barras
 Dims: %1$s	Se atenúan: %1$s
 Nothing is dimmed.	No se atenúa nada.
+%1$s ads, skipped %2$s times. Tap to manage them.	%1$s anuncios, saltados %2$s veces. Toca para gestionarlos.
+%1$s d %2$s h	%1$s d %2$s h
+%1$s h %2$s min	%1$s h %2$s min
+%1$s min	%1$s min
+%1$s s · skipped %2$s times · %3$s	%1$s s · saltado %2$s veces · %3$s
+AD	ANUNCIO
+Ad	Anuncio
+Ad range	Fragmento del anuncio
+Adds Mark ad to a video's share sheet, where you cut the ad out of the video.	Añade Marcar anuncio al panel de compartir de un vídeo, donde recortas el anuncio del vídeo.
+Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.	Los anuncios se marcan en verde en la barra de progreso. Un aviso breve muestra el nombre del anuncio, con «Verlo» para volver.
+Ads in the base	Anuncios en la base
+Ads skipped	Anuncios saltados
+All users	Todos los usuarios
+Also looks for the ad played slightly faster or slower.	También busca el anuncio reproducido un poco más rápido o más lento.
+Check on mobile data	Comprobar con datos móviles
+Check upcoming videos	Comprobar los próximos vídeos
+Contributors	Colaboradores
+Correct	Correcto
+Couldn't load this video. Check the connection and try again.	No se pudo cargar este vídeo. Comprueba la conexión e inténtalo de nuevo.
+Couldn't open the ad editor. Close the share sheet and try again.	No se pudo abrir el editor de anuncios. Cierra el panel de compartir e inténtalo de nuevo.
+Couldn't play this video. Close the editor and try again.	No se pudo reproducir este vídeo. Cierra el editor e inténtalo de nuevo.
+Delete	Eliminar
+Delete "%1$s"?	¿Eliminar «%1$s»?
+Delete all	Eliminar todos
+Delete every marked ad?	¿Eliminar todos los anuncios marcados?
+Downloading the sound…	Descargando el sonido…
+Downloading the video…	Descargando el vídeo…
+Downloads marks from other users and skips their ads too. Your own marks are shared back.	Descarga las marcas de otros usuarios y también salta sus anuncios. Tus propias marcas se comparten a cambio.
+Each check downloads the video's sound, usually a few hundred kilobytes.	Cada comprobación descarga el sonido del vídeo, normalmente unos cientos de kilobytes.
+Find sped up copies	Encontrar copias aceleradas
+In the shared base	En la base compartida
+Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.	Escucha los siguientes vídeos del feed antes de que llegues a ellos, para que un anuncio marcado se salte desde su primer segundo.
+Loading the shared base…	Cargando la base compartida…
+Loading the video and its sound…	Cargando el vídeo y su sonido…
+Loose: finds more, may skip by mistake	Flexible: encuentra más, puede saltar por error
+Mark ad	Marcar anuncio
+Mark ad in the share sheet	Marcar anuncio en el panel de compartir
+Mark an ad	Marcar un anuncio
+Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.	Marca un anuncio una vez en cualquier vídeo y, dondequiera que su sonido vuelva a sonar, incluso bajo música o ruido, Metra lo saltará.
+Marked ads	Anuncios marcados
+Match strictness	Rigor de coincidencia
+Move on from ad-only videos	Pasar los vídeos que son solo un anuncio
+Name	Nombre
+New marks you save are sent to the shared base so others benefit right away.	Las marcas nuevas que guardes se envían a la base compartida para que otros se beneficien de inmediato.
+No ads marked yet. Open a video's share sheet and tap Mark ad.	Aún no hay anuncios marcados. Abre el panel de compartir de un vídeo y toca Marcar anuncio.
+None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Aún no hay ninguno. En un vídeo, toca Compartir, luego Marcar anuncio, y elige dónde empieza y termina el anuncio.
+Open a video first	Primero abre un vídeo
+Play ad	Reproducir anuncio
+Reading the sound…	Analizando el sonido…
+Recent checks	Comprobaciones recientes
+Rename	Cambiar nombre
+Saved "%1$s", but its sound is weak. A longer or louder cut is found more reliably.	Se guardó «%1$s», pero su sonido es débil. Un fragmento más largo o más alto se detecta con más fiabilidad.
+Saved "%1$s". This ad will be skipped in other videos.	Se guardó «%1$s». Este anuncio se saltará en otros vídeos.
+Saved everyone	Ahorrado a todos
+Saved others	Ahorrado a otros
+Share new marks automatically	Compartir marcas nuevas automáticamente
+Share with everyone	Compartir con todos
+Shared base	Base compartida
+Show a notice when skipping	Mostrar un aviso al saltar
+Skip ads by sound	Saltar anuncios por sonido
+Skip marked ads	Saltar los anuncios marcados
+Skipped for others	Saltados a otros
+Strict: only clear matches	Estricto: solo coincidencias claras
+The shared base can't be reached right now.	Ahora mismo no se puede acceder a la base compartida.
+There's too little sound here to recognise. Choose a louder part.	Aquí hay muy poco sonido para reconocerlo. Elige una parte más fuerte.
+Time saved	Tiempo ahorrado
+Use shared ad database	Usar la base de datos de anuncios compartida
+Watch it	Verlo
+When the ad is the whole video, go to the next one instead of jumping to its end.	Si el anuncio ocupa todo el vídeo, pasar al siguiente en vez de saltar a su final.
+Wrong	Incorrecto
+Your contribution	Tu aporte
+Your marks	Tus marcas
+Zoom	Zoom
+Voted down	Votados en contra
+These ads are not skipped for you. Tap Undo if you voted by mistake.	Estos anuncios no se saltan para ti. Toca Deshacer si votaste por error.

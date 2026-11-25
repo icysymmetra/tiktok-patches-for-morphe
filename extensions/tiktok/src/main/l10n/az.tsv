@@ -2227,3 +2227,78 @@ Top tabs and search	Yuxarı tablar və axtarış
 Bottom tabs and bars	Aşağı tablar və zolaqlar
 Dims: %1$s	Solğunlaşır: %1$s
 Nothing is dimmed.	Heç nə solğunlaşmır.
+%1$s ads, skipped %2$s times. Tap to manage them.	%1$s reklam, %2$s dəfə ötürülüb. İdarə etmək üçün toxunun.
+%1$s d %2$s h	%1$s gün %2$s saat
+%1$s h %2$s min	%1$s saat %2$s dəq
+%1$s min	%1$s dəq
+%1$s s · skipped %2$s times · %3$s	%1$s san · %2$s dəfə ötürülüb · %3$s
+AD	REKLAM
+Ad	Reklam
+Ad range	Reklam aralığı
+Adds Mark ad to a video's share sheet, where you cut the ad out of the video.	Videonun paylaşma vərəqinə Reklamı işarələ düyməsini əlavə edir. Orada reklamı videodan kəsib ayırırsınız.
+Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.	Reklamlar irəliləyiş zolağında yaşıl rənglə işarələnir. Qısa bildiriş reklamın adını göstərir, geri qayıtmaq üçün «Baxın» düyməsi var.
+Ads in the base	Bazadakı reklamlar
+Ads skipped	Ötürülən reklamlar
+All users	Bütün istifadəçilər
+Also looks for the ad played slightly faster or slower.	Bir az sürətləndirilmiş və ya yavaşladılmış reklamı da axtarır.
+Check on mobile data	Mobil data ilə də yoxlayın
+Check upcoming videos	Növbəti videoları əvvəlcədən yoxlayın
+Contributors	Müəlliflər
+Correct	Düzdür
+Couldn't load this video. Check the connection and try again.	Bu videonu yükləmək alınmadı. Bağlantını yoxlayıb yenidən cəhd edin.
+Couldn't open the ad editor. Close the share sheet and try again.	Reklam redaktorunu açmaq alınmadı. Paylaşma vərəqini bağlayıb yenidən cəhd edin.
+Couldn't play this video. Close the editor and try again.	Bu videonu oynatmaq alınmadı. Redaktoru bağlayıb yenidən cəhd edin.
+Delete	Silin
+Delete "%1$s"?	"%1$s" silinsin?
+Delete all	Hamısını silin
+Delete every marked ad?	Bütün işarələnmiş reklamlar silinsin?
+Downloading the sound…	Səs endirilir…
+Downloading the video…	Video endirilir…
+Downloads marks from other users and skips their ads too. Your own marks are shared back.	Digər istifadəçilərin işarələrini endirir və onların reklamlarını da ötürür. Sizin işarələriniz də onlarla paylaşılır.
+Each check downloads the video's sound, usually a few hundred kilobytes.	Hər yoxlama videonun səsini endirir, adətən bir neçə yüz kilobayt.
+Find sped up copies	Sürətləndirilmiş nüsxələri tapın
+In the shared base	Ümumi bazada
+Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.	Lentdəki növbəti videoları siz onlara çatmazdan əvvəl dinləyir, beləliklə işarələnmiş reklam ilk saniyəsindən ötürülür.
+Loading the shared base…	Ümumi baza yüklənir…
+Loading the video and its sound…	Video və səsi yüklənir…
+Loose: finds more, may skip by mistake	Yumşaq: daha çox tapır, səhvən ötürə bilər
+Mark ad	Reklamı işarələ
+Mark ad in the share sheet	Paylaşma vərəqində Reklamı işarələ
+Mark an ad	Reklamı işarələyin
+Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.	Reklamı istənilən videoda bir dəfə işarələyin. Onun səsi harada yenidən eşidilsə, hətta musiqi və ya küy altında belə, Metra onu ötürəcək.
+Marked ads	İşarələnmiş reklamlar
+Match strictness	Uyğunluq sərtliyi
+Move on from ad-only videos	Yalnız reklamdan ibarət videoları keçin
+Name	Ad
+New marks you save are sent to the shared base so others benefit right away.	Saxladığınız yeni işarələr ümumi bazaya göndərilir ki, başqaları dərhal faydalansın.
+No ads marked yet. Open a video's share sheet and tap Mark ad.	Hələ işarələnmiş reklam yoxdur. Videonun paylaşma vərəqini açın və Reklamı işarələ düyməsinə toxunun.
+None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Hələ yoxdur. Videoda Paylaşın, sonra Reklamı işarələ düyməsinə toxunun və reklamın harada başlayıb bitdiyini seçin.
+Open a video first	Əvvəlcə videonu açın
+Play ad	Reklamı oynat
+Reading the sound…	Səs təhlil edilir…
+Recent checks	Son yoxlamalar
+Rename	Adını dəyişin
+Saved "%1$s", but its sound is weak. A longer or louder cut is found more reliably.	"%1$s" saxlanıldı, amma səsi zəifdir. Daha uzun və ya daha yüksək səsli kəsik daha etibarlı tapılır.
+Saved "%1$s". This ad will be skipped in other videos.	"%1$s" saxlanıldı. Bu reklam digər videolarda ötürüləcək.
+Saved everyone	Hamıya qənaət
+Saved others	Başqalarına qənaət
+Share new marks automatically	Yeni işarələri avtomatik paylaşın
+Share with everyone	Hamı ilə paylaşın
+Shared base	Ümumi baza
+Show a notice when skipping	Ötürəndə bildiriş göstərin
+Skip ads by sound	Reklamları səsə görə ötürün
+Skip marked ads	İşarələnmiş reklamları ötürün
+Skipped for others	Başqalarında ötürülüb
+Strict: only clear matches	Sərt: yalnız aydın uyğunluqlar
+The shared base can't be reached right now.	Ümumi baza hazırda əlçatan deyil.
+There's too little sound here to recognise. Choose a louder part.	Burada tanımaq üçün səs çox azdır. Daha yüksək səsli hissə seçin.
+Time saved	Qənaət olunan vaxt
+Use shared ad database	Ümumi reklam bazasından istifadə edin
+Watch it	Baxın
+When the ad is the whole video, go to the next one instead of jumping to its end.	Reklam bütün videonu tutanda, onun sonuna atlamaq əvəzinə növbəti videoya keçin.
+Wrong	Səhvdir
+Your contribution	Sizin töhfəniz
+Your marks	Sizin işarələriniz
+Zoom	Miqyas
+Voted down	Bəyənmədikləriniz
+These ads are not skipped for you. Tap Undo if you voted by mistake.	Bu reklamlar sizin üçün ötürülmür. Səhvən səs vermisinizsə, Geri qaytarın düyməsinə toxunun.

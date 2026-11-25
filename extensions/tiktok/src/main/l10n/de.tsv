@@ -2230,3 +2230,78 @@ Top tabs and search	Obere Tabs und Suche
 Bottom tabs and bars	Untere Tabs und Leisten
 Dims: %1$s	Abgedunkelt: %1$s
 Nothing is dimmed.	Nichts wird abgedunkelt.
+%1$s ads, skipped %2$s times. Tap to manage them.	%1$s Werbeabschnitte, %2$s-mal übersprungen. Tippe, um sie zu verwalten.
+%1$s d %2$s h	%1$s Tg. %2$s Std.
+%1$s h %2$s min	%1$s Std. %2$s Min.
+%1$s min	%1$s Min.
+%1$s s · skipped %2$s times · %3$s	%1$s s · %2$s-mal übersprungen · %3$s
+AD	WERBUNG
+Ad	Werbung
+Ad range	Werbeabschnitt
+Adds Mark ad to a video's share sheet, where you cut the ad out of the video.	Fügt „Werbung markieren“ zum Teilen-Menü eines Videos hinzu, wo du die Werbung aus dem Video herausschneidest.
+Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.	Werbung wird auf dem Fortschrittsbalken grün markiert. Ein kurzer Hinweis zeigt den Namen der Werbung, mit „Ansehen“ kommst du zurück.
+Ads in the base	Werbung in der Datenbank
+Ads skipped	Übersprungene Werbung
+All users	Alle Nutzer
+Also looks for the ad played slightly faster or slower.	Sucht auch nach der Werbung, wenn sie etwas schneller oder langsamer abgespielt wird.
+Check on mobile data	Bei mobilen Daten prüfen
+Check upcoming videos	Nächste Videos vorab prüfen
+Contributors	Beitragende
+Correct	Richtig
+Couldn't load this video. Check the connection and try again.	Das Video konnte nicht geladen werden. Prüfe die Verbindung und versuche es erneut.
+Couldn't open the ad editor. Close the share sheet and try again.	Der Werbe-Editor konnte nicht geöffnet werden. Schließe das Teilen-Menü und versuche es erneut.
+Couldn't play this video. Close the editor and try again.	Das Video konnte nicht abgespielt werden. Schließe den Editor und versuche es erneut.
+Delete	Löschen
+Delete "%1$s"?	„%1$s“ löschen?
+Delete all	Alle löschen
+Delete every marked ad?	Alle markierten Werbeabschnitte löschen?
+Downloading the sound…	Ton wird heruntergeladen…
+Downloading the video…	Video wird heruntergeladen…
+Downloads marks from other users and skips their ads too. Your own marks are shared back.	Lädt Markierungen anderer Nutzer herunter und überspringt auch deren Werbung. Deine eigenen Markierungen werden im Gegenzug geteilt.
+Each check downloads the video's sound, usually a few hundred kilobytes.	Jede Prüfung lädt den Ton des Videos herunter, meist ein paar hundert Kilobyte.
+Find sped up copies	Beschleunigte Kopien finden
+In the shared base	In der gemeinsamen Datenbank
+Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.	Hört die nächsten Videos im Feed ab, bevor du dort ankommst, damit markierte Werbung ab der ersten Sekunde übersprungen wird.
+Loading the shared base…	Gemeinsame Datenbank wird geladen…
+Loading the video and its sound…	Video und Ton werden geladen…
+Loose: finds more, may skip by mistake	Locker: findet mehr, kann versehentlich überspringen
+Mark ad	Werbung markieren
+Mark ad in the share sheet	„Werbung markieren“ im Teilen-Menü
+Mark an ad	Werbung markieren
+Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.	Markiere eine Werbung einmal in einem beliebigen Video, und überall, wo ihr Ton wieder läuft, selbst unter Musik oder Geräuschen, springt Metra darüber hinweg.
+Marked ads	Markierte Werbung
+Match strictness	Strenge beim Abgleich
+Move on from ad-only videos	Reine Werbevideos überspringen
+Name	Name
+New marks you save are sent to the shared base so others benefit right away.	Neue Markierungen, die du speicherst, gehen an die gemeinsame Datenbank, damit andere sofort davon profitieren.
+No ads marked yet. Open a video's share sheet and tap Mark ad.	Noch keine Werbung markiert. Öffne das Teilen-Menü eines Videos und tippe auf „Werbung markieren“.
+None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Noch keine. Tippe in einem Video auf Teilen, dann auf „Werbung markieren“, und wähle, wo die Werbung beginnt und endet.
+Open a video first	Öffne zuerst ein Video
+Play ad	Werbung abspielen
+Reading the sound…	Ton wird analysiert…
+Recent checks	Letzte Prüfungen
+Rename	Umbenennen
+Saved "%1$s", but its sound is weak. A longer or louder cut is found more reliably.	„%1$s“ gespeichert, aber der Ton ist schwach. Ein längerer oder lauterer Ausschnitt wird zuverlässiger erkannt.
+Saved "%1$s". This ad will be skipped in other videos.	„%1$s“ gespeichert. Diese Werbung wird in anderen Videos übersprungen.
+Saved everyone	Allen gespart
+Saved others	Anderen gespart
+Share new marks automatically	Neue Markierungen automatisch teilen
+Share with everyone	Mit allen teilen
+Shared base	Gemeinsame Datenbank
+Show a notice when skipping	Beim Überspringen einen Hinweis zeigen
+Skip ads by sound	Werbung per Ton überspringen
+Skip marked ads	Markierte Werbung überspringen
+Skipped for others	Bei anderen übersprungen
+Strict: only clear matches	Streng: nur eindeutige Treffer
+The shared base can't be reached right now.	Die gemeinsame Datenbank ist gerade nicht erreichbar.
+There's too little sound here to recognise. Choose a louder part.	Hier ist zu wenig Ton zum Erkennen. Wähle eine lautere Stelle.
+Time saved	Gesparte Zeit
+Use shared ad database	Gemeinsame Werbedatenbank nutzen
+Watch it	Ansehen
+When the ad is the whole video, go to the next one instead of jumping to its end.	Wenn die Werbung das ganze Video ist, zum nächsten wechseln, statt an sein Ende zu springen.
+Wrong	Falsch
+Your contribution	Dein Beitrag
+Your marks	Deine Markierungen
+Zoom	Zoom
+Voted down	Abgelehnt
+These ads are not skipped for you. Tap Undo if you voted by mistake.	Diese Werbung wird für dich nicht übersprungen. Tippe auf Rückgängig, wenn du dich vertan hast.

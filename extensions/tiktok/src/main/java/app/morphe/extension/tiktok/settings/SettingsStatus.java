@@ -136,6 +136,7 @@ public class SettingsStatus {
     public static boolean feedTextSizeEnabled = false;
     public static boolean shareSheetEnabled = false;
     public static boolean seenVideoFilterEnabled = false;
+    public static boolean adSkipEnabled = false;
     public static boolean ghostModeEnabled = false;
     public static boolean disableTelemetryEnabled = false;
     public static boolean hideFeedFollowButtonEnabled = false;
@@ -520,6 +521,10 @@ public class SettingsStatus {
 
     public static void enableSeenVideoFilter() {
         seenVideoFilterEnabled = true;
+    }
+
+    public static void enableAdSkip() {
+        adSkipEnabled = true;
     }
 
     public static void enableGhostMode() {
