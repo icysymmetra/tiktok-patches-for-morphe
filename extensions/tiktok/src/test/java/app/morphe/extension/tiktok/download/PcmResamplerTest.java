@@ -113,4 +113,23 @@ public class PcmResamplerTest {
         System.arraycopy(b, 0, both, a.length, b.length);
         return both;
     }
+
+    @Test public void processIntoMatchesProcessSampleForSample() {
+        short[] input = tone(20000, 44100, 880, 1, 0);
+        PcmResampler ref = new PcmResampler(44100, 8000, 1);
+        PcmResampler direct = new PcmResampler(44100, 8000, 1);
+        short[] expected = new short[0];
+        short[] actual = new short[4000];
+        int actualLen = 0;
+        Random random = new Random(42);
+        int at = 0;
+        while (at < input.length) {
+            int frames = Math.min(input.length - at, 1 + random.nextInt(1024));
+            short[] piece = Arrays.copyOfRange(input, at, at + frames);
+            expected = join(expected, ref.process(piece, frames, false));
+            actualLen += direct.processInto(piece, frames, actual, actualLen, actual.length - actualLen);
+            at += frames;
+        }
+        assertArrayEquals(expected, Arrays.copyOf(actual, actualLen));
+    }
 }

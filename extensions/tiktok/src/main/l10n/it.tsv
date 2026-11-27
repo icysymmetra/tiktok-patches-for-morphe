@@ -2227,3 +2227,117 @@ Top tabs and search	Schede in alto e ricerca
 Bottom tabs and bars	Schede in basso e barre
 Dims: %1$s	Attenuati: %1$s
 Nothing is dimmed.	Niente viene attenuato.
+%1$s ads, skipped %2$s times. Tap to manage them.	%1$s annunci, saltati %2$s volte. Tocca per gestirli.
+%1$s d %2$s h	%1$s g %2$s h
+%1$s h %2$s min	%1$s h %2$s min
+%1$s min	%1$s min
+%1$s s · skipped %2$s times · %3$s	%1$s s · saltato %2$s volte · %3$s
+Ad	Annuncio
+Ad range	Intervallo dell'annuncio
+Adds Mark ad to a video's share sheet, where you cut the ad out of the video.	Aggiunge Segna annuncio al menu di condivisione di un video, dove tagli l'annuncio dal video.
+Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.	Le pubblicità sono segnate in verde sulla barra di avanzamento. Un breve avviso mostra il nome della pubblicità, con «Guardalo» per tornare indietro.
+Ads in the base	Annunci nella base
+Ads skipped	Annunci saltati
+All users	Tutti gli utenti
+Also looks for the ad played slightly faster or slower.	Cerca anche l'annuncio riprodotto un po' più veloce o più lento.
+Check on mobile data	Controlla con i dati mobili
+Check upcoming videos	Controlla i video successivi
+Contributors	Contributori
+Correct	Corretto
+Couldn't load this video. Check the connection and try again.	Impossibile caricare questo video. Controlla la connessione e riprova.
+Couldn't open the ad editor. Close the share sheet and try again.	Impossibile aprire l'editor degli annunci. Chiudi il menu di condivisione e riprova.
+Couldn't play this video. Close the editor and try again.	Impossibile riprodurre questo video. Chiudi l'editor e riprova.
+Delete	Elimina
+Delete "%1$s"?	Eliminare “%1$s”?
+Delete all	Elimina tutti
+Delete every marked ad?	Eliminare tutti gli annunci segnati?
+Downloading the sound…	Download dell'audio…
+Downloading the video…	Download del video…
+Downloads marks from other users and skips their ads too. Your own marks are shared back.	Scarica i contrassegni degli altri utenti e salta anche i loro annunci. I tuoi contrassegni vengono condivisi in cambio.
+Each check downloads the video's sound, usually a few hundred kilobytes.	Ogni controllo scarica l'audio del video, di solito qualche centinaio di kilobyte.
+Find sped up copies	Trova copie accelerate
+In the shared base	Nella base condivisa
+Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.	Ascolta i video successivi nel feed prima che tu ci arrivi, così un annuncio segnato viene saltato fin dal primo secondo.
+Loading the shared base…	Caricamento della base condivisa…
+Loading the video and its sound…	Caricamento del video e dell'audio…
+Normal: finds more, may skip by mistake	Normale: trova di più, può saltare per errore
+Mark ad	Segna annuncio
+Mark ad in the share sheet	Segna annuncio nel menu di condivisione
+Mark an ad	Segna un annuncio
+Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.	Segna un annuncio una volta in un video qualsiasi e, ovunque il suo audio torni a suonare, anche sotto musica o rumore, Metra lo salta.
+Marked ads	Annunci segnati
+Match strictness	Rigore della corrispondenza
+Move on from ad-only videos	Passa oltre i video fatti solo di pubblicità
+Name	Nome
+New marks you save are sent to the shared base so others benefit right away.	I nuovi contrassegni che salvi vengono inviati alla base condivisa, così gli altri ne beneficiano subito.
+None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Ancora nessuno. In un video tocca Condividi, poi Segna annuncio, e scegli dove inizia e finisce l'annuncio.
+Open a video first	Apri prima un video
+Play ad	Riproduci annuncio
+Reading the sound…	Analisi dell'audio…
+Recent checks	Controlli recenti
+Rename	Rinomina
+Saved "%1$s", but its sound is weak. A longer or louder cut is found more reliably.	“%1$s” salvato, ma il suo audio è debole. Un taglio più lungo o più forte viene trovato in modo più affidabile.
+Saved "%1$s". This ad will be skipped in other videos.	“%1$s” salvato. Questo annuncio verrà saltato negli altri video.
+Saved everyone	Risparmiato a tutti
+Saved others	Risparmiato ad altri
+Share new marks automatically	Condividi automaticamente i nuovi contrassegni
+Share with everyone	Condividi con tutti
+Shared base	Base condivisa
+Show a notice when skipping	Mostra un avviso quando salta
+Skip ads by sound	Salta gli annunci tramite l'audio
+Skip marked ads	Salta gli annunci segnati
+Skipped for others	Saltati ad altri
+Strict: only clear matches	Rigoroso: solo corrispondenze chiare
+Very strict: only the clearest matches	Molto severo: solo le corrispondenze più chiare
+The shared base can't be reached right now.	Al momento la base condivisa non è raggiungibile.
+Time saved	Tempo risparmiato
+Use shared ad database	Usa il database condiviso degli annunci
+Watch it	Guardalo
+When the ad is the whole video, go to the next one instead of jumping to its end.	Se l'annuncio occupa tutto il video, passa al successivo invece di saltare alla fine.
+Wrong	Sbagliato
+Your contribution	Il tuo contributo
+Your marks	Le tue marcature
+Voted down	Votati negativamente
+These ads are not skipped for you. Tap Undo if you voted by mistake.	Queste pubblicità non vengono saltate per te. Tocca Annulla se hai votato per errore.
+# context: Skip ads by sound, the editor, the skip notice and the list of marked ads
+Ad skipped	Annuncio saltato
+Ad skipped: %1$s	Annuncio saltato: %1$s
+Clear sound. This part is easy to recognise.	Audio chiaro. Questa parte è facile da riconoscere.
+Discard	Scarta
+Discard this ad?	Scartare questo annuncio?
+End	Fine
+End earlier	Fine prima
+End later	Fine dopo
+Everyone with Metra skips this ad too.	Anche tutti quelli con Metra salteranno questo annuncio.
+Hold a handle still to zoom in. Pinch the strip to zoom.	Tieni fermo un cursore per ingrandire. Pizzica la striscia per lo zoom.
+Keep editing	Continua a modificare
+Length	Durata
+Listen to the end	Ascolta la fine
+Listen to the start	Ascolta l'inizio
+No ads marked yet	Nessun annuncio segnato
+Open a video's share sheet and tap Mark ad.	Apri il menu di condivisione di un video e tocca Segna annuncio.
+Skip this ad	Salta questo annuncio
+Start	Inizio
+Start earlier	Inizio prima
+Start later	Inizio dopo
+The part you chose is not saved.	La parte che hai scelto non è salvata.
+Too little sound to recognise. Choose a louder part.	Troppo poco audio da riconoscere. Scegli una parte più forte.
+Try again	Riprova
+Turn on the shared base in settings to share.	Attiva la base condivisa nelle impostazioni per condividere.
+Weak sound. A longer or louder part is found more reliably.	Audio debole. Una parte più lunga o più forte viene trovata in modo più affidabile.
+Zoom in	Ingrandisci
+Zoom out	Rimpicciolisci
+# context: Skip ads by sound, backup of the marked ads in the list
+There are no ads to export yet	Non ci sono ancora annunci da esportare
+Couldn't open the file picker. Try again.	Impossibile aprire la scelta file. Riprova.
+Exported %1$s ads	%1$s annunci esportati
+Couldn't save the backup. Try another folder.	Impossibile salvare il backup. Prova un'altra cartella.
+Imported %1$s ads, %2$s were already in the list	%1$s annunci importati, %2$s erano già nell'elenco
+Imported %1$s ads	%1$s annunci importati
+This file is not a Metra ad backup	Questo file non è un backup di annunci Metra
+Backup	Backup
+Export	Esporta
+Import	Importa
+Save %1$s ads to a file	Salva %1$s annunci in un file
+Add ads from a backup file	Aggiungi annunci da un backup
+Remove every marked ad from this phone	Rimuovi tutti gli annunci segnati da questo telefono

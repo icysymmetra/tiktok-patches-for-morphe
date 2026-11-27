@@ -97,16 +97,20 @@ class ExtensionHostsTest {
 
     private companion object {
         /** The hosts the README's Privacy section names. */
-        val ALLOWED_HOSTS = setOf("github.com", "ko-fi.com", "gitlab.com", "www.gnu.org", "www.tiktok.com", "music.youtube.com")
+        val ALLOWED_HOSTS = setOf("github.com", "ko-fi.com", "gitlab.com", "www.gnu.org", "www.tiktok.com", "music.youtube.com",
+            "api.sponblocktikitoki.dpdns.org", "cdn.sponblocktikitoki.dpdns.org")
         /**
          * The media transport (the client, and the connection it pins to a checked address), and
          * Network proxy's check, which asks the proxy the user set for a greeting or a tunnel and
-         * hangs up on the answer.
+         * hangs up on the answer. Skip ads by sound's shared database, only while that patch's
+         * switch is on.
          */
         val OPENERS = setOf(
+            "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/download/AdSkipMediaFetch.java",
             "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/download/MediaTransport.java",
             "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/download/PinnedMediaConnection.java",
             "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/network/NetworkProxy.java",
+            "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/adskip/SharedDb.java",
         )
         val URL = Regex("""(?:https?|wss?)://([A-Za-z0-9.-]+)""")
         val NETWORK = Regex(

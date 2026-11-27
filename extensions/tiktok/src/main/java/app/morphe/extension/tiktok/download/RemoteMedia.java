@@ -49,21 +49,32 @@ final class RemoteMedia {
 
     static String fetch(List<String> urls, File target, Kind kind,
             MediaTransport.Client transport, Progress progress) throws IOException {
+        return fetch(urls, target, kind, transport, progress, MediaBudget.deadline(), null);
+    }
+
+    /** Optional cancellation is used only by the adskip sound reader. */
+    static String fetch(List<String> urls, File target, Kind kind,
+            MediaTransport.Client transport, Progress progress, MediaBudget.Deadline deadline,
+            java.util.concurrent.atomic.AtomicBoolean cancel) throws IOException {
         IOException failure = new IOException("No media URL succeeded");
-        MediaBudget.Deadline deadline = MediaBudget.deadline();
+        boolean fastFail = cancel != null;
+        int connectTimeoutMs = fastFail ? 2_200 : 15_000;
+        int readTimeoutMs = fastFail ? 3_500 : 30_000;
+        int maxAttempts = fastFail ? 1 : MediaBudget.MAX_ATTEMPTS_PER_MIRROR;
         for (String url : urls == null ? Collections.<String>emptyList() : urls) {
-            for (int attempt = 0; attempt < MediaBudget.MAX_ATTEMPTS_PER_MIRROR; attempt++) {
+            for (int attempt = 0; attempt < maxAttempts; attempt++) {
+                AdSkipMediaFetch.check(cancel);
                 try (MediaTransport.Response response = transport.open(
-                        url, deadline, 15000, 30000, null, false)) {
+                        url, deadline, connectTimeoutMs, readTimeoutMs, null, false)) {
                     MediaBudget.check(deadline);
                     int responseCode = response.statusCode;
                     if (MediaBudget.isTransientStatus(responseCode)
                             || (responseCode >= 300 && response.header("Retry-After") != null)) {
                         String retryAfter = response.header("Retry-After");
                         response.close();
-                        MediaBudget.waitBeforeRetry(retryAfter, attempt, deadline);
+                        if (!fastFail) MediaBudget.waitBeforeRetry(retryAfter, attempt, deadline);
                         if (MediaBudget.isTransientStatus(responseCode)
-                                && attempt + 1 < MediaBudget.MAX_ATTEMPTS_PER_MIRROR) continue;
+                                && attempt + 1 < maxAttempts) continue;
                     }
                     if (responseCode != 200) throw new IOException("Media server returned " + responseCode);
                     long expected = contentLength(response.header("Content-Length"));
@@ -84,20 +95,25 @@ final class RemoteMedia {
                         try (FileOutputStream output = new FileOutputStream(target)) {
                             count = MediaFileWriter.copy(input, output,
                                     MediaBudget.MAX_TRANSFER_BYTES, deadline, targetDirectory,
-                                    progress == null ? null : countSoFar -> progress.copied(countSoFar, expected));
+                                    countSoFar -> {
+                                        AdSkipMediaFetch.check(cancel);
+                                        if (progress != null) progress.copied(countSoFar, expected);
+                                    });
                         }
+                        AdSkipMediaFetch.check(cancel);
                         if (expected >= 0 && count != expected) throw new IOException("Media download is incomplete");
                         return extension;
                 }
                 } catch (IOException | RuntimeException exception) {
                     boolean cleaned = target == null || MediaCache.deletePartial(target);
+                    AdSkipMediaFetch.check(cancel);
                     if (exception instanceof MediaBudget.StopException) {
                         if (!cleaned) exception.addSuppressed(
                                 new IOException("Could not remove partial media output"));
                         throw (MediaBudget.StopException) exception;
                     }
                     boolean retryable = MediaBudget.isRetryableTransport(exception);
-                    if (cleaned && retryable && attempt + 1 < MediaBudget.MAX_ATTEMPTS_PER_MIRROR) {
+                    if (cleaned && retryable && attempt + 1 < maxAttempts) {
                         MediaBudget.waitBeforeRetry(null, attempt, deadline);
                         continue;
                     }

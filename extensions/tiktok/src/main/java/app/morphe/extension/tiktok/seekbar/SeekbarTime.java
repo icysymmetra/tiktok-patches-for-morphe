@@ -98,6 +98,11 @@ public final class SeekbarTime {
             bar.post(() -> onBarProgress(bar, percent));
             return;
         }
+        // The ad marks (Skip ads by sound) ride on the same callback, before the time's own work
+        // and whatever it decides, so they show with the time switched off too.
+        if (app.morphe.extension.tiktok.settings.SettingsStatus.adSkipEnabled) {
+            app.morphe.extension.tiktok.adskip.AdSkipBar.onBar(bar, percent);
+        }
         try {
             // The full-width bar (#173) doesn't depend on the time, and it is put back first so the
             // label below attaches to the row as it will stay.

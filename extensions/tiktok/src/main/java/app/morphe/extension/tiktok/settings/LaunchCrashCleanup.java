@@ -5,6 +5,7 @@
 package app.morphe.extension.tiktok.settings;
 
 import app.morphe.extension.shared.settings.Setting;
+import app.morphe.extension.tiktok.adskip.AdSkipPrefs;
 import app.morphe.extension.tiktok.featuregatelab.FeatureGateLabStore;
 import app.morphe.extension.tiktok.privacy.DeviceIdentity;
 import app.morphe.extension.tiktok.privacy.BenchmarkRuns;
@@ -31,6 +32,7 @@ public final class LaunchCrashCleanup {
             ReleaseNotes.PREFS_NAME,
             DeviceIdentity.PREFERENCES,
             BenchmarkRuns.STATE_FILE,
+            AdSkipPrefs.NAME,
     };
 
     private LaunchCrashCleanup() {

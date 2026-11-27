@@ -2227,3 +2227,117 @@ Top tabs and search	Üst sekmeler ve arama
 Bottom tabs and bars	Alt sekmeler ve çubuklar
 Dims: %1$s	Kararan: %1$s
 Nothing is dimmed.	Hiçbir şey kararmaz.
+%1$s ads, skipped %2$s times. Tap to manage them.	%1$s reklam, %2$s kez atlandı. Yönetmek için dokun.
+%1$s d %2$s h	%1$s g %2$s sa
+%1$s h %2$s min	%1$s sa %2$s dk
+%1$s min	%1$s dk
+%1$s s · skipped %2$s times · %3$s	%1$s s · %2$s kez atlandı · %3$s
+Ad	Reklam
+Ad range	Reklam aralığı
+Adds Mark ad to a video's share sheet, where you cut the ad out of the video.	Videonun paylaşım menüsüne Reklamı işaretle ekler. Orada reklamı videodan kesip ayırırsın.
+Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.	Reklamlar ilerleme çubuğunda yeşil ile işaretlenir. Kısa bir bildirim reklamın adını gösterir, geri dönmek için İzle'ye dokun.
+Ads in the base	Veritabanındaki reklamlar
+Ads skipped	Atlanan reklamlar
+All users	Tüm kullanıcılar
+Also looks for the ad played slightly faster or slower.	Biraz hızlandırılmış veya yavaşlatılmış reklamı da arar.
+Check on mobile data	Mobil veride de kontrol et
+Check upcoming videos	Sıradaki videoları önceden kontrol et
+Contributors	Katkıda bulunanlar
+Correct	Doğru
+Couldn't load this video. Check the connection and try again.	Bu video yüklenemedi. Bağlantını kontrol edip tekrar dene.
+Couldn't open the ad editor. Close the share sheet and try again.	Reklam düzenleyicisi açılamadı. Paylaşım menüsünü kapatıp tekrar dene.
+Couldn't play this video. Close the editor and try again.	Bu video oynatılamadı. Düzenleyiciyi kapatıp tekrar dene.
+Delete	Sil
+Delete "%1$s"?	"%1$s" silinsin mi?
+Delete all	Tümünü sil
+Delete every marked ad?	İşaretlenen tüm reklamlar silinsin mi?
+Downloading the sound…	Ses indiriliyor…
+Downloading the video…	Video indiriliyor…
+Downloads marks from other users and skips their ads too. Your own marks are shared back.	Diğer kullanıcıların işaretlerini indirir ve onların reklamlarını da atlar. Senin işaretlerin de karşılığında paylaşılır.
+Each check downloads the video's sound, usually a few hundred kilobytes.	Her kontrol videonun sesini indirir, genellikle birkaç yüz kilobayt.
+Find sped up copies	Hızlandırılmış kopyaları bul
+In the shared base	Ortak veritabanında
+Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.	Akıştaki sıradaki videoları sen onlara gelmeden dinler, böylece işaretlenen reklam ilk saniyesinden atlanır.
+Loading the shared base…	Ortak veritabanı yükleniyor…
+Loading the video and its sound…	Video ve sesi yükleniyor…
+Normal: finds more, may skip by mistake	Normal: daha çok bulur, yanlışlıkla atlayabilir
+Mark ad	Reklamı işaretle
+Mark ad in the share sheet	Paylaşım menüsünde Reklamı işaretle
+Mark an ad	Bir reklamı işaretle
+Mark an ad once in any video, and wherever its sound plays again, even under music or noise, Metra skips past it.	Bir reklamı herhangi bir videoda bir kez işaretle. Sesi nerede yeniden çalarsa, müzik veya gürültü altında bile, Metra onu atlar.
+Marked ads	İşaretlenen reklamlar
+Match strictness	Eşleşme katılığı
+Move on from ad-only videos	Yalnızca reklamdan oluşan videoları geç
+Name	Ad
+New marks you save are sent to the shared base so others benefit right away.	Kaydettiğin yeni işaretler ortak veritabanına gönderilir, böylece başkaları hemen yararlanır.
+None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Henüz yok. Bir videoda Paylaş'a, ardından Reklamı işaretle'ye dokun ve reklamın nerede başlayıp bittiğini seç.
+Open a video first	Önce bir video aç
+Play ad	Reklamı oynat
+Reading the sound…	Ses analiz ediliyor…
+Recent checks	Son kontroller
+Rename	Yeniden adlandır
+Saved "%1$s", but its sound is weak. A longer or louder cut is found more reliably.	"%1$s" kaydedildi, ancak sesi zayıf. Daha uzun veya daha yüksek sesli bir kesit daha güvenilir bulunur.
+Saved "%1$s". This ad will be skipped in other videos.	"%1$s" kaydedildi. Bu reklam diğer videolarda atlanacak.
+Saved everyone	Herkese kazandırılan
+Saved others	Başkalarına kazandırılan
+Share new marks automatically	Yeni işaretleri otomatik paylaş
+Share with everyone	Herkesle paylaş
+Shared base	Ortak veritabanı
+Show a notice when skipping	Atlarken bildirim göster
+Skip ads by sound	Reklamları sesle atla
+Skip marked ads	İşaretlenen reklamları atla
+Skipped for others	Başkalarında atlandı
+Strict: only clear matches	Katı: yalnızca net eşleşmeler
+Very strict: only the clearest matches	Çok katı: yalnızca en belirgin eşleşmeler
+The shared base can't be reached right now.	Ortak veritabanına şu anda ulaşılamıyor.
+Time saved	Kazanılan süre
+Use shared ad database	Ortak reklam veritabanını kullan
+Watch it	İzle
+When the ad is the whole video, go to the next one instead of jumping to its end.	Reklam videonun tamamıysa, sonuna atlamak yerine sonraki videoya geç.
+Wrong	Yanlış
+Your contribution	Katkın
+Your marks	İşaretlerin
+Voted down	Beğenmedikleriniz
+These ads are not skipped for you. Tap Undo if you voted by mistake.	Bu reklamlar sizin için atlanmaz. Yanlışlıkla oy verdiyseniz Geri al'a dokunun.
+# context: Skip ads by sound, the editor, the skip notice and the list of marked ads
+Ad skipped	Reklam atlandı
+Ad skipped: %1$s	Reklam atlandı: %1$s
+Clear sound. This part is easy to recognise.	Net ses. Bu bölüm kolayca tanınır.
+Discard	At
+Discard this ad?	Bu reklam atılsın mı?
+End	Bitiş
+End earlier	Bitişi öne al
+End later	Bitişi ileri al
+Everyone with Metra skips this ad too.	Metra kullanan herkes de bu reklamı atlayacak.
+Hold a handle still to zoom in. Pinch the strip to zoom.	Yakınlaştırmak için bir tutamacı sabit tutun. Yakınlaştırmak için şeridi iki parmakla açın.
+Keep editing	Düzenlemeye devam et
+Length	Uzunluk
+Listen to the end	Bitişi dinle
+Listen to the start	Başlangıcı dinle
+No ads marked yet	Henüz işaretlenmiş reklam yok
+Open a video's share sheet and tap Mark ad.	Bir videonun paylaşım menüsünü açın ve Reklamı işaretle'ye dokunun.
+Skip this ad	Bu reklamı atla
+Start	Başlangıç
+Start earlier	Başlangıcı öne al
+Start later	Başlangıcı ileri al
+The part you chose is not saved.	Seçtiğiniz bölüm kaydedilmedi.
+Too little sound to recognise. Choose a louder part.	Tanınacak kadar ses yok. Daha yüksek sesli bir bölüm seçin.
+Try again	Tekrar dene
+Turn on the shared base in settings to share.	Paylaşmak için ayarlardan ortak tabanı açın.
+Weak sound. A longer or louder part is found more reliably.	Zayıf ses. Daha uzun veya daha yüksek sesli bir bölüm daha güvenilir bulunur.
+Zoom in	Yakınlaştır
+Zoom out	Uzaklaştır
+# context: Skip ads by sound, backup of the marked ads in the list
+There are no ads to export yet	Henüz dışa aktarılacak reklam yok
+Couldn't open the file picker. Try again.	Dosya seçici açılamadı. Tekrar deneyin.
+Exported %1$s ads	%1$s reklam dışa aktarıldı
+Couldn't save the backup. Try another folder.	Yedek kaydedilemedi. Başka bir klasör deneyin.
+Imported %1$s ads, %2$s were already in the list	%1$s reklam içe aktarıldı, %2$s zaten listedeydi
+Imported %1$s ads	%1$s reklam içe aktarıldı
+This file is not a Metra ad backup	Bu dosya bir Metra reklam yedeği değil
+Backup	Yedek
+Export	Dışa aktar
+Import	İçe aktar
+Save %1$s ads to a file	%1$s reklamı dosyaya kaydet
+Add ads from a backup file	Yedek dosyasından reklam ekle
+Remove every marked ad from this phone	İşaretli tüm reklamları bu telefondan kaldır

@@ -47,7 +47,7 @@ If TikTok closes while saves are still going, the next time you open it a banner
 
 ## Available Patches
 
-Simple mode in Morphe Manager selects 118 patches from this development bundle. The other 18 patches must be selected separately. Selecting a patch makes its controls available; each setting keeps the default described below.
+Simple mode in Morphe Manager selects 119 patches from this development bundle. The other 18 patches must be selected separately. Selecting a patch makes its controls available; each setting keeps the default described below.
 
 
 
@@ -169,6 +169,7 @@ Simple mode in Morphe Manager selects 118 patches from this development bundle. 
 | `Show follow status` | Shows on a profile whether that person follows you back, and marks accounts in your follow lists that don't. On by default. Turn it off in Metra settings > App behavior. Optional local counts and appearance controls apply to your own profile. |
 | `Show the progress bar` | Shows the progress bar on videos where TikTok hides it, so you can see how long a video is and skip around. On by default. Turn it off in Metra settings > App behavior, where you can also show the time beside the bar or give it a bigger handle. A seek bar for video stories is there too. |
 | `Show the progress bar thumbnail` | Shows a small preview picture while you drag the progress bar, so you can find the part you want. On by default. Turn it off in Metra settings > App behavior. |
+| `Skip ads by sound` | Lets you mark an ad in any video from its share sheet, then skips that ad by its sound wherever it plays again, even under music or noise, the way Shazam finds a song. Ads are fingerprinted and matched on your phone, and marks can be shared with other users through an optional server. Starts off. Turn it on in Metra settings > Feed controls. |
 | `Skip content warnings` | Plays videos without the warning screen you'd have to tap through first, and can hide the Check sources and Check your sources banners. Starts off. Turn it on in Metra settings > Interface. |
 | `Skip first-launch setup` | Skips TikTok's setup screens on a fresh install, like the interest picker and the swipe tutorial. Sign-in and age screens still show. Its switch is on once picked, since setup runs before you can reach settings. Turn it off in Metra settings > App behavior. |
 | `Skip passkey sign-in` | Lets you sign in another way, like your password or a code by email or text, when TikTok wants a passkey. Password managers won't hand a passkey to a patched app, so that step can't finish here. With the switch on, TikTok treats your phone as one without passkeys. Starts off. Turn it on in Metra settings > App behavior. |
@@ -263,6 +264,7 @@ Morphe reads `patches-bundle.json` from this repository, downloads the `.mpp` re
 - The source is based on [RookieEnough/De-Vanced](https://github.com/RookieEnough/De-Vanced) and the [Morphe patches template](https://github.com/MorpheApp/morphe-patches-template).
 - It is not affiliated with TikTok, ByteDance, or Morphe.
 - TikTok changes often, so compatibility is intentionally tied to the exact version and packages listed above.
+- Skip ads by sound is the one patch that talks to a server outside TikTok, and only while both Skip marked ads and Use shared ad database are on: it downloads the shared list of marked ads from metra-adskip.falker600.workers.dev and sends the ads you share, your votes and skip counts there. What is sent and how long it is kept is written up at [MidTano/tiktok-sponsorblock](https://github.com/MidTano/tiktok-sponsorblock/blob/main/docs/privacy.md).
 
 <br>
 
