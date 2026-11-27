@@ -1,6 +1,6 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
@@ -17,13 +17,18 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -31,6 +36,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -44,19 +51,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Cuts an ad out of a video: the video plays at the top with its sound, a strip of frames and
- * the waveform below it, and two handles choose where the ad starts and ends. "Play ad" plays
- * just the chosen part, so the reader hears exactly what will be matched. Saving fingerprints
- * the cut, checks it can be found again in this very video, and adds it to the list.
- */
+/** Fullscreen dialog for selecting, previewing, fingerprinting, and saving an ad segment from a video. */
 final class AdSegmentEditor {
     private static final long MAX_LOAD_MS = 10L * 60 * 1000;
     private static final long DEFAULT_LENGTH_MS = 15_000;
     private static final int THUMBS = 10;
-    /** Envelope resolution: one value per 20 ms. */
     private static final int ENVELOPE_MS = 20;
-    /** Fewer hashes than this is too little sound to recognise. */
     private static final int MIN_HASHES = 40;
     private static final long MIN_LENGTH_MS = SegmentRangeView.MIN_LENGTH_MS;
     private static final long MAX_LENGTH_MS = SegmentRangeView.MAX_LENGTH_MS;
@@ -70,15 +70,24 @@ final class AdSegmentEditor {
 
     private FrameLayout videoBox;
     private TextureView texture;
+    private View loadingBox;
     private TextView status;
     private ProgressBar spinner;
+    private AdSkipUi.IconChip retryButton;
+    private ImageView flash;
     private LinearLayout controls;
     private SegmentRangeView range;
-    private TextView startLabel, endLabel, lengthLabel, positionLabel, hint;
-    private TextView saveButton;
+    private TextView startLabel, endLabel, lengthLabel, positionLabel;
+    private ImageView meterIcon;
+    private TextView meterText;
+    private View[] meterBars;
+    private View shareRow;
+    private AdSkipUi.IconChip saveButton;
     private AdSkipUi.IconChip playAdButton;
     private ImageView playButton, zoomButton;
     private EditText nameField;
+    private boolean changed;
+    private boolean tipShown;
 
     private File pictureFile, soundFile;
     private MediaPlayer picture, sound;
@@ -87,7 +96,6 @@ final class AdSegmentEditor {
     private boolean prepared;
     private long durationMs;
     private Landmarks.Print print;
-    /** When the play should stop: the end of the ad for Play ad, or -1; and where it goes back to. */
     private long stopAt = -1;
     private long returnTo;
     private long pendingSeek = -1;
@@ -95,11 +103,9 @@ final class AdSegmentEditor {
     private int seeksInFlight;
     private int seekToken;
     private boolean playWhenSeeked;
-    /** The picture is being brought back to the sound's clock. */
     private boolean resyncing;
     private static final long DRIFT_MS = 200;
     private static final long SEEK_TIMEOUT_MS = 700;
-    /** Past this length the timeline opens zoomed in on the chosen part. */
     private static final long ZOOM_FROM_MS = 45_000;
     private final long initialPositionMs;
 
@@ -131,40 +137,68 @@ final class AdSegmentEditor {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(AdSkipUi.BG);
 
-        // Top bar.
+        // Top bar: close, the title over the creator's name, and Save.
         LinearLayout bar = new LinearLayout(c);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setGravity(Gravity.CENTER_VERTICAL);
-        bar.setPadding(dp(10), dp(8), dp(12), dp(8));
+        bar.setPadding(dp(8), dp(8), dp(12), dp(8));
         ImageView close = AdSkipUi.iconButton(c, AdIcons.Icon.CLOSE, L10n.t("Close"), 40);
-        close.setOnClickListener(v -> dialog.dismiss());
+        close.setOnClickListener(v -> requestClose());
         bar.addView(close, new LinearLayout.LayoutParams(dp(40), dp(40)));
-        TextView title = AdSkipUi.text(c, L10n.t("Mark an ad"), 18, AdSkipUi.TEXT, true);
+        LinearLayout heading = new LinearLayout(c);
+        heading.setOrientation(LinearLayout.VERTICAL);
+        heading.setPadding(dp(12), 0, dp(8), 0);
+        TextView title = AdSkipUi.text(c, L10n.t("Mark an ad"), 17, AdSkipUi.TEXT, true);
         title.setSingleLine(true);
-        title.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        title.setPadding(dp(12), 0, dp(8), 0);
-        bar.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
-        saveButton = AdSkipUi.chip(c, L10n.t("Save"), true);
+        title.setEllipsize(TextUtils.TruncateAt.END);
+        heading.addView(title);
+        String nick = authorName();
+        if (nick != null) {
+            TextView subtitle = AdSkipUi.text(c, "@" + nick, 12, AdSkipUi.TEXT_2, false);
+            subtitle.setSingleLine(true);
+            subtitle.setEllipsize(TextUtils.TruncateAt.END);
+            heading.addView(subtitle);
+        }
+        bar.addView(heading, new LinearLayout.LayoutParams(0, -2, 1f));
+        saveButton = new AdSkipUi.IconChip(c, true);
+        saveButton.set(AdIcons.Icon.CHECK, L10n.t("Save"));
         saveButton.setOnClickListener(v -> save());
         AdSkipUi.enable(saveButton, false);
-        bar.addView(saveButton);
+        bar.addView(saveButton, new LinearLayout.LayoutParams(-2, dp(40)));
         root.addView(bar);
 
-        // Video.
+        // Video, with its loading state and a play or pause flash in the middle.
         videoBox = new FrameLayout(c);
         videoBox.setBackgroundColor(Color.BLACK);
         texture = new TextureView(c);
         videoBox.addView(texture, new FrameLayout.LayoutParams(-1, -1, Gravity.CENTER));
-        spinner = new ProgressBar(c);
-        videoBox.addView(spinner, new FrameLayout.LayoutParams(dp(48), dp(48), Gravity.CENTER));
+        LinearLayout loading = new LinearLayout(c);
+        loading.setOrientation(LinearLayout.VERTICAL);
+        loading.setGravity(Gravity.CENTER_HORIZONTAL);
+        spinner = AdSkipUi.spinner(c);
+        loading.addView(spinner, new LinearLayout.LayoutParams(dp(40), dp(40)));
         status = AdSkipUi.text(c, L10n.t("Loading the video and its sound…"), 13, AdSkipUi.TEXT_2, false);
         status.setGravity(Gravity.CENTER);
-        FrameLayout.LayoutParams statusParams = new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER);
-        statusParams.topMargin = dp(70);
-        videoBox.addView(status, statusParams);
+        status.setPadding(dp(32), dp(14), dp(32), 0);
+        loading.addView(status, new LinearLayout.LayoutParams(-1, -2));
+        retryButton = new AdSkipUi.IconChip(c, false);
+        retryButton.set(AdIcons.Icon.REPLAY, L10n.t("Try again"));
+        retryButton.setVisibility(View.GONE);
+        retryButton.setOnClickListener(v -> retry());
+        LinearLayout.LayoutParams retryParams = new LinearLayout.LayoutParams(-2, dp(40));
+        retryParams.topMargin = dp(16);
+        loading.addView(retryButton, retryParams);
+        loadingBox = loading;
+        videoBox.addView(loading, new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
+        flash = new ImageView(c);
+        flash.setScaleType(ImageView.ScaleType.CENTER);
+        flash.setBackground(AdSkipUi.round(0x8C000000, dp(32)));
+        flash.setAlpha(0f);
+        videoBox.addView(flash, new FrameLayout.LayoutParams(dp(64), dp(64), Gravity.CENTER));
         positionLabel = AdSkipUi.text(c, "", 12, Color.WHITE, true);
         positionLabel.setBackground(AdSkipUi.round(0x99000000, dp(10)));
         positionLabel.setPadding(dp(8), dp(3), dp(8), dp(3));
+        positionLabel.setVisibility(View.GONE);
         FrameLayout.LayoutParams posParams = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.END);
         posParams.setMargins(0, 0, dp(10), dp(10));
         videoBox.addView(positionLabel, posParams);
@@ -174,68 +208,102 @@ final class AdSegmentEditor {
         // Controls: everything below the video fits one screen, nothing scrolls.
         controls = new LinearLayout(c);
         controls.setOrientation(LinearLayout.VERTICAL);
-        controls.setPadding(dp(12), dp(8), dp(12), dp(8));
+        controls.setPadding(dp(12), dp(6), dp(12), dp(10));
         controls.setBackgroundColor(AdSkipUi.BG);
-        controls.setAlpha(0.35f);
 
         range = new SegmentRangeView(c, AdSkipUi.ACCENT);
         range.setListener(new SegmentRangeView.Listener() {
             @Override
             public void rangeChanged(long startMs, long endMs, boolean fromUser, boolean dragging) {
+                if (fromUser) changed = true;
                 updateLabels();
                 if (!dragging) stopAt = -1;
             }
 
             @Override
             public void seekRequested(long ms, boolean dragging) {
+                // The picture follows the finger; nothing plays until the reader asks.
                 pause();
                 seek(ms);
-                if (!dragging) previewAround(ms);
             }
 
             @Override
             public void zoomChanged(boolean zoomed) {
                 AdSkipUi.setIcon(zoomButton, zoomed ? AdIcons.Icon.ZOOM_OUT : AdIcons.Icon.ZOOM_IN, BUTTON_DP);
+                zoomButton.setContentDescription(L10n.t(zoomed ? "Zoom out" : "Zoom in"));
+            }
+
+            @Override
+            public void fineZoomed() {
+                learnedFineZoom();
             }
         });
         controls.addView(range, new LinearLayout.LayoutParams(-1, -2));
+
+        // One line under the strip: a gesture tip, the sound check, or a warning.
+        LinearLayout meter = new LinearLayout(c);
+        meter.setOrientation(LinearLayout.HORIZONTAL);
+        meter.setGravity(Gravity.CENTER_VERTICAL);
+        meter.setPadding(dp(4), dp(2), dp(4), dp(2));
+        meterIcon = new ImageView(c);
+        meter.addView(meterIcon, new LinearLayout.LayoutParams(dp(16), dp(16)));
+        meterText = AdSkipUi.text(c, "", 12, AdSkipUi.TEXT_2, false);
+        meterText.setMaxLines(2);
+        meterText.setEllipsize(TextUtils.TruncateAt.END);
+        meterText.setPadding(dp(8), 0, dp(8), 0);
+        meter.addView(meterText, new LinearLayout.LayoutParams(0, -2, 1f));
+        meterBars = new View[3];
+        for (int i = 0; i < meterBars.length; i++) {
+            View barView = new View(c);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(14), dp(4));
+            params.leftMargin = dp(3);
+            meter.addView(barView, params);
+            meterBars[i] = barView;
+        }
+        meter.setMinimumHeight(dp(26));
+        controls.addView(meter, new LinearLayout.LayoutParams(-1, -2));
 
         // Start and end, each with a tenth of a second either way, and the length between.
         LinearLayout edges = new LinearLayout(c);
         edges.setOrientation(LinearLayout.HORIZONTAL);
         edges.setGravity(Gravity.CENTER_VERTICAL);
         edges.setPadding(0, dp(6), 0, dp(6));
-        edges.addView(nudge(true, -100), nudgeParams());
-        startLabel = AdSkipUi.text(c, "", 14, AdSkipUi.TEXT, true);
-        startLabel.setPadding(dp(8), 0, dp(8), 0);
-        edges.addView(startLabel);
-        edges.addView(nudge(true, 100), nudgeParams());
-        lengthLabel = AdSkipUi.text(c, "", 14, AdSkipUi.ACCENT, true);
+        edges.addView(nudge(true, -NUDGE_MS), nudgeParams());
+        startLabel = edgeChip(true);
+        edges.addView((View) startLabel.getParent());
+        edges.addView(nudge(true, NUDGE_MS), nudgeParams());
+        LinearLayout length = new LinearLayout(c);
+        length.setOrientation(LinearLayout.VERTICAL);
+        length.setGravity(Gravity.CENTER);
+        lengthLabel = AdSkipUi.text(c, "", 16, AdSkipUi.TEXT, true);
         lengthLabel.setGravity(Gravity.CENTER);
-        edges.addView(lengthLabel, new LinearLayout.LayoutParams(0, -2, 1f));
-        edges.addView(nudge(false, -100), nudgeParams());
-        endLabel = AdSkipUi.text(c, "", 14, AdSkipUi.TEXT, true);
-        endLabel.setPadding(dp(8), 0, dp(8), 0);
-        edges.addView(endLabel);
-        edges.addView(nudge(false, 100), nudgeParams());
+        length.addView(lengthLabel);
+        TextView lengthCaption = AdSkipUi.text(c, L10n.t("Length"), 11, AdSkipUi.TEXT_2, false);
+        lengthCaption.setGravity(Gravity.CENTER);
+        length.addView(lengthCaption);
+        edges.addView(length, new LinearLayout.LayoutParams(0, -2, 1f));
+        edges.addView(nudge(false, -NUDGE_MS), nudgeParams());
+        endLabel = edgeChip(false);
+        edges.addView((View) endLabel.getParent());
+        edges.addView(nudge(false, NUDGE_MS), nudgeParams());
         controls.addView(edges);
 
         // Playback: the whole video, just the ad, and zoom, one height for all three.
         LinearLayout play = new LinearLayout(c);
         play.setOrientation(LinearLayout.HORIZONTAL);
         play.setGravity(Gravity.CENTER_VERTICAL);
-        play.setPadding(0, dp(2), 0, dp(8));
+        play.setPadding(0, dp(2), 0, dp(10));
         playButton = AdSkipUi.iconButton(c, AdIcons.Icon.PLAY, L10n.t("Play"), BUTTON_DP);
         playButton.setOnClickListener(v -> togglePlay());
         play.addView(playButton, new LinearLayout.LayoutParams(dp(BUTTON_DP), dp(BUTTON_DP)));
-        playAdButton = new AdSkipUi.IconChip(c, true);
+        playAdButton = new AdSkipUi.IconChip(c, AdSkipUi.SURFACE_HI, AdSkipUi.TEXT, true);
         playAdButton.set(AdIcons.Icon.HEADPHONES, L10n.t("Play ad"));
         playAdButton.setOnClickListener(v -> playSelection());
         LinearLayout.LayoutParams playAdParams = new LinearLayout.LayoutParams(0, dp(BUTTON_DP), 1f);
         playAdParams.leftMargin = dp(10);
         playAdParams.rightMargin = dp(10);
         play.addView(playAdButton, playAdParams);
-        zoomButton = AdSkipUi.iconButton(c, AdIcons.Icon.ZOOM_IN, L10n.t("Zoom"), BUTTON_DP);
+        zoomButton = AdSkipUi.iconButton(c, AdIcons.Icon.ZOOM_IN, L10n.t("Zoom in"), BUTTON_DP);
         zoomButton.setOnClickListener(v -> range.zoom(!range.zoomed()));
         play.addView(zoomButton, new LinearLayout.LayoutParams(dp(BUTTON_DP), dp(BUTTON_DP)));
         controls.addView(play);
@@ -244,6 +312,7 @@ final class AdSegmentEditor {
         nameField = new EditText(c);
         nameField.setSingleLine(true);
         nameField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        nameField.setImeOptions(EditorInfo.IME_ACTION_DONE);
         nameField.setTextColor(AdSkipUi.TEXT);
         nameField.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
         nameField.setHintTextColor(AdSkipUi.TEXT_2);
@@ -251,28 +320,22 @@ final class AdSegmentEditor {
         nameField.setText(defaultName());
         nameField.setBackground(AdSkipUi.round(AdSkipUi.SURFACE, dp(12)));
         nameField.setPadding(dp(14), 0, dp(14), 0);
-        controls.addView(nameField, new LinearLayout.LayoutParams(-1, dp(44)));
+        nameField.setCompoundDrawablesRelative(AdIcons.of(c, AdIcons.Icon.EDIT, AdSkipUi.TEXT_2, 18), null, null, null);
+        nameField.setCompoundDrawablePadding(dp(10));
+        nameField.setOnEditorActionListener((v, action, event) -> {
+            if (action != EditorInfo.IME_ACTION_DONE) return false;
+            hideKeyboard();
+            nameField.clearFocus();
+            return true;
+        });
+        nameField.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int d) { }
+            @Override public void onTextChanged(CharSequence s, int a, int b, int d) { }
+            @Override public void afterTextChanged(android.text.Editable s) { changed = true; }
+        });
+        controls.addView(nameField, new LinearLayout.LayoutParams(-1, dp(46)));
 
-        // Warnings take this line only when there is one.
-        hint = AdSkipUi.text(c, "", 12, AdSkipUi.WARN, false);
-        hint.setPadding(dp(4), dp(6), dp(4), 0);
-        hint.setVisibility(View.GONE);
-        controls.addView(hint);
-
-        android.widget.CheckBox shareBox = new android.widget.CheckBox(c);
-        shareBox.setText(L10n.t("Share with everyone"));
-        shareBox.setTextColor(AdSkipUi.TEXT_2);
-        shareBox.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
-        if (Build.VERSION.SDK_INT >= 21) shareBox.setButtonTintList(android.content.res.ColorStateList.valueOf(AdSkipUi.ACCENT));
-        boolean sharedEnabled = app.morphe.extension.tiktok.settings.Settings.AD_SKIP_SHARED_DB.get();
-        shareBox.setChecked(sharedEnabled && app.morphe.extension.tiktok.settings.Settings.AD_SKIP_SHARE_AUTO.get());
-        shareBox.setEnabled(sharedEnabled);
-        shareBox.setAlpha(sharedEnabled ? 1f : 0.4f);
-        shareBox.setOnCheckedChangeListener((btn, checked) ->
-                app.morphe.extension.tiktok.settings.Settings.AD_SKIP_SHARE_AUTO.save(checked));
-        LinearLayout.LayoutParams shareParams = new LinearLayout.LayoutParams(-2, -2);
-        shareParams.topMargin = dp(2);
-        controls.addView(shareBox, shareParams);
+        controls.addView(shareRow(), new LinearLayout.LayoutParams(-1, -2));
 
         root.addView(controls, new LinearLayout.LayoutParams(-1, -2));
         AdSkipUi.padForSystemBars(root);
@@ -286,10 +349,30 @@ final class AdSegmentEditor {
             window.setStatusBarColor(AdSkipUi.BG);
             window.setNavigationBarColor(AdSkipUi.BG);
         }
+        // Back asks before throwing a chosen part away, like the close button.
+        dialog.setCancelable(false);
+        dialog.setOnKeyListener((d, code, event) -> {
+            if (code != KeyEvent.KEYCODE_BACK) return false;
+            if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) requestClose();
+            return true;
+        });
+        if (Build.VERSION.SDK_INT >= 33) {
+            dialog.getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::requestClose);
+        }
         dialog.setOnDismissListener(d -> release());
+        // Leaving the app pauses the editor's video; coming back pauses the feed again, which
+        // TikTok starts by itself on return, so its sound never plays behind the editor.
+        focusListener = hasFocus -> {
+            if (hasFocus) AdSkip.setFeedPlaying(false);
+            else pause();
+        };
+        root.getViewTreeObserver().addOnWindowFocusChangeListener(focusListener);
+        focusRoot = root;
         AdSkip.setPaused(true);
         AdSkip.setFeedPlaying(false);
         enableControls(false);
+        showTip();
         dialog.show();
 
         texture.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
@@ -321,22 +404,122 @@ final class AdSegmentEditor {
     }
 
     private static final float BUTTON_DP = 48;
+    private static final long NUDGE_MS = 100;
+    private static final long REPEAT_FIRST_MS = 380, REPEAT_MS = 110, REPEAT_FLOOR_MS = 40;
 
     private LinearLayout.LayoutParams nudgeParams() {
-        return new LinearLayout.LayoutParams(dp(36), dp(36));
+        return new LinearLayout.LayoutParams(dp(34), dp(34));
     }
 
-    /** Moves one end by a tenth of a second and shows that frame, without playing. */
+    /** Adjusts the start or end boundary by {@code delta} ms, accelerating while held. */
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
     private View nudge(boolean start, long delta) {
         ImageView button = AdSkipUi.iconButton(activity, delta < 0 ? AdIcons.Icon.MINUS : AdIcons.Icon.PLUS,
-                (delta < 0 ? "−0.1" : "+0.1"), 36);
-        button.setOnClickListener(v -> setEdge(start, (start ? range.start() : range.end()) + delta));
+                L10n.t(start ? (delta < 0 ? "Start earlier" : "Start later") : (delta < 0 ? "End earlier" : "End later")), 34);
+        Runnable step = () -> setEdge(start, (start ? range.start() : range.end()) + delta);
+        Runnable[] repeat = new Runnable[1];
+        long[] interval = {REPEAT_MS};
+        repeat[0] = () -> {
+            step.run();
+            button.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+            interval[0] = Math.max(REPEAT_FLOOR_MS, interval[0] - 8);
+            main.postDelayed(repeat[0], interval[0]);
+        };
+        button.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    if (!v.isEnabled()) return false;
+                    v.setPressed(true);
+                    step.run();
+                    v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+                    interval[0] = REPEAT_MS;
+                    main.postDelayed(repeat[0], REPEAT_FIRST_MS);
+                    return true;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    v.setPressed(false);
+                    main.removeCallbacks(repeat[0]);
+                    return true;
+                default:
+                    return true;
+            }
+        });
+        // Switch Access and TalkBack click rather than touch.
+        button.setOnClickListener(v -> step.run());
         return button;
     }
 
-    private String defaultName() {
+    /** Chip showing the start or end timestamp; tapping previews 1.5 s of audio inside that edge. */
+    private TextView edgeChip(boolean start) {
+        Context c = activity;
+        LinearLayout chip = new LinearLayout(c);
+        chip.setOrientation(LinearLayout.VERTICAL);
+        chip.setGravity(Gravity.CENTER);
+        chip.setPadding(dp(8), dp(4), dp(8), dp(4));
+        chip.setMinimumWidth(dp(74));
+        chip.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(0x33FFFFFF), AdSkipUi.round(AdSkipUi.SURFACE, dp(12)), null));
+        chip.setClickable(true);
+        chip.setFocusable(true);
+        TextView caption = AdSkipUi.text(c, L10n.t(start ? "Start" : "End"), 11, AdSkipUi.TEXT_2, false);
+        caption.setGravity(Gravity.CENTER);
+        caption.setCompoundDrawablesRelative(null, null, AdIcons.of(c, AdIcons.Icon.HEADPHONES, AdSkipUi.TEXT_2, 11), null);
+        caption.setCompoundDrawablePadding(dp(4));
+        chip.addView(caption);
+        TextView time = AdSkipUi.text(c, "", 15, AdSkipUi.TEXT, true);
+        time.setGravity(Gravity.CENTER);
+        chip.addView(time);
+        chip.setContentDescription(L10n.t(start ? "Listen to the start" : "Listen to the end"));
+        chip.setOnClickListener(v -> listenToEdge(start));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-2, -2);
+        params.leftMargin = dp(4);
+        params.rightMargin = dp(4);
+        chip.setLayoutParams(params);
+        return time;
+    }
+
+    /** Sharing on its own row: what it does, and why it is off when the shared base is. */
+    private View shareRow() {
+        Context c = activity;
+        boolean sharedEnabled = app.morphe.extension.tiktok.settings.Settings.AD_SKIP_SHARED_DB.get();
+        LinearLayout row = new LinearLayout(c);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(4), dp(10), 0, 0);
+        ImageView icon = new ImageView(c);
+        icon.setImageDrawable(AdIcons.of(c, AdIcons.Icon.CLOUD, sharedEnabled ? AdSkipBar.MARK : AdSkipUi.TEXT_2, 20));
+        row.addView(icon, new LinearLayout.LayoutParams(dp(22), dp(22)));
+        LinearLayout text = new LinearLayout(c);
+        text.setOrientation(LinearLayout.VERTICAL);
+        text.setPadding(dp(12), 0, dp(8), 0);
+        text.addView(AdSkipUi.text(c, L10n.t("Share with everyone"), 14, AdSkipUi.TEXT, true));
+        TextView detail = AdSkipUi.text(c, L10n.t(sharedEnabled
+                ? "Everyone with Metra skips this ad too."
+                : "Turn on the shared base in settings to share."), 12, AdSkipUi.TEXT_2, false);
+        text.addView(detail);
+        row.addView(text, new LinearLayout.LayoutParams(0, -2, 1f));
+        android.widget.Switch toggle = new android.widget.Switch(c);
+        AdSkipUi.tint(toggle, AdSkipBar.MARK);
+        toggle.setChecked(sharedEnabled && app.morphe.extension.tiktok.settings.Settings.AD_SKIP_SHARE_AUTO.get());
+        toggle.setEnabled(sharedEnabled);
+        toggle.setOnCheckedChangeListener((btn, checked) ->
+                app.morphe.extension.tiktok.settings.Settings.AD_SKIP_SHARE_AUTO.save(checked));
+        row.addView(toggle);
+        if (sharedEnabled) row.setOnClickListener(v -> toggle.toggle());
+        row.setAlpha(sharedEnabled ? 1f : 0.55f);
+        shareRow = row;
+        return row;
+    }
+
+    @Nullable
+    private String authorName() {
         Object author = Reflect.property(aweme, "getAuthor", "author");
         String nick = Reflect.string(author, "getNickname", "nickname");
+        return nick == null || nick.trim().isEmpty() ? null : nick.trim();
+    }
+
+    private String defaultName() {
+        String nick = authorName();
         String base = L10n.t("Ad");
         int n = AdSegmentStore.ownCount() + 1;
         return nick == null ? base + " " + n : base + " " + n + " · " + nick;
@@ -346,6 +529,7 @@ final class AdSegmentEditor {
         controls.setAlpha(enabled ? 1f : 0.35f);
         setEnabledDeep(controls, enabled);
         nameField.setEnabled(true);
+        if (shareRow != null) shareRow.setAlpha(app.morphe.extension.tiktok.settings.Settings.AD_SKIP_SHARED_DB.get() ? 1f : 0.55f);
     }
 
     private static void setEnabledDeep(View view, boolean enabled) {
@@ -355,6 +539,96 @@ final class AdSegmentEditor {
             for (int i = 0; i < group.getChildCount(); i++) setEnabledDeep(group.getChildAt(i), enabled);
         }
     }
+
+    /** Closes at once when nothing was chosen; otherwise asks first. */
+    private void requestClose() {
+        if (!changed) {
+            dialog.dismiss();
+            return;
+        }
+        pause();
+        new android.app.AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle(L10n.t("Discard this ad?"))
+                .setMessage(L10n.t("The part you chose is not saved."))
+                .setPositiveButton(L10n.t("Discard"), (d, w) -> dialog.dismiss())
+                .setNegativeButton(L10n.t("Keep editing"), null)
+                .show();
+    }
+
+    /** A play or pause sign that blooms in the middle of the video and fades. */
+    private void flash(AdIcons.Icon icon) {
+        flash.setImageDrawable(AdIcons.of(activity, icon, Color.WHITE, 30));
+        flash.animate().cancel();
+        flash.setAlpha(1f);
+        flash.setScaleX(0.85f);
+        flash.setScaleY(0.85f);
+        flash.animate().scaleX(1.1f).scaleY(1.1f).alpha(0f).setStartDelay(120).setDuration(420).start();
+    }
+
+    // region tips and the sound check
+
+    private static final String KEY_FINE_ZOOMS = "editor_fine_zooms";
+    private static final int TIP_UNTIL = 3;
+    private static final int STRONG_HASHES = 150;
+
+    private void showTip() {
+        android.content.SharedPreferences prefs = AdSkipPrefs.get();
+        tipShown = prefs == null || prefs.getInt(KEY_FINE_ZOOMS, 0) < TIP_UNTIL;
+        if (tipShown) setTipText();
+        else setMeter(AdIcons.Icon.GRAPHIC_EQ, AdSkipUi.TEXT_2, "", 0);
+    }
+
+    private void setTipText() {
+        setMeter(AdIcons.Icon.INFO, AdSkipUi.TEXT_2,
+                L10n.t("Hold a handle still to zoom in. Pinch the strip to zoom."), 0);
+    }
+
+    private void learnedFineZoom() {
+        android.content.SharedPreferences prefs = AdSkipPrefs.get();
+        if (prefs != null) prefs.edit().putInt(KEY_FINE_ZOOMS, prefs.getInt(KEY_FINE_ZOOMS, 0) + 1).apply();
+        if (tipShown) {
+            tipShown = false;
+            updateSound();
+        }
+    }
+
+    /** Updates the landmark-strength indicator and Save button state for the selected range. */
+    private void updateSound() {
+        if (print == null) {
+            AdSkipUi.enable(saveButton, false);
+            return;
+        }
+        int count = soundCount();
+        // Why Save is off always wins over the gesture tip.
+        if (count < MIN_HASHES) {
+            setMeter(AdIcons.Icon.WARNING, AdSkipUi.ACCENT, L10n.t("Too little sound to recognise. Choose a louder part."), 1);
+        } else if (tipShown) {
+            setTipText();
+        } else if (count < STRONG_HASHES) {
+            setMeter(AdIcons.Icon.GRAPHIC_EQ, AdSkipUi.WARN, L10n.t("Weak sound. A longer or louder part is found more reliably."), 2);
+        } else {
+            setMeter(AdIcons.Icon.GRAPHIC_EQ, AdSkipUi.GOOD, L10n.t("Clear sound. This part is easy to recognise."), 3);
+        }
+        AdSkipUi.enable(saveButton, prepared && count >= MIN_HASHES);
+    }
+
+    private int soundCount() {
+        if (print == null) return 0;
+        return print.countIn(Landmarks.msToFrame(range.start()), Landmarks.msToFrame(range.end()));
+    }
+
+    /** The line under the strip: an icon, a sentence, and 0 to 3 lit bars in the same colour. */
+    private void setMeter(AdIcons.Icon icon, int color, String text, int lit) {
+        meterIcon.setImageDrawable(AdIcons.of(activity, icon, color, 16));
+        meterText.setText(text);
+        meterText.setTextColor(color == AdSkipUi.TEXT_2 ? AdSkipUi.TEXT_2 : color);
+        for (int i = 0; i < meterBars.length; i++) {
+            meterBars[i].setVisibility(lit == 0 ? View.GONE : View.VISIBLE);
+            meterBars[i].setBackground(AdSkipUi.round(i < lit ? color : AdSkipUi.SURFACE_HI, dp(2)));
+        }
+    }
+
+    // endregion
 
     // endregion
 
@@ -388,6 +662,7 @@ final class AdSegmentEditor {
                     print = full;
                     preparePlayers(audioMs);
                     range.setEnvelope(envelope);
+                    updateSound();
                 });
 
                 Bitmap[] thumbs = thumbs(pic);
@@ -401,9 +676,26 @@ final class AdSegmentEditor {
                     spinner.setVisibility(View.GONE);
                     status.setText(L10n.t("Couldn't load this video. Check the connection and try again."));
                     status.setTextColor(AdSkipUi.WARN);
+                    retryButton.setVisibility(View.VISIBLE);
                 });
             }
         });
+    }
+
+    /** After a failed download: back to the spinner and the same steps again. */
+    private void retry() {
+        if (prepared || cancel.get()) return;
+        retryButton.setVisibility(View.GONE);
+        spinner.setVisibility(View.VISIBLE);
+        status.setTextColor(AdSkipUi.TEXT_2);
+        status.setText(L10n.t("Loading the video and its sound…"));
+        for (File file : new File[]{pictureFile, soundFile}) {
+            if (file != null) //noinspection ResultOfMethodCallIgnored
+                file.delete();
+        }
+        pictureFile = null;
+        soundFile = null;
+        load();
     }
 
     private void setStatus(String text) {
@@ -511,10 +803,10 @@ final class AdSegmentEditor {
                 range.setRange(start, end);
                 if (durationMs > ZOOM_FROM_MS) range.zoom(true);
                 updateLabels();
-                spinner.setVisibility(View.GONE);
-                status.setVisibility(View.GONE);
+                loadingBox.setVisibility(View.GONE);
+                positionLabel.setVisibility(View.VISIBLE);
                 enableControls(true);
-                AdSkipUi.enable(saveButton, true);
+                updateSound();
                 seek(start);
                 main.post(ticker);
             });
@@ -522,6 +814,7 @@ final class AdSegmentEditor {
         } catch (Exception failure) {
             Logger.printException(() -> "Ad skip: could not play the video in the editor", failure);
             spinner.setVisibility(View.GONE);
+            status.setTextColor(AdSkipUi.WARN);
             status.setText(L10n.t("Couldn't play this video. Close the editor and try again."));
         }
     }
@@ -542,13 +835,7 @@ final class AdSegmentEditor {
 
     // region playback
 
-    /*
-     * A video whose sound comes as its own file plays on two players: the picture muted and the
-     * sound beside it. The sound is the clock: it is never moved while it plays, only the picture
-     * is brought back to it, so what is heard never stutters. Every play starts only after both
-     * players report they reached the position, so the first moment heard is the right one.
-     */
-
+    /** Separate-audio posts use two MediaPlayers with the audio player as master clock. */
     private final Runnable ticker = new Runnable() {
         @Override
         public void run() {
@@ -686,11 +973,13 @@ final class AdSegmentEditor {
         stopAt = -1;
         if (isPlaying()) {
             pause();
+            flash(AdIcons.Icon.PAUSE);
             return;
         }
         long from = currentMs();
         if (from >= durationMs - 100) from = 0;
         playFrom(from);
+        flash(AdIcons.Icon.PLAY);
     }
 
     private void playSelection() {
@@ -706,15 +995,17 @@ final class AdSegmentEditor {
         playFrom(range.start());
     }
 
-    /** After a handle lets go, a second and a half of sound from that edge. */
-    private void previewAround(long ms) {
+    /** Plays 1.5 s of audio adjacent to the start or end boundary inside the selection. */
+    private void listenToEdge(boolean start) {
         if (!prepared) return;
-        boolean isEnd = Math.abs(ms - range.end()) < 5;
-        long from = isEnd ? Math.max(range.start(), ms - 1500) : ms;
-        stopAt = isEnd ? ms : Math.min(range.end(), ms + 1500);
-        returnTo = ms;
+        long edge = start ? range.start() : range.end();
+        long from = start ? edge : Math.max(range.start(), edge - EDGE_LISTEN_MS);
+        stopAt = start ? Math.min(range.end(), edge + EDGE_LISTEN_MS) : edge;
+        returnTo = edge;
         playFrom(from);
     }
+
+    private static final long EDGE_LISTEN_MS = 1500;
 
     private void updatePlayButtons() {
         boolean playing = isPlaying();
@@ -731,6 +1022,7 @@ final class AdSegmentEditor {
         else e = Math.min(Math.min(durationMs, s + MAX_LENGTH_MS), Math.max(ms, s + MIN_LENGTH_MS));
         range.setRange(s, e);
         range.reveal(start ? s : e);
+        changed = true;
         updateLabels();
         stopAt = -1;
         pause();
@@ -742,6 +1034,7 @@ final class AdSegmentEditor {
         startLabel.setText(AdSkipUi.time(s, true));
         endLabel.setText(AdSkipUi.time(e, true));
         lengthLabel.setText(L10n.f("%1$s s", AdSkipUi.seconds(e - s)));
+        updateSound();
     }
 
     // endregion
@@ -753,7 +1046,7 @@ final class AdSegmentEditor {
         long s = range.start(), e = range.end();
         Landmarks.Print cut = print.slice(Landmarks.msToFrame(s), Landmarks.msToFrame(e));
         if (cut.count < MIN_HASHES) {
-            warn(L10n.t("There's too little sound here to recognise. Choose a louder part."));
+            updateSound();
             return;
         }
         String name = nameField.getText().toString().trim();
@@ -773,17 +1066,21 @@ final class AdSegmentEditor {
         boolean found = false;
         for (AdMatcher.Match m : check) if (Math.abs(m.startMs - s) < 1500) found = true;
         AdSkipLog.add(aid, "saved \"" + name + "\" " + cut.count + " hashes, self-check " + (found ? "ok" : "weak"));
-        AdScanner.forget(aid);
+        List<AdMatcher.Match> fullMatches = AdMatcher.match(AdSegmentStore.index(), print,
+                AdMatcher.Strictness.of(app.morphe.extension.tiktok.settings.Settings.AD_SKIP_STRICTNESS.get()));
+        AdScanner.recordMarked(aid, segment, s, e, cut.count, durationMs);
+        if (!fullMatches.isEmpty()) {
+            for (AdMatcher.Match m : fullMatches) {
+                if (m.segment != segment) {
+                    AdScanner.recordMarked(aid, m.segment, m.startMs, m.endMs, m.votes, durationMs);
+                }
+            }
+        }
         hideKeyboard();
         dialog.dismiss();
         Utils.showToastLong(found
                 ? L10n.f("Saved \"%1$s\". This ad will be skipped in other videos.", name)
                 : L10n.f("Saved \"%1$s\", but its sound is weak. A longer or louder cut is found more reliably.", name));
-    }
-
-    private void warn(String message) {
-        hint.setText(message);
-        hint.setVisibility(View.VISIBLE);
     }
 
     private void hideKeyboard() {
@@ -797,7 +1094,14 @@ final class AdSegmentEditor {
 
     // endregion
 
+    private android.view.ViewTreeObserver.OnWindowFocusChangeListener focusListener;
+    private View focusRoot;
+
     private void release() {
+        if (focusRoot != null && focusListener != null && focusRoot.getViewTreeObserver().isAlive()) {
+            focusRoot.getViewTreeObserver().removeOnWindowFocusChangeListener(focusListener);
+        }
+        focusListener = null;
         cancel.set(true);
         main.removeCallbacksAndMessages(null);
         for (MediaPlayer player : new MediaPlayer[]{picture, sound}) {

@@ -155,7 +155,6 @@ A press on Share under a video copies its link instead of opening the share shee
 A tap on Home or on the For You tab while For You is showing no longer reloads it. The video you're on stays.,A tap on Home or on the For You tab while For You is showing no longer reloads it. The video you're on stays.
 A video you paused stays paused when you come back to the app instead of starting again. One you left playing starts as usual. It works on Android 10 and newer.,A video you paused stays paused when you come back to the app instead of starting again. One you left playing starts as usual. It works on Android 10 and newer.
 A web address someone left in a comment can be tapped instead of copied out by hand. Tapping anywhere else in the comment still does what it did.,A web address someone left in a comment can be tapped instead of copied out by hand. Tapping anywhere else in the comment still does what it did.
-AD,AD
 AI Self,AI Self
 AI-generated posts,AI-generated posts
 About,About
@@ -171,6 +170,8 @@ Activity,Activity
 Activity center (PIA),Activity center (PIA)
 Ad,Ad
 Ad range,Ad range
+Ad skipped,Ad skipped
+Ad skipped: %1$s,Ad skipped: %1$s
 Add,Add
 Add a button beside the block control that turns the feed's sound off and on.,Add a button beside the block control that turns the feed's sound off and on.
 Add a button beside the block control to send feedback about the current video.,Add a button beside the block control to send feedback about the current video.
@@ -180,6 +181,7 @@ Add a seen-history file saved by Metra to the videos @%1$s has seen. A video in 
 Add a seen-history file saved by Metra to this account's seen videos. A video in both keeps the newer date.,Add a seen-history file saved by Metra to this account's seen videos. A video in both keeps the newer date.
 Add a separate button that skips videos using the current sound.,Add a separate button that skips videos using the current sound.
 "Add a thin line along the bottom of a video story that you can drag to go back or skip ahead. The time shows while you drag, and a tap on it still moves between stories.","Add a thin line along the bottom of a video story that you can drag to go back or skip ahead. The time shows while you drag, and a tap on it still moves between stories."
+Add ads from a backup file,Add ads from a backup file
 Add apps to Share via,Add apps to Share via
 Add hidden creator,Add hidden creator
 Add older seen videos to this account,Add older seen videos to this account
@@ -282,6 +284,7 @@ Avatar and follow button,Avatar and follow button
 Back,Back
 Back to defaults,Back to defaults
 Back up settings,Back up settings
+Backup,Backup
 Backup and restore,Backup and restore
 Balanced,Balanced
 Bigger progress bar handle,Bigger progress bar handle
@@ -378,6 +381,7 @@ Clear preset,Clear preset
 "Clear screen hides a LIVE's chat, gifts and buttons so only the stream shows. TikTok puts it in the menu of only some rooms. This adds it to the others.","Clear screen hides a LIVE's chat, gifts and buttons so only the stream shows. TikTok puts it in the menu of only some rooms. This adds it to the others."
 Clear search,Clear search
 Clear seen videos,Clear seen videos
+Clear sound. This part is easy to recognise.,Clear sound. This part is easy to recognise.
 Clear the search,Clear the search
 Cleared. Tap to undo before TikTok closes.,Cleared. Tap to undo before TikTok closes.
 Clearing,Clearing
@@ -449,6 +453,7 @@ Couldn't open that settings section. Reopen settings and try again.,Couldn't ope
 Couldn't open the ad editor. Close the share sheet and try again.,Couldn't open the ad editor. Close the share sheet and try again.
 Couldn't open the file picker to export. Try again.,Couldn't open the file picker to export. Try again.
 Couldn't open the file picker to import. Try again.,Couldn't open the file picker to import. Try again.
+Couldn't open the file picker. Try again.,Couldn't open the file picker. Try again.
 Couldn't play this video. Close the editor and try again.,Couldn't play this video. Close the editor and try again.
 Couldn't put back the diagnostic data. Try again.,Couldn't put back the diagnostic data. Try again.
 Couldn't put the saved videos back. Try again.,Couldn't put the saved videos back. Try again.
@@ -464,6 +469,7 @@ Couldn't reset this override. Try again.,Couldn't reset this override. Try again
 Couldn't restart TikTok. Close it and open it again.,Couldn't restart TikTok. Close it and open it again.
 Couldn't restore seen history. Your saved history is unchanged.,Couldn't restore seen history. Your saved history is unchanged.
 Couldn't restore the settings. Try again.,Couldn't restore the settings. Try again.
+Couldn't save the backup. Try another folder.,Couldn't save the backup. Try another folder.
 Couldn't save the change. Try again.,Couldn't save the change. Try again.
 Couldn't save the font in TikTok's storage. Free up some space and try again.,Couldn't save the font in TikTok's storage. Free up some space and try again.
 Couldn't save the seen-history file. Try again.,Couldn't save the seen-history file. Try again.
@@ -540,7 +546,9 @@ Dim when idle and shift,Dim when idle and shift
 Dims: %1$s,Dims: %1$s
 Disable,Disable
 Disabled,Disabled
+Discard,Discard
 Discard edits,Discard edits
+Discard this ad?,Discard this ad?
 Dismissed %1$s suggested accounts,Dismissed %1$s suggested accounts
 Dismissed one suggested account,Dismissed one suggested account
 Display name last changed,Display name last changed
@@ -573,6 +581,9 @@ Empty,Empty
 "Empty the menu that opens when you press and hold TikTok's icon on the home screen. Turning this off asks TikTok to build them again. Tapping the icon still opens the app, and a shortcut you pinned yourself stays where you put it.","Empty the menu that opens when you press and hold TikTok's icon on the home screen. Turning this off asks TikTok to build them again. Tapping the icon still opens the app, and a shortcut you pinned yourself stays where you put it."
 Enable,Enable
 Enabled,Enabled
+End,End
+End earlier,End earlier
+End later,End later
 Enter a JSON object or array.,Enter a JSON object or array.
 Enter a creator handle or id,Enter a creator handle or id
 Enter a finite number.,Enter a finite number.
@@ -590,9 +601,11 @@ Enter who to message below to start.,Enter who to message below to start.
 Entry %1$d has a field with the wrong data type.,Entry %1$d has a field with the wrong data type.
 Entry %1$d isn't an object.,Entry %1$d isn't an object.
 Errors,Errors
+Everyone with Metra skips this ad too.,Everyone with Metra skips this ad too.
 Everything this list has loaded is picked or saved. Scroll down to load more.,Everything this list has loaded is picked or saved. Scroll down to load more.
 Expand activity list,Expand activity list
 Explore or Community,Explore or Community
+Export,Export
 Export CSV,Export CSV
 Export JSON,Export JSON
 Export comments,Export comments
@@ -600,6 +613,7 @@ Export diagnostic report,Export diagnostic report
 Export loaded values,Export loaded values
 Exported %1$d comments and %2$d replies,Exported %1$d comments and %2$d replies
 Exported %1$d loaded values,Exported %1$d loaded values
+Exported %1$s ads,Exported %1$s ads
 Exported 1 loaded value,Exported 1 loaded value
 "Fade the buttons, caption and tabs over the video to this level instead of hiding them. 100 leaves them as TikTok draws them. Faded controls still take taps. At 0 the buttons and caption are hidden, and the tabs stay at 10.","Fade the buttons, caption and tabs over the video to this level instead of hiding them. 100 leaves them as TikTok draws them. Faded controls still take taps. At 0 the buttons and caption are hidden, and the tabs stay at 10."
 Fade the feed out before the hold,Fade the feed out before the hold
@@ -886,6 +900,7 @@ Highest,Highest
 Historical,Historical
 Historical values,Historical values
 Hold a gate to choose several,Hold a gate to choose several
+Hold a handle still to zoom in. Pinch the strip to zoom.,Hold a handle still to zoom in. Pinch the strip to zoom.
 Hold a photo story,Hold a photo story
 Hold speed on Comment,Hold speed on Comment
 Hold speed on Favorites,Hold speed on Favorites
@@ -908,12 +923,15 @@ I tap a dimmed control,I tap a dimmed control
 I tap the video,I tap the video
 "If that name is taken, Android adds a number to the new file.","If that name is taken, Android adds a number to the new file."
 "If that name is taken, Metra adds a number to the new file.","If that name is taken, Metra adds a number to the new file."
+Import,Import
 Import a font file,Import a font file
 Import finished,Import finished
 Import loaded values,Import loaded values
 Import watch history,Import watch history
 Imported %1$d values,Imported %1$d values
 Imported %1$d values. Undo last Lab change is in the menu.,Imported %1$d values. Undo last Lab change is in the menu.
+Imported %1$s ads,Imported %1$s ads
+"Imported %1$s ads, %2$s were already in the list","Imported %1$s ads, %2$s were already in the list"
 Imported: %1$s. Pick another file to replace it.,Imported: %1$s. Pick another file to replace it.
 Importing new history ended Undo for the earlier clear. You can clear the imported history.,Importing new history ended Undo for the earlier clear. You can clear the imported history.
 Importing watch history,Importing watch history
@@ -936,6 +954,7 @@ Keep a paused video paused,Keep a paused video paused
 "Keep a photo story on screen until you tap or swipe, instead of moving on after a few seconds.","Keep a photo story on screen until you tap or swipe, instead of moving on after a few seconds."
 Keep a streak going,Keep a streak going
 Keep captions in Clear display,Keep captions in Clear display
+Keep editing,Keep editing
 Keep faded controls in Clear display,Keep faded controls in Clear display
 Keep going,Keep going
 Keep long press from quick sharing,Keep long press from quick sharing
@@ -988,6 +1007,7 @@ Leave maximum empty to keep it unlimited.,Leave maximum empty to keep it unlimit
 Leave the sound out of the saved video. Save the sound as well still writes the sound file beside it if you want both.,Leave the sound out of the saved video. Save the sound as well still writes the sound file beside it if you want both.
 Leave when TikTok says time is up,Leave when TikTok says time is up
 Left edge strip,Left edge strip
+Length,Length
 Length and views per like,Length and views per like
 Less than a minute left,Less than a minute left
 Let a LIVE fill the screen up to the top edge. The status bar comes back when you leave the LIVE. Swipe down from the top to peek at it.,Let a LIVE fill the screen up to the top edge. The status bar comes back when you leave the LIVE. Swipe down from the top to peek at it.
@@ -1010,6 +1030,8 @@ Limits,Limits
 Link copied,Link copied
 Links,Links
 Links in comments open,Links in comments open
+Listen to the end,Listen to the end
+Listen to the start,Listen to the start
 "Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.","Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second."
 Live photo clip,Live photo clip
 Live photo clip saved to %1$s,Live photo clip saved to %1$s
@@ -1044,7 +1066,6 @@ Long-press Home for Metra settings,Long-press Home for Metra settings
 Long-press menu on every post,Long-press menu on every post
 Looking for apps,Looking for apps
 Loop a story,Loop a story
-"Loose: finds more, may skip by mistake","Loose: finds more, may skip by mistake"
 Lowest,Lowest
 MENUS,MENUS
 Make it yours.,Make it yours.
@@ -1118,7 +1139,7 @@ New value,New value
 Next message: today at %1$s.,Next message: today at %1$s.
 Next message: tomorrow at %1$s.,Next message: tomorrow at %1$s.
 No,No
-No ads marked yet. Open a video's share sheet and tap Mark ad.,No ads marked yet. Open a video's share sheet and tap Mark ad.
+No ads marked yet,No ads marked yet
 No app on this phone opens that file,No app on this phone opens that file
 No app on this phone opens web links,No app on this phone opens web links
 No apps match this search,No apps match this search
@@ -1165,6 +1186,7 @@ None recorded,None recorded
 "None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.","None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends."
 Normal,Normal
 Normal-weight captions,Normal-weight captions
+"Normal: finds more, may skip by mistake","Normal: finds more, may skip by mistake"
 "Not a handle or id, so ignored: %1$s","Not a handle or id, so ignored: %1$s"
 "Not a part Metra fills in, so it's kept as typed: %1$s","Not a part Metra fills in, so it's kept as typed: %1$s"
 Not blocked,Not blocked
@@ -1227,6 +1249,7 @@ Open Metra settings,Open Metra settings
 Open TikTok on,Open TikTok on
 "Open a share sheet once, then return here to choose its actions.","Open a share sheet once, then return here to choose its actions."
 Open a video first,Open a video first
+Open a video's share sheet and tap Mark ad.,Open a video's share sheet and tap Mark ad.
 Open and close TikTok's screens without their slide. Swipes inside a screen still follow your finger.,Open and close TikTok's screens without their slide. Swipes inside a screen still follow your finger.
 Open comments,Open comments
 Open external links directly,Open external links directly
@@ -1403,6 +1426,7 @@ Remind me every,Remind me every
 Remove,Remove
 Remove %1$s,Remove %1$s
 Remove all overrides,Remove all overrides
+Remove every marked ad from this phone,Remove every marked ad from this phone
 Remove feed ads,Remove feed ads
 "Remove feed ads, creator commission posts, paid partnerships, and branded content.","Remove feed ads, creator commission posts, paid partnerships, and branded content."
 Remove story rings,Remove story rings
@@ -1464,6 +1488,7 @@ STEM,STEM
 Sample caption to test,Sample caption to test
 Sample category to test,Sample category to test
 Save,Save
+Save %1$s ads to a file,Save %1$s ads to a file
 Save a profile picture on a long press,Save a profile picture on a long press
 Save a story from its share sheet,Save a story from its share sheet
 Save a story on a long press,Save a story on a long press
@@ -1718,6 +1743,7 @@ Skip content warnings,Skip content warnings
 Skip marked ads,Skip marked ads
 "Skip the puzzle TikTok shows while you're just browsing. A puzzle right after you like, follow, comment or repost still shows, and so do sign-in, SMS and two-step checks. If something stops working, turn this off.","Skip the puzzle TikTok shows while you're just browsing. A puzzle right after you like, follow, comment or repost still shows, and so do sign-in, SMS and two-step checks. If something stops working, turn this off."
 Skip the splash ad,Skip the splash ad
+Skip this ad,Skip this ad
 Skip update checks,Skip update checks
 "Skipped entries are invalid, expired, already recorded, or older than the newest %1$s videos.","Skipped entries are invalid, expired, already recorded, or older than the newest %1$s videos."
 Skipped for others,Skipped for others
@@ -1740,8 +1766,11 @@ Speed menu choices,Speed menu choices
 Speed while you hold the video,Speed while you hold the video
 Spin the music disc,Spin the music disc
 Split comment minimum width,Split comment minimum width
+Start,Start
 Start each new video at your default. A manual choice lasts until the video changes.,Start each new video at your default. A manual choice lasts until the video changes.
+Start earlier,Start earlier
 Start feature gate recording,Start feature gate recording
+Start later,Start later
 Start recording,Start recording
 Start the day at,Start the day at
 Start today over,Start today over
@@ -1935,6 +1964,7 @@ The original photos aren't available. No video was saved.,The original photos ar
 "The override changes no fields. Edit the field values, or reset the override.","The override changes no fields. Edit the field values, or reset the override."
 "The override couldn't be applied: %1$s. Edit the field values, or reset the override.","The override couldn't be applied: %1$s. Edit the field values, or reset the override."
 "The override doesn't say what list to return. Edit the field values, or reset the override.","The override doesn't say what list to return. Edit the field values, or reset the override."
+The part you chose is not saved.,The part you chose is not saved.
 The partial file couldn't be removed. Delete it from the folder you chose.,The partial file couldn't be removed. Delete it from the folder you chose.
 The phone is running out of room. What was recorded is saved to %1$s,The phone is running out of room. What was recorded is saved to %1$s
 "The port the proxy listens on, like 8080 or 1080.","The port the proxy listens on, like 8080 or 1080."
@@ -1970,6 +2000,7 @@ The video couldn't be made from these photos. Try again.,The video couldn't be m
 "The voice and video call buttons leave the top of a chat. Calls still ring, and the chat details button stays.","The voice and video call buttons leave the top of a chat. Calls still ring, and the chat details button stays."
 "The words under the bottom tab icons go away. The icons stay, and each tab opens what it always did.","The words under the bottom tab icons go away. The icons stay, and each tab opens what it always did."
 "Their usernames, separated by commas or new lines. Each person must already have a chat with you.","Their usernames, separated by commas or new lines. Each person must already have a chat with you."
+There are no ads to export yet,There are no ads to export yet
 There is no Lab change to undo.,There is no Lab change to undo.
 There is no diagnostic data to clear,There is no diagnostic data to clear
 There is no diagnostic data to put back,There is no diagnostic data to put back
@@ -1977,7 +2008,6 @@ There isn't enough room on the phone to record,There isn't enough room on the ph
 There was nothing to put back,There was nothing to put back
 There were no saved videos to forget,There were no saved videos to forget
 There's no video on screen to save a frame from,There's no video on screen to save a frame from
-There's too little sound here to recognise. Choose a louder part.,There's too little sound here to recognise. Choose a louder part.
 These ads are not skipped for you. Tap Undo if you voted by mistake.,These ads are not skipped for you. Tap Undo if you voted by mistake.
 These are posts saved by your signed-in account. Other Favorites categories aren't included.,These are posts saved by your signed-in account. Other Favorites categories aren't included.
 These loaded values are for a different TikTok version.,These loaded values are for a different TikTok version.
@@ -1987,6 +2017,7 @@ This catalog entry is no longer available. Refresh the Lab and try again.,This c
 This change couldn't be saved. Try again.,This change couldn't be saved. Try again.
 This configuration has no fields that can be copied and changed safely on this build.,This configuration has no fields that can be copied and changed safely on this build.
 This file has no loaded values in it.,This file has no loaded values in it.
+This file is not a Metra ad backup,This file is not a Metra ad backup
 This file isn't a loaded-values export from the Feature Gate Lab.,This file isn't a loaded-values export from the Feature Gate Lab.
 This gate type isn't supported.,This gate type isn't supported.
 "This is the video's own sound, so YouTube Music won't have it","This is the video's own sound, so YouTube Music won't have it"
@@ -2079,6 +2110,7 @@ Today: %1$d minutes,Today: %1$d minutes
 Today: %1$d video,Today: %1$d video
 Today: %1$d videos,Today: %1$d videos
 Too late to put the saved videos back,Too late to put the saved videos back
+Too little sound to recognise. Choose a louder part.,Too little sound to recognise. Choose a louder part.
 Too many media saves are already running. Try again in a moment.,Too many media saves are already running. Try again in a moment.
 Top tabs and search,Top tabs and search
 Tracking,Tracking
@@ -2093,6 +2125,7 @@ Translation preview,Translation preview
 Transparent,Transparent
 Try a different word or clear the search.,Try a different word or clear the search.
 Try a different word or clear the search. Switches from patches you didn't tick in Morphe Manager aren't listed.,Try a different word or clear the search. Switches from patches you didn't tick in Morphe Manager aren't listed.
+Try again,Try again
 "Try again, or go back to TikTok.","Try again, or go back to TikTok."
 Turn Metra back on,Turn Metra back on
 Turn off double tap to react,Turn off double tap to react
@@ -2104,6 +2137,7 @@ Turn off the timer (TikTok closes at %1$s),Turn off the timer (TikTok closes at 
 Turn on %1$s first.,Turn on %1$s first.
 Turn on Keep a streak going first,Turn on Keep a streak going first
 Turn on overrides,Turn on overrides
+Turn on the shared base in settings to share.,Turn on the shared base in settings to share.
 "Turn the music disc at the bottom of the right column while a video plays, the way TikTok used to.","Turn the music disc at the bottom of the right column while a video plays, the way TikTok used to."
 Turned off %1$d gates of %2$d. The rest don't take a true or false value. Restart TikTok to apply this.,Turned off %1$d gates of %2$d. The rest don't take a true or false value. Restart TikTok to apply this.
 Turned off %1$d gates. Restart TikTok to apply this.,Turned off %1$d gates. Restart TikTok to apply this.
@@ -2172,6 +2206,7 @@ Verified accounts,Verified accounts
 Version %1$s,Version %1$s
 Version %1$s for TikTok %2$s,Version %1$s for TikTok %2$s
 "Version, changes and licenses","Version, changes and licenses"
+Very strict: only the clearest matches,Very strict: only the clearest matches
 Video,Video
 Video (MP4),Video (MP4)
 Video ID copied,Video ID copied
@@ -2206,6 +2241,7 @@ Wake the controls when,Wake the controls when
 Wakes when: %1$s,Wakes when: %1$s
 Watch history was imported for the account that chose the file. Switch back to see it.,Watch history was imported for the account that chose the file. Switch back to see it.
 Watch it,Watch it
+Weak sound. A longer or louder part is found more reliably.,Weak sound. A longer or louder part is found more reliably.
 "WebP, exactly as TikTok sent it","WebP, exactly as TikTok sent it"
 What TikTok gets,What TikTok gets
 What dims,What dims
@@ -2274,7 +2310,8 @@ Your settings already match,Your settings already match
 "Zero switches this off. A short reminder after that many minutes of watching, and again after the same again. Time on messages, a profile or search doesn't count, and nothing is shown while the feed is on hold.","Zero switches this off. A short reminder after that many minutes of watching, and again after the same again. Time on messages, a profile or search doesn't count, and nothing is shown while the feed is on hold."
 "Zero switches this off. Count the minutes the player spends running in the feed. Time on messages, a profile or search doesn't count.","Zero switches this off. Count the minutes the player spends running in the feed. Time on messages, a profile or search doesn't count."
 "Zero switches this off. Counts every video that comes up in the feed and tells you when you reach the limit. Separate from the auto-advance session limit under Playback, which counts only videos Metra moved past for you.","Zero switches this off. Counts every video that comes up in the feed and tells you when you reach the limit. Separate from the auto-advance session limit under Playback, which counts only videos Metra moved past for you."
-Zoom,Zoom
+Zoom in,Zoom in
+Zoom out,Zoom out
 collapsed,collapsed
 debug debugging logs logging,debug debugging logs logging
 expanded,expanded

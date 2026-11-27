@@ -108,8 +108,8 @@ public class AndroidTargetChangesGuardTest {
     /**
      * Addresses written into the payload, and what is done with them.
      *
-     * <p>One host is fetched: the shared ad base of Skip ads by sound, a Cloudflare Workers host
-     * on workers.dev, reached only while the reader has the shared base on. Every other URL the
+     * <p>Two hosts are fetched, both for the shared ad base of Skip ads by sound and only while
+     * the reader has the shared base on: its API and its snapshot CDN on Cloudflare. Every other URL the
      * transport opens arrives from TikTok's own model objects, is required to be https, and is re-resolved and re-checked on every redirect hop,
      * so there is no host list in this repository to opt out of Certificate Transparency even if
      * one were wanted. A CT refusal arrives as an SSLHandshakeException, which is not in
@@ -148,11 +148,16 @@ public class AndroidTargetChangesGuardTest {
         REVIEWED_ADDRESSES.put("https://github.com/login?return_to=",
                 "not fetched or opened: only its length is counted, so Report a problem's link "
                         + "still fits once GitHub's sign-in page wraps it");
-        REVIEWED_ADDRESSES.put("https://metra-adskip.falker600.workers.dev",
-                "fetched: the shared ad base. Cloudflare serves workers.dev with a publicly "
-                        + "trusted certificate logged in Certificate Transparency, so the platform's "
-                        + "default checks pass without any opt-out; reached only while the shared "
-                        + "base is on, and a failure is logged and retried at the next daily sync");
+        REVIEWED_ADDRESSES.put("https://api.sponblocktikitoki.dpdns.org",
+                "fetched: the shared ad base's API, behind Cloudflare's firewall. Cloudflare serves "
+                        + "it with a publicly trusted certificate logged in Certificate "
+                        + "Transparency, so the platform's default checks pass without any opt-out; "
+                        + "reached only while the shared base is on, and a failure is logged and "
+                        + "retried at the next daily sync");
+        REVIEWED_ADDRESSES.put("https://cdn.sponblocktikitoki.dpdns.org/db.bin",
+                "fetched: the shared ad base's nightly snapshot, a file served from Cloudflare R2 "
+                        + "through its CDN with a publicly trusted certificate; checked like any "
+                        + "other snapshot before it is merged");
         REVIEWED_ADDRESSES.put("https://ko-fi.com/P5P5YOUU7",
                 "not fetched: the Support Metra row, opened in the reader's browser");
         REVIEWED_ADDRESSES.put("https://(?:(?:vm|vt)\\\\.tiktok\\\\.com/[A-Za-z0-9]+|(?:www\\\\.|m\\\\.)?"

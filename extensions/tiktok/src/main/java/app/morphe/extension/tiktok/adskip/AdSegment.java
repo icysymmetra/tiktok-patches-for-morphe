@@ -1,18 +1,17 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
-/** One ad the reader cut out of a video: its name and the landmarks of its sound. */
+/** Marked ad segment with its audio landmark fingerprint. */
 final class AdSegment {
     final long id;
     volatile String name;
     final long createdAt;
-    /** The cut's own length. */
     final long durationMs;
     final String sourceAid;
-    /** Hashes and their frames, counted from the cut's start. */
+    /** Landmark hashes and frame offsets from segment start. */
     final int[] hashes;
     final int[] times;
     final int frames;
@@ -20,7 +19,7 @@ final class AdSegment {
     volatile int skips;
     volatile long lastSkipAt;
 
-    /** Server-side id if this came from the shared base, null for private. */
+    /** Shared database ID, or null for local-only segments. */
     volatile String sharedServerId;
 
     AdSegment(long id, String name, long createdAt, long durationMs, String sourceAid,

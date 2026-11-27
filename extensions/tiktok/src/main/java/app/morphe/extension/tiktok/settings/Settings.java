@@ -393,6 +393,9 @@ public class Settings extends BaseSettings {
             "ad_skip_prescan", TRUE, false, Setting.parent(AD_SKIP));
     public static final BooleanSetting AD_SKIP_MOBILE_DATA = new BooleanSetting(
             "ad_skip_mobile_data", TRUE, false, Setting.parent(AD_SKIP));
+    /** Beta: checks fewer videos and keeps results across restarts; off keeps the tested behaviour. */
+    public static final BooleanSetting AD_SKIP_SAVE_TRAFFIC = new BooleanSetting(
+            "ad_skip_save_traffic_v2", FALSE, false, Setting.parent(AD_SKIP));
     public static final BooleanSetting AD_SKIP_WHOLE_VIDEO = new BooleanSetting(
             "ad_skip_whole_video", TRUE, false, Setting.parent(AD_SKIP));
     public static final BooleanSetting AD_SKIP_RETIMED = new BooleanSetting(

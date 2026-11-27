@@ -28,7 +28,7 @@ final class MediaFileWriter {
     /** What a publish left in the gallery: the name MediaStore kept, and its row when there is one. */
     // java.util.function requires API 24; the injected payload also runs on API 23.
     interface CopyProgress {
-        void copied(long bytes);
+        void copied(long bytes) throws IOException;
     }
 
     static final class Saved {

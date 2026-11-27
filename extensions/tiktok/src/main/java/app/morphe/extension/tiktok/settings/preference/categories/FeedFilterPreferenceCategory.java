@@ -105,8 +105,9 @@ public class FeedFilterPreferenceCategory extends ConditionalPreferenceCategory 
                 "Ads are marked in green on the progress bar. A short notice shows the ad's name, with Watch it to go back.",
                 Settings.AD_SKIP_NOTICE));
         addPreference(new ChoicePreference(context, "Match strictness", Settings.AD_SKIP_STRICTNESS,
-                new String[]{"Loose: finds more, may skip by mistake", "Normal", "Strict: only clear matches"},
-                new String[]{"loose", "normal", "strict"}));
+                new String[]{"Normal: finds more, may skip by mistake", "Strict: only clear matches",
+                        "Very strict: only the clearest matches"},
+                new String[]{"normal", "strict", "verystrict"}));
     }
 
     private void addQuickSetup(Context context) {

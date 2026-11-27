@@ -2211,7 +2211,6 @@ Nothing is dimmed.,Tidak ada yang diredupkan.
 %1$s h %2$s min,%1$s j %2$s mnt
 %1$s min,%1$s mnt
 %1$s s · skipped %2$s times · %3$s,%1$s d · dilewati %2$s kali · %3$s
-AD,IKLAN
 Ad,Iklan
 Ad range,Rentang iklan
 "Adds Mark ad to a video's share sheet, where you cut the ad out of the video.","Menambahkan Tandai iklan ke menu bagikan video, tempat kamu memotong iklan dari video."
@@ -2240,7 +2239,7 @@ In the shared base,Di basis data bersama
 "Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.","Mendengarkan video berikutnya di feed sebelum kamu sampai ke sana, jadi iklan yang ditandai dilewati sejak detik pertamanya."
 Loading the shared base…,Memuat basis data bersama…
 Loading the video and its sound…,Memuat video dan suaranya…
-"Loose: finds more, may skip by mistake","Longgar: menemukan lebih banyak, bisa salah melewati"
+"Normal: finds more, may skip by mistake","Normal: menemukan lebih banyak, bisa salah melewati"
 Mark ad,Tandai iklan
 Mark ad in the share sheet,Tandai iklan di menu bagikan
 Mark an ad,Tandai iklan
@@ -2250,7 +2249,6 @@ Match strictness,Tingkat ketat pencocokan
 Move on from ad-only videos,Lewati video yang isinya hanya iklan
 Name,Nama
 New marks you save are sent to the shared base so others benefit right away.,Tanda baru yang kamu simpan dikirim ke basis data bersama agar orang lain langsung terbantu.
-No ads marked yet. Open a video's share sheet and tap Mark ad.,Belum ada iklan yang ditandai. Buka menu bagikan video dan ketuk Tandai iklan.
 "None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.","Belum ada. Di video, ketuk Bagikan, lalu Tandai iklan, dan pilih tempat iklan dimulai dan berakhir."
 Open a video first,Buka video terlebih dahulu
 Play ad,Putar iklan
@@ -2269,8 +2267,8 @@ Skip ads by sound,Lewati iklan berdasarkan suara
 Skip marked ads,Lewati iklan yang ditandai
 Skipped for others,Dilewati orang lain
 Strict: only clear matches,Ketat: hanya kecocokan yang jelas
+"Very strict: only the clearest matches","Sangat ketat: hanya kecocokan paling jelas"
 The shared base can't be reached right now.,Basis data bersama tidak dapat dijangkau saat ini.
-There's too little sound here to recognise. Choose a louder part.,Suara di sini terlalu sedikit untuk dikenali. Pilih bagian yang lebih keras.
 Time saved,Waktu dihemat
 Use shared ad database,Gunakan basis data iklan bersama
 Watch it,Tonton
@@ -2278,6 +2276,45 @@ Watch it,Tonton
 Wrong,Salah
 Your contribution,Kontribusimu
 Your marks,Tandaanmu
-Zoom,Perbesar
 Voted down,Tidak disukai
 These ads are not skipped for you. Tap Undo if you voted by mistake.,Iklan ini tidak dilewati untukmu. Ketuk Urungkan jika kamu salah memberi suara.
+Ad skipped,Iklan dilewati
+Ad skipped: %1$s,Iklan dilewati: %1$s
+Clear sound. This part is easy to recognise.,Suara jelas. Bagian ini mudah dikenali.
+Discard,Buang
+Discard this ad?,Buang iklan ini?
+End,Akhir
+End earlier,Akhiri lebih awal
+End later,Akhiri lebih lambat
+Everyone with Metra skips this ad too.,Semua pengguna Metra juga akan melewati iklan ini.
+Hold a handle still to zoom in. Pinch the strip to zoom.,Tahan pegangan agar diam untuk memperbesar. Cubit strip untuk zoom.
+Keep editing,Lanjut mengedit
+Length,Durasi
+Listen to the end,Dengarkan akhirnya
+Listen to the start,Dengarkan awalnya
+No ads marked yet,Belum ada iklan yang ditandai
+Open a video's share sheet and tap Mark ad.,Buka menu bagikan sebuah video lalu ketuk Tandai iklan.
+Skip this ad,Lewati iklan ini
+Start,Awal
+Start earlier,Mulai lebih awal
+The part you chose is not saved.,Bagian yang kamu pilih belum disimpan.
+Too little sound to recognise. Choose a louder part.,Suaranya terlalu sedikit untuk dikenali. Pilih bagian yang lebih keras.
+Try again,Coba lagi
+Turn on the shared base in settings to share.,Aktifkan basis bersama di pengaturan untuk membagikan.
+Weak sound. A longer or louder part is found more reliably.,Suara lemah. Bagian yang lebih panjang atau lebih keras lebih andal ditemukan.
+Zoom in,Perbesar
+Zoom out,Perkecil
+Start later,Mulai lebih lambat
+There are no ads to export yet,Belum ada iklan untuk diekspor
+Couldn't open the file picker. Try again.,Pemilih file tidak bisa dibuka. Coba lagi.
+Exported %1$s ads,%1$s iklan diekspor
+Couldn't save the backup. Try another folder.,Cadangan tidak bisa disimpan. Coba folder lain.
+"Imported %1$s ads, %2$s were already in the list","%1$s iklan diimpor, %2$s sudah ada di daftar"
+Imported %1$s ads,%1$s iklan diimpor
+This file is not a Metra ad backup,File ini bukan cadangan iklan Metra
+Backup,Cadangan
+Export,Ekspor
+Import,Impor
+Save %1$s ads to a file,Simpan %1$s iklan ke file
+Add ads from a backup file,Tambahkan iklan dari file cadangan
+Remove every marked ad from this phone,Hapus semua iklan yang ditandai dari ponsel ini

@@ -2209,7 +2209,6 @@ this creator,该创作者
 %1$s h %2$s min,%1$s 小时 %2$s 分钟
 %1$s min,%1$s 分钟
 %1$s s · skipped %2$s times · %3$s,%1$s 秒 · 已跳过 %2$s 次 · %3$s
-AD,广告
 Ad,广告
 Ad range,广告片段
 "Adds Mark ad to a video's share sheet, where you cut the ad out of the video.",在视频的分享面板中添加“标记广告”，你可以在那里把广告从视频中截取出来。
@@ -2238,7 +2237,7 @@ In the shared base,已在共享库中
 "Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.",在你刷到之前先监听信息流中的后续视频，这样已标记的广告从第一秒起就会被跳过。
 Loading the shared base…,正在加载共享库…
 Loading the video and its sound…,正在加载视频和声音…
-"Loose: finds more, may skip by mistake",宽松：找到更多，可能误跳
+"Normal: finds more, may skip by mistake",普通：找到更多，可能误跳
 Mark ad,标记广告
 Mark ad in the share sheet,分享面板中的“标记广告”
 Mark an ad,标记广告
@@ -2248,7 +2247,6 @@ Match strictness,匹配严格度
 Move on from ad-only videos,跳过整段都是广告的视频
 Name,名称
 New marks you save are sent to the shared base so others benefit right away.,你保存的新标记会发送到共享库，让其他人立即受益。
-No ads marked yet. Open a video's share sheet and tap Mark ad.,还没有标记广告。打开视频的分享面板，点按“标记广告”。
 "None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.",暂无。在视频中点按“分享”，再点按“标记广告”，然后选择广告的开始和结束位置。
 Open a video first,请先打开一个视频
 Play ad,播放广告
@@ -2267,8 +2265,8 @@ Skip ads by sound,按声音跳过广告
 Skip marked ads,跳过已标记的广告
 Skipped for others,他人跳过次数
 Strict: only clear matches,严格：仅限明确匹配
+"Very strict: only the clearest matches","非常严格：只保留最明确的匹配"
 The shared base can't be reached right now.,目前无法连接共享库。
-There's too little sound here to recognise. Choose a louder part.,这里的声音太少，无法识别。请选择更响的部分。
 Time saved,节省的时间
 Use shared ad database,使用共享广告库
 Watch it,观看
@@ -2276,6 +2274,45 @@ Watch it,观看
 Wrong,错误
 Your contribution,你的贡献
 Your marks,你的标记
-Zoom,缩放
 Voted down,已点踩
 These ads are not skipped for you. Tap Undo if you voted by mistake.,这些广告不会为你跳过。如果点错了，请点按撤消。
+Ad skipped,已跳过广告
+Ad skipped: %1$s,已跳过广告：%1$s
+Clear sound. This part is easy to recognise.,声音清晰。这一段很容易识别。
+Discard,放弃
+Discard this ad?,放弃这条广告？
+End,结束
+End earlier,结束提前
+End later,结束延后
+Everyone with Metra skips this ad too.,所有使用 Metra 的人也会跳过这条广告。
+Hold a handle still to zoom in. Pinch the strip to zoom.,按住手柄不动即可放大。双指捏合时间条可缩放。
+Keep editing,继续编辑
+Length,时长
+Listen to the end,试听结尾
+Listen to the start,试听开头
+No ads marked yet,还没有标记的广告
+Open a video's share sheet and tap Mark ad.,打开视频的分享面板，然后点按“标记广告”。
+Skip this ad,跳过这条广告
+Start,开始
+Start earlier,开始提前
+The part you chose is not saved.,你选择的片段尚未保存。
+Too little sound to recognise. Choose a louder part.,声音太少，无法识别。请选择更响的片段。
+Try again,重试
+Turn on the shared base in settings to share.,在设置中开启共享库后即可分享。
+Weak sound. A longer or louder part is found more reliably.,声音较弱。更长或更响的片段更容易被找到。
+Zoom in,放大
+Zoom out,缩小
+Start later,开始延后
+There are no ads to export yet,还没有可导出的广告
+Couldn't open the file picker. Try again.,无法打开文件选择器，请重试。
+Exported %1$s ads,已导出 %1$s 条广告
+Couldn't save the backup. Try another folder.,无法保存备份，请换一个文件夹。
+"Imported %1$s ads, %2$s were already in the list",已导入 %1$s 条广告，%2$s 条已在列表中
+Imported %1$s ads,已导入 %1$s 条广告
+This file is not a Metra ad backup,此文件不是 Metra 广告备份
+Backup,备份
+Export,导出
+Import,导入
+Save %1$s ads to a file,将 %1$s 条广告保存到文件
+Add ads from a backup file,从备份文件添加广告
+Remove every marked ad from this phone,从此手机删除所有标记的广告

@@ -98,7 +98,7 @@ class ExtensionHostsTest {
     private companion object {
         /** The hosts the README's Privacy section names. */
         val ALLOWED_HOSTS = setOf("github.com", "ko-fi.com", "gitlab.com", "www.gnu.org", "www.tiktok.com", "music.youtube.com",
-            "metra-adskip.falker600.workers.dev")
+            "api.sponblocktikitoki.dpdns.org", "cdn.sponblocktikitoki.dpdns.org")
         /**
          * The media transport (the client, and the connection it pins to a checked address), and
          * Network proxy's check, which asks the proxy the user set for a greeting or a tunnel and
@@ -106,6 +106,7 @@ class ExtensionHostsTest {
          * switch is on.
          */
         val OPENERS = setOf(
+            "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/download/AdSkipMediaFetch.java",
             "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/download/MediaTransport.java",
             "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/download/PinnedMediaConnection.java",
             "extensions/tiktok/src/main/java/app/morphe/extension/tiktok/network/NetworkProxy.java",

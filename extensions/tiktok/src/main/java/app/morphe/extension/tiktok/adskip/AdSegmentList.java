@@ -1,6 +1,6 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -32,6 +33,7 @@ final class AdSegmentList {
     private final Activity activity;
     private final Dialog dialog;
     private LinearLayout list;
+    private boolean logOpen;
 
     private AdSegmentList(Activity activity) {
         this.activity = activity;
@@ -85,12 +87,7 @@ final class AdSegmentList {
         List<AdSegment> segments = AdSegmentStore.all();
 
         list.addView(statistics());
-        if (segments.isEmpty()) {
-            TextView empty = AdSkipUi.text(c, L10n.t("No ads marked yet. Open a video's share sheet and tap Mark ad."),
-                    13, AdSkipUi.TEXT_2, false);
-            empty.setPadding(dp(4), dp(4), dp(4), dp(12));
-            list.addView(empty);
-        }
+        if (segments.isEmpty()) list.addView(empty());
 
         List<AdSegment> disliked = new java.util.ArrayList<>();
         for (int i = segments.size() - 1; i >= 0; i--) {
@@ -109,25 +106,49 @@ final class AdSegmentList {
             for (AdSegment segment : disliked) list.addView(card(segment));
         }
 
+        list.addView(sectionTitle(L10n.t("Backup")));
+        LinearLayout backup = section();
+        int count = segments.size();
+        View export = action(AdIcons.Icon.DOWNLOAD, AdSkipBar.MARK, L10n.t("Export"),
+                count == 0 ? L10n.t("There are no ads to export yet")
+                        : L10n.f("Save %1$s ads to a file", String.valueOf(count)), AdSkipUi.TEXT);
+        export.setOnClickListener(v -> AdBackup.export(activity));
+        AdSkipUi.enable(export, count > 0);
+        backup.addView(export);
+        backup.addView(rule());
+        View importRow = action(AdIcons.Icon.UPLOAD, AdSkipBar.MARK, L10n.t("Import"),
+                L10n.t("Add ads from a backup file"), AdSkipUi.TEXT);
+        importRow.setOnClickListener(v -> AdBackup.importFile(activity, () -> {
+            if (dialog.isShowing()) refresh();
+        }));
+        backup.addView(importRow);
+        list.addView(backup);
+
         if (!segments.isEmpty()) {
-            TextView clear = AdSkipUi.chip(c, L10n.t("Delete all"), false);
-            clear.setTextColor(AdSkipUi.ACCENT);
+            LinearLayout danger = section();
+            View clear = action(AdIcons.Icon.DELETE, AdSkipUi.ACCENT, L10n.t("Delete all"),
+                    L10n.t("Remove every marked ad from this phone"), AdSkipUi.ACCENT);
             clear.setOnClickListener(v -> confirm(L10n.t("Delete every marked ad?"), () -> {
                 AdSegmentStore.clear();
                 AdScanner.clearAll();
                 refresh();
             }));
-            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-2, -2);
-            p.topMargin = dp(8);
-            p.gravity = Gravity.END;
-            list.addView(clear, p);
+            danger.addView(clear);
+            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
+            p.topMargin = dp(10);
+            list.addView(danger, p);
         }
 
         List<String> log = AdSkipLog.lines();
         if (!log.isEmpty()) {
-            TextView heading = AdSkipUi.text(c, L10n.t("Recent checks"), 13, AdSkipUi.TEXT, true);
-            heading.setPadding(dp(4), dp(24), 0, dp(6));
-            list.addView(heading);
+            // The log is for troubleshooting, so it stays folded until asked for.
+            TextView heading = AdSkipUi.text(c, L10n.t("Recent checks"), 13, AdSkipUi.TEXT_2, true);
+            heading.setGravity(Gravity.CENTER_VERTICAL);
+            heading.setPadding(dp(6), dp(10), dp(6), dp(10));
+            heading.setCompoundDrawablePadding(dp(6));
+            LinearLayout.LayoutParams headingParams = new LinearLayout.LayoutParams(-1, -2);
+            headingParams.topMargin = dp(16);
+            list.addView(heading, headingParams);
             StringBuilder text = new StringBuilder();
             for (String line : log) text.append(line).append('\n');
             TextView lines = AdSkipUi.text(c, text.toString().trim(), 11, AdSkipUi.TEXT_2, false);
@@ -135,15 +156,20 @@ final class AdSegmentList {
             lines.setBackground(AdSkipUi.round(AdSkipUi.SURFACE, dp(12)));
             lines.setPadding(dp(12), dp(10), dp(12), dp(10));
             lines.setTextIsSelectable(true);
+            lines.setVisibility(logOpen ? View.VISIBLE : View.GONE);
             list.addView(lines);
+            Runnable showState = () -> heading.setCompoundDrawablesRelative(null, null,
+                    AdIcons.of(c, logOpen ? AdIcons.Icon.EXPAND_LESS : AdIcons.Icon.EXPAND_MORE, AdSkipUi.TEXT_2, 18), null);
+            showState.run();
+            heading.setOnClickListener(v -> {
+                logOpen = !logOpen;
+                lines.setVisibility(logOpen ? View.VISIBLE : View.GONE);
+                showState.run();
+            });
         }
     }
 
-    /**
-     * What skipping has given back, as SponsorBlock shows it: ads skipped and time saved on this
-     * phone, then, once the shared base answers, what the reader's own cuts saved everyone else
-     * and what the base holds as a whole.
-     */
+    /** Builds the local and shared skip-statistics summary card. */
     private View statistics() {
         Context c = activity;
         LinearLayout box = new LinearLayout(c);
@@ -210,6 +236,80 @@ final class AdSegmentList {
         return box;
     }
 
+    private View sectionTitle(String text) {
+        TextView title = AdSkipUi.text(activity, text, 13, AdSkipUi.TEXT_2, true);
+        title.setPadding(dp(6), dp(22), dp(6), dp(8));
+        return title;
+    }
+
+    private LinearLayout section() {
+        LinearLayout box = new LinearLayout(activity);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setBackground(AdSkipUi.round(AdSkipUi.SURFACE, dp(14)));
+        box.setClipToOutline(true);
+        return box;
+    }
+
+    private View rule() {
+        View line = new View(activity);
+        line.setBackgroundColor(0x14FFFFFF);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, Math.max(1, dp(0.75f)));
+        p.leftMargin = dp(64);
+        line.setLayoutParams(p);
+        return line;
+    }
+
+    private View action(AdIcons.Icon icon, int iconColor, String title, String detail, int titleColor) {
+        Context c = activity;
+        LinearLayout row = new LinearLayout(c);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setMinimumHeight(dp(64));
+        row.setPadding(dp(14), dp(10), dp(12), dp(10));
+        row.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(0x22FFFFFF), null, AdSkipUi.round(Color.WHITE, dp(14))));
+        row.setClickable(true);
+        row.setFocusable(true);
+        ImageView tile = new ImageView(c);
+        tile.setScaleType(ImageView.ScaleType.CENTER);
+        tile.setImageDrawable(AdIcons.of(c, icon, iconColor, 20));
+        tile.setBackground(AdSkipUi.round(AdSkipUi.SURFACE_HI, dp(10)));
+        row.addView(tile, new LinearLayout.LayoutParams(dp(38), dp(38)));
+        LinearLayout text = new LinearLayout(c);
+        text.setOrientation(LinearLayout.VERTICAL);
+        text.setPadding(dp(12), 0, dp(8), 0);
+        text.addView(AdSkipUi.text(c, title, 15, titleColor, true));
+        TextView line = AdSkipUi.text(c, detail, 12, AdSkipUi.TEXT_2, false);
+        line.setPadding(0, dp(2), 0, 0);
+        text.addView(line);
+        row.addView(text, new LinearLayout.LayoutParams(0, -2, 1f));
+        ImageView chevron = new ImageView(c);
+        chevron.setImageDrawable(AdIcons.of(c, AdIcons.Icon.CHEVRON_RIGHT, AdSkipUi.TEXT_2, 18));
+        row.addView(chevron, new LinearLayout.LayoutParams(dp(18), dp(18)));
+        return row;
+    }
+
+    private View empty() {
+        Context c = activity;
+        LinearLayout box = new LinearLayout(c);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+        box.setPadding(dp(24), dp(28), dp(24), dp(28));
+        ImageView icon = new ImageView(c);
+        icon.setScaleType(ImageView.ScaleType.CENTER);
+        icon.setImageDrawable(AdIcons.of(c, AdIcons.Icon.GRAPHIC_EQ, AdSkipBar.MARK, 28));
+        icon.setBackground(AdSkipUi.round(AdSkipUi.SURFACE, dp(32)));
+        box.addView(icon, new LinearLayout.LayoutParams(dp(64), dp(64)));
+        TextView title = AdSkipUi.text(c, L10n.t("No ads marked yet"), 16, AdSkipUi.TEXT, true);
+        title.setGravity(Gravity.CENTER);
+        title.setPadding(0, dp(14), 0, dp(4));
+        box.addView(title);
+        TextView how = AdSkipUi.text(c, L10n.t("Open a video's share sheet and tap Mark ad."), 13, AdSkipUi.TEXT_2, false);
+        how.setGravity(Gravity.CENTER);
+        box.addView(how);
+        return box;
+    }
+
     private View tile(String value, String label) {
         LinearLayout tile = new LinearLayout(activity);
         tile.setOrientation(LinearLayout.VERTICAL);
@@ -260,14 +360,25 @@ final class AdSegmentList {
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
         card.setBackground(AdSkipUi.round(AdSkipUi.SURFACE, dp(14)));
-        card.setPadding(dp(14), dp(12), dp(8), dp(12));
+        card.setPadding(dp(12), dp(12), dp(6), dp(12));
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(-1, -2);
         cardParams.bottomMargin = dp(8);
         card.setLayoutParams(cardParams);
 
+        boolean down = SharedDb.myVote(segment.sharedServerId) < 0;
+        ImageView glyph = new ImageView(c);
+        glyph.setScaleType(ImageView.ScaleType.CENTER);
+        glyph.setBackground(AdSkipUi.round(AdSkipUi.SURFACE_HI, dp(12)));
+        LinearLayout.LayoutParams glyphParams = new LinearLayout.LayoutParams(dp(40), dp(40));
+        glyphParams.rightMargin = dp(12);
+        card.addView(glyph, glyphParams);
+        paintGlyph(glyph, segment.enabled && !down);
+
         LinearLayout text = new LinearLayout(c);
         text.setOrientation(LinearLayout.VERTICAL);
         TextView name = AdSkipUi.text(c, segment.name, 15, segment.enabled ? AdSkipUi.TEXT : AdSkipUi.TEXT_2, true);
+        name.setMaxLines(2);
+        name.setEllipsize(android.text.TextUtils.TruncateAt.END);
         text.addView(name);
         String details = L10n.f("%1$s s · skipped %2$s times · %3$s",
                 AdSkipUi.seconds(segment.durationMs), String.valueOf(segment.skips),
@@ -281,7 +392,7 @@ final class AdSegmentList {
         text.addView(detailsView);
         card.addView(text, new LinearLayout.LayoutParams(0, -2, 1f));
 
-        if (SharedDb.myVote(segment.sharedServerId) < 0) {
+        if (down) {
             name.setTextColor(AdSkipUi.TEXT_2);
             TextView undo = AdSkipUi.chip(c, L10n.t("Undo"), false);
             undo.setTextColor(AdSkipUi.ACCENT);
@@ -292,10 +403,13 @@ final class AdSegmentList {
             card.addView(undo);
         } else {
             Switch toggle = new Switch(c);
+            AdSkipUi.tint(toggle, AdSkipBar.MARK);
             toggle.setChecked(segment.enabled);
+            toggle.setContentDescription(L10n.t("Skip this ad"));
             toggle.setOnCheckedChangeListener((b, on) -> {
                 AdSegmentStore.setEnabled(segment.id, on);
                 name.setTextColor(on ? AdSkipUi.TEXT : AdSkipUi.TEXT_2);
+                paintGlyph(glyph, on);
             });
             card.addView(toggle);
         }
@@ -307,6 +421,11 @@ final class AdSegmentList {
         card.addView(more, moreParams);
         card.setOnClickListener(v -> menu(segment));
         return card;
+    }
+
+    /** The card's waveform sign: green while the ad is skipped, grey while it is not. */
+    private void paintGlyph(ImageView glyph, boolean on) {
+        glyph.setImageDrawable(AdIcons.of(activity, AdIcons.Icon.GRAPHIC_EQ, on ? AdSkipBar.MARK : AdSkipUi.TEXT_2, 20));
     }
 
     private void menu(AdSegment segment) {

@@ -2232,7 +2232,6 @@ Nothing is dimmed.	No se atenúa nada.
 %1$s h %2$s min	%1$s h %2$s min
 %1$s min	%1$s min
 %1$s s · skipped %2$s times · %3$s	%1$s s · saltado %2$s veces · %3$s
-AD	ANUNCIO
 Ad	Anuncio
 Ad range	Fragmento del anuncio
 Adds Mark ad to a video's share sheet, where you cut the ad out of the video.	Añade Marcar anuncio al panel de compartir de un vídeo, donde recortas el anuncio del vídeo.
@@ -2261,7 +2260,7 @@ In the shared base	En la base compartida
 Listens to the next videos in the feed before you reach them, so a marked ad is passed over from its first second.	Escucha los siguientes vídeos del feed antes de que llegues a ellos, para que un anuncio marcado se salte desde su primer segundo.
 Loading the shared base…	Cargando la base compartida…
 Loading the video and its sound…	Cargando el vídeo y su sonido…
-Loose: finds more, may skip by mistake	Flexible: encuentra más, puede saltar por error
+Normal: finds more, may skip by mistake	Normal: encuentra más, puede saltar por error
 Mark ad	Marcar anuncio
 Mark ad in the share sheet	Marcar anuncio en el panel de compartir
 Mark an ad	Marcar un anuncio
@@ -2271,7 +2270,6 @@ Match strictness	Rigor de coincidencia
 Move on from ad-only videos	Pasar los vídeos que son solo un anuncio
 Name	Nombre
 New marks you save are sent to the shared base so others benefit right away.	Las marcas nuevas que guardes se envían a la base compartida para que otros se beneficien de inmediato.
-No ads marked yet. Open a video's share sheet and tap Mark ad.	Aún no hay anuncios marcados. Abre el panel de compartir de un vídeo y toca Marcar anuncio.
 None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Aún no hay ninguno. En un vídeo, toca Compartir, luego Marcar anuncio, y elige dónde empieza y termina el anuncio.
 Open a video first	Primero abre un vídeo
 Play ad	Reproducir anuncio
@@ -2290,8 +2288,8 @@ Skip ads by sound	Saltar anuncios por sonido
 Skip marked ads	Saltar los anuncios marcados
 Skipped for others	Saltados a otros
 Strict: only clear matches	Estricto: solo coincidencias claras
+Very strict: only the clearest matches	Muy estricto: solo las coincidencias más claras
 The shared base can't be reached right now.	Ahora mismo no se puede acceder a la base compartida.
-There's too little sound here to recognise. Choose a louder part.	Aquí hay muy poco sonido para reconocerlo. Elige una parte más fuerte.
 Time saved	Tiempo ahorrado
 Use shared ad database	Usar la base de datos de anuncios compartida
 Watch it	Verlo
@@ -2299,6 +2297,47 @@ When the ad is the whole video, go to the next one instead of jumping to its end
 Wrong	Incorrecto
 Your contribution	Tu aporte
 Your marks	Tus marcas
-Zoom	Zoom
 Voted down	Votados en contra
 These ads are not skipped for you. Tap Undo if you voted by mistake.	Estos anuncios no se saltan para ti. Toca Deshacer si votaste por error.
+# context: Skip ads by sound, the editor, the skip notice and the list of marked ads
+Ad skipped	Anuncio omitido
+Ad skipped: %1$s	Anuncio omitido: %1$s
+Clear sound. This part is easy to recognise.	Sonido claro. Este fragmento es fácil de reconocer.
+Discard	Descartar
+Discard this ad?	¿Descartar este anuncio?
+End	Fin
+End earlier	Terminar antes
+End later	Terminar después
+Everyone with Metra skips this ad too.	Todos los que usan Metra también omitirán este anuncio.
+Hold a handle still to zoom in. Pinch the strip to zoom.	Mantén un tirador quieto para acercar. Pellizca la tira para hacer zoom.
+Keep editing	Seguir editando
+Length	Duración
+Listen to the end	Escuchar el final
+Listen to the start	Escuchar el inicio
+No ads marked yet	Aún no hay anuncios marcados
+Open a video's share sheet and tap Mark ad.	Abre el menú de compartir de un video y toca Marcar anuncio.
+Skip this ad	Omitir este anuncio
+Start	Inicio
+Start earlier	Empezar antes
+Start later	Empezar después
+The part you chose is not saved.	El fragmento que elegiste no se ha guardado.
+Too little sound to recognise. Choose a louder part.	Hay muy poco sonido para reconocerlo. Elige una parte más fuerte.
+Try again	Reintentar
+Turn on the shared base in settings to share.	Activa la base compartida en los ajustes para compartir.
+Weak sound. A longer or louder part is found more reliably.	Sonido débil. Una parte más larga o más fuerte se encuentra con más fiabilidad.
+Zoom in	Acercar
+Zoom out	Alejar
+# context: Skip ads by sound, backup of the marked ads in the list
+There are no ads to export yet	Aún no hay anuncios para exportar
+Couldn't open the file picker. Try again.	No se pudo abrir el selector de archivos. Inténtalo de nuevo.
+Exported %1$s ads	Se exportaron %1$s anuncios
+Couldn't save the backup. Try another folder.	No se pudo guardar la copia. Prueba otra carpeta.
+Imported %1$s ads, %2$s were already in the list	Se importaron %1$s anuncios, %2$s ya estaban en la lista
+Imported %1$s ads	Se importaron %1$s anuncios
+This file is not a Metra ad backup	Este archivo no es una copia de anuncios de Metra
+Backup	Copia de seguridad
+Export	Exportar
+Import	Importar
+Save %1$s ads to a file	Guardar %1$s anuncios en un archivo
+Add ads from a backup file	Añadir anuncios desde una copia
+Remove every marked ad from this phone	Quitar todos los anuncios marcados de este teléfono

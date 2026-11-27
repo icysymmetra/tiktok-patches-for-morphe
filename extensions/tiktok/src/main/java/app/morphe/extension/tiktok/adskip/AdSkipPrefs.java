@@ -1,6 +1,6 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
@@ -14,11 +14,7 @@ import app.morphe.extension.shared.Utils;
 
 import java.security.SecureRandom;
 
-/**
- * The ad skip's one preferences file: the shared base's sync state and sync token, the reader's
- * votes and the lifetime skip counters. It is on TikTok's launch-crash keep-list, see
- * LaunchCrashCleanup.
- */
+/** SharedPreferences storage for sync state, installation token, votes, and counters. */
 public final class AdSkipPrefs {
     public static final String NAME = "metra_adskip";
     private static final String KEY_TOKEN = "sync_token";
@@ -31,7 +27,7 @@ public final class AdSkipPrefs {
         return context == null ? null : context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
     }
 
-    /** 32 random bytes, made once and kept on the phone. It is never logged. */
+    /** Persistent 32-byte URL-safe Base64 installation token. */
     @Nullable
     static synchronized String token() {
         SharedPreferences prefs = get();

@@ -1,6 +1,6 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
@@ -12,20 +12,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Lifetime skip counters, the way SponsorBlock keeps them: how many ads were skipped on this
- * phone and how much watching time that saved. They outlive the segments, so deleting an ad
- * does not take back the time it saved.
- *
- * <p>Skips of shared segments are also held until the next sync reports them, which is how the
- * base knows what each reader's cuts saved everyone else.
- */
+/** Lifetime local skip counters and pending shared-segment skip reports. */
 final class AdSkipStats {
     private static final String KEY_SKIPS = "stats_skips";
     private static final String KEY_SAVED_MS = "stats_saved_ms";
     /** Unreported skips, one "serverId count savedMs" line each. */
     private static final String KEY_PENDING = "stats_pending";
-    /** No single report claims more than this many skips of one segment. */
     private static final int MAX_REPORTED = 500;
 
     private AdSkipStats() {}
@@ -132,6 +124,11 @@ final class AdSkipStats {
         return L10n.f("%1$s s", String.valueOf(seconds));
     }
 
+    static synchronized void seedOnce() {
+        SharedPreferences prefs = prefs();
+        if (prefs != null) seed(prefs);
+    }
+
     /** Counters start from the skips the segments already carry, for phones that had them first. */
     private static void seed(SharedPreferences prefs) {
         if (prefs.contains(KEY_SKIPS)) return;
@@ -154,7 +151,6 @@ final class AdSkipStats {
             try {
                 pending.put(parts[0], new long[]{Long.parseLong(parts[1]), Long.parseLong(parts[2])});
             } catch (NumberFormatException ignored) {
-                // A damaged line is dropped; the rest still count.
             }
         }
         return pending;

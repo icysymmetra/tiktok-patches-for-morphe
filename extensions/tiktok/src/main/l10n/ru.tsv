@@ -2424,8 +2424,9 @@ Downloading the video…	Загружается видео…
 Each check downloads the video's sound, usually a few hundred kilobytes.	Каждая проверка скачивает звук видео, обычно несколько сотен килобайт.
 Find sped up copies	Находить ускоренные копии
 Loading the video and its sound…	Загружаются видео и звук…
-Loose: finds more, may skip by mistake	Мягко: находит больше, может ошибиться
+Normal: finds more, may skip by mistake	Обычно: находит больше, может ошибиться
 Strict: only clear matches	Строго: только явные совпадения
+Very strict: only the clearest matches	Очень строго: только самые явные совпадения
 Mark ad	Отметить рекламу
 Mark ad in the share sheet	«Отметить рекламу» в меню «Поделиться»
 Mark an ad	Отметить рекламу
@@ -2434,7 +2435,6 @@ Marked ads	Отмеченная реклама
 Match strictness	Строгость совпадения
 Move on from ad-only videos	Пролистывать видео целиком из рекламы
 Name	Название
-No ads marked yet. Open a video's share sheet and tap Mark ad.	Реклама ещё не отмечена. Откройте меню «Поделиться» у видео и нажмите «Отметить рекламу».
 None yet. In a video, tap Share, then Mark ad, and choose where the ad starts and ends.	Пока нет. В видео нажмите «Поделиться», затем «Отметить рекламу» и выберите начало и конец рекламы.
 Open a video first	Сначала откройте видео
 Play ad	Слушать рекламу
@@ -2446,11 +2446,8 @@ Saved "%1$s". This ad will be skipped in other videos.	«%1$s» сохранен
 Show a notice when skipping	Показывать уведомление о пропуске
 Skip ads by sound	Пропуск рекламы по звуку
 Skip marked ads	Пропускать отмеченную рекламу
-There's too little sound here to recognise. Choose a louder part.	Здесь слишком мало звука для распознавания. Выберите часть погромче.
 Watch it	Смотреть
 When the ad is the whole video, go to the next one instead of jumping to its end.	Если реклама занимает всё видео, перейти к следующему, а не прыгать в конец.
-Zoom	Масштаб
-AD	РЕКЛ
 Use shared ad database	Использовать общую базу реклам
 Downloads marks from other users and skips their ads too. Your own marks are shared back.	Скачивает метки других пользователей и тоже пропускает их рекламу. Ваши метки отправляются обратно.
 Share new marks automatically	Делиться новыми метками автоматически
@@ -2482,3 +2479,45 @@ Your contribution	Ваш вклад
 Your marks	Ваши метки
 Voted down	Ваши дизлайки
 These ads are not skipped for you. Tap Undo if you voted by mistake.	Эта реклама у вас не пропускается. Нажмите «Отменить», если дизлайк поставлен по ошибке.
+# context: Skip ads by sound, the editor, the skip notice and the list of marked ads
+Ad skipped	Реклама пропущена
+Ad skipped: %1$s	Реклама пропущена: %1$s
+Clear sound. This part is easy to recognise.	Чистый звук. Этот фрагмент легко распознать.
+Discard	Не сохранять
+Discard this ad?	Выйти без сохранения?
+End	Конец
+End earlier	Конец раньше
+End later	Конец позже
+Everyone with Metra skips this ad too.	Все с Metra тоже будут пропускать эту рекламу.
+Hold a handle still to zoom in. Pinch the strip to zoom.	Задержите палец на ручке, чтобы приблизить. Масштаб полосы меняется двумя пальцами.
+Keep editing	Продолжить
+Length	Длина
+Listen to the end	Послушать конец
+Listen to the start	Послушать начало
+No ads marked yet	Пока нет отмеченной рекламы
+Open a video's share sheet and tap Mark ad.	Откройте меню «Поделиться» у видео и нажмите «Отметить рекламу».
+Skip this ad	Пропускать эту рекламу
+Start	Начало
+Start earlier	Начало раньше
+Start later	Начало позже
+The part you chose is not saved.	Выбранный фрагмент не сохранён.
+Too little sound to recognise. Choose a louder part.	Слишком мало звука для распознавания. Выберите более громкий фрагмент.
+Try again	Повторить
+Turn on the shared base in settings to share.	Включите общую базу в настройках, чтобы делиться.
+Weak sound. A longer or louder part is found more reliably.	Слабый звук. Более длинный или громкий фрагмент находится надёжнее.
+Zoom in	Приблизить
+Zoom out	Отдалить
+# context: Skip ads by sound, backup of the marked ads in the list
+There are no ads to export yet	Пока нечего экспортировать
+Couldn't open the file picker. Try again.	Не удалось открыть выбор файла. Попробуйте ещё раз.
+Exported %1$s ads	Экспортировано реклам: %1$s
+Couldn't save the backup. Try another folder.	Не удалось сохранить копию. Выберите другую папку.
+Imported %1$s ads, %2$s were already in the list	Импортировано реклам: %1$s, уже были в списке: %2$s
+Imported %1$s ads	Импортировано реклам: %1$s
+This file is not a Metra ad backup	Это не резервная копия рекламы Metra
+Backup	Резервная копия
+Export	Экспорт
+Import	Импорт
+Save %1$s ads to a file	Сохранить рекламу в файл: %1$s
+Add ads from a backup file	Добавить рекламу из файла копии
+Remove every marked ad from this phone	Удалить всю отмеченную рекламу с телефона

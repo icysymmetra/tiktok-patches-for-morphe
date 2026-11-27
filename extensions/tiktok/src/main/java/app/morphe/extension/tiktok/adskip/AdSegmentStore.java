@@ -1,6 +1,6 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
@@ -22,12 +22,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The marked ads, kept on the phone in one small binary file. A 15 second ad is about 2,500
- * hashes, 20 KB, so a few hundred ads stay under a few megabytes and load in milliseconds.
- *
- * <p>Every change writes a new file beside the old one and renames it over, so a crash mid
- * write leaves the previous list rather than half of one. The match index is rebuilt on each
- * change and swapped in whole, so a scan running on another thread always sees one list.
+ * Persistent binary store of marked ad segments ({@code metra_ad_segments.bin}).
+ * Rebuilds the immutable {@link AdMatcher.Index} atomically on each change.
  */
 final class AdSegmentStore {
     private static final int MAGIC = 0x4D414453; // "MADS"
@@ -37,7 +33,6 @@ final class AdSegmentStore {
     private static final Object LOCK = new Object();
     private static List<AdSegment> segments;
     private static volatile AdMatcher.Index index;
-    /** Bumped on every change, so a cached scan result made against an older list is redone. */
     private static volatile int generation;
 
     private AdSegmentStore() {}
@@ -86,6 +81,34 @@ final class AdSegmentStore {
 
     static int generation() {
         return generation;
+    }
+
+    /** Imports segments not already present by sound fingerprint or shared server ID. */
+    static int importAll(List<AdSegment> incoming) {
+        synchronized (LOCK) {
+            ensureLoaded();
+            int added = 0;
+            long id = System.currentTimeMillis();
+            for (AdSegment s : segments) if (s.id >= id) id = s.id + 1;
+            for (AdSegment in : incoming) {
+                boolean known = false;
+                for (AdSegment s : segments) {
+                    if (sameSound(s, in.hashes, in.times)
+                            || (in.sharedServerId != null && in.sharedServerId.equals(s.sharedServerId))) {
+                        known = true;
+                        break;
+                    }
+                }
+                if (known) continue;
+                AdSegment copy = new AdSegment(id++, in.name, in.createdAt > 0 ? in.createdAt : System.currentTimeMillis(),
+                        in.durationMs, in.sourceAid, in.hashes, in.times, in.frames, in.enabled, in.skips, in.lastSkipAt);
+                copy.sharedServerId = in.sharedServerId;
+                segments.add(copy);
+                added++;
+            }
+            if (added > 0) changed();
+            return added;
+        }
     }
 
     static AdSegment add(String name, long durationMs, String sourceAid, Landmarks.Print print) {
@@ -155,19 +178,32 @@ final class AdSegmentStore {
         }
     }
 
-    /**
-     * Brings the shared base's segments into the list, in one write.
-     *
-     * <p>A segment this phone sent itself comes back with the very same hashes, so it is matched
-     * by its sound, not added twice: the local one keeps its name and only learns its server id,
-     * which is what lets it be voted on. A segment only the base has is named by its number in the
-     * base, ad12, which is the same on every phone. One the votes hid is taken off again.
-     */
+    /** Merges shared database segments into the local store. */
     static int mergeShared(List<Shared> incoming) {
+        return mergeShared(incoming, -1);
+    }
+
+    /**
+     * Merges shared segments; when {@code snapshotAtMs >= 0}, removes shared-only segments older
+     * than {@code snapshotAtMs} that are absent from the snapshot.
+     */
+    static int mergeShared(List<Shared> incoming, long snapshotAtMs) {
         synchronized (LOCK) {
             ensureLoaded();
             int added = 0;
             boolean dirty = false;
+            if (snapshotAtMs >= 0) {
+                java.util.Set<String> present = new java.util.HashSet<>();
+                for (Shared entry : incoming) if (!entry.hidden) present.add(entry.serverId);
+                for (java.util.Iterator<AdSegment> it = segments.iterator(); it.hasNext(); ) {
+                    AdSegment s = it.next();
+                    if (isSharedOnly(s) && s.sharedServerId != null && s.createdAt < snapshotAtMs
+                            && !present.contains(s.sharedServerId)) {
+                        it.remove();
+                        dirty = true;
+                    }
+                }
+            }
             for (Shared entry : incoming) {
                 AdSegment known = null;
                 for (AdSegment s : segments) {
@@ -192,8 +228,6 @@ final class AdSegmentStore {
                     continue;
                 }
                 if (known != null && isSharedOnly(known) && known.frames != entry.frames) {
-                    // Earlier versions stored the hash count as the length in frames, which made
-                    // a skip run far past the ad's end.
                     AdSegment fixed = new AdSegment(known.id, known.name, known.createdAt, entry.durationMs, null,
                             entry.hashes, entry.times, entry.frames, known.enabled, known.skips, known.lastSkipAt);
                     fixed.sharedServerId = entry.serverId;
@@ -217,13 +251,14 @@ final class AdSegmentStore {
                 for (AdSegment s : segments) if (s.id >= id) id = s.id + 1;
                 String name = entry.number > 0 ? sharedName(entry.number) : sharedName(sharedCount() + 1);
                 AdSegment segment = new AdSegment(id, name, System.currentTimeMillis(), entry.durationMs, null,
-                        entry.hashes, entry.times, entry.frames, entry.score > -2, 0, 0);
+                        entry.hashes, entry.times, entry.frames, true, 0, 0);
                 segment.sharedServerId = entry.serverId;
                 segments.add(segment);
                 added++;
                 dirty = true;
             }
             if (dirty) changed();
+            else if (saveFailed) save(); // an earlier merge is still only in memory
             return added;
         }
     }
@@ -282,10 +317,7 @@ final class AdSegmentStore {
         return java.util.Arrays.equals(s.hashes, hashes) && java.util.Arrays.equals(s.times, times);
     }
 
-    /**
-     * Earlier versions added a phone's own segment a second time when the base sent it back.
-     * The copy goes, and its server id moves to the original, which keeps its name.
-     */
+    /** Deduplicates shared copies of locally created segments by sound fingerprint. */
     private static boolean dropSharedCopies() {
         boolean dirty = false;
         for (int i = segments.size() - 1; i >= 0; i--) {
@@ -314,6 +346,9 @@ final class AdSegmentStore {
 
     /** Counts a skip and the time it saved. Saved later with the next change or by {@link #flushStats}. */
     static void recordSkip(AdSegment segment, long savedMs) {
+        // The lifetime counters start from the segments' counts; they must be read before this
+        // skip is added to the segment, or the first skip counts twice.
+        AdSkipStats.seedOnce();
         synchronized (LOCK) {
             segment.skips++;
             segment.lastSkipAt = System.currentTimeMillis();
@@ -383,15 +418,34 @@ final class AdSegmentStore {
                 //noinspection ResultOfMethodCallIgnored
                 file.renameTo(broken);
                 segments.clear();
+                SharedDb.forgetSyncProgress();
             }
+        } else if (file != null) {
+            SharedDb.forgetSyncProgress();
+            save();
         }
         if (dropSharedCopies()) save();
         index = AdMatcher.Index.build(segments);
     }
 
+    private static volatile boolean saveFailed;
+
+    /** Reads the list now if it isn't yet, recovering a lost one before a sync relies on it. */
+    static void load() {
+        synchronized (LOCK) {
+            ensureLoaded();
+        }
+    }
+
+    /** Whether the last write of the list failed, so a sync must not count what it merged as kept. */
+    static boolean lastSaveFailed() {
+        return saveFailed;
+    }
+
     private static void save() {
         File file = file();
         if (file == null) return;
+        saveFailed = true;
         File temp = new File(file.getParentFile(), FILE + ".tmp");
         try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(temp)))) {
             out.writeInt(MAGIC);
@@ -421,8 +475,12 @@ final class AdSegmentStore {
         if (!temp.renameTo(file)) {
             //noinspection ResultOfMethodCallIgnored
             file.delete();
-            if (!temp.renameTo(file)) Logger.printDebug(() -> "Ad skip: could not replace the ad list");
+            if (!temp.renameTo(file)) {
+                Logger.printDebug(() -> "Ad skip: could not replace the ad list");
+                return;
+            }
         }
+        saveFailed = false;
     }
 
     private static File file() {

@@ -1,6 +1,6 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
@@ -9,7 +9,7 @@ import android.app.Activity;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.tiktok.settings.L10n;
 
-/** The public doors into the ad skipper: the share sheet button and the settings rows. */
+/** Entry points for share-sheet and settings actions. */
 public final class AdSkipActions {
     private AdSkipActions() {}
 
@@ -21,7 +21,7 @@ public final class AdSkipActions {
         AdSegmentEditor.open(activity, aweme);
     }
 
-    /** Marks the video that is playing, from the settings page. */
+    /** Opens the editor for the currently playing video. */
     public static boolean markPlaying(Activity activity) {
         Object aweme = AdSkip.playingAweme();
         if (aweme == null) return false;

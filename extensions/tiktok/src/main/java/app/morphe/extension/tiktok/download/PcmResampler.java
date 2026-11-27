@@ -58,18 +58,78 @@ final class PcmResampler {
         long first = produced, last = produced;
         while (ready(last, end)) last++;
         short[] output = new short[(int) (last - first) * channels];
-        for (long k = first; k < last; k++) {
-            long scaled = k * inRate;
-            long n = scaled / outRate;
-            double t = (double) (scaled % outRate) / outRate;
-            int at = (int) (k - first) * channels;
-            for (int c = 0; c < channels; c++) {
-                output[at + c] = curve(sample(n - 1, c), sample(n, c), sample(n + 1, c), sample(n + 2, c), t);
-            }
-        }
+        writeRange(first, last, output, 0, Integer.MAX_VALUE);
         produced = last;
         drop();
         return output;
+    }
+
+    /**
+     * Resamples directly into {@code target} starting at {@code targetOffset}, up to {@code maxSamples}
+     * samples, without allocating a temporary output array per decoded frame.
+     */
+    int processInto(short[] input, int frames, short[] target, int targetOffset, int maxSamples) {
+        if (maxSamples <= 0) return 0;
+        if (inRate == outRate) {
+            int count = Math.min(frames * channels, maxSamples);
+            System.arraycopy(input, 0, target, targetOffset, count);
+            received += frames;
+            produced += frames;
+            return count;
+        }
+        append(input, frames);
+        received += frames;
+        long first = produced, last = produced;
+        while (ready(last, false)) last++;
+        int written = writeRange(first, last, target, targetOffset, maxSamples);
+        produced = last;
+        drop();
+        return written;
+    }
+
+    private int writeRange(long first, long last, short[] output, int offset, int maxSamples) {
+        final int inR = this.inRate;
+        final int outR = this.outRate;
+        final double invOutR = 1.0 / outR;
+        final int ch = this.channels;
+        final short[] pend = this.pending;
+        final long pStart = this.pendingStart;
+        final long rec = this.received;
+        int totalSamples = (int) (last - first) * ch;
+        int limitSamples = Math.min(totalSamples, maxSamples);
+        long limitK = first + limitSamples / ch;
+        if (ch == 1) {
+            for (long k = first; k < limitK; k++) {
+                long scaled = k * inR;
+                long n = scaled / outR;
+                double t = (scaled % outR) * invOutR;
+                int at = offset + (int) (k - first);
+                if (n >= 1 && n + 2 < rec) {
+                    int base = (int) (n - pStart);
+                    output[at] = curve(pend[base - 1], pend[base], pend[base + 1], pend[base + 2], t);
+                } else {
+                    output[at] = curve(sample(n - 1, 0), sample(n, 0), sample(n + 1, 0), sample(n + 2, 0), t);
+                }
+            }
+        } else {
+            for (long k = first; k < limitK; k++) {
+                long scaled = k * inR;
+                long n = scaled / outR;
+                double t = (scaled % outR) * invOutR;
+                int at = offset + (int) (k - first) * ch;
+                if (n >= 1 && n + 2 < rec) {
+                    int base = (int) (n - pStart) * ch;
+                    for (int c = 0; c < ch; c++) {
+                        output[at + c] = curve(pend[base - ch + c], pend[base + c], pend[base + ch + c], pend[base + 2 * ch + c], t);
+                    }
+                } else {
+                    for (int c = 0; c < ch; c++) {
+                        output[at + c] = curve(sample(n - 1, c), sample(n, c), sample(n + 1, c), sample(n + 2, c), t);
+                    }
+                }
+            }
+        }
+        return (int) (limitK - first) * ch;
     }
 
     /** Output frames written so far. */

@@ -1,6 +1,6 @@
 /*
- * Copyright 2026 icysymmetra/tiktok-patches-for-morphe contributors
- * https://github.com/icysymmetra/tiktok-patches-for-morphe
+ * Copyright 2026 Metra contributors
+ * Built on icysymmetra/tiktok-patches-for-morphe (GPL-3.0).
  */
 package app.morphe.extension.tiktok.adskip;
 
@@ -22,18 +22,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * The patch's hooks: TikTok's player names each video it plays and reports its position several
- * times a second, and the feed binds the posts either side of the one on screen. Bound posts are
- * scanned ahead, the playing one first, and a progress tick inside a found ad seeks past it.
- */
+/** Player and feed hooks that trigger background audio scanning and automatic ad seeking. */
 public final class AdSkip {
     private static final String PAGER = "com.ss.android.ugc.aweme.common.widget.VerticalViewPager";
-    /** A tick this close to a found ad's start counts as inside it. */
     private static final long LEAD_MS = 150;
-    /** Nothing is skipped in the ad's last moments, where the seek would gain nothing. */
     private static final long TAIL_MS = 400;
-    /** An ad that covers this much of a video makes the whole video an ad. */
     private static final float WHOLE_VIDEO = 0.85f;
 
     private static volatile WeakReference<Object> controller = new WeakReference<>(null);
@@ -42,26 +35,24 @@ public final class AdSkip {
     private static volatile long positionMs;
     private static volatile long durationMs;
 
-    /** Per playing video: the matches already skipped this play, and the ones put back. */
     private static String sessionAid;
     private static final Set<Long> skipped = new HashSet<>();
     private static final Set<Long> allowed = new HashSet<>();
     private static long lastTick = -1;
     private static boolean advancedAway;
-    /** Where the last skip seeked to and when, until the player reports it got there. */
     private static long seekTarget = -1;
     private static long seekAt;
     private static int seeksThisPlay;
     private static final long SEEK_SETTLE_MS = 2500;
-    /** A safety stop: no video gets more automatic seeks than this in one play. */
     private static final int MAX_SEEKS_PER_PLAY = 6;
     private static volatile boolean seekInFlight;
 
     private static volatile boolean paused;
     private static boolean askedThisPlay;
 
-    /** How far from the end a skip may land. */
+    private static final long LOOP_END_MS = 3000, LOOP_START_MS = 1500;
     private static final long END_GUARD_MS = 600;
+    private static final long ON_SCREEN_MS = 1500;
 
     private static Class<?> seekOwner;
     private static Method seekMethod;
@@ -82,17 +73,17 @@ public final class AdSkip {
     /** {@code PlayerController.play(Aweme, ...)}, before the engine starts. */
     public static void onPlay(Object playerController, Object aweme) {
         try {
-            // Only this selected patch's player hook runs during normal playback. SettingsStatus
-            // is otherwise populated only when the settings screen is opened.
+            // The selected patch's player hook also runs before settings have been opened.
             SettingsStatus.enableAdSkip();
             SharedDb.syncIfDue();
+            KawaiiLottie.warmUpAsync();
             if (aweme == null) return;
             String aid = Reflect.string(aweme, "getAid", "aid");
             if (aid == null) return;
             playingAweme = new WeakReference<>(aweme);
             if (!active()) return;
             if (playerController != null) controller = new WeakReference<>(playerController);
-            if (!shouldScan()) return;
+            if (Settings.AD_SKIP_SAVE_TRAFFIC.get() || !shouldScan()) return;
             AdScanner.request(aweme, true);
         } catch (Throwable failure) {
             Logger.printException(() -> "Ad skip: play hook failed", failure);
@@ -103,6 +94,7 @@ public final class AdSkip {
     public static void onBind(Object videoItemParams) {
         try {
             if (!active() || !Settings.AD_SKIP_PRESCAN.get() || !shouldScan()) return;
+            if (Settings.AD_SKIP_SAVE_TRAFFIC.get() && Utils.getNetworkType() != Utils.NetworkType.OTHER) return;
             Object aweme = Reflect.property(videoItemParams, "getAweme", "aweme");
             if (aweme != null) AdScanner.request(aweme, false);
         } catch (Throwable failure) {
@@ -117,6 +109,10 @@ public final class AdSkip {
         playingAid = aid;
         positionMs = position;
         durationMs = duration;
+        if (paused) {
+            holdFeed();
+            return;
+        }
         if (!active()) return;
         try {
             tick(aid, position, duration);
@@ -128,14 +124,19 @@ public final class AdSkip {
     // endregion
 
     private static boolean shouldScan() {
-        if (AdSegmentStore.index().isEmpty()) return false;
-        if (!Settings.AD_SKIP_MOBILE_DATA.get() && Utils.getNetworkType() == Utils.NetworkType.MOBILE) return false;
-        return true;
+        return !AdSegmentStore.index().isEmpty() && mayDownload();
+    }
+
+    /** Whether the network in use allows a scan's download now; asked again when a queued scan starts. */
+    static boolean mayDownload() {
+        return Settings.AD_SKIP_MOBILE_DATA.get() || Utils.getNetworkType() != Utils.NetworkType.MOBILE;
     }
 
     private static synchronized void tick(String aid, long position, long duration) {
         long now = android.os.SystemClock.uptimeMillis();
         if (!aid.equals(sessionAid)) {
+            // The notice belongs to the video before: its Watch it must not seek this one.
+            if (sessionAid != null) Utils.runOnMainThread(AdSkipToast::dismiss);
             sessionAid = aid;
             skipped.clear();
             allowed.clear();
@@ -146,16 +147,14 @@ public final class AdSkip {
             advancedAway = false;
             askedThisPlay = false;
         }
-        if (!askedThisPlay) {
+        if (!askedThisPlay && position >= (Settings.AD_SKIP_SAVE_TRAFFIC.get() ? ON_SCREEN_MS : 0)) {
             askedThisPlay = true;
             Object aweme = playingAweme.get();
             if (aweme != null && aid.equals(Reflect.string(aweme, "getAid", "aid")) && shouldScan()) {
                 AdScanner.request(aweme, true);
             }
         }
-        // After a seek the player keeps reporting the old position for a moment. Until it
-        // reports the new one, or a while has passed, nothing else happens: reading those
-        // late ticks as a rewind used to clear the skips and seek again, over and over.
+        // Ignore stale progress ticks while a programmatic seek is settling.
         if (seekTarget >= 0) {
             boolean landed = Math.abs(position - seekTarget) < 1500;
             if (!landed && now - seekAt < SEEK_SETTLE_MS) return;
@@ -163,10 +162,14 @@ public final class AdSkip {
             lastTick = position;
             return;
         }
-        // Played round to the start again, or the reader dragged back before an ad: it may
-        // be skipped again. Only a real jump back counts, never a tick right after a seek.
+        // Reset skipped segments on user rewind or video loop.
         if (lastTick >= 0 && position + 3000 < lastTick && now - seekAt > SEEK_SETTLE_MS) {
-            skipped.removeIf(start -> position < start - 500);
+            for (java.util.Iterator<Long> it = skipped.iterator(); it.hasNext(); ) {
+                if (position < it.next() + 500) it.remove();
+            }
+            if (position < LOOP_START_MS && lastTick > duration - LOOP_END_MS) {
+                seeksThisPlay = 0;
+            }
         }
         lastTick = position;
         if (seeksThisPlay >= MAX_SEEKS_PER_PLAY) return;
@@ -211,8 +214,7 @@ public final class AdSkip {
     }
 
     private static void seekPast(String aid, AdMatcher.Match match, long target, long duration) {
-        // Never onto the very end: landing there finishes the video inside TikTok's engine while
-        // its own completion is still running, which is what took the app down.
+        // Keep END_GUARD_MS before the end of the track to avoid overlapping player completion.
         long landing = Math.min(target, duration - END_GUARD_MS);
         if (landing <= positionMs + 500) {
             AdSkipLog.add(aid, "ad runs to the end, nothing to seek past");
@@ -242,6 +244,8 @@ public final class AdSkip {
         AdSegmentStore.recordSkip(match.segment, savedMs);
         AdSkipLog.add(aid, "skipped " + match.segment.name + ", saved " + savedMs + "ms");
         notice(match.segment.name, match.segment.sharedServerId, () -> {
+            // Only the video the ad was skipped in: after a swipe the notice is stale.
+            if (!aid.equals(playingAid)) return;
             long back = Math.max(0, match.startMs);
             synchronized (AdSkip.class) {
                 allowed.add(match.startMs);
@@ -358,6 +362,18 @@ public final class AdSkip {
     }
 
     /** Whether TikTok's own player is playing; the editor pauses it while it plays its copy. */
+    private static long lastHold;
+
+    /** Re-pauses the background feed player if TikTok resumes it while the editor is open. */
+    private static void holdFeed() {
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - lastHold < 500) return;
+        lastHold = now;
+        Utils.runOnMainThread(() -> {
+            if (paused) setFeedPlaying(false);
+        });
+    }
+
     static void setFeedPlaying(boolean play) {
         try {
             app.morphe.extension.tiktok.wellbeing.SessionPlaybackHold.setCurrentPlaying(play);
